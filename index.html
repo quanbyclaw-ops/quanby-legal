@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quanby Legal - Electronic Notarization Platform</title>
+    <meta name="description" content="Philippines first Supreme Court-accredited electronic notarization platform. AI-powered contract analysis compliant with A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and SEC MC 28-2020.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://legal.quanbyai.com/">
+    <meta property="og:title" content="Quanby Legal - Electronic Notarization Platform">
+    <meta property="og:description" content="Philippines first Supreme Court-accredited ENF. AI-powered e-notarization compliant with Philippine law.">
+    <meta property="og:url" content="https://legal.quanbyai.com/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22>&#x2696;&#xFE0F;</text></svg>">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         :root {
             --bg-color: #05060f;
@@ -610,6 +620,17 @@
         .text-purple { color: var(--purple-light); }
         .font-mono { font-family: 'Courier New', monospace; }
 
+        
+        /* Hamburger */
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; background: none; border: none; }
+        .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s; }
+        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+        .mobile-menu { display: none; position: fixed; top: 61px; left: 0; right: 0; background: rgba(5,6,15,0.98); border-bottom: 1px solid var(--card-border); padding: 1rem 1.5rem; flex-direction: column; gap: 0.75rem; z-index: 98; }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a { font-size: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--card-border); color: var(--text); }
+        .mobile-menu .btn { width: 100%; text-align: center; margin-top: 0.5rem; }
         @media (max-width: 768px) {
             h1 { font-size: 2rem; }
             h2 { font-size: 1.5rem; }
@@ -617,8 +638,10 @@
             .steps { flex-direction: column; align-items: center; }
             .connecting-line { display: none; }
             .nav-links { display: none; }
-            /* Nav: hide compliance btn on mobile to prevent overflow */
+            .hamburger { display: flex; }
+            /* Nav: hide both CTA buttons on mobile */
             .nav-right .btn-filled { display: none; }
+            .nav-right .btn-outline { display: none; }
             /* Badge: allow wrapping on mobile */
             .badge { font-size: 0.75rem; white-space: normal; text-align: center; }
             /* Hero: reduce padding */
@@ -650,12 +673,22 @@
                 <a href="#pricing">Pricing</a>
                 <a href="#about">About</a>
             </div>
+            <button class="hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
             <div class="nav-right">
                 <button class="btn btn-outline btn-sm" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})">Try Contract AI</button>
                 <button class="btn btn-filled btn-sm" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">View Compliance →</button>
             </div>
         </div>
     </nav>
+    <div class="mobile-menu" id="mobile-menu" role="navigation" aria-label="Mobile navigation">
+        <a href="#features" onclick="closeMobileMenu()">Features</a>
+        <a href="#contract-agent" onclick="closeMobileMenu()">Contract AI</a>
+        <a href="#compliance" onclick="closeMobileMenu()">Compliance</a>
+        <a href="#regulatory" onclick="closeMobileMenu()">Regulatory</a>
+        <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
+        <a href="#about" onclick="closeMobileMenu()">About</a>
+        <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'}); closeMobileMenu()">Try Contract AI</button>
+    </div>
 
     <!-- HERO -->
     <section id="hero">
@@ -1123,7 +1156,7 @@
                     </div>
                     <div class="card" style="padding: 1.5rem;">
                         <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">Corporate Governance</div>
-                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Quanby Solutions, Inc. (SEC Registration No. CS202300000) is duly registered with the Philippine SEC. We submit required annual reports and maintain corporate governance standards per the Revised Corporation Code (RA 11232).</p>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Quanby Solutions, Inc. is duly registered with the Philippine SEC. We submit required annual reports and maintain corporate governance standards per the Revised Corporation Code (RA 11232).</p>
                     </div>
                 </div>
             </div>
@@ -1362,6 +1395,10 @@
     }
 
     async function uploadAndAnalyze(file) {
+        const allowed = [".pdf",".docx",".txt"];
+        const ext = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
+        if (!allowed.includes(ext)) { showError("Invalid file type. Upload PDF, DOCX, or TXT only."); return; }
+        if (file.size > 20971520) { showError("File too large. Max 20MB."); return; }
         // Show loading
         uploadArea.style.display = 'none';
         document.getElementById('analysis-results').style.display = 'none';
@@ -1371,9 +1408,13 @@
         formData.append('file', file);
         formData.append('session_id', SESSION_ID);
 
+        const abortAnalyze = new AbortController();
+        setTimeout(() => abortAnalyze.abort(), 30000);
+        const ctrl1 = new AbortController(); setTimeout(() => ctrl1.abort(), 30000);
         try {
             const res = await fetch(`${API_BASE}/analyze`, {
                 method: 'POST',
+                signal: abortAnalyze.signal,
                 body: formData
             });
             const data = await res.json();
@@ -1599,6 +1640,9 @@
 
         const typingEl = appendChatMsg('Thinking...', 'ai');
 
+        const abortChat = new AbortController();
+        setTimeout(() => abortChat.abort(), 20000);
+        const ctrl2 = new AbortController(); setTimeout(() => ctrl2.abort(), 20000);
         try {
             const res = await fetch(`${API_BASE}/chat`, {
                 method: 'POST',
@@ -1790,6 +1834,9 @@
         const t = TEMPLATES.find(t => t.id === selectedTemplate);
         document.getElementById('generated-title').textContent = `${t.icon} ${t.name}`;
 
+        const abortGen = new AbortController();
+        setTimeout(() => abortGen.abort(), 60000);
+        const ctrl3 = new AbortController(); setTimeout(() => ctrl3.abort(), 60000);
         try {
             const res = await fetch(`${API_BASE}/generate`, {
                 method: 'POST',
@@ -1895,9 +1942,59 @@
 
     // ─── INIT ───────────────────────────────────────────────────────────────────
     initTemplates();
-    </script>
+    
+    // --- MOBILE MENU ---
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        const btn = document.getElementById('hamburger-btn');
+        const isOpen = menu.classList.toggle('open');
+        btn.classList.toggle('open', isOpen);
+        btn.setAttribute('aria-expanded', String(isOpen));
+    }
+    function closeMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        const btn = document.getElementById('hamburger-btn');
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+    }
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('mobile-menu');
+        const btn = document.getElementById('hamburger-btn');
+        if (menu && btn && menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+            closeMobileMenu();
+        }
+    });
+
+    // Mobile menu
+    function toggleMobileMenu() {
+        const m = document.getElementById('mobile-menu');
+        const b = document.getElementById('hamburger-btn');
+        const open = m.classList.toggle('open');
+        b.classList.toggle('open', open);
+        b.setAttribute('aria-expanded', String(open));
+        b.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+    }
+    function closeMobileMenu() {
+        const m = document.getElementById('mobile-menu');
+        const b = document.getElementById('hamburger-btn');
+        m.classList.remove('open');
+        b.classList.remove('open');
+        b.setAttribute('aria-expanded', 'false');
+        b.setAttribute('aria-label', 'Open navigation menu');
+    }
+    document.addEventListener('click', function(e) {
+        const m = document.getElementById('mobile-menu');
+        const b = document.getElementById('hamburger-btn');
+        if (m && b && m.classList.contains('open') && !m.contains(e.target) && !b.contains(e.target)) closeMobileMenu();
+    });
+</script>
 </body>
 </html>
+
+
+
+
 
 
 
