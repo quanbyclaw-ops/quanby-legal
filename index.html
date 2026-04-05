@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -637,7 +637,7 @@
             </div>
             <div class="nav-right">
                 <button class="btn btn-outline btn-sm" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})">Try Contract AI</button>
-                <button class="btn btn-filled btn-sm">Book a demo</button>
+                <button class="btn btn-filled btn-sm">View Compliance →" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})</button>
             </div>
         </div>
     </nav>
@@ -651,12 +651,19 @@
         </div>
         <div class="container hero-content">
             <div class="hero-text">
-                <div class="badge">⚖️ Supreme Court-accredited electronic notarization — A.M. No. 24-10-14-SC</div>
+                <div class="badge">⚖️ Supreme Court-accredited — A.M. No. 24-10-14-SC | RA 8792 | RA 10173 | BSP Circular 944 | SEC MC 28-2020</div>
                 <h1><span class="gradient-text">AI-Powered Legal</span><br>Platform for the Philippines</h1>
-                <p class="hero-subtitle">Analyze contracts, generate legally compliant documents, and get instant notarization — powered by AI and backed by the Philippine Supreme Court.</p>
+                <p class="hero-subtitle">Analyze contracts, generate legally compliant documents, and get instant notarization — powered by AI and fully compliant with Philippine law — A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and SEC MC 28-2020.</p>
+                <div style="display:flex; flex-wrap:wrap; gap:0.6rem; margin-bottom:1.25rem;">
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">⚖️ A.M. No. 24-10-14-SC</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">📜 RA 8792 E-Commerce</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">🔒 RA 10173 Data Privacy</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">🏦 BSP Circular 944</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">📋 SEC MC 28-2020</span>
+                </div>
                 <div class="hero-buttons">
                     <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})">🤖 Try Contract AI Agent →</button>
-                    <button class="btn btn-outline">Book a demo</button>
+                    <button class="btn btn-outline">View Compliance →" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})</button>
                 </div>
             </div>
             <div class="orbital">
@@ -918,38 +925,88 @@
     <!-- COMPLIANCE -->
     <section id="compliance">
         <div class="container">
-            <h2>Legally Compliant & Certified</h2>
-            <p class="section-subtitle">Built to meet Philippine regulatory requirements and international data standards</p>
+            <h2>Legally Compliant &amp; Certified</h2>
+            <p class="section-subtitle">Built from the ground up to satisfy Philippine regulatory requirements — Supreme Court, DICT, NPC, BSP, and SEC.</p>
+
+            <!-- Compliance trust bar -->
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:0.75rem; margin-bottom:2.5rem;">
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">⚖️</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">A.M. No. 24-10-14-SC</div>
+                    <div style="font-size:0.65rem;color:#64748b;">Supreme Court</div>
+                </div>
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">📜</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">RA 8792</div>
+                    <div style="font-size:0.65rem;color:#64748b;">E-Commerce Act</div>
+                </div>
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">🔒</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">RA 10173</div>
+                    <div style="font-size:0.65rem;color:#64748b;">Data Privacy Act</div>
+                </div>
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">🏦</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">BSP Circular 944</div>
+                    <div style="font-size:0.65rem;color:#64748b;">eKYC Standards</div>
+                </div>
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">📋</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">SEC MC 28-2020</div>
+                    <div style="font-size:0.65rem;color:#64748b;">Remote Notarization</div>
+                </div>
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">🛡️</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">DICT PNPKI</div>
+                    <div style="font-size:0.65rem;color:#64748b;">Gov. Identity Verified</div>
+                </div>
+            </div>
+
             <div class="compliance-grid">
                 <div class="compliance-card card">
                     <div class="icon-circle">⚖️</div>
-                    <div class="card-title">Supreme Court-Compliant</div>
-                    <p class="card-desc">A.M. No. 24-10-14-SC compliant — first and only accredited ENF in the Philippines</p>
-                    <a href="https://sc.judiciary.gov.ph/enotary-services/enotarization-rules/" style="color:var(--purple-light);font-size:0.875rem">Learn more →</a>
+                    <div class="card-title">Supreme Court-Accredited ENF</div>
+                    <p class="card-desc">First and only accredited Electronic Notarization Facility (ENF) in the Philippines under A.M. No. 24-10-14-SC. Supports both In-Person (IEN) and Remote (REN) notarization nationwide.</p>
+                    <a href="https://sc.judiciary.gov.ph/enotary-services/enotarization-rules/" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">sc.judiciary.gov.ph →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">🔑</div>
+                    <div class="icon-circle">🏛️</div>
                     <div class="card-title">DICT National PKI Verified</div>
-                    <p class="card-desc">Official Philippine government digital identity verification</p>
-                    <a href="https://dict.gov.ph/pnpki" style="color:var(--purple-light);font-size:0.875rem">Learn more →</a>
+                    <p class="card-desc">All ENPs are verified through the Philippine National PKI (RA 8792). Digital signatures carry full legal weight under the E-Commerce Act of 2000 and its IRR.</p>
+                    <a href="https://dict.gov.ph/pnpki" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">DICT PNPKI →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">🏢</div>
-                    <div class="card-title">PropTech Consortium Endorsed</div>
-                    <p class="card-desc">Strategic industry alignment for real estate transactions</p>
-                    <a href="https://facebook.com/PropTechConsortiumPH" style="color:var(--purple-light);font-size:0.875rem">Learn more →</a>
+                    <div class="icon-circle">🔒</div>
+                    <div class="card-title">NPC-Registered Data Controller</div>
+                    <p class="card-desc">Registered Personal Information Controller (PIC) with the National Privacy Commission under RA 10173. AES-256 encryption, TLS 1.3, and a dedicated Data Protection Officer (DPO).</p>
+                    <a href="https://privacy.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">privacy.gov.ph →</a>
+                </div>
+                <div class="compliance-card card">
+                    <div class="icon-circle">🏦</div>
+                    <div class="card-title">BSP-Aligned eKYC</div>
+                    <p class="card-desc">Identity verification aligns with BSP Circular 944 (eKYC) and Circular 1108 (digital onboarding), making Quanby Legal documents accepted by BSP-supervised banks and EMIs.</p>
+                    <a href="https://bsp.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">bsp.gov.ph →</a>
+                </div>
+                <div class="compliance-card card">
+                    <div class="icon-circle">📋</div>
+                    <div class="card-title">SEC &amp; Corporate Filing Ready</div>
+                    <p class="card-desc">E-notarized documents are accepted for SEC submissions under MC 28-2020 and MC 6-2021, covering GIS, AFS, and mandatory corporate filings under RA 11232.</p>
+                    <a href="https://sec.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">sec.gov.ph →</a>
                 </div>
                 <div class="compliance-card card">
                     <div class="icon-circle">⛓️</div>
-                    <div class="card-title">DOCONCHAIN & Hyperledger</div>
-                    <p class="card-desc">Enterprise blockchain-backed immutable document trail</p>
-                    <a href="https://doconchain.com" style="color:var(--purple-light);font-size:0.875rem">Learn more →</a>
+                    <div class="card-title">DOCONCHAIN &amp; Hyperledger</div>
+                    <p class="card-desc">Enterprise blockchain-backed immutable document trail via DOCONCHAIN / Hyperledger. Every notarized document is cryptographically anchored for tamper-proof verification.</p>
+                    <a href="https://doconchain.com" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">doconchain.com →</a>
                 </div>
+            </div>
+
+            <div style="text-align:center; margin-top:2rem;">
+                <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">📖 View Full Regulatory Disclosure →</button>
             </div>
         </div>
     </section>
-
-    <!-- REGULATORY COMPLIANCE DISCLOSURE -->
+<!-- REGULATORY COMPLIANCE DISCLOSURE -->
     <section id="regulatory" style="background: rgba(124,58,237,0.04); border-top: 1px solid rgba(255,255,255,0.07); border-bottom: 1px solid rgba(255,255,255,0.07);">
         <div class="container">
             <div style="text-align:center; margin-bottom: 1rem;">
@@ -1826,3 +1883,6 @@
     </script>
 </body>
 </html>
+
+
+
