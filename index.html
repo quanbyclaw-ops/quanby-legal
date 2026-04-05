@@ -611,12 +611,27 @@
         .font-mono { font-family: 'Courier New', monospace; }
 
         @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            h2 { font-size: 1.75rem; }
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
             .hero-content { flex-direction: column; }
             .steps { flex-direction: column; align-items: center; }
             .connecting-line { display: none; }
             .nav-links { display: none; }
+            /* Nav: hide compliance btn on mobile to prevent overflow */
+            .nav-right .btn-filled { display: none; }
+            /* Badge: allow wrapping on mobile */
+            .badge { font-size: 0.75rem; white-space: normal; text-align: center; }
+            /* Hero: reduce padding */
+            #hero { padding: 3rem 0; }
+            /* Compliance pills: wrap nicely */
+            .hero-text > div[style*="flex-wrap"] { gap: 0.4rem; }
+            /* Hero buttons: stack vertically */
+            .hero-buttons { flex-direction: column; align-items: flex-start; }
+            .hero-buttons .btn { width: 100%; text-align: center; }
+            /* Compliance grid: single column */
+            .compliance-grid { grid-template-columns: 1fr; }
+            /* Trust bar: 2 per row */
+            #compliance > .container > div[style*="justify-content:center"] > div { min-width: calc(50% - 0.75rem); flex: 1 1 calc(50% - 0.75rem); }
         }
     </style>
 </head>
@@ -637,7 +652,7 @@
             </div>
             <div class="nav-right">
                 <button class="btn btn-outline btn-sm" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})">Try Contract AI</button>
-                <button class="btn btn-filled btn-sm">View Compliance →" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})</button>
+                <button class="btn btn-filled btn-sm" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">View Compliance →</button>
             </div>
         </div>
     </nav>
@@ -663,7 +678,7 @@
                 </div>
                 <div class="hero-buttons">
                     <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})">🤖 Try Contract AI Agent →</button>
-                    <button class="btn btn-outline">View Compliance →" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})</button>
+                    <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">View Compliance →</button>
                 </div>
             </div>
             <div class="orbital">
@@ -1883,6 +1898,9 @@
     </script>
 </body>
 </html>
+
+
+
 
 
 
