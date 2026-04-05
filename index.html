@@ -83,6 +83,99 @@
         .btn-teal:hover { opacity: 0.9; }
         .btn-sm { padding: 0.375rem 0.875rem; font-size: 0.875rem; }
 
+        /* ── ONBOARDING CTA STRIP ── */
+        .onboard-strip {
+            background: linear-gradient(90deg, rgba(124,58,237,0.15) 0%, rgba(236,72,153,0.1) 100%);
+            border-bottom: 1px solid rgba(124,58,237,0.25);
+            padding: 0.75rem 0;
+        }
+        .onboard-strip .container { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        .onboard-label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
+        .btn-lawfirm {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white; border: none;
+            padding: 0.6rem 1.5rem; border-radius: 0.5rem;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            display: flex; align-items: center; gap: 0.5rem;
+            transition: all 0.2s; box-shadow: 0 2px 12px rgba(124,58,237,0.35);
+            white-space: nowrap;
+        }
+        .btn-lawfirm:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,58,237,0.5); }
+        .btn-publicclient {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white; border: none;
+            padding: 0.6rem 1.5rem; border-radius: 0.5rem;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            display: flex; align-items: center; gap: 0.5rem;
+            transition: all 0.2s; box-shadow: 0 2px 12px rgba(16,185,129,0.35);
+            white-space: nowrap;
+        }
+        .btn-publicclient:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(16,185,129,0.5); }
+        .onboard-divider { color: var(--muted); font-size: 0.8rem; }
+
+        /* ── SSO MODAL ── */
+        .sso-modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75); z-index: 1000;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .sso-modal-overlay.open { display: flex; }
+        .sso-modal {
+            background: #0f0e1a; border: 1px solid rgba(124,58,237,0.4);
+            border-radius: 1rem; padding: 2.5rem; max-width: 420px; width: 90%;
+            position: relative; animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        .sso-modal-close {
+            position: absolute; top: 1rem; right: 1rem;
+            background: none; border: none; color: var(--muted);
+            font-size: 1.25rem; cursor: pointer; line-height: 1;
+        }
+        .sso-modal-close:hover { color: var(--text); }
+        .sso-role-badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.25rem 0.875rem; border-radius: 9999px;
+            font-size: 0.78rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            margin-bottom: 1.25rem;
+        }
+        .sso-role-badge.attorney { background: rgba(124,58,237,0.2); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.4); }
+        .sso-role-badge.client   { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.35); }
+        .sso-modal h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .sso-modal p  { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.75rem; }
+        .sso-btn {
+            width: 100%; display: flex; align-items: center; gap: 0.875rem;
+            padding: 0.875rem 1.25rem; border-radius: 0.6rem;
+            font-size: 0.95rem; font-weight: 600; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.06);
+            color: var(--text); margin-bottom: 0.75rem;
+            transition: all 0.18s;
+        }
+        .sso-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); transform: translateX(2px); }
+        .sso-btn:last-child { margin-bottom: 0; }
+        .sso-btn-icon { width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+        .sso-divider { display: flex; align-items: center; gap: 0.75rem; margin: 1.25rem 0; }
+        .sso-divider hr { flex: 1; border: none; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sso-divider span { color: var(--muted); font-size: 0.78rem; white-space: nowrap; }
+        .sso-note { font-size: 0.75rem; color: var(--muted); text-align: center; margin-top: 1.25rem; line-height: 1.5; }
+        .sso-steps {
+            display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
+            counter-reset: step;
+        }
+        .sso-step {
+            flex: 1; text-align: center; font-size: 0.7rem; color: var(--muted);
+            display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+        }
+        .sso-step-num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4);
+            color: #c4b5fd; font-size: 0.7rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .sso-step-line { flex: 1; height: 1px; background: rgba(255,255,255,0.1); margin-top: 11px; }
+
         /* HERO */
         #hero {
             position: relative;
@@ -680,11 +773,75 @@
             </div>
             <button class="hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
             <div class="nav-right">
-                <button class="btn btn-outline btn-sm" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})">Try Contract AI</button>
-                <button class="btn btn-filled btn-sm" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">View Compliance →</button>
+                <button class="btn btn-outline btn-sm" onclick="openSSO('attorney')" style="border-color:#7c3aed;color:#c4b5fd;">🏛️ Law Firms</button>
+                <button class="btn btn-filled btn-sm" onclick="openSSO('client')" style="background:#10b981;">👤 Public Clients</button>
             </div>
         </div>
     </nav>
+    <!-- ══ ONBOARDING CTA STRIP ══ -->
+    <div class="onboard-strip" id="onboard-strip">
+        <div class="container">
+            <span class="onboard-label">⚖️ Supreme Court-accredited — Get certified today:</span>
+            <button class="btn-lawfirm" onclick="openSSO('attorney')" aria-label="Law Firms — Start ENP certification">
+                🏛️ Law Firms
+            </button>
+            <span class="onboard-divider">or</span>
+            <button class="btn-publicclient" onclick="openSSO('client')" aria-label="Public Clients — Create account">
+                👤 Public Clients
+            </button>
+        </div>
+    </div>
+
+    <!-- ══ SSO MODAL ══ -->
+    <div class="sso-modal-overlay" id="sso-modal" role="dialog" aria-modal="true" aria-label="Sign in to Quanby Legal">
+        <div class="sso-modal">
+            <button class="sso-modal-close" onclick="closeSSO()" aria-label="Close">&times;</button>
+
+            <div id="sso-role-badge" class="sso-role-badge attorney">⚖️ Law Firm / Attorney</div>
+
+            <h3 id="sso-title">Start Your ENP Certification</h3>
+            <p id="sso-desc">Sign in to begin your Electronic Notary Public certification — required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.</p>
+
+            <!-- Progress steps -->
+            <div class="sso-steps">
+                <div class="sso-step"><div class="sso-step-num" style="background:rgba(124,58,237,0.4);border-color:#7c3aed;color:white;">1</div><span>Sign In</span></div>
+                <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
+                <div class="sso-step"><div class="sso-step-num">2</div><span>Profile</span></div>
+                <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
+                <div class="sso-step"><div class="sso-step-num">3</div><span>15-Q Test</span></div>
+                <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
+                <div class="sso-step"><div class="sso-step-num">4</div><span>Liveness</span></div>
+                <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
+                <div class="sso-step"><div class="sso-step-num">5</div><span>Certificate</span></div>
+            </div>
+
+            <!-- SSO Buttons -->
+            <button class="sso-btn" id="sso-google-btn" onclick="ssoLogin('google')">
+                <div class="sso-btn-icon" style="background:#fff;">
+                    <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                </div>
+                Continue with Google
+            </button>
+            <button class="sso-btn" id="sso-facebook-btn" onclick="ssoLogin('facebook')">
+                <div class="sso-btn-icon" style="background:#1877F2;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </div>
+                Continue with Facebook
+            </button>
+            <button class="sso-btn" id="sso-linkedin-btn" onclick="ssoLogin('linkedin')">
+                <div class="sso-btn-icon" style="background:#0A66C2;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                </div>
+                Continue with LinkedIn
+            </button>
+
+            <div class="sso-note">
+                By continuing, you agree to Quanby Legal's Terms of Service and Privacy Policy.<br>
+                Your data is protected under RA 10173 (Data Privacy Act).
+            </div>
+        </div>
+    </div>
+
     <div class="mobile-menu" id="mobile-menu" role="navigation" aria-label="Mobile navigation">
         <a href="#features" onclick="closeMobileMenu()">Features</a>
         <a href="#contract-agent" onclick="closeMobileMenu()">Contract AI</a>
@@ -1943,6 +2100,148 @@
 
     function showError(msg) {
         alert('Error: ' + msg);
+    }
+
+    // ─── SSO / ONBOARDING ───────────────────────────────────────────────────────
+
+    let _ssoRole = 'attorney';
+    let _providerUrls = null;
+
+    async function _loadProviders() {
+        if (_providerUrls) return _providerUrls;
+        try {
+            const res = await fetch('/api/auth/providers');
+            const data = await res.json();
+            _providerUrls = data.providers || {};
+        } catch(e) {
+            _providerUrls = {};
+        }
+        return _providerUrls;
+    }
+
+    function openSSO(role) {
+        _ssoRole = role;
+        const modal = document.getElementById('sso-modal');
+        const badge = document.getElementById('sso-role-badge');
+        const title = document.getElementById('sso-title');
+        const desc  = document.getElementById('sso-desc');
+
+        if (role === 'attorney') {
+            badge.className = 'sso-role-badge attorney';
+            badge.textContent = '⚖️ Law Firm / Attorney';
+            title.textContent = 'Start Your ENP Certification';
+            desc.textContent = 'Sign in to begin your Electronic Notary Public (ENP) certification — required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.';
+        } else {
+            badge.className = 'sso-role-badge client';
+            badge.textContent = '👤 Public Client';
+            title.textContent = 'Create Your Client Account';
+            desc.textContent = 'Sign in to access e-notarization services, upload contracts for AI analysis, and connect with certified Electronic Notary Publics (ENPs).';
+        }
+
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        _loadProviders(); // pre-fetch
+    }
+
+    function closeSSO() {
+        document.getElementById('sso-modal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // Close modal on overlay click
+    document.getElementById('sso-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeSSO();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeSSO();
+    });
+
+    async function ssoLogin(provider) {
+        const btn = document.getElementById('sso-' + provider + '-btn');
+        const origText = btn.innerHTML;
+
+        // Show loading state
+        btn.innerHTML = btn.innerHTML.replace(/Continue with \w+/, 'Connecting...');
+        btn.disabled = true;
+
+        // Store role in sessionStorage so we can read it after OAuth redirect
+        sessionStorage.setItem('ql_pending_role', _ssoRole);
+
+        const providers = await _loadProviders();
+        const url = providers[provider];
+
+        if (!url) {
+            // OAuth not configured yet — show friendly message
+            btn.innerHTML = origText;
+            btn.disabled = false;
+            showSSOError(provider);
+            return;
+        }
+
+        // Redirect to OAuth provider — it will callback to /api/auth/callback/{provider}
+        // which issues JWT and redirects to /auth-complete?token=...&step=...
+        window.location.href = url + '&state=' + encodeURIComponent(_ssoRole);
+    }
+
+    function showSSOError(provider) {
+        const names = { google: 'Google', facebook: 'Facebook', linkedin: 'LinkedIn' };
+        const msg = document.createElement('div');
+        msg.style.cssText = 'background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;padding:0.75rem 1rem;border-radius:0.5rem;font-size:0.85rem;margin-top:0.75rem;';
+        msg.textContent = `${names[provider]} sign-in is being configured. Please check back shortly or contact legal@quanby.legal.`;
+        const modal = document.querySelector('.sso-modal');
+        const existing = modal.querySelector('.sso-error');
+        if (existing) existing.remove();
+        msg.className = 'sso-error';
+        modal.appendChild(msg);
+        setTimeout(() => msg.remove(), 5000);
+    }
+
+    // Handle return from OAuth (/auth-complete?token=...&step=...)
+    (function handleAuthReturn() {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const step  = params.get('step');
+        if (!token) return;
+
+        // Store token
+        localStorage.setItem('ql_token', token);
+
+        // Restore role if we had one pending
+        const role = sessionStorage.getItem('ql_pending_role') || 'attorney';
+        sessionStorage.removeItem('ql_pending_role');
+
+        // Clean URL
+        window.history.replaceState({}, '', '/');
+
+        // Route to correct onboarding step
+        routeToStep(step, role, token);
+    })();
+
+    function routeToStep(step, role, token) {
+        switch(step) {
+            case 'role_select': showOnboardingModal('role', role, token); break;
+            case 'profile':     showOnboardingModal('profile', role, token); break;
+            case 'test':        showOnboardingModal('test', role, token); break;
+            case 'liveness':    showOnboardingModal('liveness', role, token); break;
+            case 'survey':      showOnboardingModal('survey', role, token); break;
+            case 'certified':   showCertifiedModal(token); break;
+            default:            showOnboardingModal('role', role, token); break;
+        }
+    }
+
+    // ─── ONBOARDING MODAL ────────────────────────────────────────────────────────
+
+    function showOnboardingModal(step, role, token) {
+        // For now: redirect to /onboard page (your dev team builds the full UI there)
+        // This lets the site function end-to-end immediately
+        const params = new URLSearchParams({ step, role, token });
+        window.location.href = '/onboard?' + params.toString();
+    }
+
+    function showCertifiedModal(token) {
+        alert('🎉 You are fully certified! Check your email for your certificate.');
     }
 
     // ─── INIT ───────────────────────────────────────────────────────────────────
