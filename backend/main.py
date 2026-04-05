@@ -20,6 +20,7 @@ import time
 import uuid
 import stat
 import base64
+import threading
 from typing import Optional
 from fastapi import FastAPI, File, UploadFile, HTTPException, Form, Header, Request, Cookie, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -151,6 +152,11 @@ class RetakePaymentRequest(BaseModel):
     user_id: str
     payment_method: str  # "gcash" or "bank_transfer"
 
+
+
+class LegalChatRequest(BaseModel):
+    message: str
+    session_id: str = ""
 
 # ─── Auth helpers ─────────────────────────────────────────────────────────────
 
@@ -920,6 +926,321 @@ async def admin_confirm_retake(
         "retake_payment_confirmed": True,
     })
     return {"success": True, "message": f"Retake unlocked for user {user_id}"}
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LEGAL AI CHATBOT — POST /api/chatbot
+# ═══════════════════════════════════════════════════════════════════════════
+
+# Chat session store: { session_id: { history, created_at, last_active, msg_timestamps } }
+legal_chat_sessions: dict = {}
+_chat_lock = threading.Lock()
+
+_CHAT_SESSION_TTL  = 7200  # 2-hour idle TTL
+_CHAT_RATE_LIMIT   = 20    # max messages per session per hour
+_CHAT_RATE_WINDOW  = 3600  # 1-hour sliding window
+
+_LEGAL_CHATBOT_SYSTEM_PROMPT = """You are Quanby Legal AI — the official AI assistant for Quanby Legal, the Philippines' first and only Supreme Court-accredited Electronic Notarization Facility (ENF).
+
+## YOUR SPECIALIZATIONS
+
+### Philippine Electronic Notarization Framework
+- A.M. No. 24-10-14-SC (2024): Supreme Court Rules on Electronic Notarization. Authorizes accredited ENFs, defines Electronic Notary Publics (ENPs), sets technical/security standards.
+- RA 8792 (E-Commerce Act of 2000): Electronic documents and signatures carry the same legal force as physical ones.
+- RA 10173 (Data Privacy Act of 2012): Governs personal data collection/processing; mandates security measures and NPC breach reporting.
+- BSP Circular 944: BSP framework for virtual currencies and digital financial transactions.
+- SEC Memorandum Circular 28-2020: SEC rules for electronic corporate document submission and digital signatures.
+
+### Philippine Contract Law
+- Civil Code of the Philippines (RA 386): obligations and contracts
+- Notarization requirements for specific instruments
+- Electronic evidence admissibility in Philippine courts
+
+## PLATFORM INFORMATION
+
+### ENP Certification Process
+1. Register via Google/Facebook/LinkedIn SSO
+2. Select role: Attorney (IBP member) or Client
+3. Complete professional profile
+4. Pass certification exam: 15 questions, 80% passing score; covers A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, SEC MC 28-2020
+5. Liveness verification (webcam selfie)
+6. National ID upload
+7. Supreme Court accreditation submission
+Note: 3 free exam attempts; retakes cost PHP 500 each.
+
+### Documents Eligible for E-Notarization
+YES: Deeds of Sale, Contracts of Lease, Special Power of Attorney, Affidavits, Articles of Incorporation/Partnership, Employment Contracts, Loan Agreements, MOA/MOU, Joint Venture Agreements
+NOT eligible: Wills, testaments, documents requiring exclusive physical appearance
+
+### Pricing
+- Certification exam: FREE (3 attempts)
+- Retake fee: PHP 500 per attempt after 3rd
+- Document notarization: varies by ENP and document type (SC fee schedules)
+- Enterprise/law firm plans: contact Quanby Legal for quotation
+
+## RESPONSE GUIDELINES
+- Be professional, clear, and helpful
+- Cite specific laws/rules when relevant
+- Always include: "This is general information only — not legal advice. For your specific situation, consult a licensed Philippine attorney or one of our certified ENPs."
+- Support both English and Filipino (Tagalog)
+- Keep responses concise and focused
+- Never fabricate legal provisions or case citations
+"""
+
+
+def _clean_legal_chat_sessions() -> None:
+    """Remove sessions idle longer than TTL."""
+    now = time.time()
+    with _chat_lock:
+        expired = [
+            sid for sid, s in legal_chat_sessions.items()
+            if now - s.get("last_active", 0) > _CHAT_SESSION_TTL
+        ]
+        for sid in expired:
+            del legal_chat_sessions[sid]
+
+
+def _chatbot_keyword_fallback(message: str) -> str:
+    """Keyword-based responses when no AI API key is configured."""
+    msg = message.lower()
+
+    if any(k in msg for k in ["hello", "hi ", "hi!", "kumusta", "kamusta", "magandang", "good morning", "good afternoon", "good evening"]):
+        return (
+            "Hello! \U0001f44b Welcome to **Quanby Legal AI**.\n\n"
+            "I can help you with:\n"
+            "\u2022 \U0001f3db\ufe0f Philippine electronic notarization (A.M. No. 24-10-14-SC)\n"
+            "\u2022 \U0001f4dc ENP certification process and requirements\n"
+            "\u2022 \U0001f4c4 Documents eligible for e-notarization\n"
+            "\u2022 \u2696\ufe0f Philippine legal framework (RA 8792, RA 10173, BSP Circular 944)\n"
+            "\u2022 \U0001f4b0 Platform pricing and services\n\n"
+            "What can I help you with today?"
+        )
+
+    if any(k in msg for k in ["become", "enp", "certif", "how do i", "how to become", "process", "steps", "register"]):
+        return (
+            "**How to Become a Certified ENP on Quanby Legal**\n\n"
+            "1. **Register** \u2014 Sign up via Google, Facebook, or LinkedIn\n"
+            "2. **Select Role** \u2014 Choose *Attorney* (IBP member) or *Client*\n"
+            "3. **Complete Profile** \u2014 Fill in your professional details\n"
+            "4. **Pass the Certification Exam** \u2014 15 questions, 80% passing score\n"
+            "   Topics: A.M. No. 24-10-14-SC \u00b7 RA 8792 \u00b7 RA 10173 \u00b7 BSP Circular 944 \u00b7 SEC MC 28-2020\n"
+            "5. **Liveness Check** \u2014 Upload a webcam selfie\n"
+            "6. **Upload National ID** \u2014 Government-issued ID required\n"
+            "7. **SC Submission** \u2014 Your application is forwarded to the Supreme Court\n\n"
+            "\U0001f4cb You get **3 free exam attempts**. Retakes cost \u20b1500 each.\n\n"
+            "\u26a0\ufe0f *General information only \u2014 not legal advice. Consult a licensed Philippine attorney for specific guidance.*"
+        )
+
+    if any(k in msg for k in ["document", "what can", "eligible", "notariz", "which doc", "ano"]):
+        return (
+            "**Documents Eligible for E-Notarization** (A.M. No. 24-10-14-SC)\n\n"
+            "\u2705 Deeds of Absolute Sale\n"
+            "\u2705 Contracts of Lease\n"
+            "\u2705 Special Power of Attorney\n"
+            "\u2705 Affidavits and sworn statements\n"
+            "\u2705 Articles of Incorporation / Partnership\n"
+            "\u2705 Employment contracts requiring notarization\n"
+            "\u2705 Loan agreements\n"
+            "\u2705 Memoranda of Agreement / Understanding\n"
+            "\u2705 Joint Venture Agreements\n\n"
+            "\u274c **Not eligible**: Wills, testaments, documents requiring exclusively physical notarization\n\n"
+            "\u26a0\ufe0f *General information only \u2014 consult a licensed Philippine attorney for specific guidance.*"
+        )
+
+    if any(k in msg for k in ["a.m. no", "am no", "24-10-14", "supreme court rules", "sc rules", "electronic notariz"]):
+        return (
+            "**A.M. No. 24-10-14-SC \u2014 Rules on Electronic Notarization (2024)**\n\n"
+            "Issued by the Supreme Court of the Philippines, this landmark rule:\n\n"
+            "\u2022 Authorizes **Electronic Notarization Facilities (ENFs)** accredited by the SC\n"
+            "\u2022 Defines **Electronic Notary Publics (ENPs)** \u2014 attorneys certified for digital notarial acts\n"
+            "\u2022 Sets technical security standards: electronic signatures, digital certificates, identity verification\n"
+            "\u2022 Requires tamper-proof audit trails and document integrity verification\n"
+            "\u2022 Electronic notarial acts carry the **same legal force** as traditional notarization\n\n"
+            "\U0001f3db\ufe0f **Quanby Legal** is the Philippines' **first and only** SC-accredited ENF under these rules.\n\n"
+            "\u26a0\ufe0f *General information only \u2014 not legal advice. Consult a licensed Philippine attorney for specific guidance.*"
+        )
+
+    if any(k in msg for k in ["ra 8792", "8792", "e-commerce act", "ecommerce", "electronic commerce"]):
+        return (
+            "**RA 8792 \u2014 Electronic Commerce Act of 2000**\n\n"
+            "This foundational law establishes:\n\n"
+            "\u2022 **Electronic documents** = legally equivalent to paper documents\n"
+            "\u2022 **Electronic signatures** = legally valid when properly authenticated\n"
+            "\u2022 **Electronic contracts** = enforceable under Philippine law\n"
+            "\u2022 Governs admissibility of electronic evidence in Philippine courts\n"
+            "\u2022 Sets standards for government and private sector digital transactions\n\n"
+            "**Relevance**: RA 8792 combined with A.M. No. 24-10-14-SC makes electronically notarized documents fully valid and enforceable.\n\n"
+            "\u26a0\ufe0f *General information only \u2014 not legal advice.*"
+        )
+
+    if any(k in msg for k in ["ra 10173", "10173", "data privacy", "privacy act", "personal data", "npc"]):
+        return (
+            "**RA 10173 \u2014 Data Privacy Act of 2012**\n\n"
+            "Key provisions:\n\n"
+            "\u2022 Personal data must be collected for **specific, legitimate purposes**\n"
+            "\u2022 Data subjects have rights to **access, correct, erase, and object** to processing\n"
+            "\u2022 Organizations must implement **technical and organizational security measures**\n"
+            "\u2022 Data breaches must be reported to the **National Privacy Commission (NPC)**\n"
+            "\u2022 Violations: fines up to \u20b15 million and/or imprisonment\n\n"
+            "**Relevance**: Quanby Legal processes personal data (IDs, biometrics, documents) in full compliance with RA 10173.\n\n"
+            "\u26a0\ufe0f *General information only \u2014 not legal advice.*"
+        )
+
+    if any(k in msg for k in ["price", "cost", "fee", "how much", "pricing", "magkano", "bayad", "libre"]):
+        return (
+            "**Quanby Legal Pricing**\n\n"
+            "\U0001f393 **ENP Certification**\n"
+            "\u2022 Certification exam: **FREE** (3 attempts included)\n"
+            "\u2022 Retake fee: **\u20b1500** per attempt (after 3rd)\n\n"
+            "\U0001f4c4 **Document Notarization**\n"
+            "\u2022 Fees vary by document type and ENP\n"
+            "\u2022 Governed by Supreme Court fee schedules\n"
+            "\u2022 Generally lower than traditional notarization\n\n"
+            "\U0001f3e2 **Enterprise / Law Firm Plans**\n"
+            "\u2022 Custom pricing for bulk notarization volume\n"
+            "\u2022 Contact our team for a quotation\n\n"
+            "\u26a0\ufe0f *For current exact pricing, contact Quanby Legal directly. General information only.*"
+        )
+
+    if any(k in msg for k in ["legally binding", "legally valid", "legal binding", "valid", "enforceable", "ligal", "totoo", "court"]):
+        return (
+            "**Is E-Notarization Legally Binding in the Philippines?**\n\n"
+            "**Yes \u2014 absolutely.**\n\n"
+            "\u2705 **A.M. No. 24-10-14-SC** \u2014 Supreme Court explicitly authorizes electronic notarization\n"
+            "\u2705 **RA 8792** \u2014 Electronic signatures and documents equal physical ones in legal force\n"
+            "\u2705 **Court Acceptance** \u2014 Philippine courts accept electronically notarized documents\n"
+            "\u2705 **Audit Trail** \u2014 Tamper-proof document integrity verification\n"
+            "\u2705 **Only Accredited Platform** \u2014 Quanby Legal is the sole SC-accredited ENF in the Philippines\n\n"
+            "\u26a0\ufe0f *This is general information. For specific legal questions, consult a licensed Philippine attorney or certified ENP.*"
+        )
+
+    if any(k in msg for k in ["bsp", "circular 944", "bangko sentral", "bsp circular"]):
+        return (
+            "**BSP Circular 944 \u2014 Virtual Currency Framework**\n\n"
+            "Issued by Bangko Sentral ng Pilipinas, this circular:\n\n"
+            "\u2022 Establishes regulatory framework for virtual currency exchanges (VCEs)\n"
+            "\u2022 Sets AML/KYC requirements for digital financial platforms\n"
+            "\u2022 Governs electronic money and digital payment systems\n"
+            "\u2022 Relevant for contracts involving cryptocurrency and digital assets\n\n"
+            "**Relevance**: For contracts involving digital currencies or fintech transactions, BSP Circular 944 compliance is an important consideration alongside e-notarization.\n\n"
+            "\u26a0\ufe0f *General information only \u2014 not legal advice.*"
+        )
+
+    if any(k in msg for k in ["sec mc", "sec memorandum", "mc 28", "sec mc 28", "memorandum circular 28", "securities commission"]):
+        return (
+            "**SEC Memorandum Circular 28-2020**\n\n"
+            "The Securities and Exchange Commission issued MC 28-2020 to allow:\n\n"
+            "\u2022 Electronic submission of corporate documents to the SEC\n"
+            "\u2022 Digital signatures on SEC filings\n"
+            "\u2022 Online corporate registration and amendments\n"
+            "\u2022 Digital General Information Sheets (GIS) and financial statements\n\n"
+            "**Practical impact**: Combined with Quanby Legal e-notarization, the entire corporate document lifecycle can be fully paperless and legally valid.\n\n"
+            "\u26a0\ufe0f *General information only \u2014 not legal advice.*"
+        )
+
+    return (
+        "Thank you for your question! I can provide information about:\n\n"
+        "\u2022 **ENP Certification** \u2014 How to become a certified Electronic Notary Public\n"
+        "\u2022 **E-Notarization** \u2014 Documents eligible, legal validity, process\n"
+        "\u2022 **A.M. No. 24-10-14-SC** \u2014 Supreme Court rules on electronic notarization\n"
+        "\u2022 **RA 8792, RA 10173, BSP Circular 944, SEC MC 28-2020** \u2014 Applicable laws\n"
+        "\u2022 **Pricing** \u2014 Certification and notarization fees\n\n"
+        "Please try rephrasing your question, or contact Quanby Legal directly for personalized assistance.\n\n"
+        "\u26a0\ufe0f *Quanby Legal AI provides general information only \u2014 not legal advice. Consult a licensed Philippine attorney for specific guidance.*"
+    )
+
+
+@app.post("/api/chatbot")
+async def chatbot_endpoint(request: LegalChatRequest):
+    """
+    Quanby Legal AI Chatbot \u2014 public endpoint for Philippine legal and platform queries.
+    - Uses xAI Grok (XAI_API_KEY) or OpenAI (OPENAI_API_KEY) when configured
+    - Falls back to keyword-based responses when no AI key is set
+    - Rate limit: 20 messages per session per hour
+    - Session history maintained in-memory with 2-hour idle TTL
+    """
+    # Periodic cleanup (non-blocking background thread)
+    if int(time.time()) % 60 < 2:
+        threading.Thread(target=_clean_legal_chat_sessions, daemon=True).start()
+
+    message = (request.message or "").strip()
+    if not message:
+        raise HTTPException(400, "Message cannot be empty")
+    if len(message) > 2000:
+        raise HTTPException(400, "Message too long. Maximum 2000 characters.")
+
+    session_id = (request.session_id or "").strip() or str(uuid.uuid4())
+    now = time.time()
+
+    with _chat_lock:
+        if session_id not in legal_chat_sessions:
+            legal_chat_sessions[session_id] = {
+                "history": [],
+                "created_at": now,
+                "last_active": now,
+                "msg_timestamps": [],
+            }
+
+        session = legal_chat_sessions[session_id]
+
+        # Sliding-window rate limit
+        session["msg_timestamps"] = [
+            t for t in session["msg_timestamps"] if now - t < _CHAT_RATE_WINDOW
+        ]
+        if len(session["msg_timestamps"]) >= _CHAT_RATE_LIMIT:
+            raise HTTPException(
+                429,
+                "Rate limit reached: 20 messages per hour per session. Please wait and try again.",
+            )
+
+        session["msg_timestamps"].append(now)
+        session["last_active"] = now
+        history_snapshot = list(session["history"])
+
+    # Generate response
+    xai_key = os.getenv("XAI_API_KEY")
+    oai_key = os.getenv("OPENAI_API_KEY")
+    reply: str
+
+    if xai_key or oai_key:
+        try:
+            from openai import OpenAI as _OpenAI
+            client = _OpenAI(
+                api_key=xai_key or oai_key,
+                base_url="https://api.x.ai/v1" if xai_key else None,
+            )
+            model = "grok-3-fast-beta" if xai_key else "gpt-4o-mini"
+
+            messages = [{"role": "system", "content": _LEGAL_CHATBOT_SYSTEM_PROMPT}]
+            messages.extend(history_snapshot[-20:])
+            messages.append({"role": "user", "content": message})
+
+            completion = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                max_tokens=800,
+                temperature=0.4,
+            )
+            reply = (completion.choices[0].message.content or "").strip()
+            if not reply:
+                reply = _chatbot_keyword_fallback(message)
+        except Exception as exc:
+            import sys
+            print(f"[chatbot] AI error: {exc}", file=sys.stderr)
+            reply = _chatbot_keyword_fallback(message)
+    else:
+        reply = _chatbot_keyword_fallback(message)
+
+    # Persist history (cap at 40 messages = 20 turns)
+    with _chat_lock:
+        if session_id in legal_chat_sessions:
+            hist = legal_chat_sessions[session_id]["history"]
+            hist.append({"role": "user",      "content": message})
+            hist.append({"role": "assistant", "content": reply})
+            if len(hist) > 40:
+                legal_chat_sessions[session_id]["history"] = hist[-40:]
+
+    return {"reply": reply, "session_id": session_id}
 
 
 if __name__ == "__main__":
