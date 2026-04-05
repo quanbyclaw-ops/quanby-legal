@@ -1,6 +1,11 @@
 """
 onboarding.py — User store, onboarding state, and certificate generation
-In-memory for now (swap for DB when dev team deploys their backend)
+
+Security fixes applied:
+  FIX-3  XSS: html.escape() on all user fields in HTML templates (_e helper)
+  FIX-4  Cert ID enumeration: O(1) CERT_INDEX lookup; no full iteration
+  FIX-5  Plaintext PII: Fernet-encrypted sensitive fields; os.chmod(600) on data files
+  FIX-8  Race conditions: asyncio.Lock for USERS and TEST_SESSIONS; atomic file writes
 """
 
 import os
@@ -8,68 +13,180 @@ import json
 import uuid
 import time
 import asyncio
-import html as _html  # Fix 7: for HTML escaping
+import stat
+import html as _html
+import threading
 from datetime import datetime, timezone
 from typing import Optional
 from pathlib import Path
 
-# Fix 7: HTML escape helper — wraps every user field inserted into HTML templates
+# FIX-5: Fernet encryption for PII fields at rest
+try:
+    from cryptography.fernet import Fernet
+    _fernet_key = os.getenv("DATA_ENCRYPTION_KEY", "")
+    if _fernet_key:
+        _fernet = Fernet(_fernet_key.encode() if isinstance(_fernet_key, str) else _fernet_key)
+    else:
+        _fernet = None
+except ImportError:
+    _fernet = None
+
+# Sensitive fields that are encrypted before writing to disk
+_SENSITIVE_FIELDS = {
+    "email", "first_name", "last_name", "picture",
+    "provider_id", "phone",
+}
+
+import logging
+logger = logging.getLogger(__name__)
+
+
+# ─── HTML-escape helper (FIX-3) ───────────────────────────────────────────────
+
 def _e(s) -> str:
     """HTML-escape a value to prevent XSS injection."""
     return _html.escape(str(s) if s else "")
 
 
-# ─── IN-MEMORY STORES (replace with DB calls) ─────────────────────────────────
+# ─── Encryption helpers (FIX-5) ───────────────────────────────────────────────
 
-# users: {user_id: {...}}
+def _encrypt_field(value: str) -> str:
+    """Encrypt a string field. Returns original if Fernet not configured."""
+    if _fernet is None or not value:
+        return value
+    return _fernet.encrypt(value.encode()).decode()
+
+
+def _decrypt_field(value: str) -> str:
+    """Decrypt a string field. Returns original if Fernet not configured."""
+    if _fernet is None or not value:
+        return value
+    try:
+        return _fernet.decrypt(value.encode()).decode()
+    except Exception:
+        # If decryption fails (e.g., unencrypted legacy data), return as-is
+        return value
+
+
+def _encrypt_user(user: dict) -> dict:
+    """Return a copy of the user dict with sensitive fields encrypted."""
+    encrypted = {}
+    for key, val in user.items():
+        if key in _SENSITIVE_FIELDS and isinstance(val, str):
+            encrypted[key] = _encrypt_field(val)
+        else:
+            encrypted[key] = val
+    return encrypted
+
+
+def _decrypt_user(user: dict) -> dict:
+    """Return a copy of the user dict with sensitive fields decrypted."""
+    decrypted = {}
+    for key, val in user.items():
+        if key in _SENSITIVE_FIELDS and isinstance(val, str):
+            decrypted[key] = _decrypt_field(val)
+        else:
+            decrypted[key] = val
+    return decrypted
+
+
+# ─── IN-MEMORY STORES ─────────────────────────────────────────────────────────
+
+# users: {user_id: {...}}  — held in-memory decrypted; encrypted when persisted
 USERS: dict[str, dict] = {}
 
-# sessions: {session_token: user_id}  (for active test sessions)
+# FIX-4: Certificate ID → user_id index for O(1) lookups
+CERT_INDEX: dict[str, str] = {}  # {certificate_id: user_id}
+
+# test sessions: {session_token: {...}}
 TEST_SESSIONS: dict[str, dict] = {}
 
 DATA_DIR = Path(__file__).parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
 USERS_FILE = DATA_DIR / "users.json"
 
-# Fix 8: asyncio lock for concurrent users.json writes
+# FIX-8: asyncio lock for USERS + file I/O, threading lock for TEST_SESSIONS
 _users_lock = asyncio.Lock()
+_sessions_lock = threading.Lock()  # TEST_SESSIONS accessed from sync context
 
 
-def _load_users():
-    global USERS
-    if USERS_FILE.exists():
+# ─── Persistence helpers ──────────────────────────────────────────────────────
+
+def _load_users() -> None:
+    global USERS, CERT_INDEX
+    if not USERS_FILE.exists():
+        return
+    try:
+        raw = json.loads(USERS_FILE.read_text(encoding="utf-8"))
+        # Decrypt each user after loading
+        USERS = {uid: _decrypt_user(u) for uid, u in raw.items()}
+        # Rebuild cert index
+        CERT_INDEX = {
+            u["certificate_id"]: uid
+            for uid, u in USERS.items()
+            if u.get("certificate_id")
+        }
+    except Exception as exc:
+        logger.error("Failed to load users from disk: %s", exc)
+        USERS = {}
+        CERT_INDEX = {}
+
+
+async def _save_users() -> None:
+    """
+    Atomically write USERS to disk with encryption.
+    Must be called within _users_lock.
+    FIX-5: encrypts sensitive fields; FIX-8: atomic write via temp file + rename.
+    """
+    # Encrypt before writing
+    encrypted_users = {uid: _encrypt_user(u) for uid, u in USERS.items()}
+    tmp_path = USERS_FILE.with_suffix(".tmp")
+    try:
+        tmp_path.write_text(
+            json.dumps(encrypted_users, indent=2, default=str),
+            encoding="utf-8",
+        )
+        # FIX-5: restrict file permissions to owner-only (600)
         try:
-            USERS = json.loads(USERS_FILE.read_text())
-        except Exception:
-            USERS = {}
+            os.chmod(tmp_path, stat.S_IRUSR | stat.S_IWUSR)
+        except OSError:
+            pass  # Windows may not support POSIX chmod — best-effort
+        # Atomic rename
+        tmp_path.replace(USERS_FILE)
+        # Apply permissions to final file too
+        try:
+            os.chmod(USERS_FILE, stat.S_IRUSR | stat.S_IWUSR)
+        except OSError:
+            pass
+    except Exception as exc:
+        logger.error("Failed to save users to disk: %s", exc)
+        if tmp_path.exists():
+            tmp_path.unlink(missing_ok=True)
+        raise
 
 
-async def _save_users():
-    """Write USERS dict to disk. Must be called within _users_lock."""
-    USERS_FILE.write_text(json.dumps(USERS, indent=2, default=str))
-
-
-# Called at module import time (before event loop) — stays sync
+# Load on module import (before event loop starts — sync is fine here)
 _load_users()
 
+
+# ─── User CRUD ────────────────────────────────────────────────────────────────
 
 async def get_or_create_user(provider_info: dict) -> dict:
     """Find existing user by email or create new one."""
     email = provider_info.get("email", "").lower()
 
-    # Fix 8: Lock around any USERS mutation + disk write
     async with _users_lock:
-        # Search existing users
+        # Search existing users by email
         for uid, user in USERS.items():
             if user.get("email", "").lower() == email:
                 user["last_login"] = datetime.now(timezone.utc).isoformat()
                 user["provider"] = provider_info.get("provider")
                 await _save_users()
-                return user
+                return dict(user)
 
         # Create new user
         user_id = str(uuid.uuid4())
-        user = {
+        user: dict = {
             "id": user_id,
             "email": email,
             "first_name": provider_info.get("first_name", ""),
@@ -87,67 +204,95 @@ async def get_or_create_user(provider_info: dict) -> dict:
             "certificate_status": "none",
             "certificate_id": None,
             "retake_count": 0,
+            "retake_payment_confirmed": False,
             "created_at": datetime.now(timezone.utc).isoformat(),
             "last_login": datetime.now(timezone.utc).isoformat(),
         }
         USERS[user_id] = user
         await _save_users()
-        return user
+        return dict(user)
 
 
 def get_user(user_id: str) -> Optional[dict]:
-    return USERS.get(user_id)
+    """Return a copy of the user dict or None."""
+    user = USERS.get(user_id)
+    return dict(user) if user else None
 
 
 async def update_user(user_id: str, updates: dict) -> Optional[dict]:
     """Update user fields and persist to disk."""
-    # Fix 8: Lock around mutation + disk write
     async with _users_lock:
         if user_id not in USERS:
             return None
         USERS[user_id].update(updates)
+        # Keep CERT_INDEX in sync if certificate_id changed
+        cert_id = USERS[user_id].get("certificate_id")
+        if cert_id:
+            CERT_INDEX[cert_id] = user_id
         await _save_users()
-        return USERS[user_id]
+        return dict(USERS[user_id])
 
 
-def save_test_session(session_id: str, data: dict):
-    TEST_SESSIONS[session_id] = data
+# ─── Test session store (FIX-8: threading.Lock for sync access) ───────────────
+
+def save_test_session(session_id: str, data: dict) -> None:
+    with _sessions_lock:
+        TEST_SESSIONS[session_id] = data
 
 
 def get_test_session(session_id: str) -> Optional[dict]:
-    return TEST_SESSIONS.get(session_id)
+    with _sessions_lock:
+        session = TEST_SESSIONS.get(session_id)
+        return dict(session) if session else None
 
+
+# ─── Certificate helpers ──────────────────────────────────────────────────────
 
 def generate_certificate_id(role: str) -> str:
-    """Generate a unique certificate ID with high entropy."""
+    """Generate a unique, high-entropy certificate ID."""
     prefix = "ENP" if role == "attorney" else "CLT"
     ts = datetime.now(timezone.utc).strftime("%Y%m%d")
-    # Fix 9: Use UUID4 for 16 hex chars of entropy instead of 8
-    uid = str(uuid.uuid4()).replace("-", "")[:16].upper()
+    uid = uuid.uuid4().hex[:16].upper()
     return f"QL-{prefix}-{ts}-{uid}"
 
 
+def lookup_user_by_certificate_id(certificate_id: str) -> Optional[dict]:
+    """
+    FIX-4: O(1) certificate lookup via CERT_INDEX.
+    Returns user dict or None.
+    """
+    user_id = CERT_INDEX.get(certificate_id)
+    if not user_id:
+        return None
+    return get_user(user_id)
+
+
 def get_certificate_html(user: dict) -> str:
-    """Generate printable HTML certificate with all user fields HTML-escaped."""
+    """Generate printable HTML certificate with all user fields HTML-escaped (FIX-3)."""
     cert_type = "Electronic Notary Public (ENP)" if user["role"] == "attorney" else "Verified Legal Client"
-    cert_status = "PROBATIONARY CERTIFICATION" if user["certificate_status"] == "probationary" else "FULL CERTIFICATION"
+    cert_status = (
+        "PROBATIONARY CERTIFICATION"
+        if user["certificate_status"] == "probationary"
+        else "FULL CERTIFICATION"
+    )
     status_color = "#f59e0b" if user["certificate_status"] == "probationary" else "#10b981"
 
     profile = user.get("profile", {})
     firm_name = profile.get("firm_name", profile.get("organization", ""))
 
-    # Fix 7: Escape all user-controlled fields before insertion into HTML
+    # FIX-3: Escape ALL user-controlled fields
     first_name      = _e(user.get("first_name", ""))
     last_name       = _e(user.get("last_name", ""))
     certificate_id  = _e(user.get("certificate_id", ""))
     firm_name_esc   = _e(firm_name)
     cert_status_esc = _e(cert_status)
+    cert_type_esc   = _e(cert_type)
 
     return f"""<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Quanby Legal Certificate — {certificate_id}</title>
+<title>Quanby Legal Certificate &mdash; {certificate_id}</title>
 <style>
   body {{ font-family: 'Georgia', serif; background: #fff; padding: 40px; }}
   .cert {{ max-width: 800px; margin: 0 auto; border: 3px solid #7c3aed; padding: 48px; text-align: center; position: relative; }}
@@ -180,7 +325,7 @@ def get_certificate_html(user: dict) -> str:
   {f'<div class="firm">{firm_name_esc}</div>' if firm_name else ''}
 
   <div class="body-text">
-    has successfully completed the Quanby Legal {_e(cert_type)} Certification Program
+    has successfully completed the Quanby Legal {cert_type_esc} Certification Program
     and is authorized to use the Quanby Legal Electronic Notarization Platform
     in accordance with <strong>A.M. No. 24-10-14-SC</strong>, RA 8792, RA 10173, and applicable Philippine law.
   </div>
@@ -218,8 +363,7 @@ def get_certificate_html(user: dict) -> str:
 
 
 def get_certificate_email_html(user: dict) -> str:
-    """HTML email for probationary cert delivery. All user fields are HTML-escaped."""
-    # Fix 7: Escape all user-controlled fields
+    """HTML email for probationary cert delivery. All user fields are HTML-escaped (FIX-3)."""
     first_name     = _e(user.get("first_name", ""))
     certificate_id = _e(user.get("certificate_id", ""))
     role_label     = _e("Electronic Notary Public (ENP)" if user["role"] == "attorney" else "Client")

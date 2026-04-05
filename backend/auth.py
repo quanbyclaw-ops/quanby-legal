@@ -1,28 +1,31 @@
 """
 auth.py — Quanby Legal SSO + Onboarding + Certification Auth Backend
 Supports Google, Facebook, LinkedIn OAuth2
-JWT session tokens
+JWT session tokens (via PyJWT)
+
+Security fixes applied:
+  FIX-1  JWT_SECRET: minimum 32-char enforcement on startup
+  FIX-2  OAuth CSRF: random state + PKCE (code_verifier/code_challenge)
+  FIX-11 JWT: 15-min access tokens, refresh token endpoint, aud/iss claims,
+              PyJWT library instead of hand-rolled HS256
 """
 
 import os
-import json
 import time
-import uuid
-import hmac
-import hashlib
 import base64
+import hashlib
 import secrets
 import logging
 import urllib.parse
 from typing import Optional
 
+import jwt  # PyJWT
 from fastapi import HTTPException
 import httpx
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Fix 5: Logger for JWT verification warnings
 logger = logging.getLogger(__name__)
 
 # ─── ENV CONFIG ───────────────────────────────────────────────────────────────
@@ -35,82 +38,160 @@ LINKEDIN_CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET", "")
 FRONTEND_URL           = os.getenv("FRONTEND_URL", "https://legal.quanbyai.com")
 APP_URL                = os.getenv("APP_URL", "https://legal.quanbyai.com")
 
-# Fix 1: Remove hardcoded JWT_SECRET fallback — fail fast if not set
-_jwt_secret = os.getenv("JWT_SECRET")
+# FIX-1: Enforce JWT_SECRET is set AND has minimum 32 characters
+_jwt_secret = os.getenv("JWT_SECRET", "")
 if not _jwt_secret:
     raise RuntimeError(
         "JWT_SECRET environment variable is not set. "
         'Generate one with: python -c "import secrets; print(secrets.token_hex(32))"'
     )
+if len(_jwt_secret) < 32:
+    raise RuntimeError(
+        f"JWT_SECRET must be at least 32 characters long (got {len(_jwt_secret)}). "
+        'Generate a secure one with: python -c "import secrets; print(secrets.token_hex(32))"'
+    )
 JWT_SECRET = _jwt_secret
 
-# Fix 2: CSRF state storage — state -> expiry timestamp
-OAUTH_STATES: dict[str, float] = {}
+# FIX-11: Token lifetimes
+ACCESS_TOKEN_EXPIRES_SECONDS  = 15 * 60        # 15 minutes
+REFRESH_TOKEN_EXPIRES_SECONDS = 7 * 24 * 3600  # 7 days
+JWT_ALGORITHM  = "HS256"
+JWT_ISSUER     = "quanby-legal"
+JWT_AUDIENCE   = "quanby-legal-api"
+
+# FIX-2: CSRF state + PKCE storage — state -> {"expiry": float, "code_verifier": str}
+OAUTH_STATES: dict[str, dict] = {}
 _OAUTH_STATE_TTL = 600  # 10 minutes
 
 
-def generate_oauth_state() -> str:
-    """Generate a cryptographically secure OAuth CSRF state token."""
-    return secrets.token_urlsafe(32)
+# ─── FIX-2: PKCE helpers ──────────────────────────────────────────────────────
+
+def _generate_code_verifier() -> str:
+    """Generate a PKCE code_verifier (43-128 chars, URL-safe)."""
+    return base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b"=").decode()
 
 
-def validate_oauth_state(state: str) -> bool:
-    """Validate and consume an OAuth state token (one-time use, 10-min TTL)."""
-    expiry = OAUTH_STATES.pop(state, None)
-    if expiry is None:
-        return False
-    if time.time() > expiry:
-        return False
-    return True
+def _code_challenge(verifier: str) -> str:
+    """Derive PKCE code_challenge = BASE64URL(SHA256(verifier))."""
+    digest = hashlib.sha256(verifier.encode()).digest()
+    return base64.urlsafe_b64encode(digest).rstrip(b"=").decode()
 
 
-# ─── SIMPLE JWT (no external lib needed) ─────────────────────────────────────
-
-def _b64url(data: bytes) -> str:
-    return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
-
-
-def _b64url_decode(s: str) -> bytes:
-    padding = 4 - len(s) % 4
-    if padding != 4:
-        s += "=" * padding
-    return base64.urlsafe_b64decode(s)
-
-
-def create_jwt(payload: dict, expires_in: int = 86400 * 7) -> str:
-    """Create a signed JWT token (HS256). Valid for 7 days by default."""
-    header = _b64url(json.dumps({"alg": "HS256", "typ": "JWT"}).encode())
-    # Fix 3: Never mutate input payload — work on a copy, add jti for uniqueness
-    token_payload = {
-        **payload,
-        "exp": int(time.time()) + expires_in,
-        "iat": int(time.time()),
-        "jti": str(uuid.uuid4()),
+def generate_oauth_state(provider: str) -> tuple[str, str, str]:
+    """
+    Generate a state token + PKCE pair for an OAuth flow.
+    Returns (state, code_verifier, code_challenge).
+    State is stored in OAUTH_STATES with TTL.
+    """
+    state = secrets.token_urlsafe(32)
+    verifier = _generate_code_verifier()
+    challenge = _code_challenge(verifier)
+    OAUTH_STATES[state] = {
+        "expiry": time.time() + _OAUTH_STATE_TTL,
+        "code_verifier": verifier,
+        "provider": provider,
     }
-    body = _b64url(json.dumps(token_payload).encode())
-    sig_input = f"{header}.{body}".encode()
-    sig = hmac.new(JWT_SECRET.encode(), sig_input, hashlib.sha256).digest()
-    return f"{header}.{body}.{_b64url(sig)}"
+    return state, verifier, challenge
+
+
+def validate_oauth_state(state: str) -> Optional[dict]:
+    """
+    Validate and consume an OAuth state token (one-time use).
+    Returns the stored metadata dict (including code_verifier) or None if invalid.
+    """
+    entry = OAUTH_STATES.pop(state, None)
+    if entry is None:
+        logger.warning("OAuth state validation failed: state not found")
+        return None
+    if time.time() > entry["expiry"]:
+        logger.warning("OAuth state validation failed: state expired")
+        return None
+    return entry
+
+
+# ─── FIX-11: JWT with PyJWT ───────────────────────────────────────────────────
+
+def create_access_token(payload: dict) -> str:
+    """
+    Create a short-lived JWT access token (15 min).
+    Includes iss, aud, iat, exp claims.
+    """
+    now = int(time.time())
+    claims = {
+        **payload,
+        "iss": JWT_ISSUER,
+        "aud": JWT_AUDIENCE,
+        "iat": now,
+        "exp": now + ACCESS_TOKEN_EXPIRES_SECONDS,
+        "type": "access",
+    }
+    return jwt.encode(claims, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def create_refresh_token(user_id: str) -> str:
+    """
+    Create a long-lived refresh token (7 days).
+    Only contains user_id + type claim.
+    """
+    now = int(time.time())
+    claims = {
+        "user_id": user_id,
+        "iss": JWT_ISSUER,
+        "aud": JWT_AUDIENCE,
+        "iat": now,
+        "exp": now + REFRESH_TOKEN_EXPIRES_SECONDS,
+        "jti": secrets.token_hex(16),
+        "type": "refresh",
+    }
+    return jwt.encode(claims, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+# Keep backward-compat alias used throughout main.py
+def create_jwt(payload: dict, expires_in: int = ACCESS_TOKEN_EXPIRES_SECONDS) -> str:
+    """Alias for create_access_token. expires_in is ignored (always 15 min)."""
+    return create_access_token(payload)
 
 
 def verify_jwt(token: str) -> Optional[dict]:
-    """Verify and decode a JWT. Returns None if invalid/expired."""
+    """
+    Verify and decode a JWT access token.
+    Returns payload dict or None if invalid/expired/wrong-type.
+    """
     try:
-        parts = token.split(".")
-        if len(parts) != 3:
-            return None
-        header, body, sig = parts
-        sig_input = f"{header}.{body}".encode()
-        expected_sig = _b64url(hmac.new(JWT_SECRET.encode(), sig_input, hashlib.sha256).digest())
-        if not hmac.compare_digest(sig, expected_sig):
-            return None
-        payload = json.loads(_b64url_decode(body))
-        if payload.get("exp", 0) < time.time():
+        payload = jwt.decode(
+            token,
+            JWT_SECRET,
+            algorithms=[JWT_ALGORITHM],
+            audience=JWT_AUDIENCE,
+            issuer=JWT_ISSUER,
+        )
+        if payload.get("type") != "access":
+            logger.warning("JWT verification failed: not an access token")
             return None
         return payload
-    except Exception as e:
-        # Fix 5: Log JWT verification failures at WARNING level
-        logger.warning("JWT verification failed: %s", e)
+    except jwt.ExpiredSignatureError:
+        logger.info("JWT expired")
+        return None
+    except jwt.InvalidTokenError as exc:
+        logger.warning("JWT verification failed: %s", exc)
+        return None
+
+
+def verify_refresh_token(token: str) -> Optional[dict]:
+    """Verify a refresh token. Returns payload or None."""
+    try:
+        payload = jwt.decode(
+            token,
+            JWT_SECRET,
+            algorithms=[JWT_ALGORITHM],
+            audience=JWT_AUDIENCE,
+            issuer=JWT_ISSUER,
+        )
+        if payload.get("type") != "refresh":
+            return None
+        return payload
+    except jwt.InvalidTokenError as exc:
+        logger.warning("Refresh token verification failed: %s", exc)
         return None
 
 
@@ -183,7 +264,7 @@ async def facebook_get_user_info(code: str, redirect_uri: str) -> dict:
                 info.get("picture", {}).get("data", {}).get("url", "")
                 if isinstance(info.get("picture"), dict) else ""
             ),
-            "email_verified": True,  # Facebook email is verified
+            "email_verified": True,
         }
 
 
@@ -222,62 +303,52 @@ async def linkedin_get_user_info(code: str, redirect_uri: str) -> dict:
 
 
 def get_oauth_urls() -> dict:
-    """Return OAuth login URLs with CSRF state tokens for all providers."""
-    # Fix 2: Generate state tokens and store with TTL
-    # Fix 4: Use urllib.parse.urlencode for all query params
+    """
+    Return OAuth login URLs with CSRF state tokens + PKCE for all providers.
+    FIX-2: state is unique per provider per call; PKCE code_challenge included.
+    """
+    result: dict = {}
 
     if GOOGLE_CLIENT_ID:
-        google_state = generate_oauth_state()
-        OAUTH_STATES[google_state] = time.time() + _OAUTH_STATE_TTL
-        google_params = urllib.parse.urlencode({
+        state, _verifier, challenge = generate_oauth_state("google")
+        params = urllib.parse.urlencode({
             "client_id": GOOGLE_CLIENT_ID,
             "redirect_uri": f"{APP_URL}/api/auth/callback/google",
             "response_type": "code",
             "scope": "openid email profile",
             "access_type": "offline",
-            "state": google_state,
+            "state": state,
+            "code_challenge": challenge,
+            "code_challenge_method": "S256",
         })
-        google_url = f"https://accounts.google.com/o/oauth2/v2/auth?{google_params}"
+        result["google"] = f"https://accounts.google.com/o/oauth2/v2/auth?{params}"
     else:
-        google_url = None
-        google_state = None
+        result["google"] = None
 
     if FACEBOOK_APP_ID:
-        facebook_state = generate_oauth_state()
-        OAUTH_STATES[facebook_state] = time.time() + _OAUTH_STATE_TTL
-        facebook_params = urllib.parse.urlencode({
+        state, _verifier, _challenge = generate_oauth_state("facebook")
+        # Facebook does not support PKCE for server-side flows; state alone is sufficient
+        params = urllib.parse.urlencode({
             "client_id": FACEBOOK_APP_ID,
             "redirect_uri": f"{APP_URL}/api/auth/callback/facebook",
             "scope": "email,public_profile",
-            "state": facebook_state,
+            "state": state,
         })
-        facebook_url = f"https://www.facebook.com/v18.0/dialog/oauth?{facebook_params}"
+        result["facebook"] = f"https://www.facebook.com/v18.0/dialog/oauth?{params}"
     else:
-        facebook_url = None
-        facebook_state = None
+        result["facebook"] = None
 
     if LINKEDIN_CLIENT_ID:
-        linkedin_state = generate_oauth_state()
-        OAUTH_STATES[linkedin_state] = time.time() + _OAUTH_STATE_TTL
-        linkedin_params = urllib.parse.urlencode({
+        state, _verifier, _challenge = generate_oauth_state("linkedin")
+        params = urllib.parse.urlencode({
             "response_type": "code",
             "client_id": LINKEDIN_CLIENT_ID,
             "redirect_uri": f"{APP_URL}/api/auth/callback/linkedin",
             "scope": "openid profile email",
-            "state": linkedin_state,
+            "state": state,
         })
-        linkedin_url = f"https://www.linkedin.com/oauth/v2/authorization?{linkedin_params}"
+        result["linkedin"] = f"https://www.linkedin.com/oauth/v2/authorization?{params}"
     else:
-        linkedin_url = None
-        linkedin_state = None
+        result["linkedin"] = None
 
-    return {
-        "google": google_url,
-        "facebook": facebook_url,
-        "linkedin": linkedin_url,
-        "states": {
-            "google": google_state,
-            "facebook": facebook_state,
-            "linkedin": linkedin_state,
-        },
-    }
+    return result
