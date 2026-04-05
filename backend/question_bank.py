@@ -2,10 +2,16 @@
 question_bank.py — Quanby Legal ENP Certification Question Bank
 Questions are randomized per session. 30 questions per category,
 15 drawn randomly per test. Never static.
+
+Security design:
+- get_randomized_test() returns (client_questions, answer_key) as a tuple
+- client_questions: list of dicts WITHOUT 'answer' field — safe to send to browser
+- answer_key: {question_id: correct_answer_text} — stays server-side ONLY
+- answer_key stores full answer TEXT (not letter) so shuffling never corrupts correctness
 """
 
 import random
-from typing import List, Dict
+from typing import List
 
 # ─── ATTORNEY QUESTIONS (Philippine ENP Certification) ─────────────────────
 
@@ -618,63 +624,96 @@ CLIENT_QUESTIONS = [
 ]
 
 
-def get_randomized_test(role: str = "attorney", count: int = 15) -> List[Dict]:
+def get_randomized_test(role: str = "attorney", count: int = 15) -> tuple[list, dict]:
     """
-    Returns a randomized set of `count` questions for the given role.
-    Shuffles answer choice order too so A is not always correct.
+    Returns (client_questions, answer_key) for the given role.
+
+    client_questions: list of question dicts WITHOUT 'answer' field — safe to send to browser.
+    answer_key: {question_id: correct_answer_text} — stays server-side ONLY.
+
+    Fix 11: Separates answer key from client-facing data at the model level.
+    Fix 12: Stores full answer text (not letter) so shuffling can never corrupt the key.
     """
     pool = ATTORNEY_QUESTIONS if role == "attorney" else CLIENT_QUESTIONS
-    
-    # Sample `count` questions from pool
+
     selected = random.sample(pool, min(count, len(pool)))
-    
-    result = []
+
+    client_questions = []
+    answer_key: dict[str, str] = {}
+
     for i, q in enumerate(selected):
-        # Shuffle answer choices
         choices = q["choices"].copy()
-        answer_text = choices[ord(q["answer"]) - ord("A")]  # get the correct answer text
+        # Get the full text of the correct answer before shuffling
+        correct_answer_text = choices[ord(q["answer"]) - ord("A")]
         random.shuffle(choices)
-        new_answer = chr(ord("A") + choices.index(answer_text))  # find new position
-        
-        result.append({
+
+        qid = q["id"]
+
+        # Fix 12: Store the full answer TEXT in the key — immune to shuffle order
+        answer_key[qid] = correct_answer_text
+
+        # Fix 11: client_questions has NO 'answer' field
+        client_questions.append({
             "number": i + 1,
-            "id": q["id"],
+            "id": qid,
             "question": q["question"],
             "choices": choices,
-            "answer": new_answer,  # scrambled position
-            "category": q["category"]
+            "category": q["category"],
         })
-    
-    return result
+
+    return client_questions, answer_key
 
 
-def grade_test(questions: List[Dict], answers: Dict[str, str]) -> Dict:
+def grade_test(
+    questions_without_answers: list,
+    answer_key: dict,
+    user_answers: dict,
+) -> dict:
     """
-    Grades the test. Returns score, pass/fail, and per-question results.
-    questions: the randomized question list returned from get_randomized_test
-    answers: dict of {question_id: answer_letter} from user
+    Grade the test.
+
+    Fix 11: Accepts separate answer_key dict (no 'answer' field on questions).
+    Fix 12: Compares by answer text, not letter — robust against shuffle order.
+
+    questions_without_answers: client question list (no 'answer' field)
+    answer_key: {question_id: correct_answer_text}
+    user_answers: {question_id: answer_letter_submitted_by_user}
     """
-    total = len(questions)
+    total = len(questions_without_answers)
     correct = 0
     results = []
-    
-    for q in questions:
-        user_ans = answers.get(q["id"], "").upper()
-        is_correct = user_ans == q["answer"]
+
+    for q in questions_without_answers:
+        qid = q["id"]
+        user_letter = user_answers.get(qid, "").upper()
+        choices = q["choices"]
+
+        # Resolve user's letter to the text they chose
+        letter_idx = ord(user_letter) - ord("A") if user_letter else -1
+        if 0 <= letter_idx < len(choices):
+            user_answer_text = choices[letter_idx]
+        else:
+            user_answer_text = ""
+
+        correct_answer_text = answer_key.get(qid, "")
+        is_correct = bool(user_answer_text and user_answer_text == correct_answer_text)
+
         if is_correct:
             correct += 1
+
         results.append({
-            "id": q["id"],
+            "id": qid,
             "question": q["question"],
-            "user_answer": user_ans,
-            "correct_answer": q["answer"],
+            "user_answer": user_letter,
+            "user_answer_text": user_answer_text,
+            "correct_answer_text": correct_answer_text,
             "is_correct": is_correct,
-            "category": q["category"]
+            "category": q["category"],
         })
-    
+
     score_pct = round((correct / total) * 100, 1) if total > 0 else 0
     passed = score_pct >= 80  # 80% passing rate (12/15)
-    
+
     return {
         "total": total,
         "correct": correct,
@@ -682,5 +721,5 @@ def grade_test(questions: List[Dict], answers: Dict[str, str]) -> Dict:
         "passed": passed,
         "passing_score": 80,
         "results": results,
-        "retake_fee_php": 500 if not passed else 0
+        "retake_fee_php": 500 if not passed else 0,
     }
