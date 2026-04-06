@@ -741,9 +741,7 @@
             .connecting-line { display: none; }
             .nav-links { display: none; }
             .hamburger { display: flex; }
-            /* Nav: hide both CTA buttons on mobile */
-            .nav-right .btn-filled { display: none; }
-            .nav-right .btn-outline { display: none; }
+            /* Nav CTA buttons removed — handled by onboard-strip only */
             /* Badge: allow wrapping on mobile */
             .badge { font-size: 0.75rem; white-space: normal; text-align: center; }
             /* Hero: reduce padding */
@@ -794,10 +792,6 @@
                 <a href="#about">About</a>
             </div>
             <button class="hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
-            <div class="nav-right">
-                <button class="btn btn-outline btn-sm" onclick="openSSO('attorney')" style="border-color:#7c3aed;color:#c4b5fd;">🏛️ Law Firms</button>
-                <button class="btn btn-filled btn-sm" onclick="openSSO('client')" style="background:#10b981;">👤 Public Clients</button>
-            </div>
         </div>
     </nav>
     <!-- ══ ONBOARDING CTA STRIP ══ -->
