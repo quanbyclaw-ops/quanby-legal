@@ -753,6 +753,24 @@
             .compliance-grid { grid-template-columns: 1fr; }
             /* Trust bar: 2 per row */
             #compliance > .container > div[style*="justify-content:center"] > div { min-width: calc(50% - 0.75rem); flex: 1 1 calc(50% - 0.75rem); }
+            /* Agent tabs: scrollable on mobile so all 3 tabs are accessible */
+            .agent-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                flex-wrap: nowrap;
+                gap: 0.25rem;
+                padding-bottom: 0;
+            }
+            .agent-tabs::-webkit-scrollbar { display: none; }
+            .agent-tab {
+                padding: 0.6rem 1rem;
+                font-size: 0.82rem;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+            /* Upload area: less padding on mobile */
+            .upload-area { padding: 1.75rem 1rem; }
         }
     </style>
 </head>
