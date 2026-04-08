@@ -2378,8 +2378,40 @@
                 <button class="onboard-btn" onclick="_submitProfile()">Continue &#8594;</button>
                 <div id="ob-err" class="ob-error"></div>`;
         } else if (step === 'test') {
-            el.innerHTML = '<h3>ENP Certification Test</h3><p class="sub">Loading your 15-question test&#8230;</p>';
-            await _loadTest();
+            el.innerHTML = `
+                <h3>&#128218; Course Module</h3>
+                <p class="sub">Complete the course module before taking your certification exam.</p>
+                <div style="background:rgba(201,162,71,0.08);border:1.5px solid #c9a227;border-radius:0.75rem;padding:1.5rem;margin-bottom:1.25rem;">
+                    <div style="font-size:2rem;margin-bottom:0.5rem;">&#128218;</div>
+                    <h4 style="color:#c9a227;margin:0 0 0.5rem;">Course Module: Mastering Quanby Legal</h4>
+                    <p style="color:var(--muted);font-size:0.88rem;margin:0 0 1rem;">This course covers Philippine ENP certification law including A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and the 2004 Rules on Notarial Practice.</p>
+                    <a href="/mastering-quanby-legal.pdf" target="_blank"
+                       style="display:inline-block;background:#c9a227;color:#0a1628;padding:10px 22px;border-radius:6px;text-decoration:none;font-weight:700;font-size:0.9rem;margin-bottom:1rem;">
+                        &#128214; Download Course Module (PDF)
+                    </a>
+                </div>
+                <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
+                    <label style="display:flex;align-items:flex-start;gap:0.75rem;cursor:pointer;color:var(--muted);font-size:0.9rem;">
+                        <input type="checkbox" id="course-read-checkbox"
+                               style="width:18px;height:18px;margin-top:2px;flex-shrink:0;accent-color:#c9a227;"
+                               onchange="document.getElementById('start-exam-btn').disabled = !this.checked;">
+                        <span>I have read and understood the course module and am ready to take the 50-question ENP Certification Exam.</span>
+                    </label>
+                </div>
+                <button class="onboard-btn" id="start-exam-btn" disabled
+                        onclick="_startExam()"
+                        style="opacity:0.5;transition:opacity 0.2s;"
+                        onmouseenter="if(!this.disabled)this.style.opacity='1'"
+                        onmouseleave="if(!this.disabled)this.style.opacity='1'">
+                    &#127891; Start 50-Question Exam
+                </button>
+                <div id="ob-err" class="ob-error"></div>`;
+            // Enable button visual when checkbox is ticked
+            document.getElementById('start-exam-btn').addEventListener('click', function(){});
+            document.getElementById('course-read-checkbox').addEventListener('change', function(){
+                var btn = document.getElementById('start-exam-btn');
+                btn.style.opacity = this.checked ? '1' : '0.5';
+            });
         } else if (step === 'liveness') {
             el.innerHTML = `
                 <h3>Identity Verification</h3>
@@ -2454,6 +2486,12 @@
         }
     }
 
+    function _startExam() {
+        var el = document.getElementById('ob-content');
+        el.innerHTML = '<h3>ENP Certification Test</h3><p class="sub">Loading your 50-question exam&#8230;</p>';
+        _loadTest();
+    }
+
     async function _loadTest() {
         try {
             const res = await fetch('/api/onboarding/test/start', { method: 'POST', credentials: 'include' });
@@ -2478,7 +2516,7 @@
         ).join('');
         document.getElementById('ob-content').innerHTML =
             '<h3>ENP Certification Test</h3>' +
-            '<p class="sub">Answer all 15 questions. You need 80% (12/15) to pass.</p>' +
+            '<p class="sub">Answer all 50 questions. You need 70% (35/50) to pass.</p>' +
             qs +
             '<button class="onboard-btn" id="ob-submit-btn" onclick="_submitTest()">Submit Test</button>' +
             '<div id="ob-err" class="ob-error"></div>';
@@ -2522,7 +2560,7 @@
             ' &mdash; ' + score + '/' + total + ' correct (' + Math.round(score/total*100) + '%)</div>' +
             '<p class="sub">' + (passed
                 ? 'Congratulations! Proceed to the final identity verification step.'
-                : 'You need 80% to pass. Review the Philippine ENP rules and try again.') + '</p>' +
+                : 'You need 70% (35/50) to pass. Review the course module and try again.') + '</p>' +
             (passed
                 ? '<button class="onboard-btn" onclick="_renderObStep(\'liveness\')">Continue to Liveness Check &#8594;</button>'
                 : '<button class="onboard-btn" onclick="_loadTest()">Retake Test</button>');

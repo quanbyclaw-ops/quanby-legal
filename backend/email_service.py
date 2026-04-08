@@ -97,7 +97,9 @@ def _build_welcome_html(first_name: str, last_name: str) -> str:
               <tr>
                 <td style="padding:12px 16px;background:#f8f7ff;border-left:4px solid #c9a227;border-radius:4px;margin-bottom:12px;">
                   <strong style="color:#0d1b3e;">Step 1.</strong>
-                  <span style="color:#374151;"> Take the course module and complete the exam.</span>
+                  <span style="color:#374151;"> Take the course module and complete the exam.</span><br>
+                  <a href="https://legal.quanbyai.com/mastering-quanby-legal.pdf" style="color:#c9a227;font-size:0.9rem;">&#128218; Download Course Module (PDF)</a>&nbsp;&nbsp;
+                  <a href="https://legal.quanbyai.com/?exam=1" style="display:inline-block;background:#c9a227;color:#0d1b3e;padding:6px 14px;border-radius:4px;text-decoration:none;font-weight:700;font-size:0.85rem;margin-top:8px;">&#127891; Take the Exam</a>
                 </td>
               </tr>
               <tr><td style="height:10px;"></td></tr>
@@ -160,6 +162,9 @@ Welcome to the Quanby Legal Platform.
 Please complete the following steps to complete your onboarding process:
 
 Step 1. Take the course module and complete the exam.
+Download Course Module: https://legal.quanbyai.com/mastering-quanby-legal.pdf
+Take the Exam: https://legal.quanbyai.com/?exam=1
+
 Step 2. Download the course certificate.
 Step 3. Submit your certificate online to the Supreme Court.
 

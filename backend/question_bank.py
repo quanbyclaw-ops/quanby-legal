@@ -376,6 +376,247 @@ ATTORNEY_QUESTIONS = [
         "answer": "B",
         "category": "ENP Rules"
     },
+    # ── NEW QUESTIONS: atty_031 to atty_050 ─────────────────────────────────
+    {
+        "id": "atty_031",
+        "question": "Under A.M. No. 24-10-14-SC, which of the following is a ground for REVOCATION of an ENP's commission?",
+        "choices": [
+            "A. Performing more than 100 notarial acts in a month",
+            "B. Gross misconduct, conviction of a crime involving moral turpitude, or violation of the Rules on ENP",
+            "C. Failure to renew commission within 30 days of expiry",
+            "D. Using a digital signature not issued by the Supreme Court"
+        ],
+        "answer": "B",
+        "category": "ENP Rules"
+    },
+    {
+        "id": "atty_032",
+        "question": "Under the 2004 Rules on Notarial Practice, a notary public is PROHIBITED from notarizing a document if:",
+        "choices": [
+            "A. The document was drafted by another attorney",
+            "B. The notary is a party to the instrument or has a financial interest in the transaction",
+            "C. The document is more than 10 pages long",
+            "D. The principal is from a different city"
+        ],
+        "answer": "B",
+        "category": "Notarial Practice"
+    },
+    {
+        "id": "atty_033",
+        "question": "The primary difference between a Jurat and an Acknowledgment is:",
+        "choices": [
+            "A. A Jurat requires payment of a higher notarial fee than an Acknowledgment",
+            "B. In a Jurat, the affiant swears to the truth of the document's contents; in an Acknowledgment, the principal confirms it is their free and voluntary act",
+            "C. An Acknowledgment requires two witnesses while a Jurat requires none",
+            "D. A Jurat is used only for wills; an Acknowledgment is used for contracts"
+        ],
+        "answer": "B",
+        "category": "Notarial Practice"
+    },
+    {
+        "id": "atty_034",
+        "question": "Under RA 8792 (Electronic Commerce Act), an electronic signature is legally binding when:",
+        "choices": [
+            "A. It is affixed using a government-approved hardware token only",
+            "B. It is distinctively linked to the signatory, capable of identifying them, created under their sole control, and any alteration to the document is detectable",
+            "C. It is notarized by an accredited ENP within 24 hours of signing",
+            "D. It is registered with the SEC or DTI"
+        ],
+        "answer": "B",
+        "category": "Legal Framework"
+    },
+    {
+        "id": "atty_035",
+        "question": "Under BSP Circular 944, which of the following is an acceptable method for eKYC identity verification?",
+        "choices": [
+            "A. Submission of a photocopy of any ID via ordinary mail",
+            "B. Facial recognition with liveness detection matched against a government-issued ID",
+            "C. A verbal confirmation of name and birthdate during a phone call",
+            "D. Presentation of an employee ID from any private company"
+        ],
+        "answer": "B",
+        "category": "Regulatory"
+    },
+    {
+        "id": "atty_036",
+        "question": "Under A.M. No. 24-10-14-SC, the ENP's electronic notarial register (e-register) must include:",
+        "choices": [
+            "A. Only the name of the principal and date of notarization",
+            "B. Entry number, date and time, type of notarial act, name and ID of principal, description of document, and fee charged",
+            "C. Only the document hash and digital certificate serial number",
+            "D. The principal's full financial background and credit score"
+        ],
+        "answer": "B",
+        "category": "ENP Rules"
+    },
+    {
+        "id": "atty_037",
+        "question": "What is the minimum document retention period for electronic notarial certificates under A.M. No. 24-10-14-SC?",
+        "choices": [
+            "A. Three (3) years",
+            "B. Ten (10) years",
+            "C. Five (5) years",
+            "D. Permanently"
+        ],
+        "answer": "B",
+        "category": "ENP Rules"
+    },
+    {
+        "id": "atty_038",
+        "question": "Under RA 10173 (Data Privacy Act), what is the required action when a personal data breach occurs that likely harms data subjects?",
+        "choices": [
+            "A. The organization may keep the breach confidential to avoid public panic",
+            "B. Notify the National Privacy Commission (NPC) within 72 hours of discovery and inform affected data subjects",
+            "C. File a criminal complaint with the NBI before notifying anyone",
+            "D. Delete all affected data immediately to stop further harm"
+        ],
+        "answer": "B",
+        "category": "Data Privacy"
+    },
+    {
+        "id": "atty_039",
+        "question": "When an ENP's notarial commission EXPIRES, they must:",
+        "choices": [
+            "A. Continue notarizing until a replacement ENP is appointed",
+            "B. Immediately cease performing notarial acts and surrender or secure their notarial records pending renewal or transfer",
+            "C. Only cease Remote Electronic Notarization but may continue In-Person Electronic Notarization",
+            "D. Notify clients only if they have pending notarial acts"
+        ],
+        "answer": "B",
+        "category": "ENP Rules"
+    },
+    {
+        "id": "atty_040",
+        "question": "Under the 2004 Rules on Notarial Practice, which of the following constitutes COMPETENT EVIDENCE OF IDENTITY?",
+        "choices": [
+            "A. A printed screenshot of a social media profile",
+            "B. At least one current government-issued ID with photograph and signature of the individual",
+            "C. A barangay certification with the individual's description",
+            "D. A sworn statement by two witnesses attesting to the person's identity"
+        ],
+        "answer": "B",
+        "category": "Notarial Practice"
+    },
+    {
+        "id": "atty_041",
+        "question": "The Supreme Court accreditation requirement for ENP platforms primarily ensures that the platform:",
+        "choices": [
+            "A. Is built using only Philippine-made software",
+            "B. Meets technical, security, and procedural standards set by the Court to protect the integrity of notarial acts",
+            "C. Is majority-owned by Filipino citizens",
+            "D. Has a minimum paid-up capital of ₱10 million"
+        ],
+        "answer": "B",
+        "category": "ENP Rules"
+    },
+    {
+        "id": "atty_042",
+        "question": "Under A.M. No. 24-10-14-SC, liveness verification during Remote Electronic Notarization (REN) is required to:",
+        "choices": [
+            "A. Test the internet connection speed of the principal",
+            "B. Confirm that the person appearing is physically present and alive, preventing impersonation and spoofing attacks",
+            "C. Record a video message for the notarial archive",
+            "D. Satisfy BSP loan underwriting requirements"
+        ],
+        "answer": "B",
+        "category": "ENP Rules"
+    },
+    {
+        "id": "atty_043",
+        "question": "Under the Anti-Money Laundering Act (RA 9160, as amended by RA 10365), notaries public are classified as:",
+        "choices": [
+            "A. Exempt from all AML obligations because they are officers of the court",
+            "B. Covered persons required to perform customer due diligence and report suspicious transactions to the AMLC",
+            "C. Supervisory authorities responsible for auditing other covered persons",
+            "D. Required to report only transactions exceeding ₱10 million in value"
+        ],
+        "answer": "B",
+        "category": "Compliance"
+    },
+    {
+        "id": "atty_044",
+        "question": "Under A.M. No. 24-10-14-SC, cross-border notarization by a Philippine ENP is permitted when:",
+        "choices": [
+            "A. Both parties are located outside the Philippines",
+            "B. The principal is a Filipino citizen or foreign national executing a document for use in the Philippines, subject to applicable Philippine rules",
+            "C. The foreign country has a mutual recognition agreement with the Philippines only",
+            "D. Cross-border notarization is strictly prohibited under current rules"
+        ],
+        "answer": "B",
+        "category": "ENP Rules"
+    },
+    {
+        "id": "atty_045",
+        "question": "Which of the following is a PROHIBITED ACT under the Notarial Practice Rules?",
+        "choices": [
+            "A. Charging a higher notarial fee than the minimum set by the IBP",
+            "B. Notarizing an instrument where the signatory is not personally present (in-person) or properly connected via AVT (remote), or whose identity has not been verified",
+            "C. Using an electronic seal in addition to the notarial certificate",
+            "D. Maintaining a digital backup of the notarial register"
+        ],
+        "answer": "B",
+        "category": "Notarial Practice"
+    },
+    {
+        "id": "atty_046",
+        "question": "An electronic notarial certificate under A.M. No. 24-10-14-SC must contain:",
+        "choices": [
+            "A. Only the ENP's name and digital signature",
+            "B. The ENP's name, commission number, commission expiry date, jurisdiction, type of notarial act, and a statement that the required verification was performed",
+            "C. A QR code linking to the Supreme Court website and a physical seal impression",
+            "D. The client's full legal address and tax identification number"
+        ],
+        "answer": "B",
+        "category": "ENP Rules"
+    },
+    {
+        "id": "atty_047",
+        "question": "Under RA 8792, which type of transaction is EXCLUDED from being conducted entirely through electronic means?",
+        "choices": [
+            "A. Sale of goods and services",
+            "B. Execution of negotiable instruments such as checks, promissory notes, and bills of exchange requiring physical delivery",
+            "C. Filing of government forms and applications",
+            "D. Banking transactions and fund transfers"
+        ],
+        "answer": "B",
+        "category": "Legal Framework"
+    },
+    {
+        "id": "atty_048",
+        "question": "The penalty for performing notarial acts WITHOUT a valid notarial commission in the Philippines is:",
+        "choices": [
+            "A. A civil fine of ₱500 per act",
+            "B. Criminal liability for falsification of public documents, in addition to administrative sanctions including disbarment proceedings",
+            "C. A 30-day suspension from the IBP",
+            "D. Mandatory retraining before a new commission can be applied for"
+        ],
+        "answer": "B",
+        "category": "Notarial Practice"
+    },
+    {
+        "id": "atty_049",
+        "question": "Under A.M. No. 24-10-14-SC, conflict of interest rules prohibit an ENP from notarizing a document when:",
+        "choices": [
+            "A. The document involves real property valued over ₱5 million",
+            "B. The ENP is a party to the instrument, a relative within the fourth civil degree of the principal, or has a direct financial interest in the transaction",
+            "C. The document was prepared by the ENP's law firm",
+            "D. The ENP has previously notarized documents for the same client"
+        ],
+        "answer": "B",
+        "category": "ENP Rules"
+    },
+    {
+        "id": "atty_050",
+        "question": "Under RA 10173 and A.M. No. 24-10-14-SC, personal data collected during an e-notarization session may be retained by the ENP or platform for:",
+        "choices": [
+            "A. An indefinite period at the ENP's discretion",
+            "B. Only as long as necessary for the purpose of the notarization, and in compliance with the minimum retention period required by law (ten years for the e-register), after which it must be securely disposed of",
+            "C. A maximum of two years, after which all data must be deleted automatically",
+            "D. No retention is allowed — all data must be deleted immediately after the session"
+        ],
+        "answer": "B",
+        "category": "Data Privacy"
+    },
 ]
 
 # ─── CLIENT QUESTIONS (General Legal Awareness) ─────────────────────────────
@@ -624,7 +865,7 @@ CLIENT_QUESTIONS = [
 ]
 
 
-def get_randomized_test(role: str = "attorney", count: int = 15) -> tuple[list, dict]:
+def get_randomized_test(role: str = "attorney", count: int = 50) -> tuple[list, dict]:
     """
     Returns (client_questions, answer_key) for the given role.
 
@@ -636,7 +877,9 @@ def get_randomized_test(role: str = "attorney", count: int = 15) -> tuple[list, 
     """
     pool = ATTORNEY_QUESTIONS if role == "attorney" else CLIENT_QUESTIONS
 
-    selected = random.sample(pool, min(count, len(pool)))
+    # Return ALL questions shuffled (50 for attorneys)
+    selected = pool.copy()
+    random.shuffle(selected)
 
     client_questions = []
     answer_key: dict[str, str] = {}
@@ -712,14 +955,14 @@ def grade_test(
         })
 
     score_pct = round((correct / total) * 100, 1) if total > 0 else 0
-    passed = score_pct >= 80  # 80% passing rate (12/15)
+    passed = score_pct >= 70  # 70% passing rate (35/50)
 
     return {
         "total": total,
         "correct": correct,
         "score_pct": score_pct,
         "passed": passed,
-        "passing_score": 80,
+        "passing_score": 70,
         "results": results,
         "retake_fee_php": 500 if not passed else 0,
     }
