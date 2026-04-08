@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENP Certification — Quanby Legal</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <meta name="theme-color" content="#7c3aed">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #05060f;
+            --purple: #7c3aed;
+            --purple-light: #9d5ff3;
+            --pink: #ec4899;
+            --teal: #10b981;
+            --gold: #c9a84c;
+            --gold-bright: #c9a227;
+            --navy: #1B2A6B;
+            --card-bg: rgba(255,255,255,0.05);
+            --card-border: rgba(255,255,255,0.1);
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        a { text-decoration: none; color: inherit; }
+
+        /* NAV */
+        nav {
+            position: sticky; top: 0;
+            background: rgba(5,6,15,0.92);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .container { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; gap: 1rem; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .logo { display: flex; align-items: center; flex-shrink: 0; text-decoration: none; }
+        .logo-circle {
+            width: 40px; height: 40px;
+            background: var(--purple);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.25rem;
+            margin-right: 0.5rem;
+        }
+        .logo-text { font-weight: bold; font-size: 1.25rem; white-space: nowrap; color: var(--text); }
+        .nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+        .nav-user { display: none; align-items: center; gap: 0.625rem; }
+        .nav-user.visible { display: flex; }
+        .nav-user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); }
+        .nav-user-name { font-size: 0.85rem; color: var(--muted); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nav-signout-btn { background: transparent; border: 1px solid rgba(239,68,68,0.35); color: #f87171; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .nav-signout-btn:hover { background: rgba(239,68,68,0.12); border-color: #f87171; }
+        .nav-home-link { color: var(--muted); font-size: 0.85rem; text-decoration: none; }
+        .nav-home-link:hover { color: var(--text); }
+
+        /* PAGE LAYOUT */
+        .page-wrap {
+            min-height: calc(100vh - 70px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2.5rem 1.5rem 4rem;
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .page-header p {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        /* PROGRESS BAR */
+        .ob-progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            row-gap: 0.5rem;
+        }
+        .ob-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.72rem;
+            color: var(--muted);
+            min-width: 60px;
+        }
+        .ob-step-num {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+            border: 2px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--muted);
+            transition: all 0.3s;
+        }
+        .ob-step-num.active {
+            background: var(--purple);
+            border-color: var(--purple);
+            color: #fff;
+        }
+        .ob-step-num.done {
+            background: var(--teal);
+            border-color: var(--teal);
+            color: #fff;
+        }
+        .ob-line {
+            width: 40px; height: 2px;
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 18px;
+            flex-shrink: 0;
+        }
+        .ob-line.done { background: var(--teal); }
+
+        /* CARD */
+        .ob-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 680px;
+        }
+        .ob-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .ob-card .sub {
+            color: var(--muted);
+            font-size: 0.88rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ROLE CARDS */
+        .role-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .role-card {
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.03);
+        }
+        .role-card:hover { border-color: var(--purple); background: rgba(124,58,237,0.08); }
+        .role-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+        .role-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .role-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.35rem; }
+        .role-desc { color: var(--muted); font-size: 0.8rem; }
+
+        /* FORM FIELDS */
+        .field-row { display: flex; gap: 0.75rem; }
+        .ob-field { margin-bottom: 1rem; flex: 1; }
+        .ob-field label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 0.4rem; font-weight: 500; }
+        .ob-field input, .ob-field textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.5rem;
+            padding: 0.65rem 0.875rem;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+        .ob-field input:focus, .ob-field textarea:focus {
+            outline: none;
+            border-color: var(--purple);
+        }
+        .ob-field input::placeholder { color: rgba(148,163,184,0.5); }
+
+        /* BUTTONS */
+        .btn-row { display: flex; gap: 0.75rem; margin-top: 1.5rem; align-items: center; }
+        .btn-back {
+            flex: 0 0 auto;
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: var(--muted);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+        .btn-back:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
+        .btn-primary {
+            flex: 1;
+            padding: 0.85rem 1.5rem;
+            background: var(--purple);
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-primary:hover:not(:disabled) { background: var(--purple-light); }
+        .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+        .btn-gold {
+            display: inline-block;
+            background: var(--gold);
+            color: #000;
+            font-weight: 700;
+            padding: 0.875rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+        }
+        .btn-gold:hover { opacity: 0.88; }
+        .btn-navy {
+            display: inline-block;
+            background: var(--navy);
+            color: #fff;
+            font-weight: 700;
+            padding: 0.875rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            border: 2px solid var(--gold);
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-navy:hover { opacity: 0.88; }
+        .btn-teal {
+            background: var(--teal);
+            color: #fff;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: opacity 0.2s;
+        }
+        .btn-teal:hover { opacity: 0.88; }
+
+        /* SPINNER */
+        .spinner {
+            display: inline-block;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ERROR */
+        .ob-error {
+            color: #f87171;
+            font-size: 0.82rem;
+            margin-top: 0.75rem;
+            min-height: 1rem;
+        }
+
+        /* DISCLAIMER BOX */
+        .disclaimer-box {
+            border: 2px solid var(--gold);
+            border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            margin: 1.25rem 0;
+            background: rgba(201,168,76,0.06);
+        }
+        .disclaimer-box .disc-title {
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .disclaimer-box ul {
+            margin: 0.5rem 0 0 1.25rem;
+            color: var(--muted);
+            font-size: 0.875rem;
+            line-height: 1.8;
+        }
+        .disclaimer-box strong { color: var(--text); }
+
+        /* COURSE MODULE BOX */
+        .course-box {
+            background: rgba(201,162,71,0.08);
+            border: 1.5px solid var(--gold-bright);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+        .course-box h4 { color: var(--gold-bright); margin: 0 0 0.5rem; font-size: 1.05rem; }
+        .course-box p { color: var(--muted); font-size: 0.85rem; margin: 0 0 1rem; }
+
+        /* CHECKBOX */
+        .check-row {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .check-row label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        .check-row input[type="checkbox"] {
+            width: 18px; height: 18px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            accent-color: var(--gold-bright);
+        }
+
+        /* TIMER BANNER */
+        .timer-banner {
+            position: sticky;
+            top: 70px;
+            z-index: 50;
+            background: rgba(5,6,15,0.95);
+            border-bottom: 1px solid rgba(201,168,76,0.3);
+            padding: 0.75rem 1.5rem;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gold);
+            backdrop-filter: blur(8px);
+        }
+        .timer-banner.urgent { color: #f87171; animation: pulse-red 1s infinite; }
+        @keyframes pulse-red { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+        /* EXAM */
+        .exam-wrap { width: 100%; max-width: 680px; }
+        .exam-header {
+            margin-bottom: 1.5rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+        }
+        .exam-header h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .exam-header .sub { color: var(--muted); font-size: 0.85rem; }
+        .page-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .page-nav button {
+            padding: 0.4rem 0.75rem;
+            border-radius: 0.4rem;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.05);
+            color: var(--muted);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            transition: all 0.2s;
+        }
+        .page-nav button.active { border-color: var(--purple); background: rgba(124,58,237,0.15); color: var(--purple-light); font-weight: 600; }
+        .page-nav button.complete { border-color: var(--teal); background: rgba(16,185,129,0.1); color: var(--teal); }
+        .ob-question {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .ob-question p { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.875rem; }
+        .ob-choice {
+            padding: 0.65rem 1rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            font-size: 0.88rem;
+            color: var(--muted);
+            transition: all 0.15s;
+        }
+        .ob-choice:hover { border-color: var(--purple); color: var(--text); background: rgba(124,58,237,0.07); }
+        .ob-choice.selected { border-color: var(--gold); background: rgba(201,168,76,0.12); color: var(--text); }
+        .exam-submit-row { margin-top: 1.5rem; text-align: center; }
+        .answer-progress {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 1rem;
+        }
+        .answer-progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .answer-progress-fill {
+            height: 100%;
+            background: var(--teal);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        /* RESULT BANNERS */
+        .result-banner {
+            border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        .result-banner.pass {
+            background: rgba(16,185,129,0.12);
+            border: 2px solid rgba(16,185,129,0.4);
+            color: #34d399;
+        }
+        .result-banner.fail {
+            background: rgba(239,68,68,0.1);
+            border: 2px solid rgba(239,68,68,0.35);
+            color: #f87171;
+        }
+
+        /* CERT STEP */
+        .cert-box {
+            background: rgba(201,168,76,0.08);
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        .cert-box .cert-emoji { font-size: 3rem; margin-bottom: 1rem; }
+        .cert-box .cert-id { font-weight: 600; color: var(--gold); margin-bottom: 0.5rem; }
+        .cert-box .cert-hint { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+
+        /* SC STEP */
+        .sc-box {
+            background: rgba(27,42,107,0.3);
+            border: 1px solid rgba(201,168,76,0.35);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        .sc-box .sc-emoji { font-size: 3rem; margin-bottom: 1rem; }
+        .sc-box h4 { font-weight: 600; color: var(--gold); font-size: 1.1rem; margin-bottom: 0.35rem; }
+        .sc-box p { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+        .sc-instructions {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.875rem;
+            color: var(--muted);
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        /* ALREADY CERTIFIED */
+        .certified-card {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        .certified-card .cert-big { font-size: 4rem; margin-bottom: 1rem; }
+        .certified-card h2 { font-size: 1.5rem; font-weight: 700; color: var(--teal); margin-bottom: 0.5rem; }
+        .certified-card p { color: var(--muted); margin-bottom: 1.5rem; }
+
+        /* PAYMENT MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-card {
+            background: #0e101e;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+        }
+        .modal-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .modal-card .sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.25rem; }
+
+        /* NOT LOGGED IN */
+        .auth-gate {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        .auth-gate .gate-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .auth-gate h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .auth-gate p { color: var(--muted); margin-bottom: 1.5rem; }
+
+        /* LOADING */
+        .loading-screen {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--muted);
+        }
+        .loading-screen .big-spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--purple);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .role-cards { grid-template-columns: 1fr; }
+            .field-row { flex-direction: column; gap: 0; }
+            .ob-card { padding: 1.5rem 1.25rem; }
+            .ob-line { width: 24px; }
+            .ob-step { min-width: 48px; font-size: 0.65rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-content">
+        <a class="logo" href="/">
+            <div class="logo-circle">Q</div>
+            <span class="logo-text">Quanby Legal</span>
+        </a>
+        <div class="nav-right">
+            <a class="nav-home-link" href="/">← Back to Home</a>
+            <div class="nav-user" id="nav-user">
+                <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" onerror="this.style.display='none'">
+                <span class="nav-user-name" id="nav-user-name"></span>
+                <button class="nav-signout-btn" onclick="signOut()">Sign Out</button>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- TIMER (shown during exam) -->
+<div id="timer-banner" class="timer-banner" style="display:none;">
+    ⏱ Time Remaining: <span id="timer-display">90:00</span>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="page-wrap">
+    <!-- LOADING STATE -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="big-spinner"></div>
+        <p>Checking your account…</p>
+    </div>
+
+    <!-- AUTH GATE (not logged in) -->
+    <div id="auth-gate" class="auth-gate" style="display:none;">
+        <div class="gate-icon">🔒</div>
+        <h2>Sign In Required</h2>
+        <p>You need to sign in to access the ENP Certification process.</p>
+        <a href="/?sso=1" class="btn-primary" style="display:inline-flex;text-decoration:none;max-width:240px;">
+            🔑 Sign In to Continue
+        </a>
+    </div>
+
+    <!-- ALREADY CERTIFIED -->
+    <div id="certified-screen" class="ob-card" style="display:none;">
+        <div class="certified-card">
+            <div class="cert-big">✅</div>
+            <h2>You Are ENP Certified!</h2>
+            <p>Your Electronic Notary Public certification is on file. No further action is needed.</p>
+            <a href="/" class="btn-primary" style="display:inline-flex;text-decoration:none;max-width:240px;">
+                🏠 Return to Home
+            </a>
+        </div>
+    </div>
+
+    <!-- STEP PROGRESS -->
+    <div id="progress-wrap" style="display:none; width:100%; max-width:680px;">
+        <div class="page-header">
+            <h1>⚖️ ENP Certification</h1>
+            <p>Electronic Notary Public Certification under A.M. No. 24-10-14-SC</p>
+        </div>
+        <div class="ob-progress" id="ob-progress"></div>
+    </div>
+
+    <!-- STEP 1: ROLE -->
+    <div id="step-role" class="ob-card" style="display:none;">
+        <h2>Choose Your Role</h2>
+        <p class="sub">Select your role to begin your Electronic Notary Public (ENP) certification.</p>
+        <div class="role-cards">
+            <div class="role-card selected" id="role-attorney" onclick="selectRole('attorney')">
+                <div class="role-icon">⚖️</div>
+                <div class="role-title">Attorney / Law Firm</div>
+                <div class="role-desc">IBP-accredited, practicing notary public</div>
+            </div>
+            <div class="role-card" id="role-client" onclick="selectRole('client')">
+                <div class="role-icon">👤</div>
+                <div class="role-title">Client / Individual</div>
+                <div class="role-desc">Get documents notarized electronically</div>
+            </div>
+        </div>
+        <div id="err-role" class="ob-error"></div>
+        <button class="btn-primary" id="btn-role-continue" onclick="submitRole()">
+            Continue →
+        </button>
+    </div>
+
+    <!-- STEP 2: PROFILE -->
+    <div id="step-profile" class="ob-card" style="display:none;">
+        <h2>Complete Your Profile</h2>
+        <p class="sub">Required for ENP certification under A.M. No. 24-10-14-SC.</p>
+        <div class="field-row">
+            <div class="ob-field">
+                <label>First Name *</label>
+                <input type="text" id="ob-first-name" placeholder="Juan">
+            </div>
+            <div class="ob-field">
+                <label>Last Name *</label>
+                <input type="text" id="ob-last-name" placeholder="dela Cruz">
+            </div>
+        </div>
+        <div class="ob-field">
+            <label>Phone Number *</label>
+            <input type="tel" id="ob-phone" placeholder="+63 9XX XXX XXXX">
+        </div>
+        <!-- Attorney fields -->
+        <div id="attorney-fields">
+            <div class="ob-field">
+                <label>Law Firm / Office Name</label>
+                <input type="text" id="ob-firm" placeholder="e.g. Dela Cruz Law Offices">
+            </div>
+            <div class="ob-field">
+                <label>IBP Roll No. *</label>
+                <input type="text" id="ob-ibp" placeholder="e.g. 12345">
+            </div>
+            <div class="ob-field">
+                <label>PTC No. (if applicable)</label>
+                <input type="text" id="ob-ptc" placeholder="e.g. 98765">
+            </div>
+            <div class="ob-field">
+                <label>Legal Address</label>
+                <input type="text" id="ob-address" placeholder="e.g. Legazpi City, Albay">
+            </div>
+        </div>
+        <!-- Client fields -->
+        <div id="client-fields" style="display:none;">
+            <div class="ob-field">
+                <label>Organization (if applicable)</label>
+                <input type="text" id="ob-org" placeholder="e.g. ABC Corporation">
+            </div>
+            <div class="ob-field">
+                <label>Position / Title</label>
+                <input type="text" id="ob-position" placeholder="e.g. General Manager">
+            </div>
+        </div>
+        <div id="err-profile" class="ob-error"></div>
+        <div class="btn-row">
+            <button class="btn-back" onclick="goToStep('role')">← Back</button>
+            <button class="btn-primary" id="btn-profile-continue" onclick="submitProfile()">Continue →</button>
+        </div>
+    </div>
+
+    <!-- STEP 3: COURSE + DISCLAIMER -->
+    <div id="step-course" class="ob-card" style="display:none;">
+        <h2>📚 Course Module</h2>
+        <p class="sub">Read the course module before taking your certification exam.</p>
+        <div class="course-box">
+            <div style="font-size:2rem;margin-bottom:0.5rem;">📚</div>
+            <h4>Course Module: Mastering Quanby Legal</h4>
+            <p>This course covers Philippine ENP certification law including A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and the 2004 Rules on Notarial Practice.</p>
+            <a href="/mastering-quanby-legal.pdf" target="_blank" class="btn-gold" style="font-size:0.9rem;padding:0.625rem 1.25rem;">
+                📖 Download Course Module (PDF)
+            </a>
+        </div>
+        <div class="disclaimer-box">
+            <div class="disc-title">⚠️ Exam Notice</div>
+            <p style="color:var(--muted);font-size:0.875rem;margin-bottom:0.5rem;">Please read before proceeding:</p>
+            <ul>
+                <li>This exam consists of <strong>50 questions</strong> and is <strong>timed at 90 minutes</strong>.</li>
+                <li>Once started, the timer <strong>cannot be paused</strong>.</li>
+                <li>You must score <strong>70% (35 out of 50)</strong> to pass.</li>
+                <li>If you do not pass, you will be redirected to the course material.</li>
+                <li><strong>Retaking the exam requires a ₱500 GCash fee.</strong></li>
+                <li>Ensure you are ready before proceeding.</li>
+            </ul>
+        </div>
+        <div class="check-row">
+            <label>
+                <input type="checkbox" id="course-checkbox" onchange="toggleStartBtn()">
+                <span>I have read the course module and understand the exam conditions above.</span>
+            </label>
+        </div>
+        <div id="err-course" class="ob-error"></div>
+        <div class="btn-row">
+            <button class="btn-back" onclick="goToStep('profile')">← Back</button>
+            <button class="btn-primary" id="btn-start-exam" disabled onclick="startExam()">🎓 Start Exam</button>
+        </div>
+    </div>
+
+    <!-- STEP 4: EXAM -->
+    <div id="step-exam" style="display:none;" class="exam-wrap">
+        <div class="exam-header">
+            <h2>📝 ENP Certification Exam</h2>
+            <p class="sub">Answer all 50 questions. You need 70% (35/50) to pass.</p>
+            <div class="answer-progress" id="answer-progress">
+                <span id="answer-count">0/50 answered</span>
+                <div class="answer-progress-bar"><div class="answer-progress-fill" id="answer-bar" style="width:0%"></div></div>
+            </div>
+        </div>
+        <div id="page-nav" class="page-nav"></div>
+        <div id="exam-questions"></div>
+        <div id="err-exam" class="ob-error" style="text-align:center;"></div>
+        <div class="exam-submit-row">
+            <button class="btn-primary" id="btn-submit-exam" onclick="submitExam()" style="max-width:280px;margin:0 auto;">
+                Submit Test
+            </button>
+        </div>
+    </div>
+
+    <!-- EXAM RESULT -->
+    <div id="step-result" class="ob-card" style="display:none;">
+        <h2>📊 Exam Result</h2>
+        <div id="result-banner"></div>
+        <div id="result-content"></div>
+    </div>
+
+    <!-- STEP 5: DOWNLOAD CERTIFICATE -->
+    <div id="step-certificate" class="ob-card" style="display:none;">
+        <h2>🎓 Download Your Certificate</h2>
+        <p class="sub">Your ENP Course Completion Certificate is ready. Download it and submit it to the Supreme Court.</p>
+        <div class="cert-box">
+            <div class="cert-emoji">📜</div>
+            <div class="cert-id">Certificate ID: <span id="cert-id-display"></span></div>
+            <div class="cert-hint">Keep this ID — you will need it for Supreme Court submission.</div>
+            <a id="cert-download-link" href="#" target="_blank" class="btn-gold">
+                ⬇️ Download Certificate (PDF)
+            </a>
+        </div>
+        <div style="text-align:center;margin-top:1rem;">
+            <button class="btn-primary" onclick="goToStep('sc')" style="max-width:320px;margin:0 auto;">
+                Continue to Supreme Court Submission →
+            </button>
+        </div>
+    </div>
+
+    <!-- STEP 6: SC SUBMISSION -->
+    <div id="step-sc" class="ob-card" style="display:none;">
+        <h2>📋 Submit to the Supreme Court</h2>
+        <p class="sub">You are required to submit your certificate to the Supreme Court of the Philippines Electronic Notarization Portal.</p>
+        <div class="sc-box">
+            <div class="sc-emoji">⚖️</div>
+            <h4>Supreme Court of the Philippines</h4>
+            <p>Electronic Notarization Portal</p>
+            <a href="https://efiling.sc.judiciary.gov.ph" target="_blank" class="btn-navy">
+                Go to Supreme Court Portal →
+            </a>
+        </div>
+        <div class="sc-instructions">
+            After submitting your certificate on the Supreme Court portal, your ENP accreditation will be processed. 
+            You will receive confirmation from the Supreme Court directly. 
+            Please keep your Certificate ID handy during submission.
+        </div>
+        <div style="text-align:center;margin-top:1.5rem;">
+            <button class="btn-teal" onclick="completeOnboarding()">
+                ✅ Done — Return to Home
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- RETAKE PAYMENT MODAL -->
+<div class="modal-overlay" id="retake-modal">
+    <div class="modal-card">
+        <h3>💳 Retake Fee Payment</h3>
+        <p class="sub">A ₱500 retake fee is required to attempt the exam again.</p>
+        <div style="display:flex;gap:0.75rem;margin-bottom:1.25rem;">
+            <button id="tab-gcash" onclick="switchPayTab('gcash')" style="flex:1;padding:0.65rem;border-radius:0.5rem;border:2px solid rgba(201,168,76,0.5);background:rgba(201,168,76,0.1);color:#c9a84c;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">📱 GCash</button>
+            <button id="tab-bank" onclick="switchPayTab('bank')" style="flex:1;padding:0.65rem;border-radius:0.5rem;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);cursor:pointer;font-family:Inter,sans-serif;">🏦 Bank Transfer</button>
+        </div>
+        <div id="pay-gcash">
+            <div style="background:rgba(0,168,107,0.08);border:1px solid rgba(0,168,107,0.3);border-radius:0.5rem;padding:1.25rem;text-align:center;">
+                <div style="font-size:2rem;margin-bottom:0.5rem;">📱</div>
+                <p style="margin:0 0 0.5rem;font-weight:600;color:#00a86b;">GCash</p>
+                <p style="font-size:1.4rem;font-weight:700;margin:0 0 0.25rem;color:#fff;" id="pay-gcash-number">Loading…</p>
+                <p style="color:var(--muted);font-size:0.875rem;margin:0;">Account Name: Quanby Solutions, Inc.</p>
+                <div style="margin-top:1rem;padding:0.75rem;background:rgba(255,255,255,0.05);border-radius:0.4rem;">
+                    <p style="margin:0;font-size:0.8rem;color:var(--muted);">Reference Number</p>
+                    <p style="margin:0.25rem 0 0;font-weight:700;color:#c9a84c;letter-spacing:0.05em;" id="pay-ref">Loading…</p>
+                </div>
+            </div>
+        </div>
+        <div id="pay-bank" style="display:none;">
+            <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.3);border-radius:0.5rem;padding:1.25rem;">
+                <div style="font-size:2rem;margin-bottom:0.5rem;text-align:center;">🏦</div>
+                <table style="width:100%;font-size:0.875rem;border-collapse:collapse;">
+                    <tr><td style="padding:0.4rem 0;color:var(--muted);">Bank:</td><td style="padding:0.4rem 0;font-weight:600;" id="pay-bank-name">Loading…</td></tr>
+                    <tr><td style="padding:0.4rem 0;color:var(--muted);">Account Number:</td><td style="padding:0.4rem 0;font-weight:600;" id="pay-bank-account">Loading…</td></tr>
+                    <tr><td style="padding:0.4rem 0;color:var(--muted);">Account Name:</td><td style="padding:0.4rem 0;font-weight:600;" id="pay-bank-acname">Loading…</td></tr>
+                    <tr><td style="padding:0.4rem 0;color:var(--muted);">Amount:</td><td style="padding:0.4rem 0;font-weight:700;color:#c9a84c;">₱500.00</td></tr>
+                    <tr><td style="padding:0.4rem 0;color:var(--muted);">Reference:</td><td style="padding:0.4rem 0;font-weight:600;color:#c9a84c;" id="pay-ref-bank">Loading…</td></tr>
+                </table>
+            </div>
+        </div>
+        <div style="margin:1rem 0;background:rgba(255,255,255,0.03);border-radius:0.5rem;padding:0.875rem;font-size:0.8rem;color:var(--muted);">
+            ⚠️ After sending payment, click "I've Paid" below. Our team will verify and unlock your retake within 24 hours.
+        </div>
+        <div id="err-pay" class="ob-error"></div>
+        <button class="btn-primary" id="btn-confirm-pay" onclick="submitRetakePayment()">✅ I've Paid — Submit for Verification</button>
+        <button onclick="document.getElementById('retake-modal').classList.remove('open')" style="width:100%;margin-top:0.75rem;padding:0.6rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:0.5rem;cursor:pointer;font-family:Inter,sans-serif;font-size:0.85rem;">Cancel</button>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let _user = null;
+let _role = 'attorney';
+let _currentStep = 'role';
+let _questions = [];
+let _answers = {};
+let _testSessionId = null;
+let _timerInterval = null;
+let _certificateId = null;
+let _currentPage = 0;
+const QUESTIONS_PER_PAGE = 10;
+
+const OB_STEPS = ['role','profile','course','exam','certificate','sc'];
+const OB_LABELS = ['Role','Profile','Course','Exam','Certificate','SC Submit'];
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+async function init() {
+    try {
+        const res = await fetch('/api/auth/me', { credentials: 'include' });
+        if (!res.ok) {
+            // Not logged in
+            showScreen('auth-gate');
+            return;
+        }
+        _user = await res.json();
+
+        // Update nav
+        const nameEl = document.getElementById('nav-user-name');
+        const avatarEl = document.getElementById('nav-user-avatar');
+        const navUser = document.getElementById('nav-user');
+        if (nameEl) nameEl.textContent = _user.first_name || _user.email || 'Account';
+        if (avatarEl && _user.picture) avatarEl.src = _user.picture;
+        if (navUser) navUser.classList.add('visible');
+
+        // Already certified?
+        if (_user.onboarding_step === 'certified') {
+            showScreen('certified-screen');
+            return;
+        }
+
+        // Resume from their step
+        _role = _user.role || 'attorney';
+        const step = mapApiStepToLocal(_user.onboarding_step || 'role_select');
+        showProgress();
+        goToStep(step);
+
+    } catch(e) {
+        showScreen('auth-gate');
+    }
+}
+
+function mapApiStepToLocal(apiStep) {
+    const map = {
+        'role_select': 'role',
+        'profile':     'profile',
+        'test':        'course',
+        'kyc':         'course',    // Skip KYC for now, go to course/exam
+        'liveness':    'course',
+        'certificate': 'certificate',
+        'sc_redirect': 'sc',
+        'certified':   'certified'
+    };
+    return map[apiStep] || 'role';
+}
+
+function showProgress() {
+    document.getElementById('progress-wrap').style.display = 'block';
+}
+
+function showScreen(id) {
+    document.getElementById('loading-screen').style.display = 'none';
+    const screens = ['auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc'];
+    screens.forEach(s => {
+        const el = document.getElementById(s);
+        if (el) el.style.display = 'none';
+    });
+    const target = document.getElementById(id);
+    if (target) target.style.display = '';
+}
+
+function goToStep(step) {
+    _currentStep = step;
+    updateProgress(step);
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('certified-screen').style.display = 'none';
+    document.getElementById('step-role').style.display = 'none';
+    document.getElementById('step-profile').style.display = 'none';
+    document.getElementById('step-course').style.display = 'none';
+    document.getElementById('step-exam').style.display = 'none';
+    document.getElementById('step-result').style.display = 'none';
+    document.getElementById('step-certificate').style.display = 'none';
+    document.getElementById('step-sc').style.display = 'none';
+
+    const stepMap = {
+        'role':        'step-role',
+        'profile':     'step-profile',
+        'course':      'step-course',
+        'exam':        'step-exam',
+        'result':      'step-result',
+        'certificate': 'step-certificate',
+        'sc':          'step-sc'
+    };
+    const target = stepMap[step];
+    if (target) {
+        const el = document.getElementById(target);
+        if (el) el.style.display = '';
+    }
+
+    // Profile fields toggle
+    if (step === 'profile') {
+        toggleProfileFields();
+    }
+
+    // Hide timer if not on exam
+    if (step !== 'exam') {
+        document.getElementById('timer-banner').style.display = 'none';
+    }
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgress(activeStep) {
+    const idx = OB_STEPS.indexOf(activeStep);
+    const wrap = document.getElementById('ob-progress');
+    if (!wrap) return;
+    wrap.innerHTML = OB_STEPS.map((s, i) => {
+        const cls = i < idx ? 'done' : (i === idx ? 'active' : '');
+        const lbl = i < idx ? '✓' : (i + 1);
+        const lineClass = i < idx ? 'done' : '';
+        return (i > 0 ? `<div class="ob-line ${lineClass}"></div>` : '') +
+            `<div class="ob-step"><div class="ob-step-num ${cls}">${lbl}</div><span>${OB_LABELS[i]}</span></div>`;
+    }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// STEP 1: ROLE
+// ═══════════════════════════════════════════════
+function selectRole(role) {
+    _role = role;
+    document.getElementById('role-attorney').classList.toggle('selected', role === 'attorney');
+    document.getElementById('role-client').classList.toggle('selected', role === 'client');
+}
+
+async function submitRole() {
+    const btn = document.getElementById('btn-role-continue');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Saving…';
+    document.getElementById('err-role').textContent = '';
+    try {
+        const res = await fetch('/api/onboarding/role', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ role: _role })
+        });
+        if (!res.ok) throw new Error((await res.json()).detail || 'Failed to save role');
+        goToStep('profile');
+    } catch(e) {
+        document.getElementById('err-role').textContent = e.message;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Continue →';
+    }
+}
+
+// ═══════════════════════════════════════════════
+// STEP 2: PROFILE
+// ═══════════════════════════════════════════════
+function toggleProfileFields() {
+    const isAttorney = _role === 'attorney';
+    document.getElementById('attorney-fields').style.display = isAttorney ? '' : 'none';
+    document.getElementById('client-fields').style.display = isAttorney ? 'none' : '';
+}
+
+async function submitProfile() {
+    const firstName = (document.getElementById('ob-first-name') || {}).value?.trim() || '';
+    const lastName = (document.getElementById('ob-last-name') || {}).value?.trim() || '';
+    const phone = (document.getElementById('ob-phone') || {}).value?.trim() || '';
+    if (!firstName || !lastName || !phone) {
+        document.getElementById('err-profile').textContent = 'First name, last name, and phone are required.';
+        return;
+    }
+    const btn = document.getElementById('btn-profile-continue');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Saving…';
+    document.getElementById('err-profile').textContent = '';
+    const payload = {
+        first_name: firstName,
+        last_name: lastName,
+        phone: phone,
+        role: _role,
+        firm_name: (document.getElementById('ob-firm') || {}).value?.trim() || '',
+        ibp_number: (document.getElementById('ob-ibp') || {}).value?.trim() || '',
+        ptc_number: (document.getElementById('ob-ptc') || {}).value?.trim() || '',
+        legal_address: (document.getElementById('ob-address') || {}).value?.trim() || '',
+        organization: (document.getElementById('ob-org') || {}).value?.trim() || '',
+        position: (document.getElementById('ob-position') || {}).value?.trim() || '',
+    };
+    try {
+        const res = await fetch('/api/onboarding/profile', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            const errData = await res.json();
+            const detail = errData.detail;
+            let msg = 'Failed to save profile.';
+            if (typeof detail === 'string') msg = detail;
+            else if (Array.isArray(detail)) msg = detail.map(e => e.msg || e.message || JSON.stringify(e)).join('; ');
+            else if (detail) msg = JSON.stringify(detail);
+            throw new Error(msg);
+        }
+        goToStep('course');
+    } catch(e) {
+        document.getElementById('err-profile').textContent = e.message;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Continue →';
+    }
+}
+
+// ═══════════════════════════════════════════════
+// STEP 3: COURSE / DISCLAIMER
+// ═══════════════════════════════════════════════
+function toggleStartBtn() {
+    const cb = document.getElementById('course-checkbox');
+    const btn = document.getElementById('btn-start-exam');
+    btn.disabled = !cb.checked;
+    btn.style.opacity = cb.checked ? '1' : '0.45';
+}
+
+// ═══════════════════════════════════════════════
+// STEP 4: EXAM
+// ═══════════════════════════════════════════════
+async function startExam() {
+    goToStep('exam');
+    document.getElementById('exam-questions').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);"><div class="big-spinner" style="width:36px;height:36px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;"></div>Loading your 50-question exam…</div>';
+    document.getElementById('page-nav').innerHTML = '';
+    try {
+        const res = await fetch('/api/certification/start', { method: 'GET', credentials: 'include' });
+        if (!res.ok) throw new Error((await res.json()).detail || 'Failed to start exam');
+        const data = await res.json();
+        _questions = data.questions;
+        _answers = {};
+        _testSessionId = data.test_session_id;
+        _currentPage = 0;
+        renderExamPage(0);
+        startTimer(data.time_limit_minutes || 90);
+        document.getElementById('timer-banner').style.display = 'block';
+    } catch(e) {
+        document.getElementById('exam-questions').innerHTML =
+            '<div class="ob-error" style="text-align:center;padding:2rem;">' + e.message + '</div>';
+    }
+}
+
+function renderExamPage(page) {
+    _currentPage = page;
+    const start = page * QUESTIONS_PER_PAGE;
+    const end = Math.min(start + QUESTIONS_PER_PAGE, _questions.length);
+    const pageQuestions = _questions.slice(start, end);
+
+    // Render pagination
+    const totalPages = Math.ceil(_questions.length / QUESTIONS_PER_PAGE);
+    const navEl = document.getElementById('page-nav');
+    navEl.innerHTML = Array.from({length: totalPages}, (_, i) => {
+        const pageStart = i * QUESTIONS_PER_PAGE;
+        const pageEnd = Math.min(pageStart + QUESTIONS_PER_PAGE, _questions.length);
+        const pageAnswered = _questions.slice(pageStart, pageEnd).filter(q => _answers[q.id] !== undefined).length;
+        const allAnswered = pageAnswered === (pageEnd - pageStart);
+        const cls = i === page ? 'active' : (allAnswered ? 'complete' : '');
+        return `<button class="${cls}" onclick="renderExamPage(${i})">Page ${i+1} (${pageAnswered}/${pageEnd-pageStart})</button>`;
+    }).join('');
+
+    // Render questions
+    const qs = pageQuestions.map((q, i) =>
+        `<div class="ob-question" id="q-${q.id}">
+            <p>${start + i + 1}. ${q.question}</p>
+            ${q.choices.map(c =>
+                `<div class="ob-choice ${_answers[q.id] === c ? 'selected' : ''}" onclick="pickAnswer('${q.id}', this)">${c}</div>`
+            ).join('')}
+        </div>`
+    ).join('');
+    document.getElementById('exam-questions').innerHTML = qs;
+
+    updateAnswerProgress();
+
+    // Next page button
+    const hasNext = (page + 1) < totalPages;
+    const hasPrev = page > 0;
+    let navBtns = '';
+    if (hasPrev) navBtns += `<button class="btn-back" onclick="renderExamPage(${page-1})" style="flex:0 0 auto;">← Previous</button>`;
+    if (hasNext) navBtns += `<button class="btn-primary" onclick="renderExamPage(${page+1})" style="max-width:160px;">Next →</button>`;
+    document.getElementById('exam-questions').innerHTML += `<div class="btn-row" style="justify-content:${hasPrev&&hasNext?'space-between':(hasNext?'flex-end':'flex-start')}">${navBtns}</div>`;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateAnswerProgress() {
+    const answered = Object.keys(_answers).length;
+    const total = _questions.length;
+    const pct = total > 0 ? (answered / total * 100) : 0;
+    const countEl = document.getElementById('answer-count');
+    const barEl = document.getElementById('answer-bar');
+    if (countEl) countEl.textContent = `${answered}/${total} answered`;
+    if (barEl) barEl.style.width = pct + '%';
+}
+
+function pickAnswer(qid, el) {
+    const text = el.textContent;
+    _answers[qid] = text;
+    const block = document.getElementById('q-' + qid);
+    if (block) block.querySelectorAll('.ob-choice').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    updateAnswerProgress();
+    // Update page nav
+    const totalPages = Math.ceil(_questions.length / QUESTIONS_PER_PAGE);
+    const navEl = document.getElementById('page-nav');
+    if (navEl) {
+        navEl.innerHTML = Array.from({length: totalPages}, (_, i) => {
+            const pageStart = i * QUESTIONS_PER_PAGE;
+            const pageEnd = Math.min(pageStart + QUESTIONS_PER_PAGE, _questions.length);
+            const pageAnswered = _questions.slice(pageStart, pageEnd).filter(q => _answers[q.id] !== undefined).length;
+            const allAnswered = pageAnswered === (pageEnd - pageStart);
+            const cls = i === _currentPage ? 'active' : (allAnswered ? 'complete' : '');
+            return `<button class="${cls}" onclick="renderExamPage(${i})">Page ${i+1} (${pageAnswered}/${pageEnd-pageStart})</button>`;
+        }).join('');
+    }
+}
+
+function startTimer(minutes) {
+    if (_timerInterval) clearInterval(_timerInterval);
+    let remaining = minutes * 60;
+    function update() {
+        const el = document.getElementById('timer-display');
+        const banner = document.getElementById('timer-banner');
+        if (!el) { clearInterval(_timerInterval); return; }
+        const m = Math.floor(remaining / 60);
+        const s = remaining % 60;
+        el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+        if (remaining <= 300 && banner) banner.classList.add('urgent');
+        if (remaining <= 0) {
+            clearInterval(_timerInterval);
+            _timerInterval = null;
+            el.textContent = '00:00';
+            submitExam();
+        }
+        remaining--;
+    }
+    update();
+    _timerInterval = setInterval(update, 1000);
+}
+
+async function submitExam() {
+    const answered = Object.keys(_answers).length;
+    const total = _questions.length;
+    if (answered < total) {
+        document.getElementById('err-exam').textContent =
+            `Please answer all questions (${answered}/${total} answered). Use the page buttons to navigate.`;
+        return;
+    }
+    const btn = document.getElementById('btn-submit-exam');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Grading…';
+    if (_timerInterval) { clearInterval(_timerInterval); _timerInterval = null; }
+    document.getElementById('timer-banner').style.display = 'none';
+    document.getElementById('err-exam').textContent = '';
+    try {
+        const res = await fetch('/api/certification/submit', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ answers: _answers, test_session_id: _testSessionId })
+        });
+        const data = await res.json();
+        renderResult(data);
+    } catch(e) {
+        btn.disabled = false;
+        btn.textContent = 'Submit Test';
+        document.getElementById('err-exam').textContent = 'Submission failed. Please try again.';
+    }
+}
+
+// ═══════════════════════════════════════════════
+// EXAM RESULT
+// ═══════════════════════════════════════════════
+function renderResult(data) {
+    if (data.certificate_id) _certificateId = data.certificate_id;
+    const passed = data.passed;
+    const score = data.score !== undefined ? data.score : data.correct;
+    const total = data.total;
+    const scorePct = data.score_pct || Math.round(score / total * 100);
+
+    goToStep('result');
+
+    const bannerEl = document.getElementById('result-banner');
+    const contentEl = document.getElementById('result-content');
+
+    if (passed) {
+        bannerEl.innerHTML = `<div class="result-banner pass">🎉 Passed! — ${score}/${total} correct (${scorePct}%)</div>`;
+        contentEl.innerHTML = `
+            <p style="color:var(--muted);margin-bottom:1.5rem;">Congratulations! Your certificate is ready to download.</p>
+            <div style="text-align:center;">
+                <button class="btn-primary" onclick="goToDownloadCert('${data.certificate_id || ''}')" style="max-width:280px;margin:0 auto;">
+                    🎓 Proceed to Download Certificate →
+                </button>
+            </div>`;
+    } else {
+        bannerEl.innerHTML = `<div class="result-banner fail">❌ Not Passed — ${score}/${total} correct (${scorePct}%)</div>`;
+        contentEl.innerHTML = `
+            <p style="color:var(--muted);margin-bottom:1rem;">You need 70% (35/50) to pass. Review the course material and try again.</p>
+            <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:0.5rem;padding:1rem;margin-bottom:1.5rem;font-size:0.875rem;color:var(--muted);">
+                📧 A notification has been sent to your registered email with retake instructions.
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;">
+                <a href="/mastering-quanby-legal.pdf" target="_blank" class="btn-gold" style="text-align:center;width:100%;max-width:300px;">
+                    📖 Review Course Material
+                </a>
+                <button class="btn-primary" onclick="openRetakeModal()" style="max-width:300px;">
+                    🔄 Retake Exam (₱500 fee)
+                </button>
+            </div>`;
+    }
+}
+
+function goToDownloadCert(certId) {
+    if (certId) _certificateId = certId;
+    const certIdEl = document.getElementById('cert-id-display');
+    const dlLink = document.getElementById('cert-download-link');
+    if (certIdEl) certIdEl.textContent = _certificateId || '';
+    if (dlLink) dlLink.href = '/api/certificate/' + (_certificateId || '');
+    goToStep('certificate');
+}
+
+// ═══════════════════════════════════════════════
+// STEP 5: CERTIFICATE (resume from API step)
+// ═══════════════════════════════════════════════
+// Called on page load if user already has certificate step
+async function loadCertStep() {
+    // Try to get cert ID from user object or API
+    if (_user && _user.certificate_id) {
+        goToDownloadCert(_user.certificate_id);
+    } else {
+        goToStep('certificate');
+    }
+}
+
+// ═══════════════════════════════════════════════
+// RETAKE PAYMENT
+// ═══════════════════════════════════════════════
+function openRetakeModal() {
+    document.getElementById('retake-modal').classList.add('open');
+    loadPaymentDetails();
+}
+
+async function loadPaymentDetails() {
+    try {
+        const res = await fetch('/api/onboarding/retake-payment', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ payment_method: 'gcash' })
+        });
+        const d = await res.json();
+        const ref = d.reference_number || ('RETAKE-' + Math.random().toString(36).substr(2,8).toUpperCase());
+        const gn = document.getElementById('pay-gcash-number');
+        const pr = document.getElementById('pay-ref');
+        const prb = document.getElementById('pay-ref-bank');
+        const bn = document.getElementById('pay-bank-name');
+        const ba = document.getElementById('pay-bank-account');
+        const ban = document.getElementById('pay-bank-acname');
+        if (gn) gn.textContent = d.gcash_number || '09XX-XXX-XXXX';
+        if (pr) pr.textContent = ref;
+        if (prb) prb.textContent = ref;
+        if (bn) bn.textContent = d.bank_name || 'BDO';
+        if (ba) ba.textContent = d.bank_account || 'XXXX-XXXX-XXXX';
+        if (ban) ban.textContent = d.bank_account_name || 'Quanby Solutions, Inc.';
+    } catch(e) {}
+}
+
+function switchPayTab(tab) {
+    document.getElementById('pay-gcash').style.display = tab === 'gcash' ? '' : 'none';
+    document.getElementById('pay-bank').style.display = tab === 'bank' ? '' : 'none';
+    const activeStyle = 'flex:1;padding:0.65rem;border-radius:0.5rem;border:2px solid rgba(201,168,76,0.5);background:rgba(201,168,76,0.1);color:#c9a84c;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;';
+    const inactiveStyle = 'flex:1;padding:0.65rem;border-radius:0.5rem;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);cursor:pointer;font-family:Inter,sans-serif;';
+    document.getElementById('tab-gcash').style.cssText = tab === 'gcash' ? activeStyle : inactiveStyle;
+    document.getElementById('tab-bank').style.cssText = tab === 'bank' ? activeStyle : inactiveStyle;
+}
+
+async function submitRetakePayment() {
+    const btn = document.getElementById('btn-confirm-pay');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Submitting…';
+    document.getElementById('err-pay').textContent = '';
+    try {
+        const res = await fetch('/api/onboarding/retake-payment/verify', { method: 'POST', credentials: 'include' });
+        const d = await res.json();
+        document.getElementById('retake-modal').classList.remove('open');
+        // Show pending message in result content
+        const contentEl = document.getElementById('result-content');
+        if (contentEl) {
+            contentEl.innerHTML = `
+                <div style="text-align:center;padding:2rem 0;">
+                    <div style="font-size:3rem;margin-bottom:1rem;">⏳</div>
+                    <p style="font-weight:600;color:#c9a84c;">Payment verification pending</p>
+                    <p style="color:var(--muted);font-size:0.875rem;margin-top:0.5rem;">Our team will verify your payment within 24 hours and send you a confirmation email with a link to retake the exam.</p>
+                    ${d.reference_number ? `<p style="margin-top:0.75rem;font-size:0.85rem;color:var(--muted);">Reference: <strong style="color:#c9a84c;">${d.reference_number}</strong></p>` : ''}
+                </div>`;
+        }
+    } catch(e) {
+        btn.disabled = false;
+        btn.textContent = "✅ I've Paid — Submit for Verification";
+        document.getElementById('err-pay').textContent = 'Submission failed. Please try again.';
+    }
+}
+
+// ═══════════════════════════════════════════════
+// STEP 6: COMPLETE
+// ═══════════════════════════════════════════════
+async function completeOnboarding() {
+    try { await fetch('/api/onboarding/complete', { method: 'POST', credentials: 'include' }); } catch(e) {}
+    window.location.href = '/';
+}
+
+// ═══════════════════════════════════════════════
+// SIGN OUT
+// ═══════════════════════════════════════════════
+async function signOut() {
+    try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch(e) {}
+    window.location.href = '/';
+}
+
+// ═══════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════
+init();
+</script>
+</body>
+</html>

@@ -2524,23 +2524,8 @@
 
     function _navBadgeClick() {
         var badge = document.getElementById('nav-cert-badge');
-        if (!badge) return;
-        var step = badge._step || 'role_select';
-        var role = badge._role || 'attorney';
-        if (step === 'certified') return;
-        // Always start from role if role not yet set
-        if (step === 'role_select' || !role || role === 'undefined') {
-            openOnboard('role', 'attorney'); return;
-        }
-        var stepMap = {
-            'role_select': 'role', 'profile': 'profile', 'test': 'test',
-            'kyc': 'kyc', 'liveness': 'liveness',
-            'certificate': 'certificate', 'sc_redirect': 'sc_redirect'
-        };
-        var obStep = stepMap[step] || 'role';
-        if (obStep === 'certificate') { _renderCertificateStep(); document.getElementById('onboard-overlay').classList.add('open'); return; }
-        if (obStep === 'sc_redirect') { _renderSCRedirectStep(); document.getElementById('onboard-overlay').classList.add('open'); return; }
-        openOnboard(obStep, role);
+        if (badge && badge._step === 'certified') return;
+        window.location.href = '/onboard';
     }
 
     function _updateOnboardStrip(user) {
@@ -2570,7 +2555,7 @@
         };
         var msg = stepLabels[step] || stepLabels['test'];
         var action = actionLabels[step] || actionLabels['test'];
-        strip.innerHTML = '<div class="container"><span class="onboard-label">⚖️ ' + msg + '</span><button class="btn-signup" onclick="_navBadgeClick()">' + action + '</button></div>';
+        strip.innerHTML = '<div class="container"><span class="onboard-label">⚖️ ' + msg + '</span><button class="btn-signup" onclick="window.location.href=\'/onboard\'">' + action + '</button></div>';
     }
     initNavUser();
 
@@ -2578,35 +2563,7 @@
     (function handleExamLink() {
         const params = new URLSearchParams(window.location.search);
         if (params.get('exam') !== '1') return;
-        // Check if user is already logged in
-        fetch('/api/auth/me', { credentials: 'include' })
-            .then(r => r.ok ? r.json() : null)
-            .then(user => {
-                if (!user) {
-                    // Not logged in — show login prompt
-                    var s=document.getElementById('sso-modal'); if(s) s.classList.add('open'); else alert('Please sign in to take the exam.');
-                    return;
-                }
-                const step = user.onboarding_step || 'role_select';
-                if (step === 'certified') {
-                    alert('\u2705 You are already ENP Certified! No need to retake the exam.');
-                    return;
-                }
-                // Clear ?exam=1 from URL cleanly
-                window.history.replaceState({}, '', '/');
-                const role = user.role || sessionStorage.getItem('ql_pending_role') || 'attorney';
-                // If profile not yet complete, start from role selection
-                if (step === 'role_select' || !user.role) {
-                    setTimeout(function() { openOnboard('role', 'attorney'); }, 300);
-                } else if (step === 'profile') {
-                    setTimeout(function() { openOnboard('profile', role); }, 300);
-                } else {
-                    setTimeout(function() { openOnboard('test', role); }, 300);
-                }
-            })
-            .catch(function() {
-                var s=document.getElementById('sso-modal'); if(s) s.classList.add('open');
-            });
+        window.location.href = '/onboard';
     })();
 
         function routeToStep(step, role) {
