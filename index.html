@@ -75,6 +75,13 @@
         .nav-user-name { font-size: 0.85rem; color: var(--muted); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .nav-signout-btn { background: transparent; border: 1px solid rgba(239,68,68,0.35); color: #f87171; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
         .nav-signout-btn:hover { background: rgba(239,68,68,0.12); border-color: #f87171; }
+        .nav-cert-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 999px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+        .nav-cert-badge.step-exam { background: rgba(234,179,8,0.15); border: 1px solid rgba(234,179,8,0.4); color: #fbbf24; }
+        .nav-cert-badge.step-exam:hover { background: rgba(234,179,8,0.25); }
+        .nav-cert-badge.step-liveness { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.4); color: #60a5fa; }
+        .nav-cert-badge.step-certificate { background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); color: #c9a84c; }
+        .nav-cert-badge.step-certified { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: #34d399; cursor: default; }
+        .nav-cert-badge.step-profile { background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4); color: #c084fc; }
         .btn {
             padding: 0.5rem 1.25rem;
             border-radius: 0.375rem;
@@ -793,6 +800,7 @@
             <div class="nav-user" id="nav-user">
                 <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" onerror="this.style.display='none'">
                 <span class="nav-user-name" id="nav-user-name"></span>
+                <button id="nav-cert-badge" class="nav-cert-badge" style="display:none;" onclick="_navBadgeClick()"></button>
                 <button class="nav-signout-btn" onclick="signOut()">Sign Out</button>
             </div>
             <button class="hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
@@ -2317,7 +2325,80 @@
             if (nameEl) nameEl.textContent = user.first_name || user.email || 'Account';
             if (avatarEl && user.picture) avatarEl.src = user.picture;
             if (navUser) navUser.classList.add('visible');
+            _updateCertBadge(user);
+            _updateOnboardStrip(user);
         } catch(e) {}
+    }
+
+    function _updateCertBadge(user) {
+        var badge = document.getElementById('nav-cert-badge');
+        if (!badge) return;
+        var step = user.onboarding_step || 'role_select';
+        var role = user.role || 'attorney';
+        var config = {
+            'role_select': { cls: 'step-profile',     icon: '📋', label: 'Complete Profile' },
+            'profile':     { cls: 'step-profile',     icon: '📋', label: 'Complete Profile' },
+            'test':        { cls: 'step-exam',         icon: '📝', label: 'Take Exam' },
+            'kyc':         { cls: 'step-liveness',     icon: '🪪', label: 'Upload ID' },
+            'liveness':    { cls: 'step-liveness',     icon: '📷', label: 'Liveness Check' },
+            'certificate': { cls: 'step-certificate',  icon: '🎓', label: 'Download Certificate' },
+            'sc_redirect': { cls: 'step-certificate',  icon: '⚖️', label: 'Submit to SC' },
+            'certified':   { cls: 'step-certified',    icon: '✅', label: 'ENP Certified' },
+        };
+        var cfg = config[step] || config['test'];
+        badge.className = 'nav-cert-badge ' + cfg.cls;
+        badge.textContent = cfg.icon + ' ' + cfg.label;
+        badge.style.display = 'inline-flex';
+        badge._step = step;
+        badge._role = role;
+    }
+
+    function _navBadgeClick() {
+        var badge = document.getElementById('nav-cert-badge');
+        if (!badge) return;
+        var step = badge._step || 'test';
+        var role = badge._role || 'attorney';
+        if (step === 'certified') return;
+        // Map step to openOnboard call
+        var stepMap = {
+            'role_select': 'role', 'profile': 'profile', 'test': 'test',
+            'kyc': 'kyc', 'liveness': 'liveness',
+            'certificate': 'certificate', 'sc_redirect': 'sc_redirect'
+        };
+        var obStep = stepMap[step] || 'test';
+        if (obStep === 'certificate') { _renderCertificateStep(); document.getElementById('onboard-overlay').style.display = 'flex'; return; }
+        if (obStep === 'sc_redirect') { _renderSCRedirectStep(); document.getElementById('onboard-overlay').style.display = 'flex'; return; }
+        openOnboard(obStep, role);
+    }
+
+    function _updateOnboardStrip(user) {
+        var strip = document.getElementById('onboard-strip');
+        if (!strip) return;
+        var step = user.onboarding_step || 'test';
+        var role = user.role || 'attorney';
+        var name = user.first_name || 'there';
+        if (step === 'certified') {
+            strip.innerHTML = '<div class="container"><span class="onboard-label">✅ You are ENP Certified, ' + name + '! Your certificate is on file.</span></div>';
+            return;
+        }
+        var stepLabels = {
+            'role_select': 'Step 1: Complete your profile to begin certification.',
+            'profile':     'Step 1: Complete your profile to begin certification.',
+            'test':        'Step 2: Take your ENP Certification Exam to get certified.',
+            'kyc':         'Step 3: Upload your government ID to continue.',
+            'liveness':    'Step 4: Complete liveness verification.',
+            'certificate': 'Step 5: Download your certificate.',
+            'sc_redirect': 'Step 6: Submit your certificate to the Supreme Court.',
+        };
+        var actionLabels = {
+            'role_select': '📋 Complete Profile', 'profile': '📋 Complete Profile',
+            'test': '📝 Take the Exam Now', 'kyc': '🪪 Upload ID',
+            'liveness': '📷 Liveness Check', 'certificate': '🎓 Download Certificate',
+            'sc_redirect': '⚖️ Submit to Supreme Court',
+        };
+        var msg = stepLabels[step] || stepLabels['test'];
+        var action = actionLabels[step] || actionLabels['test'];
+        strip.innerHTML = '<div class="container"><span class="onboard-label">⚖️ ' + msg + '</span><button class="btn-signup" onclick="_navBadgeClick()">' + action + '</button></div>';
     }
     initNavUser();
 
