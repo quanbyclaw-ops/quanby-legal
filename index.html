@@ -2710,14 +2710,24 @@
                 <button class="onboard-btn" onclick="_submitRole()">Continue &#8594;</button>
                 <div id="ob-err" class="ob-error"></div>`;
         } else if (step === 'profile') {
+            const isAttorney = _obRole === 'attorney';
             el.innerHTML = `
                 <h3>Complete Your Profile</h3>
                 <p class="sub">Required for ENP certification under A.M. No. 24-10-14-SC.</p>
-                <div class="onboard-field"><label>Full Name *</label><input type="text" id="ob-name" placeholder="Juan dela Cruz"></div>
-                <div class="onboard-field"><label>IBP Roll No. ${_obRole==='attorney'?'*':'(if applicable)'}</label><input type="text" id="ob-ibp" placeholder="e.g. 12345"></div>
-                <div class="onboard-field"><label>PTR No. (if applicable)</label><input type="text" id="ob-ptr" placeholder="e.g. 98765"></div>
-                <div class="onboard-field"><label>Province / City *</label><input type="text" id="ob-province" placeholder="e.g. Legazpi City, Albay"></div>
-                <div class="onboard-field"><label>Notarial Jurisdiction</label><input type="text" id="ob-jurisdiction" placeholder="e.g. Albay"></div>
+                <div style="display:flex;gap:0.75rem;">
+                    <div class="onboard-field" style="flex:1"><label>First Name *</label><input type="text" id="ob-first-name" placeholder="Juan"></div>
+                    <div class="onboard-field" style="flex:1"><label>Last Name *</label><input type="text" id="ob-last-name" placeholder="dela Cruz"></div>
+                </div>
+                <div class="onboard-field"><label>Phone Number *</label><input type="tel" id="ob-phone" placeholder="+63 9XX XXX XXXX"></div>
+                ${isAttorney ? `
+                <div class="onboard-field"><label>Law Firm / Office Name</label><input type="text" id="ob-firm" placeholder="e.g. Dela Cruz Law Offices"></div>
+                <div class="onboard-field"><label>IBP Roll No. *</label><input type="text" id="ob-ibp" placeholder="e.g. 12345"></div>
+                <div class="onboard-field"><label>PTC No. (if applicable)</label><input type="text" id="ob-ptc" placeholder="e.g. 98765"></div>
+                <div class="onboard-field"><label>Legal Address</label><input type="text" id="ob-address" placeholder="e.g. Legazpi City, Albay"></div>
+                ` : `
+                <div class="onboard-field"><label>Organization (if applicable)</label><input type="text" id="ob-org" placeholder="e.g. ABC Corporation"></div>
+                <div class="onboard-field"><label>Position / Title</label><input type="text" id="ob-position" placeholder="e.g. General Manager"></div>
+                `}
                 <button class="onboard-btn" onclick="_submitProfile()">Continue &#8594;</button>
                 <div id="ob-err" class="ob-error"></div>
                 <p style="text-align:center;margin-top:0.75rem;"><a href="#" onclick="event.preventDefault();_renderObStep('test')" style="color:var(--muted);font-size:0.8rem;text-decoration:underline;">Skip to Exam (test mode)</a></p>`;
@@ -2836,31 +2846,39 @@
     }
 
     async function _submitProfile() {
-        const name = document.getElementById('ob-name').value.trim();
-        const province = document.getElementById('ob-province').value.trim();
-        if (!name || !province) {
-            document.getElementById('ob-err').textContent = 'Full name and province are required.'; return;
+        const firstName = (document.getElementById('ob-first-name') || {}).value?.trim() || '';
+        const lastName = (document.getElementById('ob-last-name') || {}).value?.trim() || '';
+        const phone = (document.getElementById('ob-phone') || {}).value?.trim() || '';
+        if (!firstName || !lastName || !phone) {
+            document.getElementById('ob-err').textContent = 'First name, last name, and phone are required.'; return;
         }
         const btn = document.querySelector('#ob-content .onboard-btn');
         btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Saving&#8230;';
+        const isAttorney = _obRole === 'attorney';
+        const payload = {
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone,
+            role: _obRole,
+            firm_name: (document.getElementById('ob-firm') || {}).value?.trim() || '',
+            ibp_number: (document.getElementById('ob-ibp') || {}).value?.trim() || '',
+            ptc_number: (document.getElementById('ob-ptc') || {}).value?.trim() || '',
+            legal_address: (document.getElementById('ob-address') || {}).value?.trim() || '',
+            organization: (document.getElementById('ob-org') || {}).value?.trim() || '',
+            position: (document.getElementById('ob-position') || {}).value?.trim() || '',
+        };
         try {
             const res = await fetch('/api/onboarding/profile', {
                 method: 'POST', credentials: 'include',
                 headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({
-                    full_name: name,
-                    ibp_number: document.getElementById('ob-ibp').value.trim(),
-                    ptr_number: document.getElementById('ob-ptr').value.trim(),
-                    province: province,
-                    notarial_jurisdiction: document.getElementById('ob-jurisdiction').value.trim()
-                })
+                body: JSON.stringify(payload)
             });
             if (!res.ok) {
                 const errData = await res.json();
                 const detail = errData.detail;
                 let msg = 'Failed to save profile.';
                 if (typeof detail === 'string') msg = detail;
-                else if (Array.isArray(detail)) msg = detail.map(e => e.msg || JSON.stringify(e)).join(', ');
+                else if (Array.isArray(detail)) msg = detail.map(e => e.msg || e.message || JSON.stringify(e)).join('; ');
                 else if (detail) msg = JSON.stringify(detail);
                 throw new Error(msg);
             }
