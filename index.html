@@ -2719,7 +2719,8 @@
                 <div class="onboard-field"><label>Province / City *</label><input type="text" id="ob-province" placeholder="e.g. Legazpi City, Albay"></div>
                 <div class="onboard-field"><label>Notarial Jurisdiction</label><input type="text" id="ob-jurisdiction" placeholder="e.g. Albay"></div>
                 <button class="onboard-btn" onclick="_submitProfile()">Continue &#8594;</button>
-                <div id="ob-err" class="ob-error"></div>`;
+                <div id="ob-err" class="ob-error"></div>
+                <p style="text-align:center;margin-top:0.75rem;"><a href="#" onclick="event.preventDefault();_renderObStep('test')" style="color:var(--muted);font-size:0.8rem;text-decoration:underline;">Skip to Exam (test mode)</a></p>`;
         } else if (step === 'test') {
             el.innerHTML = `
                 <h3>&#128218; Course Module</h3>
@@ -2738,7 +2739,7 @@
                         <input type="checkbox" id="course-read-checkbox"
                                style="width:18px;height:18px;margin-top:2px;flex-shrink:0;accent-color:#c9a227;"
                                onchange="document.getElementById('start-exam-btn').disabled = !this.checked;">
-                        <span>I have read and understood the course module and am ready to take the 15-question ENP Certification Exam.</span>
+                        <span>I have read and understood the course module and am ready to take the 50-question ENP Certification Exam.</span>
                     </label>
                 </div>
                 <button class="onboard-btn" id="start-exam-btn" disabled
@@ -2746,7 +2747,7 @@
                         style="opacity:0.5;transition:opacity 0.2s;"
                         onmouseenter="if(!this.disabled)this.style.opacity='1'"
                         onmouseleave="if(!this.disabled)this.style.opacity='1'">
-                    &#127891; Start 15-Question Exam
+                    &#127891; Start 50-Question Exam
                 </button>
                 <div id="ob-err" class="ob-error"></div>`;
             // Enable button visual when checkbox is ticked
@@ -2854,7 +2855,15 @@
                     notarial_jurisdiction: document.getElementById('ob-jurisdiction').value.trim()
                 })
             });
-            if (!res.ok) throw new Error((await res.json()).detail || 'Failed');
+            if (!res.ok) {
+                const errData = await res.json();
+                const detail = errData.detail;
+                let msg = 'Failed to save profile.';
+                if (typeof detail === 'string') msg = detail;
+                else if (Array.isArray(detail)) msg = detail.map(e => e.msg || JSON.stringify(e)).join(', ');
+                else if (detail) msg = JSON.stringify(detail);
+                throw new Error(msg);
+            }
             _renderObStep('test');
         } catch(e) {
             btn.disabled = false; btn.textContent = 'Continue →';
