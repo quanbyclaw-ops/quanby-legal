@@ -1422,13 +1422,14 @@ async function signInWithGoogle() {
     try {
         // Store that we want to return to /onboard after login
         sessionStorage.setItem('post_login_redirect', '/onboard');
-        const res = await fetch('/api/auth/google/url?role=attorney', { credentials: 'include' });
+        const res = await fetch('/api/auth/providers', { credentials: 'include' });
         if (!res.ok) throw new Error('Could not get sign-in URL');
         const data = await res.json();
-        if (data.url) {
-            window.location.href = data.url;
+        const url = (data.providers && data.providers.google) || null;
+        if (url) {
+            window.location.href = url;
         } else {
-            throw new Error('No URL returned');
+            throw new Error('Google sign-in not configured');
         }
     } catch(e) {
         alert('Sign in failed: ' + e.message + '. Please go back to the homepage and sign in.');
