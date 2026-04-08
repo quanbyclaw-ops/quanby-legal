@@ -69,6 +69,12 @@
         .nav-links a { white-space: nowrap; }
         .nav-links a:hover { color: var(--purple-light); }
         .nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+        .nav-user { display: none; align-items: center; gap: 0.625rem; }
+        .nav-user.visible { display: flex; }
+        .nav-user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); }
+        .nav-user-name { font-size: 0.85rem; color: var(--muted); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nav-signout-btn { background: transparent; border: 1px solid rgba(239,68,68,0.35); color: #f87171; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .nav-signout-btn:hover { background: rgba(239,68,68,0.12); border-color: #f87171; }
         .btn {
             padding: 0.5rem 1.25rem;
             border-radius: 0.375rem;
@@ -791,6 +797,11 @@
                 <a href="#regulatory">Regulatory</a>
                 <a href="#pricing">Pricing</a>
                 <a href="#about">About</a>
+            </div>
+            <div class="nav-user" id="nav-user">
+                <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" onerror="this.style.display='none'">
+                <span class="nav-user-name" id="nav-user-name"></span>
+                <button class="nav-signout-btn" onclick="signOut()">Sign Out</button>
             </div>
             <button class="hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
         </div>
@@ -2299,7 +2310,30 @@
             });
     })();
 
-    function routeToStep(step, role) {
+    async function signOut() {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        } catch(e) {}
+        document.getElementById('nav-user').classList.remove('visible');
+        window.location.reload();
+    }
+
+    async function initNavUser() {
+        try {
+            const res = await fetch('/api/auth/me', { credentials: 'include' });
+            if (!res.ok) return;
+            const user = await res.json();
+            const nameEl = document.getElementById('nav-user-name');
+            const avatarEl = document.getElementById('nav-user-avatar');
+            const navUser = document.getElementById('nav-user');
+            if (nameEl) nameEl.textContent = user.first_name || user.email || 'Account';
+            if (avatarEl && user.picture) avatarEl.src = user.picture;
+            if (navUser) navUser.classList.add('visible');
+        } catch(e) {}
+    }
+    initNavUser();
+
+        function routeToStep(step, role) {
         switch(step) {
             case 'role_select': openOnboard('role', role); break;
             case 'profile':     openOnboard('profile', role); break;
