@@ -74,8 +74,8 @@
     "provider": "google",
     "provider_id": "117234970218948577348",
     "email_verified": true,
-    "role": null,
-    "onboarding_step": "role_select",
+    "role": "attorney",
+    "onboarding_step": "profile",
     "profile": {},
     "test_result": null,
     "liveness_verified": false,
@@ -85,7 +85,6 @@
     "retake_count": 0,
     "retake_payment_confirmed": false,
     "created_at": "2026-04-08T05:25:50.742225+00:00",
-    "last_login": "2026-04-08T10:06:16.168697+00:00",
-    "retake_payment_pending": false
+    "last_login": "2026-04-08T10:49:14.710868+00:00"
   }
 }

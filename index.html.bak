@@ -69,6 +69,19 @@
         .nav-links a { white-space: nowrap; }
         .nav-links a:hover { color: var(--purple-light); }
         .nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+        .nav-user { display: none; align-items: center; gap: 0.625rem; }
+        .nav-user.visible { display: flex; }
+        .nav-user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); }
+        .nav-user-name { font-size: 0.85rem; color: var(--muted); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nav-signout-btn { background: transparent; border: 1px solid rgba(239,68,68,0.35); color: #f87171; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .nav-signout-btn:hover { background: rgba(239,68,68,0.12); border-color: #f87171; }
+        .nav-cert-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 999px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+        .nav-cert-badge.step-exam { background: rgba(234,179,8,0.15); border: 1px solid rgba(234,179,8,0.4); color: #fbbf24; }
+        .nav-cert-badge.step-exam:hover { background: rgba(234,179,8,0.25); }
+        .nav-cert-badge.step-liveness { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.4); color: #60a5fa; }
+        .nav-cert-badge.step-certificate { background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); color: #c9a84c; }
+        .nav-cert-badge.step-certified { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: #34d399; cursor: default; }
+        .nav-cert-badge.step-profile { background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4); color: #c084fc; }
         .btn {
             padding: 0.5rem 1.25rem;
             border-radius: 0.375rem;
@@ -88,7 +101,7 @@
         .btn-teal:hover { opacity: 0.9; }
         .btn-sm { padding: 0.375rem 0.875rem; font-size: 0.875rem; }
 
-        /* Ã¢â€â‚¬Ã¢â€â‚¬ ONBOARDING CTA STRIP Ã¢â€â‚¬Ã¢â€â‚¬ */
+        /* ── ONBOARDING CTA STRIP ── */
         .onboard-strip {
             background: linear-gradient(90deg, rgba(124,58,237,0.15) 0%, rgba(236,72,153,0.1) 100%);
             border-bottom: 1px solid rgba(124,58,237,0.25);
@@ -96,29 +109,21 @@
         }
         .onboard-strip .container { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; }
         .onboard-label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
-        .btn-lawfirm {
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
-            color: white; border: none;
-            padding: 0.6rem 1.5rem; border-radius: 0.5rem;
-            font-weight: 700; font-size: 0.9rem; cursor: pointer;
-            display: flex; align-items: center; gap: 0.5rem;
-            transition: all 0.2s; box-shadow: 0 2px 12px rgba(124,58,237,0.35);
-            white-space: nowrap;
+        .btn-signup {
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.75rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.02em;
         }
-        .btn-lawfirm:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,58,237,0.5); }
-        .btn-publicclient {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white; border: none;
-            padding: 0.6rem 1.5rem; border-radius: 0.5rem;
-            font-weight: 700; font-size: 0.9rem; cursor: pointer;
-            display: flex; align-items: center; gap: 0.5rem;
-            transition: all 0.2s; box-shadow: 0 2px 12px rgba(16,185,129,0.35);
-            white-space: nowrap;
-        }
-        .btn-publicclient:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(16,185,129,0.5); }
-        .onboard-divider { color: var(--muted); font-size: 0.8rem; }
+        .btn-signup:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(124,58,237,0.45); }
 
-        /* Ã¢â€â‚¬Ã¢â€â‚¬ SSO MODAL Ã¢â€â‚¬Ã¢â€â‚¬ */
+        /* ── SSO MODAL ── */
         .sso-modal-overlay {
             display: none; position: fixed; inset: 0;
             background: rgba(0,0,0,0.75); z-index: 1000;
@@ -299,11 +304,11 @@
         .tier-price { font-size: 2rem; margin-bottom: 1rem; }
         .tier-features { list-style: none; color: var(--muted); }
         .tier-features li { margin-bottom: 0.5rem; }
-        .tier-features li::before { content: "Ã¢Å“â€œ "; color: var(--teal); }
+        .tier-features li::before { content: "✓ "; color: var(--teal); }
 
-        /* Ã¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€Â */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         /* CONTRACT AGENT SECTION */
-        /* Ã¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€Â */
+        /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
         #contract-agent {
             background: linear-gradient(180deg, rgba(124,58,237,0.05) 0%, transparent 100%);
             border-top: 1px solid rgba(124,58,237,0.2);
@@ -742,7 +747,7 @@
             .connecting-line { display: none; }
             .nav-links { display: none; }
             .hamburger { display: flex; }
-            /* Nav CTA buttons removed Ã¢â‚¬â€ handled by onboard-strip only */
+            /* Nav CTA buttons removed — handled by onboard-strip only */
             /* Badge: allow wrapping on mobile */
             .badge { font-size: 0.75rem; white-space: normal; text-align: center; }
             /* Hero: reduce padding */
@@ -775,6 +780,175 @@
             /* Upload area: less padding on mobile */
             .upload-area { padding: 1.75rem 1rem; }
         }
+
+        /* ── ONBOARDING MODAL ── */
+        .onboard-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .onboard-overlay.open { display: flex; }
+        .onboard-modal {
+            background: #0f1020;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 640px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .onboard-close {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            transition: color 0.2s;
+        }
+        .onboard-close:hover { color: #fff; }
+        .onboard-progress {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            padding-bottom: 0.25rem;
+        }
+        .ob-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
+            flex-shrink: 0;
+            min-width: 56px;
+        }
+        .ob-step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted, #94a3b8);
+            transition: all 0.2s;
+        }
+        .ob-step-num.done {
+            background: var(--teal, #10b981);
+            border-color: var(--teal, #10b981);
+            color: #fff;
+        }
+        .ob-step-num.active {
+            background: var(--purple, #7c3aed);
+            border-color: var(--purple, #7c3aed);
+            color: #fff;
+        }
+        .ob-step span {
+            font-size: 0.65rem;
+            color: var(--muted, #94a3b8);
+            white-space: nowrap;
+            text-align: center;
+        }
+        .ob-line {
+            flex: 1;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            min-width: 12px;
+            margin-bottom: 1.1rem;
+        }
+        .onboard-modal h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        .onboard-modal .sub {
+            color: var(--muted, #94a3b8);
+            font-size: 0.9rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+        .onboard-btn {
+            display: block;
+            width: 100%;
+            padding: 0.875rem 1.5rem;
+            background: var(--purple, #7c3aed);
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.25rem;
+            transition: background 0.2s;
+        }
+        .onboard-btn:hover { background: var(--purple-light, #9d5ff3); }
+        .onboard-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .onboard-field { margin-bottom: 1rem; }
+        .onboard-field label { display: block; font-size: 0.85rem; color: var(--muted,#94a3b8); margin-bottom: 0.35rem; }
+        .onboard-field input, .onboard-field select {
+            width: 100%;
+            padding: 0.6rem 0.875rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.4rem;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+        .onboard-field input:focus { outline: none; border-color: var(--purple,#7c3aed); }
+        .onboard-role-cards { display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+        .onboard-role-card {
+            flex: 1; min-width: 140px;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .onboard-role-card:hover, .onboard-role-card.selected {
+            border-color: var(--purple,#7c3aed);
+            background: rgba(124,58,237,0.1);
+        }
+        .ob-question { margin-bottom: 1.25rem; }
+        .ob-question p { font-weight: 500; margin-bottom: 0.75rem; line-height: 1.5; }
+        .ob-choice {
+            padding: 0.6rem 0.875rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.4rem;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.15s;
+        }
+        .ob-choice:hover { background: rgba(124,58,237,0.15); border-color: rgba(124,58,237,0.4); }
+        .ob-choice.selected { background: rgba(124,58,237,0.2); border-color: var(--purple,#7c3aed); color: #fff; }
+        .ob-result-banner { padding: 1rem 1.25rem; border-radius: 0.5rem; font-weight: 600; font-size: 1rem; margin-bottom: 1rem; text-align: center; }
+        .ob-result-banner.pass { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399; }
+        .ob-result-banner.fail { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #f87171; }
+        .ob-error { color: #f87171; font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2em; }
+        .ob-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: ob-spin 0.7s linear infinite; margin-right: 0.5rem; vertical-align: middle; }
+        @keyframes ob-spin { to { transform: rotate(360deg); } }
+        .ob-cam-container { text-align: center; margin: 1rem 0; }
+        .ob-cam-container video, .ob-cam-container canvas { border-radius: 0.5rem; max-width: 100%; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
@@ -792,32 +966,34 @@
                 <a href="#pricing">Pricing</a>
                 <a href="#about">About</a>
             </div>
+            <div class="nav-user" id="nav-user">
+                <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" onerror="this.style.display='none'">
+                <span class="nav-user-name" id="nav-user-name"></span>
+                <button id="nav-cert-badge" class="nav-cert-badge" style="display:none;" onclick="_navBadgeClick()"></button>
+                <button class="nav-signout-btn" onclick="signOut()">Sign Out</button>
+            </div>
             <button class="hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
         </div>
     </nav>
-    <!-- Ã¢â€¢ÂÃ¢â€¢Â ONBOARDING CTA STRIP Ã¢â€¢ÂÃ¢â€¢Â -->
+    <!-- ══ ONBOARDING CTA STRIP ══ -->
     <div class="onboard-strip" id="onboard-strip">
         <div class="container">
-            <span class="onboard-label">Ã¢Å¡â€“Ã¯Â¸Â Supreme Court-accredited Ã¢â‚¬â€ Get certified today:</span>
-            <button class="btn-lawfirm" onclick="openSSO('attorney')" aria-label="Law Firms Ã¢â‚¬â€ Start ENP certification">
-                Ã°Å¸Ââ€ºÃ¯Â¸Â Law Firms
-            </button>
-            <span class="onboard-divider">or</span>
-            <button class="btn-publicclient" onclick="openSSO('client')" aria-label="Public Clients Ã¢â‚¬â€ Create account">
-                Ã°Å¸â€˜Â¤ Public Clients
+            <span class="onboard-label">⚖️ Supreme Court-accredited — Get certified today:</span>
+            <button class="btn-signup" onclick="openSSO('attorney')" aria-label="Sign Up — Get certified today">
+                ✍️ Sign Up
             </button>
         </div>
     </div>
 
-    <!-- Ã¢â€¢ÂÃ¢â€¢Â SSO MODAL Ã¢â€¢ÂÃ¢â€¢Â -->
+    <!-- ══ SSO MODAL ══ -->
     <div class="sso-modal-overlay" id="sso-modal" role="dialog" aria-modal="true" aria-label="Sign in to Quanby Legal">
         <div class="sso-modal">
             <button class="sso-modal-close" onclick="closeSSO()" aria-label="Close">&times;</button>
 
-            <div id="sso-role-badge" class="sso-role-badge attorney">Ã¢Å¡â€“Ã¯Â¸Â Law Firm / Attorney</div>
+            <div id="sso-role-badge" class="sso-role-badge attorney">⚖️ Law Firm / Attorney</div>
 
             <h3 id="sso-title">Start Your ENP Certification</h3>
-            <p id="sso-desc">Sign in to begin your Electronic Notary Public certification Ã¢â‚¬â€ required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.</p>
+            <p id="sso-desc">Sign in to begin your Electronic Notary Public certification — required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.</p>
 
             <!-- Progress steps -->
             <div class="sso-steps">
@@ -866,29 +1042,29 @@
         </div>
         <div class="container hero-content">
             <div class="hero-text">
-                <div class="badge">Ã¢Å¡â€“Ã¯Â¸Â Supreme Court-accredited Ã¢â‚¬â€ A.M. No. 24-10-14-SC | RA 8792 | RA 10173 | BSP Circular 944 | SEC MC 28-2020</div>
+                <div class="badge">⚖️ Supreme Court-accredited — A.M. No. 24-10-14-SC | RA 8792 | RA 10173 | BSP Circular 944 | SEC MC 28-2020</div>
                 <h1><span class="gradient-text">AI-Powered Legal</span><br>Platform for the Philippines</h1>
-                <p class="hero-subtitle">Analyze contracts, generate legally compliant documents, and get instant notarization Ã¢â‚¬â€ powered by AI and fully compliant with Philippine law Ã¢â‚¬â€ A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and SEC MC 28-2020.</p>
+                <p class="hero-subtitle">Analyze contracts, generate legally compliant documents, and get instant notarization — powered by AI and fully compliant with Philippine law — A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and SEC MC 28-2020.</p>
                 <div style="display:flex; flex-wrap:wrap; gap:0.6rem; margin-bottom:1.25rem;">
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Ã¢Å¡â€“Ã¯Â¸Â A.M. No. 24-10-14-SC</span>
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Ã°Å¸â€œÅ“ RA 8792 E-Commerce</span>
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Ã°Å¸â€â€™ RA 10173 Data Privacy</span>
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Ã°Å¸ÂÂ¦ BSP Circular 944</span>
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Ã°Å¸â€œâ€¹ SEC MC 28-2020</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">⚖️ A.M. No. 24-10-14-SC</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">📜 RA 8792 E-Commerce</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">🔒 RA 10173 Data Privacy</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">🏦 BSP Circular 944</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">📋 SEC MC 28-2020</span>
                 </div>
                 <div class="hero-buttons">
-                    <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})">Ã°Å¸Â¤â€“ Try Contract AI Agent Ã¢â€ â€™</button>
-                    <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">View Compliance Ã¢â€ â€™</button>
+                    <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})">🤖 Try Contract AI Agent →</button>
+                    <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">View Compliance →</button>
                 </div>
             </div>
             <div class="orbital">
-                <div class="orbital-center">Ã¢Å¡â€“Ã¯Â¸Â</div>
+                <div class="orbital-center">⚖️</div>
                 <div class="ring ring1"></div>
                 <div class="ring ring2"></div>
-                <div class="orbital-icon icon1">Ã°Å¸â€œâ€ž</div>
-                <div class="orbital-icon icon2">Ã°Å¸â€ºÂ¡Ã¯Â¸Â</div>
-                <div class="orbital-icon icon3">Ã¢Å“ÂÃ¯Â¸Â</div>
-                <div class="orbital-icon icon4">Ã¢â€ºâ€œÃ¯Â¸Â</div>
+                <div class="orbital-icon icon1">📄</div>
+                <div class="orbital-icon icon2">🛡️</div>
+                <div class="orbital-icon icon3">✍️</div>
+                <div class="orbital-icon icon4">⛓️</div>
             </div>
         </div>
     </section>
@@ -910,32 +1086,32 @@
             <p class="section-subtitle">Comprehensive ENF platform compliant with A.M. No. 24-10-14-SC</p>
             <div class="features-grid">
                 <div class="card">
-                    <div class="card-icon">Ã°Å¸Â¤â€“</div>
+                    <div class="card-icon">🤖</div>
                     <div class="card-title">Contract AI Agent</div>
-                    <p class="card-desc">Upload any contract and get instant AI analysis Ã¢â‚¬â€ parties, risks, obligations, Philippine law compliance flags</p>
+                    <p class="card-desc">Upload any contract and get instant AI analysis — parties, risks, obligations, Philippine law compliance flags</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">Ã°Å¸â€œÂ¹</div>
+                    <div class="card-icon">📹</div>
                     <div class="card-title">IEN & REN Services</div>
                     <p class="card-desc">In-Person and Remote Electronic Notarization with HD videoconferencing</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">Ã°Å¸â€ºÂ¡Ã¯Â¸Â</div>
+                    <div class="card-icon">🛡️</div>
                     <div class="card-title">DICT National PKI Authentication</div>
                     <p class="card-desc">Official digital certificates for identity verification</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">Ã¢Å“ÂÃ¯Â¸Â</div>
+                    <div class="card-icon">✍️</div>
                     <div class="card-title">Electronic Signatures & Seal</div>
                     <p class="card-desc">Legally binding electronic notarial seal compliant with Philippine law</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">Ã¢â€ºâ€œÃ¯Â¸Â</div>
+                    <div class="card-icon">⛓️</div>
                     <div class="card-title">Immutable Blockchain Audit</div>
-                    <p class="card-desc">Hyperledger Fabric blockchain audit trails Ã¢â‚¬â€ tamper-proof notarization records</p>
+                    <p class="card-desc">Hyperledger Fabric blockchain audit trails — tamper-proof notarization records</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">Ã°Å¸Å’Â</div>
+                    <div class="card-icon">🌐</div>
                     <div class="card-title">Global-Grade Security</div>
                     <p class="card-desc">Singapore-based blockchain security by DOCONCHAIN Group</p>
                 </div>
@@ -943,22 +1119,22 @@
         </div>
     </section>
 
-    <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <!-- CONTRACT AI AGENT SECTION -->
-    <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+    <!-- ═══════════════════════════════════════════════════════════════════════ -->
     <section id="contract-agent">
         <div class="container">
             <div class="agent-header">
-                <div class="agent-badge">Ã¢Å“Â¨ Powered by xAI Grok Ã‚Â· Philippine Law Expert</div>
+                <div class="agent-badge">✨ Powered by xAI Grok · Philippine Law Expert</div>
                 <h2>Contract <span class="gradient-text">AI Agent</span></h2>
-                <p class="section-subtitle">Upload any contract for instant AI analysis, ask questions, or generate new contracts Ã¢â‚¬â€ all compliant with Philippine law</p>
+                <p class="section-subtitle">Upload any contract for instant AI analysis, ask questions, or generate new contracts — all compliant with Philippine law</p>
             </div>
 
             <!-- TABS -->
             <div class="agent-tabs">
-                <button class="agent-tab active" onclick="switchTab('analyze')">Ã°Å¸â€œâ€¹ Analyze Contract</button>
-                <button class="agent-tab" onclick="switchTab('chat')">Ã°Å¸â€™Â¬ Ask AI</button>
-                <button class="agent-tab" onclick="switchTab('generate')">Ã¢Å“Â¨ Generate Contract</button>
+                <button class="agent-tab active" onclick="switchTab('analyze')">📋 Analyze Contract</button>
+                <button class="agent-tab" onclick="switchTab('chat')">💬 Ask AI</button>
+                <button class="agent-tab" onclick="switchTab('generate')">✨ Generate Contract</button>
             </div>
 
             <!-- TAB: ANALYZE -->
@@ -966,7 +1142,7 @@
                 <!-- Upload Area -->
                 <div class="upload-area" id="upload-area">
                     <input type="file" id="file-input" accept=".pdf,.docx,.txt" onchange="handleFileSelect(this)">
-                    <div class="upload-icon">Ã°Å¸â€œâ€ž</div>
+                    <div class="upload-icon">📄</div>
                     <div class="upload-title">Drop your contract here</div>
                     <p class="upload-desc">Upload a PDF or DOCX contract for instant AI-powered legal analysis under Philippine law</p>
                     <div class="upload-types">
@@ -988,59 +1164,59 @@
                 <div class="analysis-results" id="analysis-results">
                     <div class="analysis-header">
                         <div>
-                            <div class="analysis-meta" id="analysis-filename">Ã°Å¸â€œâ€ž contract.pdf</div>
+                            <div class="analysis-meta" id="analysis-filename">📄 contract.pdf</div>
                             <div class="analysis-title" id="analysis-contract-type">Service Agreement</div>
                             <div class="analysis-meta" id="analysis-summary" style="margin-top:0.5rem;max-width:700px;color:var(--muted)"></div>
                         </div>
                         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center">
-                            <div class="risk-badge" id="overall-risk-badge">Ã°Å¸Å¸Â¡ MEDIUM RISK</div>
-                            <button class="btn btn-outline btn-sm" onclick="switchTab('chat')">Ã°Å¸â€™Â¬ Ask AI about this</button>
-                            <button class="btn btn-sm" style="background:transparent;border:1px solid var(--card-border);color:var(--muted)" onclick="resetAnalysis()">Upload new Ã¢â€ â€™</button>
+                            <div class="risk-badge" id="overall-risk-badge">🟡 MEDIUM RISK</div>
+                            <button class="btn btn-outline btn-sm" onclick="switchTab('chat')">💬 Ask AI about this</button>
+                            <button class="btn btn-sm" style="background:transparent;border:1px solid var(--card-border);color:var(--muted)" onclick="resetAnalysis()">Upload new →</button>
                         </div>
                     </div>
 
                     <div class="analysis-grid">
                         <!-- Parties -->
                         <div class="analysis-card">
-                            <div class="analysis-card-title">Ã°Å¸â€˜Â¥ Parties</div>
+                            <div class="analysis-card-title">👥 Parties</div>
                             <div id="parties-list"></div>
                         </div>
 
                         <!-- Key Dates & Payment -->
                         <div class="analysis-card">
-                            <div class="analysis-card-title">Ã°Å¸â€œâ€¦ Key Dates & Payment</div>
+                            <div class="analysis-card-title">📅 Key Dates & Payment</div>
                             <div id="dates-payment-list"></div>
                         </div>
 
                         <!-- Risk Flags -->
                         <div class="analysis-card" style="grid-column: 1 / -1">
-                            <div class="analysis-card-title">Ã°Å¸Å¡Â© Risk Flags & Issues</div>
+                            <div class="analysis-card-title">🚩 Risk Flags & Issues</div>
                             <div id="risk-flags-list"></div>
                         </div>
 
                         <!-- Obligations -->
                         <div class="analysis-card">
-                            <div class="analysis-card-title">Ã°Å¸â€œÅ’ Key Obligations</div>
+                            <div class="analysis-card-title">📌 Key Obligations</div>
                             <div id="obligations-list"></div>
                         </div>
 
                         <!-- Compliance -->
                         <div class="analysis-card">
-                            <div class="analysis-card-title">Ã¢Å“â€¦ Compliance Check</div>
+                            <div class="analysis-card-title">✅ Compliance Check</div>
                             <div id="compliance-list"></div>
                         </div>
 
                         <!-- Missing Clauses -->
                         <div class="analysis-card" style="grid-column: 1 / -1">
-                            <div class="analysis-card-title">Ã¢Å¡Â Ã¯Â¸Â Missing Clauses</div>
+                            <div class="analysis-card-title">⚠️ Missing Clauses</div>
                             <div id="missing-clauses-list"></div>
                         </div>
                     </div>
 
                     <div style="margin-top:1.5rem;padding:1.25rem;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:0.75rem">
-                        <div style="font-weight:600;margin-bottom:0.5rem">Ã°Å¸Â¤â€“ AI Recommendation</div>
+                        <div style="font-weight:600;margin-bottom:0.5rem">🤖 AI Recommendation</div>
                         <div id="ai-recommendation" style="color:var(--muted);font-size:0.9rem;line-height:1.6"></div>
-                        <div style="margin-top:1rem;font-size:0.75rem;color:var(--muted);font-style:italic">Ã¢Å¡â€“Ã¯Â¸Â This AI analysis is for informational purposes only and does not constitute legal advice. Consult a licensed Philippine attorney for final decisions. Quanby Legal's certified ENPs are available for e-notarization.</div>
+                        <div style="margin-top:1rem;font-size:0.75rem;color:var(--muted);font-style:italic">⚖️ This AI analysis is for informational purposes only and does not constitute legal advice. Consult a licensed Philippine attorney for final decisions. Quanby Legal's certified ENPs are available for e-notarization.</div>
                     </div>
                 </div>
             </div>
@@ -1050,13 +1226,13 @@
                 <div class="contract-chat-container">
                     <!-- Contract Info -->
                     <div class="contract-info-panel">
-                        <div style="font-weight:600;margin-bottom:1rem">Ã°Å¸â€œâ€ž Loaded Contract</div>
+                        <div style="font-weight:600;margin-bottom:1rem">📄 Loaded Contract</div>
                         <div id="chat-contract-info">
                             <div class="no-contract-msg">
-                                <div style="font-size:2rem;margin-bottom:0.5rem">Ã°Å¸â€œâ€¹</div>
+                                <div style="font-size:2rem;margin-bottom:0.5rem">📋</div>
                                 <div>No contract loaded yet</div>
                                 <div style="font-size:0.85rem;margin-top:0.25rem">Upload a contract in the Analyze tab first</div>
-                                <button class="btn btn-outline btn-sm" style="margin-top:1rem" onclick="switchTab('analyze')">Upload Contract Ã¢â€ â€™</button>
+                                <button class="btn btn-outline btn-sm" style="margin-top:1rem" onclick="switchTab('analyze')">Upload Contract →</button>
                             </div>
                         </div>
                         <div class="divider" id="suggested-divider" style="display:none"></div>
@@ -1078,7 +1254,7 @@
                     <!-- Chat Panel -->
                     <div class="contract-chat-panel">
                         <div class="contract-chat-header">
-                            <div class="ai-avatar">Ã°Å¸Â¤â€“</div>
+                            <div class="ai-avatar">🤖</div>
                             <div>
                                 <div style="font-weight:600;font-size:0.9rem">Quanby Legal AI</div>
                                 <div style="font-size:0.75rem;color:var(--muted)">Philippine Law Expert <span class="online-dot" style="margin-left:4px"></span></div>
@@ -1086,12 +1262,12 @@
                         </div>
                         <div class="contract-chat-messages" id="contract-chat-messages">
                             <div class="chat-msg chat-msg-ai">
-                                Kumusta! I'm your Quanby Legal AI Agent, specialized in Philippine contract law and the Civil Code. Upload a contract in the Analyze tab, then ask me anything about it Ã¢â‚¬â€ I'll give you precise, legally grounded answers.
+                                Kumusta! I'm your Quanby Legal AI Agent, specialized in Philippine contract law and the Civil Code. Upload a contract in the Analyze tab, then ask me anything about it — I'll give you precise, legally grounded answers.
                             </div>
                         </div>
                         <div class="contract-chat-input-area">
                             <input type="text" class="contract-chat-input" id="contract-chat-input" placeholder="Ask about your contract..." onkeypress="if(event.key==='Enter') sendContractChat()">
-                            <button class="chat-send-btn" id="chat-send-btn" onclick="sendContractChat()">Send Ã¢â€ â€™</button>
+                            <button class="chat-send-btn" id="chat-send-btn" onclick="sendContractChat()">Send →</button>
                         </div>
                     </div>
                 </div>
@@ -1110,19 +1286,19 @@
 
                     <!-- Generate Form -->
                     <div class="generate-form">
-                        <div class="form-title" id="generate-form-title">Ã°Å¸ÂÂ¡ Deed of Absolute Sale</div>
+                        <div class="form-title" id="generate-form-title">🏡 Deed of Absolute Sale</div>
                         <div id="generate-form-fields">
                             <!-- Dynamic fields populated by JS -->
                         </div>
-                        <button class="btn btn-filled" onclick="generateContract()" id="generate-btn">Ã¢Å“Â¨ Generate Contract with AI</button>
+                        <button class="btn btn-filled" onclick="generateContract()" id="generate-btn">✨ Generate Contract with AI</button>
 
                         <!-- Generated Contract Output -->
                         <div class="generated-contract" id="generated-contract">
                             <div class="generated-contract-header">
                                 <div style="font-weight:600" id="generated-title">Generated Contract</div>
                                 <div style="display:flex;gap:0.5rem">
-                                    <button class="btn btn-outline btn-sm" onclick="copyContract()">Ã°Å¸â€œâ€¹ Copy</button>
-                                    <button class="btn btn-teal btn-sm" onclick="downloadContract()">Ã¢Â¬â€¡ Download</button>
+                                    <button class="btn btn-outline btn-sm" onclick="copyContract()">📋 Copy</button>
+                                    <button class="btn btn-teal btn-sm" onclick="downloadContract()">⬇ Download</button>
                                 </div>
                             </div>
                             <div class="analysis-loading" id="generate-loading" style="display:none">
@@ -1141,37 +1317,37 @@
     <section id="compliance">
         <div class="container">
             <h2>Legally Compliant &amp; Certified</h2>
-            <p class="section-subtitle">Built from the ground up to satisfy Philippine regulatory requirements Ã¢â‚¬â€ Supreme Court, DICT, NPC, BSP, and SEC.</p>
+            <p class="section-subtitle">Built from the ground up to satisfy Philippine regulatory requirements — Supreme Court, DICT, NPC, BSP, and SEC.</p>
 
             <!-- Compliance trust bar -->
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:0.75rem; margin-bottom:2.5rem;">
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">Ã¢Å¡â€“Ã¯Â¸Â</div>
+                    <div style="font-size:1.3rem;">⚖️</div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">A.M. No. 24-10-14-SC</div>
                     <div style="font-size:0.65rem;color:#64748b;">Supreme Court</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">Ã°Å¸â€œÅ“</div>
+                    <div style="font-size:1.3rem;">📜</div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">RA 8792</div>
                     <div style="font-size:0.65rem;color:#64748b;">E-Commerce Act</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">Ã°Å¸â€â€™</div>
+                    <div style="font-size:1.3rem;">🔒</div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">RA 10173</div>
                     <div style="font-size:0.65rem;color:#64748b;">Data Privacy Act</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">Ã°Å¸ÂÂ¦</div>
+                    <div style="font-size:1.3rem;">🏦</div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">BSP Circular 944</div>
                     <div style="font-size:0.65rem;color:#64748b;">eKYC Standards</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">Ã°Å¸â€œâ€¹</div>
+                    <div style="font-size:1.3rem;">📋</div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">SEC MC 28-2020</div>
                     <div style="font-size:0.65rem;color:#64748b;">Remote Notarization</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">Ã°Å¸â€ºÂ¡Ã¯Â¸Â</div>
+                    <div style="font-size:1.3rem;">🛡️</div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">DICT PNPKI</div>
                     <div style="font-size:0.65rem;color:#64748b;">Gov. Identity Verified</div>
                 </div>
@@ -1179,45 +1355,45 @@
 
             <div class="compliance-grid">
                 <div class="compliance-card card">
-                    <div class="icon-circle">Ã¢Å¡â€“Ã¯Â¸Â</div>
+                    <div class="icon-circle">⚖️</div>
                     <div class="card-title">Supreme Court-Accredited ENF</div>
                     <p class="card-desc">First and only accredited Electronic Notarization Facility (ENF) in the Philippines under A.M. No. 24-10-14-SC. Supports both In-Person (IEN) and Remote (REN) notarization nationwide.</p>
-                    <a href="https://sc.judiciary.gov.ph/enotary-services/enotarization-rules/" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">sc.judiciary.gov.ph Ã¢â€ â€™</a>
+                    <a href="https://sc.judiciary.gov.ph/enotary-services/enotarization-rules/" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">sc.judiciary.gov.ph →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">Ã°Å¸Ââ€ºÃ¯Â¸Â</div>
+                    <div class="icon-circle">🏛️</div>
                     <div class="card-title">DICT National PKI Verified</div>
                     <p class="card-desc">All ENPs are verified through the Philippine National PKI (RA 8792). Digital signatures carry full legal weight under the E-Commerce Act of 2000 and its IRR.</p>
-                    <a href="https://dict.gov.ph/pnpki" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">DICT PNPKI Ã¢â€ â€™</a>
+                    <a href="https://dict.gov.ph/pnpki" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">DICT PNPKI →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">Ã°Å¸â€â€™</div>
+                    <div class="icon-circle">🔒</div>
                     <div class="card-title">NPC-Registered Data Controller</div>
                     <p class="card-desc">Registered Personal Information Controller (PIC) with the National Privacy Commission under RA 10173. AES-256 encryption, TLS 1.3, and a dedicated Data Protection Officer (DPO).</p>
-                    <a href="https://privacy.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">privacy.gov.ph Ã¢â€ â€™</a>
+                    <a href="https://privacy.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">privacy.gov.ph →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">Ã°Å¸ÂÂ¦</div>
+                    <div class="icon-circle">🏦</div>
                     <div class="card-title">BSP-Aligned eKYC</div>
                     <p class="card-desc">Identity verification aligns with BSP Circular 944 (eKYC) and Circular 1108 (digital onboarding), making Quanby Legal documents accepted by BSP-supervised banks and EMIs.</p>
-                    <a href="https://bsp.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">bsp.gov.ph Ã¢â€ â€™</a>
+                    <a href="https://bsp.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">bsp.gov.ph →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">Ã°Å¸â€œâ€¹</div>
+                    <div class="icon-circle">📋</div>
                     <div class="card-title">SEC &amp; Corporate Filing Ready</div>
                     <p class="card-desc">E-notarized documents are accepted for SEC submissions under MC 28-2020 and MC 6-2021, covering GIS, AFS, and mandatory corporate filings under RA 11232.</p>
-                    <a href="https://sec.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">sec.gov.ph Ã¢â€ â€™</a>
+                    <a href="https://sec.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">sec.gov.ph →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">Ã¢â€ºâ€œÃ¯Â¸Â</div>
+                    <div class="icon-circle">⛓️</div>
                     <div class="card-title">DOCONCHAIN &amp; Hyperledger</div>
                     <p class="card-desc">Enterprise blockchain-backed immutable document trail via DOCONCHAIN / Hyperledger. Every notarized document is cryptographically anchored for tamper-proof verification.</p>
-                    <a href="https://doconchain.com" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">doconchain.com Ã¢â€ â€™</a>
+                    <a href="https://doconchain.com" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">doconchain.com →</a>
                 </div>
             </div>
 
             <div style="text-align:center; margin-top:2rem;">
-                <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">Ã°Å¸â€œâ€“ View Full Regulatory Disclosure Ã¢â€ â€™</button>
+                <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">📖 View Full Regulatory Disclosure →</button>
             </div>
         </div>
     </section>
@@ -1232,12 +1408,12 @@
 
             <!-- Supreme Court & Judiciary -->
             <div style="margin-bottom: 3rem;">
-                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">Ã¢Å¡â€“Ã¯Â¸Â Supreme Court of the Philippines</h3>
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">⚖️ Supreme Court of the Philippines</h3>
                 <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
                     <div class="card" style="padding: 1.5rem;">
                         <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">A.M. No. 24-10-14-SC</div>
                         <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Rules on Electronic Notarization in the Philippines. Quanby Legal is the first and only platform accredited under this Supreme Court issuance, authorizing both In-Person (IEN) and Remote (REN) electronic notarization nationwide.</p>
-                        <a href="https://sc.judiciary.gov.ph/enotary-services/enotarization-rules/" target="_blank" rel="noopener" style="color: #a78bfa; font-size: 0.825rem; display: inline-block; margin-top: 0.75rem;">sc.judiciary.gov.ph Ã¢â€ â€”</a>
+                        <a href="https://sc.judiciary.gov.ph/enotary-services/enotarization-rules/" target="_blank" rel="noopener" style="color: #a78bfa; font-size: 0.825rem; display: inline-block; margin-top: 0.75rem;">sc.judiciary.gov.ph ↗</a>
                     </div>
                     <div class="card" style="padding: 1.5rem;">
                         <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">2004 Rules on Notarial Practice</div>
@@ -1252,19 +1428,19 @@
 
             <!-- DICT / E-Commerce Act -->
             <div style="margin-bottom: 3rem;">
-                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">Ã°Å¸Ââ€ºÃ¯Â¸Â DICT & E-Commerce Legislation</h3>
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">🏛️ DICT & E-Commerce Legislation</h3>
                 <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
                     <div class="card" style="padding: 1.5rem;">
-                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">RA 8792 Ã¢â‚¬â€ E-Commerce Act</div>
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">RA 8792 — E-Commerce Act</div>
                         <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Electronic documents and signatures processed through Quanby Legal carry full legal weight under the Electronic Commerce Act of 2000, ensuring validity and enforceability of digitally notarized instruments.</p>
                     </div>
                     <div class="card" style="padding: 1.5rem;">
-                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">RA 8792 Ã¢â‚¬â€ Electronic Signature Standards</div>
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">RA 8792 — Electronic Signature Standards</div>
                         <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">All electronic signatures on our platform conform to DICT-prescribed electronic signature standards, including PKI-based certificates issued by the Philippine National Public Key Infrastructure (PNPKI).</p>
-                        <a href="https://dict.gov.ph/pnpki" target="_blank" rel="noopener" style="color: #a78bfa; font-size: 0.825rem; display: inline-block; margin-top: 0.75rem;">DICT PNPKI Ã¢â€ â€”</a>
+                        <a href="https://dict.gov.ph/pnpki" target="_blank" rel="noopener" style="color: #a78bfa; font-size: 0.825rem; display: inline-block; margin-top: 0.75rem;">DICT PNPKI ↗</a>
                     </div>
                     <div class="card" style="padding: 1.5rem;">
-                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">DICT National PKI Ã¢â‚¬â€ Identity Verification</div>
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">DICT National PKI — Identity Verification</div>
                         <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">All ENPs are verified through the Philippine National PKI operated by DICT, ensuring government-grade identity assurance for every notary on the Quanby Legal platform.</p>
                     </div>
                 </div>
@@ -1272,12 +1448,12 @@
 
             <!-- Data Privacy -->
             <div style="margin-bottom: 3rem;">
-                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">Ã°Å¸â€â€™ Data Privacy (NPC / RA 10173)</h3>
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">🔒 Data Privacy (NPC / RA 10173)</h3>
                 <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
                     <div class="card" style="padding: 1.5rem;">
-                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">RA 10173 Ã¢â‚¬â€ Data Privacy Act of 2012</div>
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">RA 10173 — Data Privacy Act of 2012</div>
                         <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Quanby Legal is compliant with the Data Privacy Act of 2012 and its Implementing Rules and Regulations (IRR). We have appointed a Data Protection Officer (DPO) and maintain a Personal Information Management System (PIMS).</p>
-                        <a href="https://privacy.gov.ph/" target="_blank" rel="noopener" style="color: #a78bfa; font-size: 0.825rem; display: inline-block; margin-top: 0.75rem;">National Privacy Commission Ã¢â€ â€”</a>
+                        <a href="https://privacy.gov.ph/" target="_blank" rel="noopener" style="color: #a78bfa; font-size: 0.825rem; display: inline-block; margin-top: 0.75rem;">National Privacy Commission ↗</a>
                     </div>
                     <div class="card" style="padding: 1.5rem;">
                         <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">NPC Registration</div>
@@ -1292,14 +1468,14 @@
 
             <!-- BSP / Fintech -->
             <div style="margin-bottom: 3rem;">
-                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">Ã°Å¸ÂÂ¦ BSP Ã¢â‚¬â€ Financial & Fintech Compliance</h3>
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">🏦 BSP — Financial & Fintech Compliance</h3>
                 <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
                     <div class="card" style="padding: 1.5rem;">
-                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">BSP Circular No. 944 Ã¢â‚¬â€ eKYC Standards</div>
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">BSP Circular No. 944 — eKYC Standards</div>
                         <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Our identity verification workflows align with BSP Circular No. 944, which sets standards for electronic Know-Your-Customer (eKYC) processes used by BSP-supervised financial institutions. This ensures Quanby Legal is interoperable with banks and EMIs that rely on notarized documents.</p>
                     </div>
                     <div class="card" style="padding: 1.5rem;">
-                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">BSP Circular No. 1108 Ã¢â‚¬â€ Digital Onboarding</div>
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">BSP Circular No. 1108 — Digital Onboarding</div>
                         <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Electronic notarization services provided through Quanby Legal support compliant digital customer onboarding under BSP Circular No. 1108, enabling financial institutions to accept e-notarized documents for account opening and lending.</p>
                     </div>
                     <div class="card" style="padding: 1.5rem;">
@@ -1311,14 +1487,14 @@
 
             <!-- SEC -->
             <div style="margin-bottom: 3rem;">
-                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">Ã°Å¸â€œâ€¹ SEC Ã¢â‚¬â€ Corporate & Securities Compliance</h3>
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">📋 SEC — Corporate & Securities Compliance</h3>
                 <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
                     <div class="card" style="padding: 1.5rem;">
-                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">SEC Memorandum Circular No. 28-2020 Ã¢â‚¬â€ Remote Notarization</div>
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">SEC Memorandum Circular No. 28-2020 — Remote Notarization</div>
                         <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Quanby Legal supports corporate transactions compliant with SEC MC No. 28-2020 (later extended), which authorized remote notarization for SEC filings and corporate acts during and beyond the pandemic-era digital transition.</p>
                     </div>
                     <div class="card" style="padding: 1.5rem;">
-                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">SEC Memorandum Circular No. 6-2021 Ã¢â‚¬â€ Digital Corporate Records</div>
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">SEC Memorandum Circular No. 6-2021 — Digital Corporate Records</div>
                         <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Documents notarized through Quanby Legal are accepted for SEC submissions under SEC MC No. 6-2021, covering GIS, AFS, and other mandatory corporate filings that require notarization.</p>
                     </div>
                     <div class="card" style="padding: 1.5rem;">
@@ -1330,15 +1506,15 @@
 
             <!-- Disclaimer -->
             <div class="card" style="padding: 1.75rem 2rem; border-left: 3px solid rgba(124,58,237,0.5); background: rgba(124,58,237,0.06);">
-                <div style="font-weight: 700; margin-bottom: 0.75rem; color: #f1f5f9; font-size: 0.95rem;">Ã¢Å¡Â Ã¯Â¸Â Regulatory Disclaimer</div>
+                <div style="font-weight: 700; margin-bottom: 0.75rem; color: #f1f5f9; font-size: 0.95rem;">⚠️ Regulatory Disclaimer</div>
                 <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.8;">This page is provided for informational purposes and does not constitute legal advice. Regulatory frameworks are subject to change. Quanby Legal makes no warranty that all information is current at the time of reading. For the most up-to-date regulatory guidance, consult the Supreme Court of the Philippines, the National Privacy Commission (NPC), Bangko Sentral ng Pilipinas (BSP), or the Securities and Exchange Commission (SEC). Businesses and individuals should seek independent legal counsel for compliance advice specific to their situation.</p>
                 <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.825rem;">
-                    <a href="https://sc.judiciary.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">Supreme Court Ã¢â€ â€”</a>
-                    <a href="https://privacy.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">NPC Ã¢â€ â€”</a>
-                    <a href="https://bsp.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">BSP Ã¢â€ â€”</a>
-                    <a href="https://sec.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">SEC Ã¢â€ â€”</a>
-                    <a href="https://dict.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">DICT Ã¢â€ â€”</a>
-                    <a href="https://amlc.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">AMLC Ã¢â€ â€”</a>
+                    <a href="https://sc.judiciary.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">Supreme Court ↗</a>
+                    <a href="https://privacy.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">NPC ↗</a>
+                    <a href="https://bsp.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">BSP ↗</a>
+                    <a href="https://sec.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">SEC ↗</a>
+                    <a href="https://dict.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">DICT ↗</a>
+                    <a href="https://amlc.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">AMLC ↗</a>
                 </div>
             </div>
         </div>
@@ -1351,21 +1527,21 @@
             <div class="steps">
                 <div class="step">
                     <div class="step-number">1</div>
-                    <div class="step-icon">Ã°Å¸â€œÂ¤</div>
+                    <div class="step-icon">📤</div>
                     <div class="step-title">Upload & Analyze</div>
-                    <p style="color:var(--muted);font-size:0.9rem">Upload your contract Ã¢â‚¬â€ AI analyzes it instantly</p>
+                    <p style="color:var(--muted);font-size:0.9rem">Upload your contract — AI analyzes it instantly</p>
                 </div>
                 <div class="connecting-line"></div>
                 <div class="step">
                     <div class="step-number">2</div>
-                    <div class="step-icon">Ã°Å¸ÂªÂª</div>
+                    <div class="step-icon">🪪</div>
                     <div class="step-title">Verify Identity</div>
-                    <p style="color:var(--muted);font-size:0.9rem">eKYC with DICT PKI Ã¢â‚¬â€ legally binding identity</p>
+                    <p style="color:var(--muted);font-size:0.9rem">eKYC with DICT PKI — legally binding identity</p>
                 </div>
                 <div class="connecting-line"></div>
                 <div class="step">
                     <div class="step-number">3</div>
-                    <div class="step-icon">Ã¢Å“â€¦</div>
+                    <div class="step-icon">✅</div>
                     <div class="step-title">Certified & Notarized</div>
                     <p style="color:var(--muted);font-size:0.9rem">Instant blockchain-anchored notarized document</p>
                 </div>
@@ -1378,10 +1554,10 @@
         <div class="container">
             <h2>Built for every industry that needs legal certainty</h2>
             <div class="use-cases-grid">
-                <div class="card"><div class="card-icon">Ã°Å¸ÂËœÃ¯Â¸Â</div><div class="card-title">Real Estate</div><p class="card-desc">Deeds of Sale, Lease Agreements, MOAs Ã¢â‚¬â€ fully analyzed and notarized</p></div>
-                <div class="card"><div class="card-icon">Ã¢Å¡â€“Ã¯Â¸Â</div><div class="card-title">Legal & Law Firms</div><p class="card-desc">Faster document review and notarization for your clients</p></div>
-                <div class="card"><div class="card-icon">Ã°Å¸ÂÂ¦</div><div class="card-title">Banking & Finance</div><p class="card-desc">Loan agreements, SPAs, and financial contracts with AI compliance checks</p></div>
-                <div class="card"><div class="card-icon">Ã°Å¸Ââ€ºÃ¯Â¸Â</div><div class="card-title">Government</div><p class="card-desc">Procurement, MOAs, and government contracts with full audit trail</p></div>
+                <div class="card"><div class="card-icon">🏘️</div><div class="card-title">Real Estate</div><p class="card-desc">Deeds of Sale, Lease Agreements, MOAs — fully analyzed and notarized</p></div>
+                <div class="card"><div class="card-icon">⚖️</div><div class="card-title">Legal & Law Firms</div><p class="card-desc">Faster document review and notarization for your clients</p></div>
+                <div class="card"><div class="card-icon">🏦</div><div class="card-title">Banking & Finance</div><p class="card-desc">Loan agreements, SPAs, and financial contracts with AI compliance checks</p></div>
+                <div class="card"><div class="card-icon">🏛️</div><div class="card-title">Government</div><p class="card-desc">Procurement, MOAs, and government contracts with full audit trail</p></div>
             </div>
         </div>
     </section>
@@ -1406,7 +1582,7 @@
                 <div class="pricing-card card" style="border-color:var(--purple);position:relative">
                     <div class="popular-badge">MOST POPULAR</div>
                     <div class="tier-name">Professional</div>
-                    <div class="tier-price">Ã¢â€šÂ±2,999<span style="font-size:1rem;color:var(--muted)">/mo</span></div>
+                    <div class="tier-price">₱2,999<span style="font-size:1rem;color:var(--muted)">/mo</span></div>
                     <ul class="tier-features">
                         <li>100 notarizations/month</li>
                         <li>Full AI Contract Agent</li>
@@ -1440,38 +1616,38 @@
             <div class="contact-section">
                 <div class="topics">
                     <div class="topic-card" data-topic="enp">
-                        <div class="topic-icon">Ã°Å¸â€œâ€ž</div>
+                        <div class="topic-icon">📄</div>
                         <div class="topic-title">I Need an ENP</div>
                         <p class="topic-desc">ENP is an Electronic Notary Public</p>
                     </div>
                     <div class="topic-card" data-topic="lawyer">
-                        <div class="topic-icon">Ã¢Å¡â€“Ã¯Â¸Â</div>
+                        <div class="topic-icon">⚖️</div>
                         <div class="topic-title">I'm a Lawyer</div>
                         <p class="topic-desc">Apply to become a certified ENP on the platform</p>
                     </div>
                     <div class="topic-card" data-topic="investor">
-                        <div class="topic-icon">Ã°Å¸â€™Â¼</div>
+                        <div class="topic-icon">💼</div>
                         <div class="topic-title">Investment Inquiry</div>
                         <p class="topic-desc">Quanby Legal is seeking strategic investors</p>
                     </div>
                     <div class="topic-card" data-topic="question">
-                        <div class="topic-icon">Ã¢Ââ€œ</div>
+                        <div class="topic-icon">❓</div>
                         <div class="topic-title">I Have a Question</div>
                         <p class="topic-desc">General inquiries about the platform</p>
                     </div>
                 </div>
                 <div class="chat-panel">
-                    <div class="chat-header">Ã°Å¸Â¤â€“ Quanby Assistant <span class="online-dot"></span></div>
+                    <div class="chat-header">🤖 Quanby Assistant <span class="online-dot"></span></div>
                     <div class="chat-messages" id="chat-messages">
                         <div class="empty-state">
-                            <div style="font-size:2.5rem;margin-bottom:0.5rem">Ã°Å¸Â¤â€“</div>
+                            <div style="font-size:2.5rem;margin-bottom:0.5rem">🤖</div>
                             <div style="font-weight:500">Quanby Legal Assistant</div>
                             <p style="font-size:0.875rem;margin-top:0.25rem">Select a topic to start</p>
                         </div>
                     </div>
                     <div class="chat-input">
                         <input type="text" placeholder="Type your message..." id="contact-chat-input" disabled>
-                        <button id="send-btn">Ã¢â€ â€™</button>
+                        <button id="send-btn">→</button>
                     </div>
                 </div>
             </div>
@@ -1517,11 +1693,11 @@
                 </div>
             </div>
         </div>
-        <div class="footer-bottom">Ã‚Â© 2026 Quanby Legal Ã‚Â· Quanby Solutions, Inc. Ã‚Â· All rights reserved.</div>
+        <div class="footer-bottom">© 2026 Quanby Legal · Quanby Solutions, Inc. · All rights reserved.</div>
     </footer>
 
     <script>
-    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ API CONFIG Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ─── API CONFIG ────────────────────────────────────────────────────────────
     const API_BASE = '/api';
     let SESSION_ID = 'session_' + Math.random().toString(36).substr(2, 9);
     let currentContractLoaded = false;
@@ -1529,7 +1705,7 @@
     let generatedContractText = '';
     let selectedTemplate = 'deed_of_sale';
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ TAB SWITCHING Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ─── TAB SWITCHING ──────────────────────────────────────────────────────────
     function switchTab(tab) {
         document.querySelectorAll('.agent-tab').forEach((t, i) => {
             t.classList.remove('active');
@@ -1542,7 +1718,7 @@
         document.getElementById('panel-' + tab).classList.add('active');
     }
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ FILE UPLOAD Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ─── FILE UPLOAD ────────────────────────────────────────────────────────────
     const uploadArea = document.getElementById('upload-area');
 
     uploadArea.addEventListener('dragover', (e) => {
@@ -1616,7 +1792,7 @@
         const a = data.analysis;
         
         // Header
-        document.getElementById('analysis-filename').textContent = 'Ã°Å¸â€œâ€ž ' + data.filename;
+        document.getElementById('analysis-filename').textContent = '📄 ' + data.filename;
         document.getElementById('analysis-contract-type').textContent = a.contract_type || 'Contract Analysis';
         document.getElementById('analysis-summary').textContent = a.summary || '';
         
@@ -1624,9 +1800,9 @@
         const riskEl = document.getElementById('overall-risk-badge');
         const risk = (a.overall_risk || 'medium').toLowerCase();
         const riskMap = {
-            'high': ['Ã°Å¸â€Â´ HIGH RISK', 'risk-high'],
-            'medium': ['Ã°Å¸Å¸Â¡ MEDIUM RISK', 'risk-medium'],
-            'low': ['Ã°Å¸Å¸Â¢ LOW RISK', 'risk-low']
+            'high': ['🔴 HIGH RISK', 'risk-high'],
+            'medium': ['🟡 MEDIUM RISK', 'risk-medium'],
+            'low': ['🟢 LOW RISK', 'risk-low']
         };
         const [riskLabel, riskClass] = riskMap[risk] || riskMap['medium'];
         riskEl.textContent = riskLabel;
@@ -1640,14 +1816,14 @@
             partiesEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">No parties identified</div>';
         }
         parties.forEach(p => {
-            const avatarEmoji = p.type === 'Corporation' ? 'Ã°Å¸ÂÂ¢' : 'Ã°Å¸â€˜Â¤';
+            const avatarEmoji = p.type === 'Corporation' ? '🏢' : '👤';
             partiesEl.innerHTML += `
                 <div class="party-item">
                     <div class="party-avatar">${avatarEmoji}</div>
                     <div>
                         <div class="party-name">${escHtml(p.name || 'Unknown')}</div>
-                        <div class="party-role">${escHtml(p.role || '')}${p.type ? ' Ã‚Â· ' + p.type : ''}</div>
-                        ${p.notes ? `<div style="color:#fbbf24;font-size:0.75rem;margin-top:0.2rem">Ã¢Å¡Â  ${escHtml(p.notes)}</div>` : ''}
+                        <div class="party-role">${escHtml(p.role || '')}${p.type ? ' · ' + p.type : ''}</div>
+                        ${p.notes ? `<div style="color:#fbbf24;font-size:0.75rem;margin-top:0.2rem">âš  ${escHtml(p.notes)}</div>` : ''}
                     </div>
                 </div>`;
         });
@@ -1661,7 +1837,7 @@
         if (payment.total_amount) {
             datesEl.innerHTML += `
                 <div class="obligation-item">
-                    <div class="obligation-party">Ã°Å¸â€™Â° Payment</div>
+                    <div class="obligation-party">💰 Payment</div>
                     <div>${escHtml(payment.currency || 'PHP')} ${escHtml(payment.total_amount)}</div>
                     ${payment.schedule ? `<div style="color:var(--muted);font-size:0.8rem">${escHtml(payment.schedule)}</div>` : ''}
                     ${payment.penalties ? `<div style="color:#f87171;font-size:0.8rem">Penalty: ${escHtml(payment.penalties)}</div>` : ''}
@@ -1671,7 +1847,7 @@
             const riskColor = d.risk === 'high' ? '#f87171' : d.risk === 'medium' ? '#fbbf24' : 'var(--text)';
             datesEl.innerHTML += `
                 <div class="obligation-item">
-                    <div class="obligation-party">Ã°Å¸â€œâ€¦ ${escHtml(d.label || 'Date')}</div>
+                    <div class="obligation-party">📅 ${escHtml(d.label || 'Date')}</div>
                     <div style="color:${riskColor}">${escHtml(d.date || 'N/A')}</div>
                     ${d.note ? `<div style="color:var(--muted);font-size:0.8rem">${escHtml(d.note)}</div>` : ''}
                 </div>`;
@@ -1685,19 +1861,19 @@
         flagsEl.innerHTML = '';
         const flags = Array.isArray(a.risk_flags) ? a.risk_flags : [];
         if (flags.length === 0) {
-            flagsEl.innerHTML = '<div style="color:var(--teal);font-size:0.875rem">Ã¢Å“â€œ No significant risk flags identified</div>';
+            flagsEl.innerHTML = '<div style="color:var(--teal);font-size:0.875rem">✓ No significant risk flags identified</div>';
         }
         flags.forEach(f => {
             const sev = (f.severity || 'info').toLowerCase();
-            const icons = { high: 'Ã°Å¸â€Â´', medium: 'Ã°Å¸Å¸Â¡', low: 'Ã°Å¸Å¸Â¢', info: 'Ã¢â€žÂ¹Ã¯Â¸Â' };
+            const icons = { high: '🔴', medium: '🟡', low: '🟢', info: 'ℹ️' };
             flagsEl.innerHTML += `
                 <div class="flag-item flag-${sev}">
-                    <div class="flag-icon">${icons[sev] || 'Ã¢â€žÂ¹Ã¯Â¸Â'}</div>
+                    <div class="flag-icon">${icons[sev] || 'ℹ️'}</div>
                     <div>
                         <div class="flag-title">${escHtml(f.title || 'Issue')}</div>
                         <div class="flag-desc">${escHtml(f.description || '')}</div>
-                        ${f.law_reference ? `<div class="flag-law">Ã°Å¸â€œâ€“ ${escHtml(f.law_reference)}</div>` : ''}
-                        ${f.recommendation ? `<div style="color:#a78bfa;font-size:0.78rem;margin-top:0.25rem">Ã¢â€ â€™ ${escHtml(f.recommendation)}</div>` : ''}
+                        ${f.law_reference ? `<div class="flag-law">📖 ${escHtml(f.law_reference)}</div>` : ''}
+                        ${f.recommendation ? `<div style="color:#a78bfa;font-size:0.78rem;margin-top:0.25rem">→ ${escHtml(f.recommendation)}</div>` : ''}
                     </div>
                 </div>`;
         });
@@ -1732,7 +1908,7 @@
             const isOk = status.toLowerCase().includes('compliant') || status === 'Yes';
             const isWarn = status.toLowerCase().includes('review') || status.toLowerCase().includes('update') || status === 'N/A';
             const cls = isOk ? 'compliance-status-ok' : isWarn ? 'compliance-status-warn' : 'compliance-status-fail';
-            const icon = isOk ? 'Ã¢Å“â€œ' : isWarn ? '~' : 'Ã¢Å“â€”';
+            const icon = isOk ? '✓' : isWarn ? '~' : '✗';
             compEl.innerHTML += `
                 <div class="compliance-row">
                     <span>${label}</span>
@@ -1751,17 +1927,17 @@
         missEl.innerHTML = '';
         const missing = Array.isArray(a.missing_clauses) ? a.missing_clauses : [];
         if (missing.length === 0) {
-            missEl.innerHTML = '<div style="color:var(--teal);font-size:0.875rem">Ã¢Å“â€œ All standard clauses appear to be present</div>';
+            missEl.innerHTML = '<div style="color:var(--teal);font-size:0.875rem">✓ All standard clauses appear to be present</div>';
         }
         missing.forEach(m => {
             const impColor = m.importance === 'high' ? '#f87171' : m.importance === 'medium' ? '#fbbf24' : 'var(--muted)';
             missEl.innerHTML += `
                 <div class="flag-item flag-${m.importance || 'medium'}">
-                    <div class="flag-icon">Ã¢Å¡Â Ã¯Â¸Â</div>
+                    <div class="flag-icon">⚠️</div>
                     <div>
                         <div class="flag-title">${escHtml(m.clause || 'Missing clause')}</div>
                         <div class="flag-desc">${escHtml(m.why_needed || '')}</div>
-                        ${m.recommendation ? `<div style="color:#a78bfa;font-size:0.78rem;margin-top:0.25rem">Ã¢â€ â€™ ${escHtml(m.recommendation)}</div>` : ''}
+                        ${m.recommendation ? `<div style="color:#a78bfa;font-size:0.78rem;margin-top:0.25rem">→ ${escHtml(m.recommendation)}</div>` : ''}
                     </div>
                 </div>`;
         });
@@ -1774,7 +1950,7 @@
         const a = data.analysis;
         const infoEl = document.getElementById('chat-contract-info');
         infoEl.innerHTML = `
-            <div style="font-size:0.875rem;color:var(--muted);margin-bottom:0.25rem">Ã°Å¸â€œâ€ž ${escHtml(data.filename)}</div>
+            <div style="font-size:0.875rem;color:var(--muted);margin-bottom:0.25rem">📄 ${escHtml(data.filename)}</div>
             <div style="font-weight:600;margin-bottom:0.5rem">${escHtml(a.contract_type || 'Contract')}</div>
             <div style="font-size:0.85rem;color:var(--muted)">${escHtml(a.summary || '')}</div>
             <div style="margin-top:0.75rem">
@@ -1787,7 +1963,7 @@
         document.getElementById('suggested-questions-section').style.display = 'block';
     }
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ CONTRACT CHAT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ─── CONTRACT CHAT ──────────────────────────────────────────────────────────
     async function sendContractChat() {
         const input = document.getElementById('contract-chat-input');
         const msg = input.value.trim();
@@ -1829,7 +2005,7 @@
             appendChatMsg('Network error. Please try again.', 'system');
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Send Ã¢â€ â€™';
+            btn.textContent = 'Send →';
         }
     }
 
@@ -1850,17 +2026,17 @@
         sendContractChat();
     }
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ GENERATE CONTRACT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ─── GENERATE CONTRACT ──────────────────────────────────────────────────────
     const TEMPLATES = [
-        { id: 'deed_of_sale', name: 'Deed of Absolute Sale', icon: 'Ã°Å¸ÂÂ¡', category: 'Real Estate' },
-        { id: 'lease_agreement', name: 'Contract of Lease', icon: 'Ã°Å¸ÂÂ¢', category: 'Real Estate' },
-        { id: 'employment_contract', name: 'Employment Contract', icon: 'Ã°Å¸â€˜â€', category: 'Labor' },
-        { id: 'service_agreement', name: 'Service Agreement', icon: 'Ã°Å¸Â¤Â', category: 'Business' },
-        { id: 'loan_agreement', name: 'Loan Agreement', icon: 'Ã°Å¸â€™Â°', category: 'Finance' },
-        { id: 'partnership_agreement', name: 'Partnership Agreement', icon: 'Ã°Å¸Ââ€ºÃ¯Â¸Â', category: 'Corporate' },
-        { id: 'nda', name: 'Non-Disclosure Agreement', icon: 'Ã°Å¸â€â€™', category: 'Corporate' },
-        { id: 'memorandum_of_agreement', name: 'Memorandum of Agreement', icon: 'Ã°Å¸â€œâ€¹', category: 'Business' },
-        { id: 'power_of_attorney', name: 'Special Power of Attorney', icon: 'Ã¢Å¡â€“Ã¯Â¸Â', category: 'Legal' },
+        { id: 'deed_of_sale', name: 'Deed of Absolute Sale', icon: '🏡', category: 'Real Estate' },
+        { id: 'lease_agreement', name: 'Contract of Lease', icon: '🏢', category: 'Real Estate' },
+        { id: 'employment_contract', name: 'Employment Contract', icon: '👔', category: 'Labor' },
+        { id: 'service_agreement', name: 'Service Agreement', icon: '🤝', category: 'Business' },
+        { id: 'loan_agreement', name: 'Loan Agreement', icon: '💰', category: 'Finance' },
+        { id: 'partnership_agreement', name: 'Partnership Agreement', icon: '🏛️', category: 'Corporate' },
+        { id: 'nda', name: 'Non-Disclosure Agreement', icon: '🔒', category: 'Corporate' },
+        { id: 'memorandum_of_agreement', name: 'Memorandum of Agreement', icon: '📋', category: 'Business' },
+        { id: 'power_of_attorney', name: 'Special Power of Attorney', icon: '⚖️', category: 'Legal' },
     ];
 
     const TEMPLATE_FIELDS = {
@@ -1996,7 +2172,7 @@
         loadingEl.style.display = 'flex';
         textEl.textContent = '';
         btn.disabled = true;
-        btn.textContent = 'Ã¢ÂÂ³ Generating...';
+        btn.textContent = '⏳ Generating...';
 
         const t = TEMPLATES.find(t => t.id === selectedTemplate);
         document.getElementById('generated-title').textContent = `${t.icon} ${t.name}`;
@@ -2024,7 +2200,7 @@
             textEl.textContent = 'Network error. Please try again.';
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Ã¢Å“Â¨ Generate Contract with AI';
+            btn.textContent = '✨ Generate Contract with AI';
         }
     }
 
@@ -2032,8 +2208,8 @@
         if (!generatedContractText) return;
         navigator.clipboard.writeText(generatedContractText).then(() => {
             const btn = event.currentTarget;
-            btn.textContent = 'Ã¢Å“â€œ Copied!';
-            setTimeout(() => btn.textContent = 'Ã°Å¸â€œâ€¹ Copy', 2000);
+            btn.textContent = '✓ Copied!';
+            setTimeout(() => btn.textContent = '📋 Copy', 2000);
         });
     }
 
@@ -2049,7 +2225,7 @@
         URL.revokeObjectURL(url);
     }
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ CONTACT CHAT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ─── CONTACT CHAT ───────────────────────────────────────────────────────────
     const botResponses = {
         enp: "To find a certified Electronic Notary Public (ENP), you can browse our verified ENP directory. We have accredited notaries available for both In-Person (IEN) and Remote (REN) notarization. Would you like help finding one near you?",
         lawyer: "To apply as a certified ENP on Quanby Legal, you'll need your IBP ID and must complete our identity verification via DICT National PKI. The process takes about 3-5 business days. Shall I walk you through the requirements?",
@@ -2097,7 +2273,7 @@
         }, 600);
     }
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ UTILITIES Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ─── UTILITIES ──────────────────────────────────────────────────────────────
     function escHtml(str) {
         if (!str) return '';
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -2107,13 +2283,13 @@
         alert('Error: ' + msg);
     }
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ SSO / ONBOARDING Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ─── SSO / ONBOARDING ───────────────────────────────────────────────────────
 
     let _ssoRole = 'attorney';
     let _providerUrls = null;
 
     async function _loadProviders() {
-        if (_providerUrls) return _providerUrls;
+        
         try {
             const res = await fetch('/api/auth/providers');
             const data = await res.json();
@@ -2133,12 +2309,12 @@
 
         if (role === 'attorney') {
             badge.className = 'sso-role-badge attorney';
-            badge.textContent = 'Ã¢Å¡â€“Ã¯Â¸Â Law Firm / Attorney';
+            badge.textContent = '⚖️ Law Firm / Attorney';
             title.textContent = 'Start Your ENP Certification';
-            desc.textContent = 'Sign in to begin your Electronic Notary Public (ENP) certification Ã¢â‚¬â€ required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.';
+            desc.textContent = 'Sign in to begin your Electronic Notary Public (ENP) certification — required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.';
         } else {
             badge.className = 'sso-role-badge client';
-            badge.textContent = 'Ã°Å¸â€˜Â¤ Public Client';
+            badge.textContent = '👤 Public Client';
             title.textContent = 'Create Your Client Account';
             desc.textContent = 'Sign in to access e-notarization services, upload contracts for AI analysis, and connect with certified Electronic Notary Publics (ENPs).';
         }
@@ -2178,16 +2354,16 @@
         const url = providers[provider];
 
         if (!url) {
-            // OAuth not configured yet Ã¢â‚¬â€ show friendly message
+            // OAuth not configured yet — show friendly message
             btn.innerHTML = origText;
             btn.disabled = false;
             showSSOError(provider);
             return;
         }
 
-        // Redirect to OAuth provider Ã¢â‚¬â€ it will callback to /api/auth/callback/{provider}
+        // Redirect to OAuth provider — it will callback to /api/auth/callback/{provider}
         // which issues JWT and redirects to /auth-complete?token=...&step=...
-        window.location.href = url + '&state=' + encodeURIComponent(_ssoRole);
+        window.location.href = url;
     }
 
     function showSSOError(provider) {
@@ -2203,6 +2379,78 @@
         setTimeout(() => msg.remove(), 5000);
     }
 
+    // ── Login Toast Notification ────────────────────────────────────────────────
+    function showLoginToast(user, isNew) {
+        // Remove any existing toast
+        const existing = document.getElementById('ql-login-toast');
+        if (existing) existing.remove();
+
+        const firstName = (user.first_name || '').trim();
+        const lastName  = (user.last_name  || '').trim();
+        const fullName  = [firstName, lastName].filter(Boolean).join(' ') || user.email || 'User';
+        const greeting  = isNew ? `Welcome, ${firstName || fullName}!` : `Welcome back, ${firstName || fullName}!`;
+
+        // Build avatar — use Google picture or initials fallback
+        let avatarHtml;
+        if (user.picture) {
+            avatarHtml = `<img src="${user.picture}" alt="avatar" style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;">`;
+        } else {
+            const initials = ((firstName[0] || '') + (lastName[0] || '')).toUpperCase() || (fullName[0] || 'U').toUpperCase();
+            avatarHtml = `<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;color:#fff;flex-shrink:0;">${initials}</div>`;
+        }
+
+        const toast = document.createElement('div');
+        toast.id = 'ql-login-toast';
+        toast.setAttribute('role', 'status');
+        toast.setAttribute('aria-live', 'polite');
+        toast.style.cssText = [
+            'position:fixed',
+            'top:1.25rem',
+            'right:1.25rem',
+            'z-index:9999',
+            'background:rgba(15,17,30,0.97)',
+            'border:1px solid rgba(124,58,237,0.45)',
+            'border-radius:0.75rem',
+            'box-shadow:0 8px 32px rgba(0,0,0,0.55)',
+            'padding:0.875rem 1.125rem',
+            'display:flex',
+            'align-items:center',
+            'gap:0.875rem',
+            'min-width:260px',
+            'max-width:340px',
+            'animation:ql-toast-in 0.35s cubic-bezier(.22,1,.36,1) both',
+        ].join(';');
+
+        toast.innerHTML = `
+            ${avatarHtml}
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:600;font-size:0.95rem;color:#f1f5f9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${greeting}</div>
+                <div style="font-size:0.78rem;color:#94a3b8;margin-top:0.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${user.email || ''}</div>
+            </div>
+            <button onclick="document.getElementById('ql-login-toast')?.remove()" style="background:none;border:none;cursor:pointer;color:#64748b;font-size:1.1rem;line-height:1;padding:0.1rem;flex-shrink:0;" aria-label="Dismiss">&#10005;</button>
+        `;
+
+        // Inject keyframes once
+        if (!document.getElementById('ql-toast-styles')) {
+            const style = document.createElement('style');
+            style.id = 'ql-toast-styles';
+            style.textContent = `
+                @keyframes ql-toast-in { from { opacity:0; transform:translateX(100%); } to { opacity:1; transform:translateX(0); } }
+                @keyframes ql-toast-out { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(100%); } }
+            `;
+            document.head.appendChild(style);
+        }
+
+        document.body.appendChild(toast);
+
+        // Auto-dismiss after 5s
+        setTimeout(() => {
+            if (!toast.parentNode) return;
+            toast.style.animation = 'ql-toast-out 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 5000);
+    }
+
     // Handle return from OAuth (backend sets HttpOnly cookie, redirects with ?step=)
     (function handleAuthReturn() {
         const params = new URLSearchParams(window.location.search);
@@ -2211,10 +2459,157 @@
         const role = sessionStorage.getItem('ql_pending_role') || 'attorney';
         sessionStorage.removeItem('ql_pending_role');
         window.history.replaceState({}, '', '/');
-        routeToStep(step, role);
+
+        // Fetch user info for welcome toast, then route
+        fetch('/api/auth/me', { credentials: 'include' })
+            .then(r => r.ok ? r.json() : null)
+            .then(user => {
+                if (user) {
+                    const isNew = step === 'role_select';
+                    showLoginToast(user, isNew);
+                }
+            })
+            .catch(() => { /* toast is nice-to-have, never block routing */ })
+            .finally(() => {
+                routeToStep(step, role);
+            });
     })();
 
-    function routeToStep(step, role) {
+    async function signOut() {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        } catch(e) {}
+        document.getElementById('nav-user').classList.remove('visible');
+        window.location.reload();
+    }
+
+    async function initNavUser() {
+        try {
+            const res = await fetch('/api/auth/me', { credentials: 'include' });
+            if (!res.ok) return;
+            const user = await res.json();
+            const nameEl = document.getElementById('nav-user-name');
+            const avatarEl = document.getElementById('nav-user-avatar');
+            const navUser = document.getElementById('nav-user');
+            if (nameEl) nameEl.textContent = user.first_name || user.email || 'Account';
+            if (avatarEl && user.picture) avatarEl.src = user.picture;
+            if (navUser) navUser.classList.add('visible');
+            _updateCertBadge(user);
+            _updateOnboardStrip(user);
+        } catch(e) {}
+    }
+
+    function _updateCertBadge(user) {
+        var badge = document.getElementById('nav-cert-badge');
+        if (!badge) return;
+        var step = user.onboarding_step || 'role_select';
+        var role = user.role || 'attorney';
+        var config = {
+            'role_select': { cls: 'step-profile',     icon: '📋', label: 'Complete Profile' },
+            'profile':     { cls: 'step-profile',     icon: '📋', label: 'Complete Profile' },
+            'test':        { cls: 'step-exam',         icon: '📝', label: 'Take Exam' },
+            'kyc':         { cls: 'step-liveness',     icon: '🪪', label: 'Upload ID' },
+            'liveness':    { cls: 'step-liveness',     icon: '📷', label: 'Liveness Check' },
+            'certificate': { cls: 'step-certificate',  icon: '🎓', label: 'Download Certificate' },
+            'sc_redirect': { cls: 'step-certificate',  icon: '⚖️', label: 'Submit to SC' },
+            'certified':   { cls: 'step-certified',    icon: '✅', label: 'ENP Certified' },
+        };
+        var cfg = config[step] || config['test'];
+        badge.className = 'nav-cert-badge ' + cfg.cls;
+        badge.textContent = cfg.icon + ' ' + cfg.label;
+        badge.style.display = 'inline-flex';
+        badge._step = step;
+        badge._role = role;
+    }
+
+    function _navBadgeClick() {
+        var badge = document.getElementById('nav-cert-badge');
+        if (!badge) return;
+        var step = badge._step || 'role_select';
+        var role = badge._role || 'attorney';
+        if (step === 'certified') return;
+        // Always start from role if role not yet set
+        if (step === 'role_select' || !role || role === 'undefined') {
+            openOnboard('role', 'attorney'); return;
+        }
+        var stepMap = {
+            'role_select': 'role', 'profile': 'profile', 'test': 'test',
+            'kyc': 'kyc', 'liveness': 'liveness',
+            'certificate': 'certificate', 'sc_redirect': 'sc_redirect'
+        };
+        var obStep = stepMap[step] || 'role';
+        if (obStep === 'certificate') { _renderCertificateStep(); document.getElementById('onboard-overlay').classList.add('open'); return; }
+        if (obStep === 'sc_redirect') { _renderSCRedirectStep(); document.getElementById('onboard-overlay').classList.add('open'); return; }
+        openOnboard(obStep, role);
+    }
+
+    function _updateOnboardStrip(user) {
+        var strip = document.getElementById('onboard-strip');
+        if (!strip) return;
+        var step = user.onboarding_step || 'test';
+        var role = user.role || 'attorney';
+        var name = user.first_name || 'there';
+        if (step === 'certified') {
+            strip.innerHTML = '<div class="container"><span class="onboard-label">✅ You are ENP Certified, ' + name + '! Your certificate is on file.</span></div>';
+            return;
+        }
+        var stepLabels = {
+            'role_select': 'Step 1: Complete your profile to begin certification.',
+            'profile':     'Step 1: Complete your profile to begin certification.',
+            'test':        'Step 2: Take your ENP Certification Exam to get certified.',
+            'kyc':         'Step 3: Upload your government ID to continue.',
+            'liveness':    'Step 4: Complete liveness verification.',
+            'certificate': 'Step 5: Download your certificate.',
+            'sc_redirect': 'Step 6: Submit your certificate to the Supreme Court.',
+        };
+        var actionLabels = {
+            'role_select': '📋 Complete Profile', 'profile': '📋 Complete Profile',
+            'test': '📝 Take the Exam Now', 'kyc': '🪪 Upload ID',
+            'liveness': '📷 Liveness Check', 'certificate': '🎓 Download Certificate',
+            'sc_redirect': '⚖️ Submit to Supreme Court',
+        };
+        var msg = stepLabels[step] || stepLabels['test'];
+        var action = actionLabels[step] || actionLabels['test'];
+        strip.innerHTML = '<div class="container"><span class="onboard-label">⚖️ ' + msg + '</span><button class="btn-signup" onclick="_navBadgeClick()">' + action + '</button></div>';
+    }
+    initNavUser();
+
+    // Handle ?exam=1 email link — fires on direct page load (not OAuth redirect)
+    (function handleExamLink() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('exam') !== '1') return;
+        // Check if user is already logged in
+        fetch('/api/auth/me', { credentials: 'include' })
+            .then(r => r.ok ? r.json() : null)
+            .then(user => {
+                if (!user) {
+                    // Not logged in — show login prompt
+                    var s=document.getElementById('sso-modal'); if(s) s.classList.add('open'); else alert('Please sign in to take the exam.');
+                    return;
+                }
+                const step = user.onboarding_step || 'role_select';
+                if (step === 'certified') {
+                    alert('\u2705 You are already ENP Certified! No need to retake the exam.');
+                    return;
+                }
+                // Clear ?exam=1 from URL cleanly
+                window.history.replaceState({}, '', '/');
+                const role = user.role || sessionStorage.getItem('ql_pending_role') || 'attorney';
+                // If profile not yet complete, start from role selection
+                if (step === 'role_select' || !user.role) {
+                    setTimeout(function() { openOnboard('role', 'attorney'); }, 300);
+                } else if (step === 'profile') {
+                    setTimeout(function() { openOnboard('profile', role); }, 300);
+                } else {
+                    setTimeout(function() { openOnboard('test', role); }, 300);
+                }
+            })
+            .catch(function() {
+                var s=document.getElementById('sso-modal'); if(s) s.classList.add('open');
+            });
+    })();
+
+        function routeToStep(step, role) {
         switch(step) {
             case 'role_select': openOnboard('role', role); break;
             case 'profile':     openOnboard('profile', role); break;
@@ -2226,13 +2621,16 @@
         }
     }
 
-    // Ã¢â€¢ÂÃ¢â€¢Â ONBOARDING MODAL ENGINE Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+    // ══ ONBOARDING MODAL ENGINE ════════════════════════════════════════════════
 
-    const OB_STEPS  = ['role','profile','test','liveness','certified'];
-    const OB_LABELS = ['Role','Profile','15-Q Test','Liveness','Certificate'];
+    const OB_STEPS  = ['role','profile','test','kyc','liveness','certified'];
+    const OB_LABELS = ['Role','Profile','Exam','ID Upload','Liveness','Certificate'];
     let _obRole      = 'attorney';
     let _obAnswers   = {};
     let _obQuestions = [];
+    let _obTestSessionId = null;
+    let _obTimerInterval = null;
+    let _obCertificateId = null;
 
     function openOnboard(step, role) {
         _obRole = role || 'attorney';
@@ -2242,6 +2640,46 @@
         document.body.style.overflow = 'hidden';
         _renderObStep(step);
     }
+
+    function _renderCertificateStep() {
+        var ob = document.getElementById('ob-content');
+        var certId = _obCertificateId || '';
+        ob.innerHTML =
+            '<h3>&#127891; Download Your Certificate</h3>' +
+            '<p class="sub">Your ENP Course Completion Certificate is ready. Download it and submit it to the Supreme Court of the Philippines.</p>' +
+            '<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:0.75rem;padding:2rem;text-align:center;margin:1.5rem 0;">' +
+                '<div style="font-size:3rem;margin-bottom:1rem;">&#128220;</div>' +
+                '<p style="font-weight:600;color:#c9a84c;margin-bottom:0.5rem;">Certificate ID: <span style="letter-spacing:0.05em;">' + certId + '</span></p>' +
+                '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1.5rem;">Keep this ID &#8212; you will need it for Supreme Court submission.</p>' +
+                '<a href="/api/certificate/' + certId + '" target="_blank" style="display:inline-block;background:#c9a84c;color:#000;font-weight:700;padding:0.875rem 2rem;border-radius:0.5rem;text-decoration:none;font-size:1rem;">&#11015;&#65039; Download Certificate (PDF)</a>' +
+            '</div>' +
+            '<button class="onboard-btn" onclick="_renderSCRedirectStep()" style="margin-top:0.5rem;">Continue to Supreme Court Submission &#8594;</button>';
+        _renderObProgress('certified');
+    }
+
+    function _renderSCRedirectStep() {
+        var ob = document.getElementById('ob-content');
+        ob.innerHTML =
+            '<h3>&#128203; Submit to the Supreme Court</h3>' +
+            '<p class="sub">You are required to submit your certificate to the Supreme Court of the Philippines Electronic Notarization Portal.</p>' +
+            '<div style="background:rgba(27,42,107,0.3);border:1px solid rgba(201,168,76,0.35);border-radius:0.75rem;padding:2rem;text-align:center;margin:1.5rem 0;">' +
+                '<div style="font-size:3rem;margin-bottom:1rem;">&#9878;&#65039;</div>' +
+                '<p style="font-weight:600;color:#c9a84c;font-size:1.1rem;margin-bottom:0.5rem;">Supreme Court of the Philippines</p>' +
+                '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1.5rem;">Electronic Notarization Portal</p>' +
+                '<a href="https://efiling.sc.judiciary.gov.ph" target="_blank" style="display:inline-block;background:#1B2A6B;color:#fff;font-weight:700;padding:0.875rem 2rem;border-radius:0.5rem;text-decoration:none;font-size:1rem;border:2px solid #c9a84c;">Go to Supreme Court Portal &#8594;</a>' +
+            '</div>' +
+            '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:0.5rem;padding:1rem;margin:1rem 0;font-size:0.875rem;color:var(--muted);line-height:1.6;">' +
+                'After submitting your certificate on the Supreme Court portal, your ENP accreditation will be processed. You will receive confirmation from the Supreme Court directly.' +
+            '</div>' +
+            '<button class="onboard-btn" onclick="_completeOnboarding()" style="margin-top:0.5rem;">&#9989; Done &#8212; Return to Dashboard</button>';
+    }
+
+    async function _completeOnboarding() {
+        try { await fetch('/api/onboarding/complete', { method: 'POST', credentials: 'include' }); } catch(e) {}
+        closeOnboard();
+        window.location.reload();
+    }
+
     function closeOnboard() {
         var overlay = document.getElementById('onboard-overlay');
         if (overlay) overlay.classList.remove('open');
@@ -2282,27 +2720,109 @@
                 <button class="onboard-btn" onclick="_submitRole()">Continue &#8594;</button>
                 <div id="ob-err" class="ob-error"></div>`;
         } else if (step === 'profile') {
+            const isAttorney = _obRole === 'attorney';
             el.innerHTML = `
                 <h3>Complete Your Profile</h3>
                 <p class="sub">Required for ENP certification under A.M. No. 24-10-14-SC.</p>
-                <div class="onboard-field"><label>Full Name *</label><input type="text" id="ob-name" placeholder="Juan dela Cruz"></div>
-                <div class="onboard-field"><label>IBP Roll No. ${_obRole==='attorney'?'*':'(if applicable)'}</label><input type="text" id="ob-ibp" placeholder="e.g. 12345"></div>
-                <div class="onboard-field"><label>PTR No. (if applicable)</label><input type="text" id="ob-ptr" placeholder="e.g. 98765"></div>
-                <div class="onboard-field"><label>Province / City *</label><input type="text" id="ob-province" placeholder="e.g. Legazpi City, Albay"></div>
-                <div class="onboard-field"><label>Notarial Jurisdiction</label><input type="text" id="ob-jurisdiction" placeholder="e.g. Albay"></div>
-                <button class="onboard-btn" onclick="_submitProfile()">Continue &#8594;</button>
-                <div id="ob-err" class="ob-error"></div>`;
+                <div style="display:flex;gap:0.75rem;">
+                    <div class="onboard-field" style="flex:1"><label>First Name *</label><input type="text" id="ob-first-name" placeholder="Juan"></div>
+                    <div class="onboard-field" style="flex:1"><label>Last Name *</label><input type="text" id="ob-last-name" placeholder="dela Cruz"></div>
+                </div>
+                <div class="onboard-field"><label>Phone Number *</label><input type="tel" id="ob-phone" placeholder="+63 9XX XXX XXXX"></div>
+                ${isAttorney ? `
+                <div class="onboard-field"><label>Law Firm / Office Name</label><input type="text" id="ob-firm" placeholder="e.g. Dela Cruz Law Offices"></div>
+                <div class="onboard-field"><label>IBP Roll No. *</label><input type="text" id="ob-ibp" placeholder="e.g. 12345"></div>
+                <div class="onboard-field"><label>PTC No. (if applicable)</label><input type="text" id="ob-ptc" placeholder="e.g. 98765"></div>
+                <div class="onboard-field"><label>Legal Address</label><input type="text" id="ob-address" placeholder="e.g. Legazpi City, Albay"></div>
+                ` : `
+                <div class="onboard-field"><label>Organization (if applicable)</label><input type="text" id="ob-org" placeholder="e.g. ABC Corporation"></div>
+                <div class="onboard-field"><label>Position / Title</label><input type="text" id="ob-position" placeholder="e.g. General Manager"></div>
+                `}
+                <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+                    <button onclick="_renderObStep('role')" style="flex:0 0 auto;padding:0.75rem 1.25rem;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);border-radius:0.5rem;cursor:pointer;font-size:0.9rem;">&#8592; Back</button>
+                    <button class="onboard-btn" onclick="_submitProfile()" style="margin-top:0;flex:1;">Continue &#8594;</button>
+                </div>
+                <div id="ob-err" class="ob-error"></div>
+                <p style="text-align:center;margin-top:0.75rem;"><a href="#" onclick="event.preventDefault();_renderObStep('test')" style="color:var(--muted);font-size:0.8rem;text-decoration:underline;">Skip to Exam (test mode)</a></p>`;
         } else if (step === 'test') {
-            el.innerHTML = '<h3>ENP Certification Test</h3><p class="sub">Loading your 15-question test&#8230;</p>';
-            await _loadTest();
+            el.innerHTML = `
+                <h3>&#128218; Course Module</h3>
+                <p class="sub">Complete the course module before taking your certification exam.</p>
+                <div style="background:rgba(201,162,71,0.08);border:1.5px solid #c9a227;border-radius:0.75rem;padding:1.5rem;margin-bottom:1.25rem;">
+                    <div style="font-size:2rem;margin-bottom:0.5rem;">&#128218;</div>
+                    <h4 style="color:#c9a227;margin:0 0 0.5rem;">Course Module: Mastering Quanby Legal</h4>
+                    <p style="color:var(--muted);font-size:0.88rem;margin:0 0 1rem;">This course covers Philippine ENP certification law including A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and the 2004 Rules on Notarial Practice.</p>
+                    <a href="/mastering-quanby-legal.pdf" target="_blank"
+                       style="display:inline-block;background:#c9a227;color:#0a1628;padding:10px 22px;border-radius:6px;text-decoration:none;font-weight:700;font-size:0.9rem;margin-bottom:1rem;">
+                        &#128214; Download Course Module (PDF)
+                    </a>
+                </div>
+                <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:0.75rem;padding:1.25rem;margin-bottom:1.25rem;">
+                    <label style="display:flex;align-items:flex-start;gap:0.75rem;cursor:pointer;color:var(--muted);font-size:0.9rem;">
+                        <input type="checkbox" id="course-read-checkbox"
+                               style="width:18px;height:18px;margin-top:2px;flex-shrink:0;accent-color:#c9a227;"
+                               onchange="document.getElementById('start-exam-btn').disabled = !this.checked;">
+                        <span>I have read and understood the course module and am ready to take the 50-question ENP Certification Exam.</span>
+                    </label>
+                </div>
+                <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+                    <button onclick="_renderObStep('profile')" style="flex:0 0 auto;padding:0.75rem 1.25rem;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);border-radius:0.5rem;cursor:pointer;font-size:0.9rem;">&#8592; Back</button>
+                    <button class="onboard-btn" id="start-exam-btn" disabled
+                            onclick="_startExam()"
+                            style="opacity:0.5;transition:opacity 0.2s;margin-top:0;flex:1;"
+                            onmouseenter="if(!this.disabled)this.style.opacity='1'"
+                            onmouseleave="if(!this.disabled)this.style.opacity='1'">
+                        &#127891; Start 50-Question Exam
+                    </button>
+                </div>
+                <div id="ob-err" class="ob-error"></div>`;
+            // Enable button visual when checkbox is ticked
+            document.getElementById('start-exam-btn').addEventListener('click', function(){});
+            document.getElementById('course-read-checkbox').addEventListener('change', function(){
+                var btn = document.getElementById('start-exam-btn');
+                btn.style.opacity = this.checked ? '1' : '0.5';
+            });
+        } else if (step === 'kyc') {
+            el.innerHTML = `
+                <h3>&#128203; KYC &mdash; Identity Document Upload</h3>
+                <p class="sub">Upload a valid Philippine government-issued ID. This will be used during the liveness verification step when meeting with your notary.</p>
+                <div class="kyc-upload-box" id="kyc-upload-box">
+                    <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#129371;</div>
+                    <p style="color:var(--muted);font-size:0.88rem;margin:0 0 1rem;">Accepted IDs: PhilSys (National ID), Passport, Driver&#39;s License, SSS/GSIS, PRC ID, Voter&#39;s ID</p>
+                    <div style="background:rgba(255,255,255,0.05);border:2px dashed rgba(201,168,76,0.4);border-radius:0.75rem;padding:2rem;text-align:center;cursor:pointer;margin-bottom:1rem;" onclick="document.getElementById('kyc-file-input').click()">
+                        <div id="kyc-preview" style="display:none;margin-bottom:0.75rem;">
+                            <img id="kyc-img-preview" style="max-width:100%;max-height:200px;border-radius:0.5rem;" />
+                        </div>
+                        <div id="kyc-placeholder">
+                            <div style="font-size:1.5rem;margin-bottom:0.5rem;">&#128228;</div>
+                            <p style="color:var(--muted);margin:0;font-size:0.875rem;">Click to upload your ID photo</p>
+                            <p style="color:var(--muted);margin:0.25rem 0 0;font-size:0.75rem;">JPG, PNG, or PDF &middot; Max 5MB</p>
+                        </div>
+                    </div>
+                    <input type="file" id="kyc-file-input" accept="image/jpeg,image/png,application/pdf" style="display:none;" onchange="_kycFileSelected(this)">
+                    <button class="onboard-btn" id="kyc-upload-btn" disabled style="opacity:0.5;" onclick="_submitKycId()">
+                        Upload ID &amp; Continue &rarr;
+                    </button>
+                </div>
+                <div id="ob-err" class="ob-error"></div>`;
         } else if (step === 'liveness') {
             el.innerHTML = `
-                <h3>Identity Verification</h3>
-                <p class="sub">A quick liveness check is required under BSP Circular 944 (eKYC).</p>
+                <h3>&#128248; Liveness Verification</h3>
+                <p class="sub">BSP Circular 944 (eKYC) requires a live selfie verification. Please have your Philippine National ID ready.</p>
                 <div style="border:1px solid rgba(255,255,255,0.1);border-radius:0.75rem;padding:1.5rem;text-align:center;margin-bottom:1.25rem;background:rgba(255,255,255,0.03);">
                     <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#128248;</div>
-                    <p style="color:var(--muted);font-size:0.88rem;margin:0 0 1rem;">Your camera will be used to verify your identity. Ensure good lighting and look directly at the camera.</p>
-                    <button class="onboard-btn" style="max-width:220px;margin:0 auto;display:block;" onclick="_startLiveness(event)">Start Liveness Check</button>
+                    <div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:0.5rem;padding:1rem;margin-bottom:1rem;text-align:left;">
+                        <p style="margin:0 0 0.5rem;font-weight:600;color:var(--gold, #c9a84c);">Before you begin:</p>
+                        <ul style="margin:0;padding-left:1.25rem;color:var(--muted);font-size:0.875rem;line-height:1.7;">
+                            <li>Ensure good lighting &mdash; face well-lit from the front</li>
+                            <li>Hold your <strong>Philippine National ID</strong> (PhilSys) next to your face</li>
+                            <li>Look directly at the camera</li>
+                            <li>The ID photo will be compared with your uploaded KYC document</li>
+                        </ul>
+                    </div>
+                    <button class="onboard-btn" style="max-width:240px;margin:0 auto;display:block;" onclick="_startLiveness(event)">
+                        &#128248; Start Liveness Check
+                    </button>
                 </div>
                 <div id="ob-err" class="ob-error"></div>`;
         } else if (step === 'certified') {
@@ -2336,46 +2856,69 @@
             if (!res.ok) throw new Error((await res.json()).detail || 'Failed');
             _renderObStep('profile');
         } catch(e) {
-            btn.disabled = false; btn.textContent = 'Continue Ã¢â€ â€™';
+            btn.disabled = false; btn.textContent = 'Continue →';
             document.getElementById('ob-err').textContent = e.message;
         }
     }
 
     async function _submitProfile() {
-        const name = document.getElementById('ob-name').value.trim();
-        const province = document.getElementById('ob-province').value.trim();
-        if (!name || !province) {
-            document.getElementById('ob-err').textContent = 'Full name and province are required.'; return;
+        const firstName = (document.getElementById('ob-first-name') || {}).value?.trim() || '';
+        const lastName = (document.getElementById('ob-last-name') || {}).value?.trim() || '';
+        const phone = (document.getElementById('ob-phone') || {}).value?.trim() || '';
+        if (!firstName || !lastName || !phone) {
+            document.getElementById('ob-err').textContent = 'First name, last name, and phone are required.'; return;
         }
         const btn = document.querySelector('#ob-content .onboard-btn');
         btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Saving&#8230;';
+        const isAttorney = _obRole === 'attorney';
+        const payload = {
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone,
+            role: _obRole,
+            firm_name: (document.getElementById('ob-firm') || {}).value?.trim() || '',
+            ibp_number: (document.getElementById('ob-ibp') || {}).value?.trim() || '',
+            ptc_number: (document.getElementById('ob-ptc') || {}).value?.trim() || '',
+            legal_address: (document.getElementById('ob-address') || {}).value?.trim() || '',
+            organization: (document.getElementById('ob-org') || {}).value?.trim() || '',
+            position: (document.getElementById('ob-position') || {}).value?.trim() || '',
+        };
         try {
             const res = await fetch('/api/onboarding/profile', {
                 method: 'POST', credentials: 'include',
                 headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({
-                    full_name: name,
-                    ibp_number: document.getElementById('ob-ibp').value.trim(),
-                    ptr_number: document.getElementById('ob-ptr').value.trim(),
-                    province: province,
-                    notarial_jurisdiction: document.getElementById('ob-jurisdiction').value.trim()
-                })
+                body: JSON.stringify(payload)
             });
-            if (!res.ok) throw new Error((await res.json()).detail || 'Failed');
+            if (!res.ok) {
+                const errData = await res.json();
+                const detail = errData.detail;
+                let msg = 'Failed to save profile.';
+                if (typeof detail === 'string') msg = detail;
+                else if (Array.isArray(detail)) msg = detail.map(e => e.msg || e.message || JSON.stringify(e)).join('; ');
+                else if (detail) msg = JSON.stringify(detail);
+                throw new Error(msg);
+            }
             _renderObStep('test');
         } catch(e) {
-            btn.disabled = false; btn.textContent = 'Continue Ã¢â€ â€™';
+            btn.disabled = false; btn.textContent = 'Continue →';
             document.getElementById('ob-err').textContent = e.message;
         }
     }
 
+    function _startExam() {
+        var el = document.getElementById('ob-content');
+        el.innerHTML = '<h3>ENP Certification Test</h3><p class="sub">Loading your 15-question exam&#8230;</p>';
+        _loadTest();
+    }
+
     async function _loadTest() {
         try {
-            const res = await fetch('/api/onboarding/test/start', { method: 'POST', credentials: 'include' });
+            const res = await fetch('/api/certification/start', { method: 'GET', credentials: 'include' });
             if (!res.ok) throw new Error((await res.json()).detail || 'Failed to start test');
             const data = await res.json();
-            _obQuestions = data.questions; _obAnswers = {};
+            _obQuestions = data.questions; _obAnswers = {}; _obTestSessionId = data.test_session_id;
             _renderTestUI();
+            _startTimer(data.time_limit_minutes || 60);
         } catch(e) {
             document.getElementById('ob-content').innerHTML =
                 '<h3>Test</h3><div class="ob-error">' + e.message + '</div>';
@@ -2393,10 +2936,33 @@
         ).join('');
         document.getElementById('ob-content').innerHTML =
             '<h3>ENP Certification Test</h3>' +
-            '<p class="sub">Answer all 15 questions. You need 80% (12/15) to pass.</p>' +
+            '<div id="ob-timer" style="text-align:center;font-size:1.1rem;font-weight:600;color:var(--accent,#c8a45c);margin-bottom:0.75rem;">&#9203; Time Remaining: --:--</div>' +
+            '<p class="sub">Answer all 50 questions. You need 70% (35/50) to pass.</p>' +
             qs +
             '<button class="onboard-btn" id="ob-submit-btn" onclick="_submitTest()">Submit Test</button>' +
             '<div id="ob-err" class="ob-error"></div>';
+    }
+
+
+    function _startTimer(minutes) {
+        if (_obTimerInterval) clearInterval(_obTimerInterval);
+        let remaining = minutes * 60;
+        function _updateDisplay() {
+            const el = document.getElementById('ob-timer');
+            if (!el) { clearInterval(_obTimerInterval); return; }
+            const m = Math.floor(remaining / 60);
+            const s = remaining % 60;
+            el.textContent = '\u23f1 Time Remaining: ' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+            if (remaining <= 0) {
+                clearInterval(_obTimerInterval);
+                _obTimerInterval = null;
+                el.textContent = '\u23f1 Time Remaining: 00:00';
+                _submitTest();
+            }
+            remaining--;
+        }
+        _updateDisplay();
+        _obTimerInterval = setInterval(_updateDisplay, 1000);
     }
 
     function _pickAnswer(qid, el) {
@@ -2415,11 +2981,12 @@
         }
         const btn = document.getElementById('ob-submit-btn');
         btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Grading&#8230;';
+        if (_obTimerInterval) { clearInterval(_obTimerInterval); _obTimerInterval = null; }
         try {
-            const res = await fetch('/api/onboarding/test/submit', {
+            const res = await fetch('/api/certification/submit', {
                 method: 'POST', credentials: 'include',
                 headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ answers: _obAnswers })
+                body: JSON.stringify({ answers: _obAnswers, test_session_id: _obTestSessionId })
             });
             _renderTestResult(await res.json());
         } catch(e) {
@@ -2429,19 +2996,162 @@
     }
 
     function _renderTestResult(data) {
-        const passed = data.passed, score = data.score, total = data.total;
-        document.getElementById('ob-content').innerHTML =
-            '<h3>Test Result</h3>' +
-            '<div class="ob-result-banner ' + (passed?'pass':'fail') + '">' +
-            (passed ? '&#127881; Passed!' : '&#10060; Not Passed') +
-            ' &mdash; ' + score + '/' + total + ' correct (' + Math.round(score/total*100) + '%)</div>' +
-            '<p class="sub">' + (passed
-                ? 'Congratulations! Proceed to the final identity verification step.'
-                : 'You need 80% to pass. Review the Philippine ENP rules and try again.') + '</p>' +
-            (passed
-                ? '<button class="onboard-btn" onclick="_renderObStep(\'liveness\')">Continue to Liveness Check &#8594;</button>'
-                : '<button class="onboard-btn" onclick="_loadTest()">Retake Test</button>');
-        _renderObProgress(passed ? 'liveness' : 'test');
+        if (data.certificate_id) { _obCertificateId = data.certificate_id; }
+        const passed = data.passed;
+        const score = data.score !== undefined ? data.score : data.correct;
+        const total = data.total;
+        const scorePct = data.score_pct || Math.round(score/total*100);
+        const ob = document.getElementById('ob-content');
+        if (passed) {
+            ob.innerHTML =
+                '<h3>Test Result</h3>' +
+                '<div class="ob-result-banner pass">&#127881; Passed! &mdash; ' + score + '/' + total + ' correct (' + scorePct + '%)</div>' +
+                '<p class="sub">Congratulations! Proceed to identity verification.</p>' +
+                '<button class="onboard-btn" onclick="_renderObStep(\'kyc\')">Continue to ID Verification &rarr;</button>';
+            _renderObProgress('kyc');
+        } else {
+            const safeData = JSON.stringify(data).replace(/'/g, "\\'");
+            ob.innerHTML =
+                '<h3>Test Result</h3>' +
+                '<div class="ob-result-banner fail">&#10060; Not Passed &mdash; ' + score + '/' + total + ' correct (' + scorePct + '%)</div>' +
+                '<p class="sub">You need 70% (35/50) to pass. A notification has been sent to your registered email with instructions on how to retake the exam.</p>' +
+                '<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:0.5rem;padding:1rem;margin:1rem 0;font-size:0.875rem;color:var(--muted);">&#128231; Check your email for retake instructions and payment details.</div>' +
+                '<button class="onboard-btn" onclick="_showRetakePayment(' + safeData + ')">Retake Test (&#8369;500 fee) &rarr;</button>';
+            _renderObProgress('test');
+        }
+    }
+
+    function _showRetakePayment(testData) {
+        const ob = document.getElementById('ob-content');
+        ob.innerHTML =
+            '<h3>&#128179; Retake Fee Payment</h3>' +
+            '<p class="sub">A &#8369;500 retake fee is required to attempt the exam again.</p>' +
+            '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:0.75rem;padding:1.5rem;margin-bottom:1.25rem;">' +
+                '<div style="display:flex;gap:1rem;margin-bottom:1.25rem;">' +
+                    '<button id="tab-gcash" onclick="_switchPayTab(\'gcash\')" style="flex:1;padding:0.75rem;border-radius:0.5rem;border:2px solid rgba(201,168,76,0.5);background:rgba(201,168,76,0.1);color:#c9a84c;font-weight:600;cursor:pointer;">&#128241; GCash</button>' +
+                    '<button id="tab-bank" onclick="_switchPayTab(\'bank\')" style="flex:1;padding:0.75rem;border-radius:0.5rem;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);cursor:pointer;">&#127974; Bank Transfer</button>' +
+                '</div>' +
+                '<div id="payment-gcash">' +
+                    '<div style="background:rgba(0,168,107,0.08);border:1px solid rgba(0,168,107,0.3);border-radius:0.5rem;padding:1.25rem;text-align:center;">' +
+                        '<div style="font-size:2rem;margin-bottom:0.5rem;">&#128241;</div>' +
+                        '<p style="margin:0 0 0.5rem;font-weight:600;color:#00a86b;">GCash</p>' +
+                        '<p style="font-size:1.5rem;font-weight:700;margin:0 0 0.25rem;color:#fff;" id="gcash-number">Loading&hellip;</p>' +
+                        '<p style="color:var(--muted);font-size:0.875rem;margin:0;">Account Name: Quanby Solutions, Inc.</p>' +
+                        '<div style="margin-top:1rem;padding:0.75rem;background:rgba(255,255,255,0.05);border-radius:0.4rem;">' +
+                            '<p style="margin:0;font-size:0.8rem;color:var(--muted);">Reference Number</p>' +
+                            '<p style="margin:0.25rem 0 0;font-weight:700;color:#c9a84c;letter-spacing:0.05em;" id="pay-ref">Loading&hellip;</p>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div id="payment-bank" style="display:none;">' +
+                    '<div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.3);border-radius:0.5rem;padding:1.25rem;">' +
+                        '<div style="font-size:2rem;margin-bottom:0.5rem;text-align:center;">&#127974;</div>' +
+                        '<table style="width:100%;font-size:0.875rem;border-collapse:collapse;">' +
+                            '<tr><td style="padding:0.4rem 0;color:var(--muted);">Bank:</td><td style="padding:0.4rem 0;font-weight:600;" id="bank-name">Loading&hellip;</td></tr>' +
+                            '<tr><td style="padding:0.4rem 0;color:var(--muted);">Account Number:</td><td style="padding:0.4rem 0;font-weight:600;" id="bank-account">Loading&hellip;</td></tr>' +
+                            '<tr><td style="padding:0.4rem 0;color:var(--muted);">Account Name:</td><td style="padding:0.4rem 0;font-weight:600;" id="bank-name-2">Loading&hellip;</td></tr>' +
+                            '<tr><td style="padding:0.4rem 0;color:var(--muted);">Amount:</td><td style="padding:0.4rem 0;font-weight:700;color:#c9a84c;">&#8369;500.00</td></tr>' +
+                            '<tr><td style="padding:0.4rem 0;color:var(--muted);">Reference:</td><td style="padding:0.4rem 0;font-weight:600;color:#c9a84c;" id="pay-ref-bank">Loading&hellip;</td></tr>' +
+                        '</table>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div style="background:rgba(255,255,255,0.03);border-radius:0.5rem;padding:1rem;margin-bottom:1rem;font-size:0.8rem;color:var(--muted);">' +
+            '&#9888;&#65039; After sending payment, click "I\'ve Paid \u2014 Submit for Verification" below. Our team will verify and unlock your retake within 24 hours. You will receive a confirmation email.' +
+            '</div>' +
+            '<button class="onboard-btn" id="pay-confirm-btn" onclick="_submitRetakePayment()">&#9989; I\'ve Paid \u2014 Submit for Verification</button>' +
+            '<div id="ob-err" class="ob-error"></div>';
+        _loadPaymentDetails();
+    }
+
+    function _switchPayTab(tab) {
+        document.getElementById('payment-gcash').style.display = tab === 'gcash' ? 'block' : 'none';
+        document.getElementById('payment-bank').style.display = tab === 'bank' ? 'block' : 'none';
+        document.getElementById('tab-gcash').style.cssText = tab === 'gcash'
+            ? 'flex:1;padding:0.75rem;border-radius:0.5rem;border:2px solid rgba(201,168,76,0.5);background:rgba(201,168,76,0.1);color:#c9a84c;font-weight:600;cursor:pointer;'
+            : 'flex:1;padding:0.75rem;border-radius:0.5rem;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);cursor:pointer;';
+        document.getElementById('tab-bank').style.cssText = tab === 'bank'
+            ? 'flex:1;padding:0.75rem;border-radius:0.5rem;border:2px solid rgba(201,168,76,0.5);background:rgba(201,168,76,0.1);color:#c9a84c;font-weight:600;cursor:pointer;'
+            : 'flex:1;padding:0.75rem;border-radius:0.5rem;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);cursor:pointer;';
+    }
+
+    async function _loadPaymentDetails() {
+        try {
+            const res = await fetch('/api/onboarding/retake-payment', {
+                method: 'POST', credentials: 'include',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ payment_method: 'gcash' })
+            });
+            const d = await res.json();
+            const ref = d.reference_number || ('RETAKE-' + Math.random().toString(36).substr(2,8).toUpperCase());
+            if (document.getElementById('gcash-number')) document.getElementById('gcash-number').textContent = d.gcash_number || '09XX-XXX-XXXX';
+            if (document.getElementById('pay-ref')) document.getElementById('pay-ref').textContent = ref;
+            if (document.getElementById('pay-ref-bank')) document.getElementById('pay-ref-bank').textContent = ref;
+            if (document.getElementById('bank-name')) document.getElementById('bank-name').textContent = d.bank_name || 'BDO';
+            if (document.getElementById('bank-account')) document.getElementById('bank-account').textContent = d.bank_account || 'XXXX-XXXX-XXXX';
+            if (document.getElementById('bank-name-2')) document.getElementById('bank-name-2').textContent = d.bank_account_name || 'Quanby Solutions, Inc.';
+        } catch(e) {}
+    }
+
+    async function _submitRetakePayment() {
+        const btn = document.getElementById('pay-confirm-btn');
+        btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Submitting&hellip;';
+        try {
+            const res = await fetch('/api/onboarding/retake-payment/verify', { method: 'POST', credentials: 'include' });
+            const d = await res.json();
+            document.getElementById('ob-content').innerHTML =
+                '<h3>Payment Submitted</h3>' +
+                '<div style="text-align:center;padding:2rem 0;">' +
+                '<div style="font-size:3rem;margin-bottom:1rem;">&#9203;</div>' +
+                '<p style="font-weight:600;color:#c9a84c;">Payment verification pending</p>' +
+                '<p class="sub">Our team will verify your payment within 24 hours and send you a confirmation email with a link to retake the exam.</p>' +
+                '<p class="sub">Reference: <strong style="color:#c9a84c;">' + (d.reference_number || '') + '</strong></p>' +
+                '</div>';
+        } catch(e) {
+            btn.disabled = false; btn.textContent = "\u2705 I've Paid \u2014 Submit for Verification";
+            document.getElementById('ob-err').textContent = 'Submission failed. Please try again.';
+        }
+    }
+
+    function _kycFileSelected(input) {
+        const file = input.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+            document.getElementById('ob-err').textContent = 'File too large. Max 5MB.'; return;
+        }
+        document.getElementById('ob-err').textContent = '';
+        const btn = document.getElementById('kyc-upload-btn');
+        btn.disabled = false; btn.style.opacity = '1';
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('kyc-img-preview').src = e.target.result;
+                document.getElementById('kyc-preview').style.display = 'block';
+                document.getElementById('kyc-placeholder').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            document.getElementById('kyc-placeholder').innerHTML = '<div style="font-size:1.5rem;">&#128196;</div><p style="color:var(--teal);margin:0;">' + file.name + '</p>';
+        }
+    }
+
+    async function _submitKycId() {
+        const input = document.getElementById('kyc-file-input');
+        if (!input.files[0]) { document.getElementById('ob-err').textContent = 'Please select a file first.'; return; }
+        const btn = document.getElementById('kyc-upload-btn');
+        btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Uploading&hellip;';
+        try {
+            const formData = new FormData();
+            formData.append('national_id', input.files[0]);
+            const res = await fetch('/api/onboarding/national-id', {
+                method: 'POST', credentials: 'include', body: formData
+            });
+            if (!res.ok) throw new Error((await res.json()).detail || 'Upload failed');
+            _renderObStep('liveness');
+        } catch(e) {
+            btn.disabled = false; btn.textContent = 'Upload ID & Continue \u2192';
+            document.getElementById('ob-err').textContent = e.message;
+        }
     }
 
     async function _startLiveness(evt) {
@@ -2468,7 +3178,7 @@
 
 
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ INIT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ─── INIT ───────────────────────────────────────────────────────────────────
     initTemplates();
     
     // --- MOBILE MENU ---
@@ -2518,11 +3228,11 @@
     });
 </script>
 
-<!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+<!-- ═══════════════════════════════════════════════════════════════════════
      QUANBY LEGAL AI CHATBOT WIDGET
-     Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+     ═══════════════════════════════════════════════════════════════════════ -->
 <style>
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Chatbot Widget Styles Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ── Chatbot Widget Styles ── */
 #ql-chat-btn {
     position: fixed;
     bottom: 28px;
@@ -2844,7 +3554,7 @@
     <!-- Header -->
     <div id="ql-chat-header">
         <div class="ql-chat-header-left">
-            <div class="ql-chat-avatar">Ã¢Å¡â€“Ã¯Â¸Â</div>
+            <div class="ql-chat-avatar">⚖️</div>
             <div class="ql-chat-header-info">
                 <h4>Quanby Legal AI</h4>
                 <div class="ql-status-dot-wrap ql-chat-status">
@@ -2893,14 +3603,14 @@
 (function() {
     'use strict';
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ State Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── State ──────────────────────────────────────────────────────────────
     const CHAT_API = '/api/chatbot';
     let qlIsOpen = false;
     let qlIsWaiting = false;
     let qlSessionId = '';
     const qlGreeting = "Hello! \u{1F44B} I'm **Quanby Legal AI**, your Philippine legal assistant.\n\nI can help you with e-notarization, ENP certification, and Philippine legal frameworks (A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, SEC MC 28-2020).\n\nWhat can I help you with today?";
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Init Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Init ───────────────────────────────────────────────────────────────
     (function qlInit() {
         // Restore session_id from sessionStorage
         try {
@@ -2913,7 +3623,7 @@
         }
     })();
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Toggle chat window Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Toggle chat window ─────────────────────────────────────────────────
     window.qlToggleChat = function() {
         qlIsOpen = !qlIsOpen;
         const win = document.getElementById('ql-chat-window');
@@ -2936,7 +3646,7 @@
         }
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Send suggestion Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Send suggestion ────────────────────────────────────────────────────
     window.qlSendSuggestion = function(btn) {
         const text = btn.textContent.trim();
         // Hide suggestions panel
@@ -2944,7 +3654,7 @@
         qlDispatch(text);
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Handle keyboard Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Handle keyboard ────────────────────────────────────────────────────
     window.qlHandleKey = function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -2952,13 +3662,13 @@
         }
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Auto-resize textarea Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Auto-resize textarea ───────────────────────────────────────────────
     window.qlAutoResize = function(el) {
         el.style.height = 'auto';
         el.style.height = Math.min(el.scrollHeight, 120) + 'px';
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Send message Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Send message ───────────────────────────────────────────────────────
     window.qlSendMessage = function() {
         const input = document.getElementById('ql-chat-input');
         const text = input.value.trim();
@@ -2970,7 +3680,7 @@
         qlDispatch(text);
     };
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Core dispatch: add user msg, call API, show bot reply Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Core dispatch: add user msg, call API, show bot reply ─────────────
     function qlDispatch(text) {
         if (qlIsWaiting) return;
         qlAddUserMessage(text);
@@ -3012,7 +3722,7 @@
         });
     }
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Render helpers Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Render helpers ─────────────────────────────────────────────────────
     function qlAddUserMessage(text) {
         const msgs = document.getElementById('ql-chat-messages');
         const div = document.createElement('div');
@@ -3078,7 +3788,7 @@
         if (msgs) msgs.scrollTop = msgs.scrollHeight;
     }
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Minimal secure markdown renderer (no innerHTML from user input) Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Minimal secure markdown renderer (no innerHTML from user input) ──
     // Only used for BOT messages (controlled server output)
     function qlRenderMarkdown(text) {
         // Escape HTML first (defensive)
@@ -3096,12 +3806,12 @@
         return s;
     }
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Close on Escape Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Close on Escape ────────────────────────────────────────────────────
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && qlIsOpen) qlToggleChat();
     });
 
-    // Ã¢â€â‚¬Ã¢â€â‚¬ Close on outside click Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    // ── Close on outside click ─────────────────────────────────────────────
     document.addEventListener('click', function(e) {
         if (!qlIsOpen) return;
         const win = document.getElementById('ql-chat-window');
@@ -3112,9 +3822,9 @@
     });
 })();
 </script>
-<!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+<!-- ═══════════════════════════════════════════════════════════════════════
      END QUANBY LEGAL AI CHATBOT WIDGET
-     Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+     ═══════════════════════════════════════════════════════════════════════ -->
 
 
     <!-- ONBOARDING MODAL -->
