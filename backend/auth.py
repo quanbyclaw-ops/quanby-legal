@@ -18,6 +18,7 @@ import hashlib
 import secrets
 import logging
 import urllib.parse
+import fcntl
 from pathlib import Path
 from typing import Optional
 
@@ -58,35 +59,83 @@ JWT_ISSUER     = "quanby-legal"
 JWT_AUDIENCE   = "quanby-legal-api"
 
 # FIX-2: CSRF state + PKCE storage — state -> {"expiry": float, "code_verifier": str}
-# Persisted to disk so states survive backend restarts.
+# Persisted to disk with file locking so multiple uvicorn workers share state safely.
 _OAUTH_STATES_PATH = Path(__file__).parent / "data" / "oauth_states.json"
 _OAUTH_STATE_TTL = 600  # 10 minutes
 
 
-def _load_oauth_states() -> dict:
-    """Load persisted OAuth states from disk, discarding expired ones."""
-    try:
-        if _OAUTH_STATES_PATH.exists():
-            with open(_OAUTH_STATES_PATH) as f:
-                raw = json.load(f)
-            now = time.time()
-            return {k: v for k, v in raw.items() if v.get("expiry", 0) > now}
-    except Exception:
-        pass
-    return {}
+def _read_states_locked(f) -> dict:
+    """Read and parse states from an open, locked file."""
+    f.seek(0)
+    content = f.read()
+    if not content.strip():
+        return {}
+    raw = json.loads(content)
+    now = time.time()
+    return {k: v for k, v in raw.items() if v.get("expiry", 0) > now}
 
 
-def _save_oauth_states(states: dict) -> None:
-    """Persist OAuth states to disk."""
-    try:
-        _OAUTH_STATES_PATH.parent.mkdir(parents=True, exist_ok=True)
-        with open(_OAUTH_STATES_PATH, "w") as f:
-            json.dump(states, f)
-    except Exception as e:
-        logger.warning(f"Failed to persist OAuth states: {e}")
+def _write_states_locked(f, states: dict) -> None:
+    """Write states to an open, locked file (truncate first)."""
+    f.seek(0)
+    f.truncate()
+    json.dump(states, f)
+    f.flush()
 
 
-OAUTH_STATES: dict[str, dict] = _load_oauth_states()
+def generate_oauth_state_entry(provider: str) -> tuple[str, str, str]:
+    """
+    Generate + persist a state token + PKCE pair. File-locked so all workers share it.
+    Returns (state, code_verifier, code_challenge).
+    """
+    state = secrets.token_urlsafe(32)
+    verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b"=").decode()
+    digest = hashlib.sha256(verifier.encode()).digest()
+    challenge = base64.urlsafe_b64encode(digest).rstrip(b"=").decode()
+
+    _OAUTH_STATES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(_OAUTH_STATES_PATH, "a+") as f:
+        fcntl.flock(f, fcntl.LOCK_EX)
+        try:
+            states = _read_states_locked(f)
+            states[state] = {
+                "expiry": time.time() + _OAUTH_STATE_TTL,
+                "code_verifier": verifier,
+                "provider": provider,
+            }
+            _write_states_locked(f, states)
+        finally:
+            fcntl.flock(f, fcntl.LOCK_UN)
+    return state, verifier, challenge
+
+
+def validate_oauth_state_entry(state: str) -> dict | None:
+    """
+    Validate and consume a state token. File-locked so all workers share it.
+    Returns metadata dict or None if invalid/expired.
+    """
+    if not _OAUTH_STATES_PATH.exists():
+        logger.warning("OAuth state validation failed: no states file")
+        return None
+    with open(_OAUTH_STATES_PATH, "r+") as f:
+        fcntl.flock(f, fcntl.LOCK_EX)
+        try:
+            states = _read_states_locked(f)
+            entry = states.pop(state, None)
+            _write_states_locked(f, states)
+        finally:
+            fcntl.flock(f, fcntl.LOCK_UN)
+    if entry is None:
+        logger.warning("OAuth state validation failed: state not found")
+        return None
+    if time.time() > entry.get("expiry", 0):
+        logger.warning("OAuth state validation failed: state expired")
+        return None
+    return entry
+
+
+# Legacy in-memory dict kept for compatibility — no longer used for multi-worker
+OAUTH_STATES: dict[str, dict] = {}
 
 
 # â"€â"€â"€ FIX-2: PKCE helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
@@ -105,35 +154,19 @@ def _code_challenge(verifier: str) -> str:
 def generate_oauth_state(provider: str) -> tuple[str, str, str]:
     """
     Generate a state token + PKCE pair for an OAuth flow.
+    File-locked so all uvicorn workers share the same state store.
     Returns (state, code_verifier, code_challenge).
-    State is stored in OAUTH_STATES with TTL.
     """
-    state = secrets.token_urlsafe(32)
-    verifier = _generate_code_verifier()
-    challenge = _code_challenge(verifier)
-    OAUTH_STATES[state] = {
-        "expiry": time.time() + _OAUTH_STATE_TTL,
-        "code_verifier": verifier,
-        "provider": provider,
-    }
-    _save_oauth_states(OAUTH_STATES)
-    return state, verifier, challenge
+    return generate_oauth_state_entry(provider)
 
 
 def validate_oauth_state(state: str) -> Optional[dict]:
     """
     Validate and consume an OAuth state token (one-time use).
+    File-locked so all uvicorn workers share the same state store.
     Returns the stored metadata dict (including code_verifier) or None if invalid.
     """
-    entry = OAUTH_STATES.pop(state, None)
-    _save_oauth_states(OAUTH_STATES)
-    if entry is None:
-        logger.warning("OAuth state validation failed: state not found")
-        return None
-    if time.time() > entry["expiry"]:
-        logger.warning("OAuth state validation failed: state expired")
-        return None
-    return entry
+    return validate_oauth_state_entry(state)
 
 
 # â"€â"€â"€ FIX-11: JWT with PyJWT â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
