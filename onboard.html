@@ -653,9 +653,6 @@
             </div>
         </div>
         <div id="err-role" class="ob-error"></div>
-        <button class="btn-primary" id="btn-role-continue" onclick="submitRole()">
-            Continue →
-        </button>
     </div>
 
     <!-- STEP 2: PROFILE -->
@@ -1038,26 +1035,21 @@ function selectRole(role) {
     _role = role;
     document.getElementById('role-attorney').classList.toggle('selected', role === 'attorney');
     document.getElementById('role-client').classList.toggle('selected', role === 'client');
+    submitRole();
 }
 
 async function submitRole() {
-    const btn = document.getElementById('btn-role-continue');
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Saving…';
-    document.getElementById('err-role').textContent = '';
+    document.getElementById("err-role").textContent = "";
     try {
-        const res = await fetch('/api/onboarding/role', {
-            method: 'POST', credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("/api/onboarding/role", {
+            method: "POST", credentials: "include",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ role: _role })
         });
-        if (!res.ok) throw new Error((await res.json()).detail || 'Failed to save role');
-        goToStep('profile');
+        if (!res.ok) throw new Error((await res.json()).detail || "Failed");
+        goToStep("profile");
     } catch(e) {
-        document.getElementById('err-role').textContent = e.message;
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'Continue →';
+        document.getElementById("err-role").textContent = e.message;
     }
 }
 
