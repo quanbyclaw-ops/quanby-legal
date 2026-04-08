@@ -1,5 +1,5 @@
 """
-auth.py â€” Quanby Legal SSO + Onboarding + Certification Auth Backend
+auth.py â€" Quanby Legal SSO + Onboarding + Certification Auth Backend
 Supports Google OAuth2
 JWT session tokens (via PyJWT)
 
@@ -11,12 +11,14 @@ Security fixes applied:
 """
 
 import os
+import json
 import time
 import base64
 import hashlib
 import secrets
 import logging
 import urllib.parse
+from pathlib import Path
 from typing import Optional
 
 import jwt  # PyJWT
@@ -28,7 +30,7 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# â”€â”€â”€ ENV CONFIG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â"€â"€â"€ ENV CONFIG â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 GOOGLE_CLIENT_ID       = os.getenv("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET   = os.getenv("GOOGLE_CLIENT_SECRET", "")
 FRONTEND_URL           = os.getenv("FRONTEND_URL", "https://legal.quanbyai.com")
@@ -55,12 +57,39 @@ JWT_ALGORITHM  = "HS256"
 JWT_ISSUER     = "quanby-legal"
 JWT_AUDIENCE   = "quanby-legal-api"
 
-# FIX-2: CSRF state + PKCE storage â€” state -> {"expiry": float, "code_verifier": str}
-OAUTH_STATES: dict[str, dict] = {}
+# FIX-2: CSRF state + PKCE storage — state -> {"expiry": float, "code_verifier": str}
+# Persisted to disk so states survive backend restarts.
+_OAUTH_STATES_PATH = Path(__file__).parent / "data" / "oauth_states.json"
 _OAUTH_STATE_TTL = 600  # 10 minutes
 
 
-# â”€â”€â”€ FIX-2: PKCE helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+def _load_oauth_states() -> dict:
+    """Load persisted OAuth states from disk, discarding expired ones."""
+    try:
+        if _OAUTH_STATES_PATH.exists():
+            with open(_OAUTH_STATES_PATH) as f:
+                raw = json.load(f)
+            now = time.time()
+            return {k: v for k, v in raw.items() if v.get("expiry", 0) > now}
+    except Exception:
+        pass
+    return {}
+
+
+def _save_oauth_states(states: dict) -> None:
+    """Persist OAuth states to disk."""
+    try:
+        _OAUTH_STATES_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(_OAUTH_STATES_PATH, "w") as f:
+            json.dump(states, f)
+    except Exception as e:
+        logger.warning(f"Failed to persist OAuth states: {e}")
+
+
+OAUTH_STATES: dict[str, dict] = _load_oauth_states()
+
+
+# â"€â"€â"€ FIX-2: PKCE helpers â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 def _generate_code_verifier() -> str:
     """Generate a PKCE code_verifier (43-128 chars, URL-safe)."""
@@ -87,6 +116,7 @@ def generate_oauth_state(provider: str) -> tuple[str, str, str]:
         "code_verifier": verifier,
         "provider": provider,
     }
+    _save_oauth_states(OAUTH_STATES)
     return state, verifier, challenge
 
 
@@ -96,6 +126,7 @@ def validate_oauth_state(state: str) -> Optional[dict]:
     Returns the stored metadata dict (including code_verifier) or None if invalid.
     """
     entry = OAUTH_STATES.pop(state, None)
+    _save_oauth_states(OAUTH_STATES)
     if entry is None:
         logger.warning("OAuth state validation failed: state not found")
         return None
@@ -105,7 +136,7 @@ def validate_oauth_state(state: str) -> Optional[dict]:
     return entry
 
 
-# â”€â”€â”€ FIX-11: JWT with PyJWT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â"€â"€â"€ FIX-11: JWT with PyJWT â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 def create_access_token(payload: dict) -> str:
     """
@@ -191,7 +222,7 @@ def verify_refresh_token(token: str) -> Optional[dict]:
         return None
 
 
-# â”€â”€â”€ OAUTH HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# â"€â"€â"€ OAUTH HELPERS â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
 async def google_get_user_info(code: str, redirect_uri: str) -> dict:
     """Exchange Google auth code for user info."""
@@ -248,4 +279,4 @@ def get_oauth_urls() -> dict:
         result["google"] = f"https://accounts.google.com/o/oauth2/v2/auth?{params}"
     else:
         result["google"] = None
-return result
+    return result
