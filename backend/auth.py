@@ -346,6 +346,7 @@ def get_oauth_urls() -> dict:
             "response_type": "code",
             "scope": "openid email profile",
             "access_type": "offline",
+            "prompt": "select_account",
             "state": state,
         })
         result["google"] = f"https://accounts.google.com/o/oauth2/v2/auth?{params}"
