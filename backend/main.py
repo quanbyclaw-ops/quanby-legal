@@ -47,6 +47,7 @@ from onboarding import (
     lookup_user_by_certificate_id,
 )
 from question_bank import get_randomized_test, grade_test
+from email_service import send_welcome_email, send_test_fail_email
 
 load_dotenv()
 
@@ -398,6 +399,10 @@ async def google_callback(
     user_info = await google_get_user_info(code, redirect_uri)
     user = await get_or_create_user(user_info)
 
+    # Send welcome email on first login (onboarding_step == 'role_select' = brand new user)
+    if user.get("onboarding_step", "role_select") == "role_select":
+        send_welcome_email(user)  # fire-and-forget, non-blocking
+
     # FIX-1: Deliver token via HttpOnly Secure cookie, NOT query param
     response = RedirectResponse(
         url=f"{FRONTEND_URL}/auth-complete?step={user.get('onboarding_step', 'role_select')}",
@@ -438,6 +443,10 @@ async def get_me(
         "certificate_id": user.get("certificate_id"),
         "liveness_verified": user.get("liveness_verified", False),
         "national_id_uploaded": user.get("national_id_uploaded", False),
+        "kyc_id_uploaded": user.get("kyc_id_uploaded", False),
+        "retake_count": user.get("retake_count", 0),
+        "retake_payment_pending": user.get("retake_payment_pending", False),
+        "retake_payment_confirmed": user.get("retake_payment_confirmed", False),
     }
 
 
@@ -606,10 +615,14 @@ async def submit_test(
         updates.update({
             "certificate_id": cert_id,
             "certificate_status": "probationary",
-            "onboarding_step": "liveness",
+            "onboarding_step": "kyc_id",
         })
 
     await update_user(user["id"], updates)
+
+    # Fire fail email notification if not passed
+    if not result["passed"]:
+        send_test_fail_email(user, result["score_pct"])
 
     response: dict = {
         "success": True,
@@ -624,7 +637,7 @@ async def submit_test(
         response.update({
             "certificate_id": updates["certificate_id"],
             "message": "Ã°Å¸Å½â€° Congratulations! You passed. Your probationary certificate has been issued.",
-            "next_step": "liveness",
+            "next_step": "kyc_id",
         })
     else:
         new_retake_count = updates["retake_count"]
@@ -664,6 +677,43 @@ def _safe_upload_ext(filename: Optional[str], default: str = "jpg") -> str:
         return default
     return ext
 
+
+
+# ─── KYC ID Upload ─────────────────────────────────────────────────────────
+
+@app.post("/api/onboarding/kyc-id")
+async def upload_kyc_id(
+    kyc_id: UploadFile = File(...),
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Upload government-issued ID for KYC. Sets onboarding_step to liveness."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+
+    id_bytes = await kyc_id.read()
+    if len(id_bytes) < 1000:
+        raise HTTPException(400, "Invalid file — too small")
+    if len(id_bytes) > 10 * 1024 * 1024:
+        raise HTTPException(400, "File too large — max 10MB")
+
+    ext = _safe_upload_ext(kyc_id.filename, default="jpg")
+    kyc_dir = os.path.join(os.path.dirname(__file__), "data", "kyc_ids")
+    os.makedirs(kyc_dir, exist_ok=True)
+    kyc_path = os.path.join(kyc_dir, f"{user['id']}.{ext}")
+    with open(kyc_path, "wb") as fh:
+        fh.write(id_bytes)
+    try:
+        os.chmod(kyc_path, stat.S_IRUSR | stat.S_IWUSR)
+    except OSError:
+        pass
+
+    await update_user(user["id"], {
+        "kyc_id_uploaded": True,
+        "onboarding_step": "liveness",
+    })
+    return {"success": True, "message": "KYC ID uploaded successfully.", "next_step": "liveness"}
 
 @app.post("/api/onboarding/liveness")
 async def submit_liveness(
@@ -879,6 +929,105 @@ async def admin_confirm_retake(
 # Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 # LEGAL AI CHATBOT Ã¢â‚¬â€ POST /api/chatbot
 # Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+
+
+
+
+# ─── Retake Payment (NEW canonical endpoints) ───────────────────────────────
+
+@app.post("/api/retake/initiate")
+async def retake_initiate(
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Return payment details for retake. Requires retake_count >= 1."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    retake_count = user.get("retake_count", 0)
+    ref = f"RETAKE-{user['id'][:8].upper()}-{retake_count}"
+    return {
+        "success": True,
+        "amount": 500,
+        "reference_code": ref,
+        "gcash_number": os.getenv("GCASH_NUMBER", "09XX-XXX-XXXX"),
+        "bank_name": os.getenv("BANK_NAME", "BDO"),
+        "bank_account": os.getenv("BANK_ACCOUNT", "XXXX-XXXX-XXXX"),
+        "bank_account_name": os.getenv("BANK_ACCOUNT_NAME", "Quanby Solutions, Inc."),
+        "retake_count": retake_count,
+    }
+
+
+class RetakeConfirmRequest(BaseModel):
+    payment_method: str  # "gcash" or "bank_transfer"
+    reference: str
+
+
+@app.post("/api/retake/confirm-payment")
+async def retake_confirm_payment(
+    req: RetakeConfirmRequest,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """User confirms payment sent — marks as pending admin verification."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    if req.payment_method not in ("gcash", "bank_transfer"):
+        raise HTTPException(400, "Invalid payment_method")
+    await update_user(user["id"], {
+        "retake_payment_pending": True,
+        "retake_payment_confirmed": False,
+        "retake_payment_method": req.payment_method,
+        "retake_payment_reference": req.reference,
+    })
+    return {
+        "success": True,
+        "message": "Payment submitted! You will receive an email once verified.",
+        "next_step": "test",
+    }
+
+# ── Onboarding Retake Payment (frontend-facing) ─────────────────────────────
+
+@app.post("/api/onboarding/retake-payment")
+async def onboarding_retake_payment(
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Return payment details for retake fee. Frontend polls this to get GCash/bank info."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    ref = f"RETAKE-{user['id'][:8].upper()}"
+    return {
+        "gcash_number": os.getenv("GCASH_NUMBER", "09XX-XXX-XXXX"),
+        "bank_name": os.getenv("BANK_NAME", "BDO"),
+        "bank_account": os.getenv("BANK_ACCOUNT", "XXXX-XXXX-XXXX"),
+        "bank_account_name": os.getenv("BANK_ACCOUNT_NAME", "Quanby Solutions, Inc."),
+        "reference_number": ref,
+        "amount": 500,
+    }
+
+
+@app.post("/api/onboarding/retake-payment/verify")
+async def verify_retake_payment(
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """User confirms they have sent payment — marks as pending verification."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    ref = f"RETAKE-{user['id'][:8].upper()}"
+    await update_user(user["id"], {
+        "retake_payment_pending": True,
+        "retake_payment_confirmed": False,
+    })
+    return {
+        "success": True,
+        "message": "Payment submission received. Verification within 24 hours.",
+        "reference_number": ref,
+    }
 
 # Chat session store: { session_id: { history, created_at, last_active, msg_timestamps } }
 legal_chat_sessions: dict = {}

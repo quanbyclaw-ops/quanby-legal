@@ -1,0 +1,3140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quanby Legal - Electronic Notarization Platform</title>
+    <meta name="description" content="Philippines first Supreme Court-accredited electronic notarization platform. AI-powered contract analysis compliant with A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and SEC MC 28-2020.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://legal.quanbyai.com/">
+    <meta property="og:title" content="Quanby Legal - Electronic Notarization Platform">
+    <meta property="og:description" content="Philippines first Supreme Court-accredited ENF. AI-powered e-notarization compliant with Philippine law.">
+    <meta property="og:url" content="https://legal.quanbyai.com/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/favicon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/favicon-512.png">
+    <meta name="theme-color" content="#7c3aed">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta property="og:image" content="https://legal.quanbyai.com/favicon-512.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        :root {
+            --bg-color: #05060f;
+            --purple: #7c3aed;
+            --purple-light: #9d5ff3;
+            --pink: #ec4899;
+            --teal: #10b981;
+            --card-bg: rgba(255,255,255,0.05);
+            --card-border: rgba(255,255,255,0.1);
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            line-height: 1.5;
+        }
+        a { text-decoration: none; color: inherit; }
+
+        /* NAV */
+        nav {
+            position: sticky; top: 0;
+            background: rgba(5,6,15,0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; gap: 2rem; }
+        .logo { display: flex; align-items: center; flex-shrink: 0; }
+        .logo-circle {
+            width: 40px; height: 40px;
+            background: var(--purple);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.25rem;
+            margin-right: 0.5rem;
+        }
+        .logo-text { font-weight: bold; font-size: 1.25rem; white-space: nowrap; }
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; flex: 1; justify-content: center; }
+        .nav-links a { white-space: nowrap; }
+        .nav-links a:hover { color: var(--purple-light); }
+        .nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+        .btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .btn-outline { border: 1px solid var(--purple); color: var(--purple); background: transparent; }
+        .btn-outline:hover { background: rgba(124,58,237,0.1); }
+        .btn-filled { background: var(--purple); color: white; }
+        .btn-filled:hover { background: var(--purple-light); }
+        .btn-pink { background: var(--pink); color: white; }
+        .btn-pink:hover { opacity: 0.9; }
+        .btn-teal { background: var(--teal); color: white; }
+        .btn-teal:hover { opacity: 0.9; }
+        .btn-sm { padding: 0.375rem 0.875rem; font-size: 0.875rem; }
+
+        /* Ã¢â€â‚¬Ã¢â€â‚¬ ONBOARDING CTA STRIP Ã¢â€â‚¬Ã¢â€â‚¬ */
+        .onboard-strip {
+            background: linear-gradient(90deg, rgba(124,58,237,0.15) 0%, rgba(236,72,153,0.1) 100%);
+            border-bottom: 1px solid rgba(124,58,237,0.25);
+            padding: 0.75rem 0;
+        }
+        .onboard-strip .container { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; }
+        .onboard-label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
+        .btn-lawfirm {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white; border: none;
+            padding: 0.6rem 1.5rem; border-radius: 0.5rem;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            display: flex; align-items: center; gap: 0.5rem;
+            transition: all 0.2s; box-shadow: 0 2px 12px rgba(124,58,237,0.35);
+            white-space: nowrap;
+        }
+        .btn-lawfirm:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,58,237,0.5); }
+        .btn-publicclient {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white; border: none;
+            padding: 0.6rem 1.5rem; border-radius: 0.5rem;
+            font-weight: 700; font-size: 0.9rem; cursor: pointer;
+            display: flex; align-items: center; gap: 0.5rem;
+            transition: all 0.2s; box-shadow: 0 2px 12px rgba(16,185,129,0.35);
+            white-space: nowrap;
+        }
+        .btn-publicclient:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(16,185,129,0.5); }
+        .onboard-divider { color: var(--muted); font-size: 0.8rem; }
+
+        /* Ã¢â€â‚¬Ã¢â€â‚¬ SSO MODAL Ã¢â€â‚¬Ã¢â€â‚¬ */
+        .sso-modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.75); z-index: 1000;
+            align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .sso-modal-overlay.open { display: flex; }
+        .sso-modal {
+            background: #0f0e1a; border: 1px solid rgba(124,58,237,0.4);
+            border-radius: 1rem; padding: 2.5rem; max-width: 420px; width: 90%;
+            position: relative; animation: slideUp 0.25s ease;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+        .sso-modal-close {
+            position: absolute; top: 1rem; right: 1rem;
+            background: none; border: none; color: var(--muted);
+            font-size: 1.25rem; cursor: pointer; line-height: 1;
+        }
+        .sso-modal-close:hover { color: var(--text); }
+        .sso-role-badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            padding: 0.25rem 0.875rem; border-radius: 9999px;
+            font-size: 0.78rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            margin-bottom: 1.25rem;
+        }
+        .sso-role-badge.attorney { background: rgba(124,58,237,0.2); color: #c4b5fd; border: 1px solid rgba(124,58,237,0.4); }
+        .sso-role-badge.client   { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.35); }
+        .sso-modal h3 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .sso-modal p  { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.75rem; }
+        .sso-btn {
+            width: 100%; display: flex; align-items: center; gap: 0.875rem;
+            padding: 0.875rem 1.25rem; border-radius: 0.6rem;
+            font-size: 0.95rem; font-weight: 600; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.06);
+            color: var(--text); margin-bottom: 0.75rem;
+            transition: all 0.18s;
+        }
+        .sso-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); transform: translateX(2px); }
+        .sso-btn:last-child { margin-bottom: 0; }
+        .sso-btn-icon { width: 22px; height: 22px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+        .sso-divider { display: flex; align-items: center; gap: 0.75rem; margin: 1.25rem 0; }
+        .sso-divider hr { flex: 1; border: none; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sso-divider span { color: var(--muted); font-size: 0.78rem; white-space: nowrap; }
+        .sso-note { font-size: 0.75rem; color: var(--muted); text-align: center; margin-top: 1.25rem; line-height: 1.5; }
+        .sso-steps {
+            display: flex; gap: 0.5rem; margin-bottom: 1.5rem;
+            counter-reset: step;
+        }
+        .sso-step {
+            flex: 1; text-align: center; font-size: 0.7rem; color: var(--muted);
+            display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+        }
+        .sso-step-num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4);
+            color: #c4b5fd; font-size: 0.7rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .sso-step-line { flex: 1; height: 1px; background: rgba(255,255,255,0.1); margin-top: 11px; }
+
+        /* HERO */
+        #hero {
+            position: relative;
+            padding: 6rem 0;
+            overflow: hidden;
+        }
+        .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .glow-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.3; }
+        .glow-purple { background: radial-gradient(circle, var(--purple), transparent); width: 600px; height: 600px; top: -100px; left: -200px; }
+        .glow-pink { background: radial-gradient(circle, var(--pink), transparent); width: 500px; height: 500px; top: 200px; right: -150px; }
+        .glow-teal { background: radial-gradient(circle, var(--teal), transparent); width: 400px; height: 400px; bottom: -100px; left: 300px; }
+        .hero-content { display: flex; align-items: center; gap: 2rem; }
+        .hero-text { max-width: 800px; }
+        .badge {
+            display: inline-flex; align-items: center;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+        h1 { font-size: 4rem; line-height: 1.1; margin-bottom: 1rem; }
+        .gradient-text {
+            background: linear-gradient(to right, var(--purple), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-subtitle { color: var(--muted); font-size: 1.25rem; margin-bottom: 2rem; }
+        .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .orbital { position: relative; width: 300px; height: 300px; display: none; }
+        @media (min-width: 768px) { .orbital { display: block; } }
+        .orbital-center {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px; height: 80px;
+            background: var(--purple);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem;
+        }
+        .ring {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px dashed var(--muted);
+            border-radius: 50%;
+            animation: rotate 20s linear infinite;
+        }
+        .ring1 { width: 200px; height: 200px; }
+        .ring2 { width: 280px; height: 280px; animation-duration: 25s; animation-direction: reverse; }
+        @keyframes rotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .orbital-icon { position: absolute; font-size: 1.5rem; }
+        .icon1 { top: 10%; left: 50%; transform: translate(-50%, -50%); }
+        .icon2 { top: 50%; right: 10%; transform: translate(50%, -50%); }
+        .icon3 { bottom: 10%; left: 50%; transform: translate(-50%, 50%); }
+        .icon4 { top: 50%; left: 10%; transform: translate(-50%, -50%); }
+
+        /* SECTIONS */
+        section { padding: 4rem 0; }
+        h2 { font-size: 2.5rem; text-align: center; margin-bottom: 1rem; }
+        .section-subtitle { text-align: center; color: var(--muted); margin-bottom: 3rem; }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: border-color 0.2s;
+        }
+        .card:hover { border-color: rgba(124,58,237,0.4); }
+        .card-icon { font-size: 2rem; margin-bottom: 1rem; }
+        .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .card-desc { color: var(--muted); font-size: 0.9rem; }
+
+        /* PARTNERS */
+        #partners { padding: 2rem 0; background: var(--card-bg); }
+        .partners-row { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; color: var(--muted); }
+
+        /* FEATURES */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+
+        /* COMPLIANCE */
+        .compliance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+        .compliance-card { text-align: center; }
+        .icon-circle {
+            width: 60px; height: 60px;
+            background: var(--purple);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+        }
+
+        /* HOW IT WORKS */
+        .steps { display: flex; justify-content: center; gap: 2rem; position: relative; flex-wrap: wrap; }
+        .step { text-align: center; max-width: 250px; }
+        .step-number { font-size: 3rem; font-weight: bold; color: var(--purple); margin-bottom: 0.5rem; }
+        .step-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .step-title { font-weight: 600; margin-bottom: 0.5rem; }
+        .connecting-line { position: absolute; top: 40%; left: 25%; width: 50%; height: 2px; background: var(--muted); z-index: -1; }
+
+        /* USE CASES */
+        .use-cases-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
+
+        /* PRICING */
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .pricing-card { position: relative; }
+        .popular-badge {
+            position: absolute; top: -1rem; left: 50%; transform: translateX(-50%);
+            background: var(--pink); padding: 0.25rem 0.75rem;
+            border-radius: 9999px; font-size: 0.75rem; font-weight: bold;
+        }
+        .tier-name { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .tier-price { font-size: 2rem; margin-bottom: 1rem; }
+        .tier-features { list-style: none; color: var(--muted); }
+        .tier-features li { margin-bottom: 0.5rem; }
+        .tier-features li::before { content: "Ã¢Å“â€œ "; color: var(--teal); }
+
+        /* Ã¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€Â */
+        /* CONTRACT AGENT SECTION */
+        /* Ã¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€ÂÃ¢â€Â */
+        #contract-agent {
+            background: linear-gradient(180deg, rgba(124,58,237,0.05) 0%, transparent 100%);
+            border-top: 1px solid rgba(124,58,237,0.2);
+            border-bottom: 1px solid rgba(124,58,237,0.2);
+        }
+        .agent-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .agent-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(124,58,237,0.2);
+            border: 1px solid rgba(124,58,237,0.4);
+            padding: 0.375rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: #c4b5fd;
+            margin-bottom: 1rem;
+        }
+        .agent-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0;
+        }
+        .agent-tab {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--muted);
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        .agent-tab.active {
+            color: var(--text);
+            border-bottom-color: var(--purple);
+            background: rgba(124,58,237,0.1);
+        }
+        .agent-tab:hover:not(.active) { color: var(--text); }
+        .agent-panel { display: none; }
+        .agent-panel.active { display: block; }
+
+        /* UPLOAD PANEL */
+        .upload-area {
+            border: 2px dashed rgba(124,58,237,0.4);
+            border-radius: 1rem;
+            padding: 3rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(124,58,237,0.03);
+            position: relative;
+        }
+        .upload-area:hover, .upload-area.drag-over {
+            border-color: var(--purple);
+            background: rgba(124,58,237,0.08);
+        }
+        .upload-area input[type="file"] {
+            position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+        }
+        .upload-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .upload-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .upload-desc { color: var(--muted); margin-bottom: 1.5rem; }
+        .upload-types {
+            display: inline-flex; gap: 0.5rem;
+            font-size: 0.8rem; color: var(--muted);
+        }
+        .upload-type-badge {
+            background: var(--card-bg); border: 1px solid var(--card-border);
+            padding: 0.2rem 0.6rem; border-radius: 0.375rem;
+        }
+
+        /* ANALYSIS PANEL */
+        .analysis-loading {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+        }
+        .spinner {
+            width: 48px; height: 48px;
+            border: 3px solid rgba(124,58,237,0.2);
+            border-top-color: var(--purple);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .analysis-results { display: none; }
+        .analysis-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap; gap: 1rem;
+        }
+        .analysis-title { font-size: 1.5rem; font-weight: 700; }
+        .analysis-meta { color: var(--muted); font-size: 0.875rem; }
+        .risk-badge {
+            display: inline-flex; align-items: center; gap: 0.375rem;
+            padding: 0.375rem 1rem; border-radius: 9999px;
+            font-weight: 600; font-size: 0.875rem;
+        }
+        .risk-high { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+        .risk-medium { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+        .risk-low { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+
+        .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 768px) { .analysis-grid { grid-template-columns: 1fr; } }
+        .analysis-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+        }
+        .analysis-card-title {
+            font-weight: 600; font-size: 0.875rem;
+            color: var(--muted);
+            text-transform: uppercase; letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+        .party-item {
+            display: flex; gap: 0.75rem; margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .party-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .party-avatar {
+            width: 36px; height: 36px;
+            background: rgba(124,58,237,0.2);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0;
+        }
+        .party-name { font-weight: 500; }
+        .party-role { color: var(--muted); font-size: 0.96rem; }
+
+        .flag-item {
+            display: flex; gap: 0.75rem; margin-bottom: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.03);
+            border-radius: 0.5rem;
+            border-left: 3px solid;
+        }
+        .flag-high { border-left-color: #f87171; }
+        .flag-medium { border-left-color: #fbbf24; }
+        .flag-low { border-left-color: #34d399; }
+        .flag-info { border-left-color: #60a5fa; }
+        .flag-icon { font-size: 1.1rem; }
+        .flag-title { font-weight: 500; font-size: 0.9rem; margin-bottom: 0.2rem; }
+        .flag-desc { color: var(--muted); font-size: 0.96rem; }
+        .flag-law { color: #a78bfa; font-size: 0.75rem; margin-top: 0.25rem; }
+
+        .compliance-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.875rem;
+        }
+        .compliance-row:last-child { border-bottom: none; }
+        .compliance-status-ok { color: var(--teal); }
+        .compliance-status-warn { color: #fbbf24; }
+        .compliance-status-fail { color: #f87171; }
+
+        .obligation-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--card-border);
+            font-size: 0.875rem;
+        }
+        .obligation-item:last-child { border-bottom: none; }
+        .obligation-party { color: var(--purple-light); font-weight: 500; font-size: 0.8rem; }
+
+        /* CHAT INTERFACE */
+        .contract-chat-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        @media (max-width: 768px) { .contract-chat-container { grid-template-columns: 1fr; } }
+        .contract-info-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        .no-contract-msg {
+            text-align: center; color: var(--muted); padding: 2rem 0;
+        }
+        .contract-chat-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            display: flex; flex-direction: column;
+            height: 600px;
+        }
+        .contract-chat-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            display: flex; align-items: center; gap: 0.75rem;
+        }
+        .ai-avatar {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+        }
+        .online-dot { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; display: inline-block; }
+        .contract-chat-messages {
+            flex: 1; overflow-y: auto; padding: 1.25rem;
+            display: flex; flex-direction: column; gap: 1rem;
+        }
+        .chat-msg {
+            max-width: 85%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .chat-msg-user {
+            align-self: flex-end;
+            background: var(--purple);
+            color: white;
+            border-radius: 1rem 1rem 0 1rem;
+        }
+        .chat-msg-ai {
+            align-self: flex-start;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--card-border);
+            border-radius: 1rem 1rem 1rem 0;
+            white-space: pre-wrap;
+        }
+        .chat-msg-system {
+            align-self: center;
+            background: rgba(124,58,237,0.1);
+            border: 1px solid rgba(124,58,237,0.2);
+            color: #c4b5fd;
+            font-size: 0.8rem;
+            text-align: center;
+            border-radius: 0.5rem;
+            max-width: 100%;
+        }
+        .contract-chat-input-area {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--card-border);
+            display: flex; gap: 0.75rem;
+        }
+        .contract-chat-input {
+            flex: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem;
+            padding: 0.625rem 1rem;
+            color: var(--text);
+            outline: none;
+            font-size: 0.9rem;
+        }
+        .contract-chat-input:focus { border-color: var(--purple); }
+        .contract-chat-input::placeholder { color: var(--muted); }
+        .chat-send-btn {
+            background: var(--purple); border: none; color: white;
+            padding: 0.625rem 1.25rem; border-radius: 0.5rem;
+            cursor: pointer; font-weight: 500; font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .chat-send-btn:hover { background: var(--purple-light); }
+        .chat-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .suggested-questions {
+            display: flex; flex-wrap: wrap; gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        .suggested-q {
+            background: rgba(124,58,237,0.1);
+            border: 1px solid rgba(124,58,237,0.3);
+            color: #c4b5fd;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .suggested-q:hover { background: rgba(124,58,237,0.25); }
+
+        /* GENERATE PANEL */
+        .generate-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1.5rem;
+        }
+        @media (max-width: 768px) { .generate-container { grid-template-columns: 1fr; } }
+        .template-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .template-item {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .template-item.active {
+            border-color: var(--purple);
+            background: rgba(124,58,237,0.1);
+        }
+        .template-item:hover:not(.active) { border-color: rgba(124,58,237,0.3); }
+        .template-icon { font-size: 1.25rem; }
+        .template-name { font-size: 0.9rem; font-weight: 500; }
+        .template-cat { font-size: 0.75rem; color: var(--muted); }
+        .generate-form {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        .form-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; }
+        .form-row { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.875rem; color: var(--muted); margin-bottom: 0.375rem; }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem;
+            padding: 0.625rem 1rem;
+            color: var(--text);
+            outline: none;
+            font-size: 0.9rem;
+            font-family: inherit;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--purple); }
+        .form-select option { background: #1e1b4b; }
+        .form-textarea { resize: vertical; min-height: 80px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .generated-contract {
+            margin-top: 1.5rem;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--card-border);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            display: none;
+        }
+        .generated-contract-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1rem;
+        }
+        .generated-contract-text {
+            white-space: pre-wrap;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text);
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* GET IN TOUCH */
+        .contact-section { display: flex; gap: 2rem; }
+        @media (max-width: 768px) { .contact-section { flex-direction: column; } }
+        .topics { flex: 1; }
+        .topic-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem; padding: 1rem;
+            margin-bottom: 1rem; cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .topic-card.active { border-color: var(--purple); background: rgba(124,58,237,0.05); }
+        .topic-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .topic-title { font-weight: 600; }
+        .topic-desc { color: var(--muted); font-size: 0.875rem; }
+        .chat-panel {
+            flex: 1; background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 0.5rem;
+            display: flex; flex-direction: column;
+        }
+        .chat-header {
+            padding: 1rem; border-bottom: 1px solid var(--card-border);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .chat-messages { flex: 1; padding: 1rem; min-height: 200px; overflow-y: auto; }
+        .empty-state { text-align: center; color: var(--muted); padding: 2rem 0; }
+        .message { margin-bottom: 1rem; }
+        .user-message { text-align: right; }
+        .bot-message { text-align: left; }
+        .chat-input {
+            display: flex; padding: 1rem;
+            border-top: 1px solid var(--card-border);
+            gap: 0.5rem;
+        }
+        .chat-input input {
+            flex: 1; background: transparent;
+            border: none; color: var(--text); outline: none;
+        }
+        .chat-input button {
+            background: var(--purple); border: none;
+            color: white; padding: 0.5rem 0.875rem;
+            border-radius: 0.375rem; cursor: pointer;
+        }
+
+        /* FOOTER */
+        footer { padding: 4rem 0; border-top: 1px solid var(--card-border); }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .footer-logo { display: flex; align-items: center; margin-bottom: 1rem; }
+        .footer-tagline { color: var(--muted); margin-bottom: 1rem; }
+        .accreditations { color: var(--muted); font-size: 0.875rem; }
+        .footer-links { display: flex; flex-direction: column; gap: 0.5rem; }
+        .footer-links a:hover { color: var(--purple-light); }
+        .footer-bottom { text-align: center; color: var(--muted); font-size: 0.875rem; }
+
+        /* UTILITY */
+        .divider { height: 1px; background: var(--card-border); margin: 2rem 0; }
+        .text-teal { color: var(--teal); }
+        .text-pink { color: var(--pink); }
+        .text-purple { color: var(--purple-light); }
+        .font-mono { font-family: 'Courier New', monospace; }
+
+        
+        /* Hamburger */
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 6px; background: none; border: none; }
+        .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s; }
+        .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+        .mobile-menu { display: none; position: fixed; top: 61px; left: 0; right: 0; background: rgba(5,6,15,0.98); border-bottom: 1px solid var(--card-border); padding: 1rem 1.5rem; flex-direction: column; gap: 0.75rem; z-index: 98; }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a { font-size: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--card-border); color: var(--text); }
+        .mobile-menu .btn { width: 100%; text-align: center; margin-top: 0.5rem; }
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.5rem; }
+            .hero-content { flex-direction: column; }
+            .steps { flex-direction: column; align-items: center; }
+            .connecting-line { display: none; }
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            /* Nav CTA buttons removed Ã¢â‚¬â€ handled by onboard-strip only */
+            /* Badge: allow wrapping on mobile */
+            .badge { font-size: 0.75rem; white-space: normal; text-align: center; }
+            /* Hero: reduce padding */
+            #hero { padding: 3rem 0; }
+            /* Compliance pills: wrap nicely */
+            .hero-text > div[style*="flex-wrap"] { gap: 0.4rem; }
+            /* Hero buttons: stack vertically */
+            .hero-buttons { flex-direction: column; align-items: flex-start; }
+            .hero-buttons .btn { width: 100%; text-align: center; }
+            /* Compliance grid: single column */
+            .compliance-grid { grid-template-columns: 1fr; }
+            /* Trust bar: 2 per row */
+            #compliance > .container > div[style*="justify-content:center"] > div { min-width: calc(50% - 0.75rem); flex: 1 1 calc(50% - 0.75rem); }
+            /* Agent tabs: scrollable on mobile so all 3 tabs are accessible */
+            .agent-tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                flex-wrap: nowrap;
+                gap: 0.25rem;
+                padding-bottom: 0;
+            }
+            .agent-tabs::-webkit-scrollbar { display: none; }
+            .agent-tab {
+                padding: 0.6rem 1rem;
+                font-size: 0.82rem;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+            /* Upload area: less padding on mobile */
+            .upload-area { padding: 1.75rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="container nav-content">
+            <div class="logo">
+                <div class="logo-circle">Q</div>
+                <span class="logo-text">Quanby Legal</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#contract-agent">Contract AI</a>
+                <a href="#compliance">Compliance</a>
+                <a href="#regulatory">Regulatory</a>
+                <a href="#pricing">Pricing</a>
+                <a href="#about">About</a>
+            </div>
+            <button class="hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
+        </div>
+    </nav>
+    <!-- Ã¢â€¢ÂÃ¢â€¢Â ONBOARDING CTA STRIP Ã¢â€¢ÂÃ¢â€¢Â -->
+    <div class="onboard-strip" id="onboard-strip">
+        <div class="container">
+            <span class="onboard-label">Ã¢Å¡â€“Ã¯Â¸Â Supreme Court-accredited Ã¢â‚¬â€ Get certified today:</span>
+            <button class="btn-lawfirm" onclick="openSSO('attorney')" aria-label="Law Firms Ã¢â‚¬â€ Start ENP certification">
+                Ã°Å¸Ââ€ºÃ¯Â¸Â Law Firms
+            </button>
+            <span class="onboard-divider">or</span>
+            <button class="btn-publicclient" onclick="openSSO('client')" aria-label="Public Clients Ã¢â‚¬â€ Create account">
+                Ã°Å¸â€˜Â¤ Public Clients
+            </button>
+        </div>
+    </div>
+
+    <!-- Ã¢â€¢ÂÃ¢â€¢Â SSO MODAL Ã¢â€¢ÂÃ¢â€¢Â -->
+    <div class="sso-modal-overlay" id="sso-modal" role="dialog" aria-modal="true" aria-label="Sign in to Quanby Legal">
+        <div class="sso-modal">
+            <button class="sso-modal-close" onclick="closeSSO()" aria-label="Close">&times;</button>
+
+            <div id="sso-role-badge" class="sso-role-badge attorney">Ã¢Å¡â€“Ã¯Â¸Â Law Firm / Attorney</div>
+
+            <h3 id="sso-title">Start Your ENP Certification</h3>
+            <p id="sso-desc">Sign in to begin your Electronic Notary Public certification Ã¢â‚¬â€ required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.</p>
+
+            <!-- Progress steps -->
+            <div class="sso-steps">
+                <div class="sso-step"><div class="sso-step-num" style="background:rgba(124,58,237,0.4);border-color:#7c3aed;color:white;">1</div><span>Sign In</span></div>
+                <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
+                <div class="sso-step"><div class="sso-step-num">2</div><span>Profile</span></div>
+                <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
+                <div class="sso-step"><div class="sso-step-num">3</div><span>15-Q Test</span></div>
+                <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
+                <div class="sso-step"><div class="sso-step-num">4</div><span>Liveness</span></div>
+                <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
+                <div class="sso-step"><div class="sso-step-num">5</div><span>Certificate</span></div>
+            </div>
+
+            <!-- SSO Buttons -->
+            <button class="sso-btn" id="sso-google-btn" onclick="ssoLogin('google')">
+                <div class="sso-btn-icon" style="background:#fff;">
+                    <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                </div>
+                Continue with Google
+            </button>
+
+            <div class="sso-note">
+                By continuing, you agree to Quanby Legal's Terms of Service and Privacy Policy.<br>
+                Your data is protected under RA 10173 (Data Privacy Act).
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-menu" id="mobile-menu" role="navigation" aria-label="Mobile navigation">
+        <a href="#features" onclick="closeMobileMenu()">Features</a>
+        <a href="#contract-agent" onclick="closeMobileMenu()">Contract AI</a>
+        <a href="#compliance" onclick="closeMobileMenu()">Compliance</a>
+        <a href="#regulatory" onclick="closeMobileMenu()">Regulatory</a>
+        <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
+        <a href="#about" onclick="closeMobileMenu()">About</a>
+        <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'}); closeMobileMenu()">Try Contract AI</button>
+    </div>
+
+    <!-- HERO -->
+    <section id="hero">
+        <div class="hero-bg">
+            <div class="glow-orb glow-purple"></div>
+            <div class="glow-orb glow-pink"></div>
+            <div class="glow-orb glow-teal"></div>
+        </div>
+        <div class="container hero-content">
+            <div class="hero-text">
+                <div class="badge">Ã¢Å¡â€“Ã¯Â¸Â Supreme Court-accredited Ã¢â‚¬â€ A.M. No. 24-10-14-SC | RA 8792 | RA 10173 | BSP Circular 944 | SEC MC 28-2020</div>
+                <h1><span class="gradient-text">AI-Powered Legal</span><br>Platform for the Philippines</h1>
+                <p class="hero-subtitle">Analyze contracts, generate legally compliant documents, and get instant notarization Ã¢â‚¬â€ powered by AI and fully compliant with Philippine law Ã¢â‚¬â€ A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and SEC MC 28-2020.</p>
+                <div style="display:flex; flex-wrap:wrap; gap:0.6rem; margin-bottom:1.25rem;">
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Ã¢Å¡â€“Ã¯Â¸Â A.M. No. 24-10-14-SC</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Ã°Å¸â€œÅ“ RA 8792 E-Commerce</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Ã°Å¸â€â€™ RA 10173 Data Privacy</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Ã°Å¸ÂÂ¦ BSP Circular 944</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">Ã°Å¸â€œâ€¹ SEC MC 28-2020</span>
+                </div>
+                <div class="hero-buttons">
+                    <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})">Ã°Å¸Â¤â€“ Try Contract AI Agent Ã¢â€ â€™</button>
+                    <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">View Compliance Ã¢â€ â€™</button>
+                </div>
+            </div>
+            <div class="orbital">
+                <div class="orbital-center">Ã¢Å¡â€“Ã¯Â¸Â</div>
+                <div class="ring ring1"></div>
+                <div class="ring ring2"></div>
+                <div class="orbital-icon icon1">Ã°Å¸â€œâ€ž</div>
+                <div class="orbital-icon icon2">Ã°Å¸â€ºÂ¡Ã¯Â¸Â</div>
+                <div class="orbital-icon icon3">Ã¢Å“ÂÃ¯Â¸Â</div>
+                <div class="orbital-icon icon4">Ã¢â€ºâ€œÃ¯Â¸Â</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PARTNERS -->
+    <section id="partners">
+        <div class="container partners-row">
+            <span>DOCONCHAIN Group</span>
+            <span>Hyperledger Fabric</span>
+            <span>Supreme Court of the Philippines</span>
+            <span>DICT National PKI</span>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features">
+        <div class="container">
+            <h2>Full-Featured Electronic Notarization Facility</h2>
+            <p class="section-subtitle">Comprehensive ENF platform compliant with A.M. No. 24-10-14-SC</p>
+            <div class="features-grid">
+                <div class="card">
+                    <div class="card-icon">Ã°Å¸Â¤â€“</div>
+                    <div class="card-title">Contract AI Agent</div>
+                    <p class="card-desc">Upload any contract and get instant AI analysis Ã¢â‚¬â€ parties, risks, obligations, Philippine law compliance flags</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">Ã°Å¸â€œÂ¹</div>
+                    <div class="card-title">IEN & REN Services</div>
+                    <p class="card-desc">In-Person and Remote Electronic Notarization with HD videoconferencing</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">Ã°Å¸â€ºÂ¡Ã¯Â¸Â</div>
+                    <div class="card-title">DICT National PKI Authentication</div>
+                    <p class="card-desc">Official digital certificates for identity verification</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">Ã¢Å“ÂÃ¯Â¸Â</div>
+                    <div class="card-title">Electronic Signatures & Seal</div>
+                    <p class="card-desc">Legally binding electronic notarial seal compliant with Philippine law</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">Ã¢â€ºâ€œÃ¯Â¸Â</div>
+                    <div class="card-title">Immutable Blockchain Audit</div>
+                    <p class="card-desc">Hyperledger Fabric blockchain audit trails Ã¢â‚¬â€ tamper-proof notarization records</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">Ã°Å¸Å’Â</div>
+                    <div class="card-title">Global-Grade Security</div>
+                    <p class="card-desc">Singapore-based blockchain security by DOCONCHAIN Group</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+    <!-- CONTRACT AI AGENT SECTION -->
+    <!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+    <section id="contract-agent">
+        <div class="container">
+            <div class="agent-header">
+                <div class="agent-badge">Ã¢Å“Â¨ Powered by xAI Grok Ã‚Â· Philippine Law Expert</div>
+                <h2>Contract <span class="gradient-text">AI Agent</span></h2>
+                <p class="section-subtitle">Upload any contract for instant AI analysis, ask questions, or generate new contracts Ã¢â‚¬â€ all compliant with Philippine law</p>
+            </div>
+
+            <!-- TABS -->
+            <div class="agent-tabs">
+                <button class="agent-tab active" onclick="switchTab('analyze')">Ã°Å¸â€œâ€¹ Analyze Contract</button>
+                <button class="agent-tab" onclick="switchTab('chat')">Ã°Å¸â€™Â¬ Ask AI</button>
+                <button class="agent-tab" onclick="switchTab('generate')">Ã¢Å“Â¨ Generate Contract</button>
+            </div>
+
+            <!-- TAB: ANALYZE -->
+            <div class="agent-panel active" id="panel-analyze">
+                <!-- Upload Area -->
+                <div class="upload-area" id="upload-area">
+                    <input type="file" id="file-input" accept=".pdf,.docx,.txt" onchange="handleFileSelect(this)">
+                    <div class="upload-icon">Ã°Å¸â€œâ€ž</div>
+                    <div class="upload-title">Drop your contract here</div>
+                    <p class="upload-desc">Upload a PDF or DOCX contract for instant AI-powered legal analysis under Philippine law</p>
+                    <div class="upload-types">
+                        <span class="upload-type-badge">PDF</span>
+                        <span class="upload-type-badge">DOCX</span>
+                        <span class="upload-type-badge">TXT</span>
+                        <span class="upload-type-badge">Max 20MB</span>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div class="analysis-loading" id="analysis-loading">
+                    <div class="spinner"></div>
+                    <div style="font-size:1.1rem;font-weight:500;margin-bottom:0.5rem;">Analyzing your contract...</div>
+                    <div style="color:var(--muted);font-size:0.9rem;">Extracting parties, obligations, risk clauses, and Philippine law compliance</div>
+                </div>
+
+                <!-- Analysis Results -->
+                <div class="analysis-results" id="analysis-results">
+                    <div class="analysis-header">
+                        <div>
+                            <div class="analysis-meta" id="analysis-filename">Ã°Å¸â€œâ€ž contract.pdf</div>
+                            <div class="analysis-title" id="analysis-contract-type">Service Agreement</div>
+                            <div class="analysis-meta" id="analysis-summary" style="margin-top:0.5rem;max-width:700px;color:var(--muted)"></div>
+                        </div>
+                        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center">
+                            <div class="risk-badge" id="overall-risk-badge">Ã°Å¸Å¸Â¡ MEDIUM RISK</div>
+                            <button class="btn btn-outline btn-sm" onclick="switchTab('chat')">Ã°Å¸â€™Â¬ Ask AI about this</button>
+                            <button class="btn btn-sm" style="background:transparent;border:1px solid var(--card-border);color:var(--muted)" onclick="resetAnalysis()">Upload new Ã¢â€ â€™</button>
+                        </div>
+                    </div>
+
+                    <div class="analysis-grid">
+                        <!-- Parties -->
+                        <div class="analysis-card">
+                            <div class="analysis-card-title">Ã°Å¸â€˜Â¥ Parties</div>
+                            <div id="parties-list"></div>
+                        </div>
+
+                        <!-- Key Dates & Payment -->
+                        <div class="analysis-card">
+                            <div class="analysis-card-title">Ã°Å¸â€œâ€¦ Key Dates & Payment</div>
+                            <div id="dates-payment-list"></div>
+                        </div>
+
+                        <!-- Risk Flags -->
+                        <div class="analysis-card" style="grid-column: 1 / -1">
+                            <div class="analysis-card-title">Ã°Å¸Å¡Â© Risk Flags & Issues</div>
+                            <div id="risk-flags-list"></div>
+                        </div>
+
+                        <!-- Obligations -->
+                        <div class="analysis-card">
+                            <div class="analysis-card-title">Ã°Å¸â€œÅ’ Key Obligations</div>
+                            <div id="obligations-list"></div>
+                        </div>
+
+                        <!-- Compliance -->
+                        <div class="analysis-card">
+                            <div class="analysis-card-title">Ã¢Å“â€¦ Compliance Check</div>
+                            <div id="compliance-list"></div>
+                        </div>
+
+                        <!-- Missing Clauses -->
+                        <div class="analysis-card" style="grid-column: 1 / -1">
+                            <div class="analysis-card-title">Ã¢Å¡Â Ã¯Â¸Â Missing Clauses</div>
+                            <div id="missing-clauses-list"></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:1.5rem;padding:1.25rem;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:0.75rem">
+                        <div style="font-weight:600;margin-bottom:0.5rem">Ã°Å¸Â¤â€“ AI Recommendation</div>
+                        <div id="ai-recommendation" style="color:var(--muted);font-size:0.9rem;line-height:1.6"></div>
+                        <div style="margin-top:1rem;font-size:0.75rem;color:var(--muted);font-style:italic">Ã¢Å¡â€“Ã¯Â¸Â This AI analysis is for informational purposes only and does not constitute legal advice. Consult a licensed Philippine attorney for final decisions. Quanby Legal's certified ENPs are available for e-notarization.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: CHAT -->
+            <div class="agent-panel" id="panel-chat">
+                <div class="contract-chat-container">
+                    <!-- Contract Info -->
+                    <div class="contract-info-panel">
+                        <div style="font-weight:600;margin-bottom:1rem">Ã°Å¸â€œâ€ž Loaded Contract</div>
+                        <div id="chat-contract-info">
+                            <div class="no-contract-msg">
+                                <div style="font-size:2rem;margin-bottom:0.5rem">Ã°Å¸â€œâ€¹</div>
+                                <div>No contract loaded yet</div>
+                                <div style="font-size:0.85rem;margin-top:0.25rem">Upload a contract in the Analyze tab first</div>
+                                <button class="btn btn-outline btn-sm" style="margin-top:1rem" onclick="switchTab('analyze')">Upload Contract Ã¢â€ â€™</button>
+                            </div>
+                        </div>
+                        <div class="divider" id="suggested-divider" style="display:none"></div>
+                        <div id="suggested-questions-section" style="display:none">
+                            <div style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem">Suggested questions:</div>
+                            <div class="suggested-questions" id="suggested-questions">
+                                <span class="suggested-q" onclick="askQuestion(this)">Who are the parties in this contract?</span>
+                                <span class="suggested-q" onclick="askQuestion(this)">What are the payment terms?</span>
+                                <span class="suggested-q" onclick="askQuestion(this)">What are the termination conditions?</span>
+                                <span class="suggested-q" onclick="askQuestion(this)">Are there any red flags I should worry about?</span>
+                                <span class="suggested-q" onclick="askQuestion(this)">Is this contract ready for notarization?</span>
+                                <span class="suggested-q" onclick="askQuestion(this)">What are my obligations as a party?</span>
+                                <span class="suggested-q" onclick="askQuestion(this)">Does this comply with Philippine law?</span>
+                                <span class="suggested-q" onclick="askQuestion(this)">Summarize this contract in simple terms</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Panel -->
+                    <div class="contract-chat-panel">
+                        <div class="contract-chat-header">
+                            <div class="ai-avatar">Ã°Å¸Â¤â€“</div>
+                            <div>
+                                <div style="font-weight:600;font-size:0.9rem">Quanby Legal AI</div>
+                                <div style="font-size:0.75rem;color:var(--muted)">Philippine Law Expert <span class="online-dot" style="margin-left:4px"></span></div>
+                            </div>
+                        </div>
+                        <div class="contract-chat-messages" id="contract-chat-messages">
+                            <div class="chat-msg chat-msg-ai">
+                                Kumusta! I'm your Quanby Legal AI Agent, specialized in Philippine contract law and the Civil Code. Upload a contract in the Analyze tab, then ask me anything about it Ã¢â‚¬â€ I'll give you precise, legally grounded answers.
+                            </div>
+                        </div>
+                        <div class="contract-chat-input-area">
+                            <input type="text" class="contract-chat-input" id="contract-chat-input" placeholder="Ask about your contract..." onkeypress="if(event.key==='Enter') sendContractChat()">
+                            <button class="chat-send-btn" id="chat-send-btn" onclick="sendContractChat()">Send Ã¢â€ â€™</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: GENERATE -->
+            <div class="agent-panel" id="panel-generate">
+                <div class="generate-container">
+                    <!-- Template List -->
+                    <div>
+                        <div style="font-size:0.875rem;color:var(--muted);margin-bottom:0.75rem;font-weight:500">SELECT TEMPLATE</div>
+                        <div class="template-list" id="template-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Generate Form -->
+                    <div class="generate-form">
+                        <div class="form-title" id="generate-form-title">Ã°Å¸ÂÂ¡ Deed of Absolute Sale</div>
+                        <div id="generate-form-fields">
+                            <!-- Dynamic fields populated by JS -->
+                        </div>
+                        <button class="btn btn-filled" onclick="generateContract()" id="generate-btn">Ã¢Å“Â¨ Generate Contract with AI</button>
+
+                        <!-- Generated Contract Output -->
+                        <div class="generated-contract" id="generated-contract">
+                            <div class="generated-contract-header">
+                                <div style="font-weight:600" id="generated-title">Generated Contract</div>
+                                <div style="display:flex;gap:0.5rem">
+                                    <button class="btn btn-outline btn-sm" onclick="copyContract()">Ã°Å¸â€œâ€¹ Copy</button>
+                                    <button class="btn btn-teal btn-sm" onclick="downloadContract()">Ã¢Â¬â€¡ Download</button>
+                                </div>
+                            </div>
+                            <div class="analysis-loading" id="generate-loading" style="display:none">
+                                <div class="spinner"></div>
+                                <div>Generating contract with AI...</div>
+                            </div>
+                            <pre class="generated-contract-text" id="generated-contract-text"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMPLIANCE -->
+    <section id="compliance">
+        <div class="container">
+            <h2>Legally Compliant &amp; Certified</h2>
+            <p class="section-subtitle">Built from the ground up to satisfy Philippine regulatory requirements Ã¢â‚¬â€ Supreme Court, DICT, NPC, BSP, and SEC.</p>
+
+            <!-- Compliance trust bar -->
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:0.75rem; margin-bottom:2.5rem;">
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">Ã¢Å¡â€“Ã¯Â¸Â</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">A.M. No. 24-10-14-SC</div>
+                    <div style="font-size:0.65rem;color:#64748b;">Supreme Court</div>
+                </div>
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">Ã°Å¸â€œÅ“</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">RA 8792</div>
+                    <div style="font-size:0.65rem;color:#64748b;">E-Commerce Act</div>
+                </div>
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">Ã°Å¸â€â€™</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">RA 10173</div>
+                    <div style="font-size:0.65rem;color:#64748b;">Data Privacy Act</div>
+                </div>
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">Ã°Å¸ÂÂ¦</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">BSP Circular 944</div>
+                    <div style="font-size:0.65rem;color:#64748b;">eKYC Standards</div>
+                </div>
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">Ã°Å¸â€œâ€¹</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">SEC MC 28-2020</div>
+                    <div style="font-size:0.65rem;color:#64748b;">Remote Notarization</div>
+                </div>
+                <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
+                    <div style="font-size:1.3rem;">Ã°Å¸â€ºÂ¡Ã¯Â¸Â</div>
+                    <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">DICT PNPKI</div>
+                    <div style="font-size:0.65rem;color:#64748b;">Gov. Identity Verified</div>
+                </div>
+            </div>
+
+            <div class="compliance-grid">
+                <div class="compliance-card card">
+                    <div class="icon-circle">Ã¢Å¡â€“Ã¯Â¸Â</div>
+                    <div class="card-title">Supreme Court-Accredited ENF</div>
+                    <p class="card-desc">First and only accredited Electronic Notarization Facility (ENF) in the Philippines under A.M. No. 24-10-14-SC. Supports both In-Person (IEN) and Remote (REN) notarization nationwide.</p>
+                    <a href="https://sc.judiciary.gov.ph/enotary-services/enotarization-rules/" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">sc.judiciary.gov.ph Ã¢â€ â€™</a>
+                </div>
+                <div class="compliance-card card">
+                    <div class="icon-circle">Ã°Å¸Ââ€ºÃ¯Â¸Â</div>
+                    <div class="card-title">DICT National PKI Verified</div>
+                    <p class="card-desc">All ENPs are verified through the Philippine National PKI (RA 8792). Digital signatures carry full legal weight under the E-Commerce Act of 2000 and its IRR.</p>
+                    <a href="https://dict.gov.ph/pnpki" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">DICT PNPKI Ã¢â€ â€™</a>
+                </div>
+                <div class="compliance-card card">
+                    <div class="icon-circle">Ã°Å¸â€â€™</div>
+                    <div class="card-title">NPC-Registered Data Controller</div>
+                    <p class="card-desc">Registered Personal Information Controller (PIC) with the National Privacy Commission under RA 10173. AES-256 encryption, TLS 1.3, and a dedicated Data Protection Officer (DPO).</p>
+                    <a href="https://privacy.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">privacy.gov.ph Ã¢â€ â€™</a>
+                </div>
+                <div class="compliance-card card">
+                    <div class="icon-circle">Ã°Å¸ÂÂ¦</div>
+                    <div class="card-title">BSP-Aligned eKYC</div>
+                    <p class="card-desc">Identity verification aligns with BSP Circular 944 (eKYC) and Circular 1108 (digital onboarding), making Quanby Legal documents accepted by BSP-supervised banks and EMIs.</p>
+                    <a href="https://bsp.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">bsp.gov.ph Ã¢â€ â€™</a>
+                </div>
+                <div class="compliance-card card">
+                    <div class="icon-circle">Ã°Å¸â€œâ€¹</div>
+                    <div class="card-title">SEC &amp; Corporate Filing Ready</div>
+                    <p class="card-desc">E-notarized documents are accepted for SEC submissions under MC 28-2020 and MC 6-2021, covering GIS, AFS, and mandatory corporate filings under RA 11232.</p>
+                    <a href="https://sec.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">sec.gov.ph Ã¢â€ â€™</a>
+                </div>
+                <div class="compliance-card card">
+                    <div class="icon-circle">Ã¢â€ºâ€œÃ¯Â¸Â</div>
+                    <div class="card-title">DOCONCHAIN &amp; Hyperledger</div>
+                    <p class="card-desc">Enterprise blockchain-backed immutable document trail via DOCONCHAIN / Hyperledger. Every notarized document is cryptographically anchored for tamper-proof verification.</p>
+                    <a href="https://doconchain.com" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">doconchain.com Ã¢â€ â€™</a>
+                </div>
+            </div>
+
+            <div style="text-align:center; margin-top:2rem;">
+                <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">Ã°Å¸â€œâ€“ View Full Regulatory Disclosure Ã¢â€ â€™</button>
+            </div>
+        </div>
+    </section>
+<!-- REGULATORY COMPLIANCE DISCLOSURE -->
+    <section id="regulatory" style="background: rgba(124,58,237,0.04); border-top: 1px solid rgba(255,255,255,0.07); border-bottom: 1px solid rgba(255,255,255,0.07);">
+        <div class="container">
+            <div style="text-align:center; margin-bottom: 1rem;">
+                <span style="display:inline-block; background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.4); color: #a78bfa; padding: 0.3rem 1rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">Regulatory Disclosure</span>
+            </div>
+            <h2 style="text-align:center; margin-bottom: 0.75rem;">Philippine Regulatory Compliance Framework</h2>
+            <p class="section-subtitle" style="max-width: 680px; margin: 0 auto 3rem;">Quanby Legal operates in full compliance with Philippine law and applicable regulatory standards governing electronic notarization, digital identity, data privacy, and fintech services.</p>
+
+            <!-- Supreme Court & Judiciary -->
+            <div style="margin-bottom: 3rem;">
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">Ã¢Å¡â€“Ã¯Â¸Â Supreme Court of the Philippines</h3>
+                <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">A.M. No. 24-10-14-SC</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Rules on Electronic Notarization in the Philippines. Quanby Legal is the first and only platform accredited under this Supreme Court issuance, authorizing both In-Person (IEN) and Remote (REN) electronic notarization nationwide.</p>
+                        <a href="https://sc.judiciary.gov.ph/enotary-services/enotarization-rules/" target="_blank" rel="noopener" style="color: #a78bfa; font-size: 0.825rem; display: inline-block; margin-top: 0.75rem;">sc.judiciary.gov.ph Ã¢â€ â€”</a>
+                    </div>
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">2004 Rules on Notarial Practice</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">All notarial acts performed through Quanby Legal adhere to the 2004 Rules on Notarial Practice as amended and extended by A.M. No. 24-10-14-SC to cover electronic notarial instruments.</p>
+                    </div>
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">Electronic Notarization Facility (ENF)</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Quanby Legal operates as a registered ENF provider. All Electronic Notary Publics (ENPs) on our platform have completed SC-mandated identity verification and training requirements.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DICT / E-Commerce Act -->
+            <div style="margin-bottom: 3rem;">
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">Ã°Å¸Ââ€ºÃ¯Â¸Â DICT & E-Commerce Legislation</h3>
+                <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">RA 8792 Ã¢â‚¬â€ E-Commerce Act</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Electronic documents and signatures processed through Quanby Legal carry full legal weight under the Electronic Commerce Act of 2000, ensuring validity and enforceability of digitally notarized instruments.</p>
+                    </div>
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">RA 8792 Ã¢â‚¬â€ Electronic Signature Standards</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">All electronic signatures on our platform conform to DICT-prescribed electronic signature standards, including PKI-based certificates issued by the Philippine National Public Key Infrastructure (PNPKI).</p>
+                        <a href="https://dict.gov.ph/pnpki" target="_blank" rel="noopener" style="color: #a78bfa; font-size: 0.825rem; display: inline-block; margin-top: 0.75rem;">DICT PNPKI Ã¢â€ â€”</a>
+                    </div>
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">DICT National PKI Ã¢â‚¬â€ Identity Verification</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">All ENPs are verified through the Philippine National PKI operated by DICT, ensuring government-grade identity assurance for every notary on the Quanby Legal platform.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Privacy -->
+            <div style="margin-bottom: 3rem;">
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">Ã°Å¸â€â€™ Data Privacy (NPC / RA 10173)</h3>
+                <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">RA 10173 Ã¢â‚¬â€ Data Privacy Act of 2012</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Quanby Legal is compliant with the Data Privacy Act of 2012 and its Implementing Rules and Regulations (IRR). We have appointed a Data Protection Officer (DPO) and maintain a Personal Information Management System (PIMS).</p>
+                        <a href="https://privacy.gov.ph/" target="_blank" rel="noopener" style="color: #a78bfa; font-size: 0.825rem; display: inline-block; margin-top: 0.75rem;">National Privacy Commission Ã¢â€ â€”</a>
+                    </div>
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">NPC Registration</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Quanby Solutions, Inc. is registered as a Personal Information Controller (PIC) with the National Privacy Commission. All personal data is processed lawfully, transparently, and with appropriate security safeguards.</p>
+                    </div>
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">Data Retention & Security</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">All notarized documents are encrypted at rest and in transit using AES-256 and TLS 1.3. Blockchain-anchored audit trails (via DOCONCHAIN / Hyperledger) ensure immutability. Data retention periods follow NPC guidelines.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BSP / Fintech -->
+            <div style="margin-bottom: 3rem;">
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">Ã°Å¸ÂÂ¦ BSP Ã¢â‚¬â€ Financial & Fintech Compliance</h3>
+                <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">BSP Circular No. 944 Ã¢â‚¬â€ eKYC Standards</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Our identity verification workflows align with BSP Circular No. 944, which sets standards for electronic Know-Your-Customer (eKYC) processes used by BSP-supervised financial institutions. This ensures Quanby Legal is interoperable with banks and EMIs that rely on notarized documents.</p>
+                    </div>
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">BSP Circular No. 1108 Ã¢â‚¬â€ Digital Onboarding</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Electronic notarization services provided through Quanby Legal support compliant digital customer onboarding under BSP Circular No. 1108, enabling financial institutions to accept e-notarized documents for account opening and lending.</p>
+                    </div>
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">AML & AMLA Awareness</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Quanby Legal implements internal controls aligned with the Anti-Money Laundering Act (RA 9160, as amended). ENPs are trained to flag suspicious transactions and we maintain records compliant with AMLC reporting requirements.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEC -->
+            <div style="margin-bottom: 3rem;">
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">Ã°Å¸â€œâ€¹ SEC Ã¢â‚¬â€ Corporate & Securities Compliance</h3>
+                <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">SEC Memorandum Circular No. 28-2020 Ã¢â‚¬â€ Remote Notarization</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Quanby Legal supports corporate transactions compliant with SEC MC No. 28-2020 (later extended), which authorized remote notarization for SEC filings and corporate acts during and beyond the pandemic-era digital transition.</p>
+                    </div>
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">SEC Memorandum Circular No. 6-2021 Ã¢â‚¬â€ Digital Corporate Records</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Documents notarized through Quanby Legal are accepted for SEC submissions under SEC MC No. 6-2021, covering GIS, AFS, and other mandatory corporate filings that require notarization.</p>
+                    </div>
+                    <div class="card" style="padding: 1.5rem;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">Corporate Governance</div>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Quanby Solutions, Inc. is duly registered with the Philippine SEC. We submit required annual reports and maintain corporate governance standards per the Revised Corporation Code (RA 11232).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="card" style="padding: 1.75rem 2rem; border-left: 3px solid rgba(124,58,237,0.5); background: rgba(124,58,237,0.06);">
+                <div style="font-weight: 700; margin-bottom: 0.75rem; color: #f1f5f9; font-size: 0.95rem;">Ã¢Å¡Â Ã¯Â¸Â Regulatory Disclaimer</div>
+                <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.8;">This page is provided for informational purposes and does not constitute legal advice. Regulatory frameworks are subject to change. Quanby Legal makes no warranty that all information is current at the time of reading. For the most up-to-date regulatory guidance, consult the Supreme Court of the Philippines, the National Privacy Commission (NPC), Bangko Sentral ng Pilipinas (BSP), or the Securities and Exchange Commission (SEC). Businesses and individuals should seek independent legal counsel for compliance advice specific to their situation.</p>
+                <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.825rem;">
+                    <a href="https://sc.judiciary.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">Supreme Court Ã¢â€ â€”</a>
+                    <a href="https://privacy.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">NPC Ã¢â€ â€”</a>
+                    <a href="https://bsp.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">BSP Ã¢â€ â€”</a>
+                    <a href="https://sec.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">SEC Ã¢â€ â€”</a>
+                    <a href="https://dict.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">DICT Ã¢â€ â€”</a>
+                    <a href="https://amlc.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">AMLC Ã¢â€ â€”</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works">
+        <div class="container">
+            <h2>Three steps to a legally valid notarized document</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">Ã°Å¸â€œÂ¤</div>
+                    <div class="step-title">Upload & Analyze</div>
+                    <p style="color:var(--muted);font-size:0.9rem">Upload your contract Ã¢â‚¬â€ AI analyzes it instantly</p>
+                </div>
+                <div class="connecting-line"></div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">Ã°Å¸ÂªÂª</div>
+                    <div class="step-title">Verify Identity</div>
+                    <p style="color:var(--muted);font-size:0.9rem">eKYC with DICT PKI Ã¢â‚¬â€ legally binding identity</p>
+                </div>
+                <div class="connecting-line"></div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">Ã¢Å“â€¦</div>
+                    <div class="step-title">Certified & Notarized</div>
+                    <p style="color:var(--muted);font-size:0.9rem">Instant blockchain-anchored notarized document</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- USE CASES -->
+    <section id="use-cases">
+        <div class="container">
+            <h2>Built for every industry that needs legal certainty</h2>
+            <div class="use-cases-grid">
+                <div class="card"><div class="card-icon">Ã°Å¸ÂËœÃ¯Â¸Â</div><div class="card-title">Real Estate</div><p class="card-desc">Deeds of Sale, Lease Agreements, MOAs Ã¢â‚¬â€ fully analyzed and notarized</p></div>
+                <div class="card"><div class="card-icon">Ã¢Å¡â€“Ã¯Â¸Â</div><div class="card-title">Legal & Law Firms</div><p class="card-desc">Faster document review and notarization for your clients</p></div>
+                <div class="card"><div class="card-icon">Ã°Å¸ÂÂ¦</div><div class="card-title">Banking & Finance</div><p class="card-desc">Loan agreements, SPAs, and financial contracts with AI compliance checks</p></div>
+                <div class="card"><div class="card-icon">Ã°Å¸Ââ€ºÃ¯Â¸Â</div><div class="card-title">Government</div><p class="card-desc">Procurement, MOAs, and government contracts with full audit trail</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing">
+        <div class="container">
+            <h2>Simple, transparent pricing</h2>
+            <p class="section-subtitle">Start free, scale as you grow</p>
+            <div class="pricing-grid">
+                <div class="pricing-card card">
+                    <div class="tier-name">Starter</div>
+                    <div class="tier-price">Free</div>
+                    <ul class="tier-features">
+                        <li>5 notarizations/month</li>
+                        <li>Basic AI contract analysis</li>
+                        <li>Basic eKYC</li>
+                        <li>PDF export</li>
+                    </ul>
+                    <button class="btn btn-outline" style="width:100%;margin-top:1.5rem">Get started</button>
+                </div>
+                <div class="pricing-card card" style="border-color:var(--purple);position:relative">
+                    <div class="popular-badge">MOST POPULAR</div>
+                    <div class="tier-name">Professional</div>
+                    <div class="tier-price">Ã¢â€šÂ±2,999<span style="font-size:1rem;color:var(--muted)">/mo</span></div>
+                    <ul class="tier-features">
+                        <li>100 notarizations/month</li>
+                        <li>Full AI Contract Agent</li>
+                        <li>Full PKI verification</li>
+                        <li>Blockchain audit trail</li>
+                        <li>Priority support</li>
+                    </ul>
+                    <button class="btn btn-filled" style="width:100%;margin-top:1.5rem">Start free trial</button>
+                </div>
+                <div class="pricing-card card">
+                    <div class="tier-name">Enterprise</div>
+                    <div class="tier-price">Custom</div>
+                    <ul class="tier-features">
+                        <li>Unlimited notarizations</li>
+                        <li>Dedicated infrastructure</li>
+                        <li>Custom AI training</li>
+                        <li>99.9% SLA</li>
+                        <li>Dedicated ENP team</li>
+                    </ul>
+                    <button class="btn btn-outline" style="width:100%;margin-top:1.5rem">Contact sales</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GET IN TOUCH -->
+    <section id="about">
+        <div class="container">
+            <h2>Get in touch</h2>
+            <p class="section-subtitle">Select a topic to tailor our conversation</p>
+            <div class="contact-section">
+                <div class="topics">
+                    <div class="topic-card" data-topic="enp">
+                        <div class="topic-icon">Ã°Å¸â€œâ€ž</div>
+                        <div class="topic-title">I Need an ENP</div>
+                        <p class="topic-desc">ENP is an Electronic Notary Public</p>
+                    </div>
+                    <div class="topic-card" data-topic="lawyer">
+                        <div class="topic-icon">Ã¢Å¡â€“Ã¯Â¸Â</div>
+                        <div class="topic-title">I'm a Lawyer</div>
+                        <p class="topic-desc">Apply to become a certified ENP on the platform</p>
+                    </div>
+                    <div class="topic-card" data-topic="investor">
+                        <div class="topic-icon">Ã°Å¸â€™Â¼</div>
+                        <div class="topic-title">Investment Inquiry</div>
+                        <p class="topic-desc">Quanby Legal is seeking strategic investors</p>
+                    </div>
+                    <div class="topic-card" data-topic="question">
+                        <div class="topic-icon">Ã¢Ââ€œ</div>
+                        <div class="topic-title">I Have a Question</div>
+                        <p class="topic-desc">General inquiries about the platform</p>
+                    </div>
+                </div>
+                <div class="chat-panel">
+                    <div class="chat-header">Ã°Å¸Â¤â€“ Quanby Assistant <span class="online-dot"></span></div>
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="empty-state">
+                            <div style="font-size:2.5rem;margin-bottom:0.5rem">Ã°Å¸Â¤â€“</div>
+                            <div style="font-weight:500">Quanby Legal Assistant</div>
+                            <p style="font-size:0.875rem;margin-top:0.25rem">Select a topic to start</p>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" placeholder="Type your message..." id="contact-chat-input" disabled>
+                        <button id="send-btn">Ã¢â€ â€™</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container footer-grid">
+            <div>
+                <div class="footer-logo">
+                    <div class="logo-circle">Q</div>
+                    <span class="logo-text" style="margin-left:0.5rem">Quanby Legal</span>
+                </div>
+                <p class="footer-tagline">The Philippines' first Supreme Court-accredited AI-powered electronic notarization platform</p>
+                <div class="accreditations">Accredited: Supreme Court PH | DICT PKI | PropTech Consortium | DOCONCHAIN | Hyperledger</div>
+            </div>
+            <div>
+                <h3 style="margin-bottom:1rem">Product</h3>
+                <div class="footer-links">
+                    <a href="#features">Features</a>
+                    <a href="#contract-agent">Contract AI Agent</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#compliance">Compliance</a>
+                </div>
+            </div>
+            <div>
+                <h3 style="margin-bottom:1rem">Company</h3>
+                <div class="footer-links">
+                    <a href="#">About Us</a>
+                    <a href="#">Blog</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Press</a>
+                </div>
+            </div>
+            <div>
+                <h3 style="margin-bottom:1rem">Legal</h3>
+                <div class="footer-links">
+                    <a href="#">Data Privacy Act Compliance</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Mission & Vision</a>
+                    <a href="#">Contact Us</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">Ã‚Â© 2026 Quanby Legal Ã‚Â· Quanby Solutions, Inc. Ã‚Â· All rights reserved.</div>
+    </footer>
+
+    <script>
+    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ API CONFIG Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    const API_BASE = '/api';
+    let SESSION_ID = 'session_' + Math.random().toString(36).substr(2, 9);
+    let currentContractLoaded = false;
+    let currentAnalysis = null;
+    let generatedContractText = '';
+    let selectedTemplate = 'deed_of_sale';
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ TAB SWITCHING Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    function switchTab(tab) {
+        document.querySelectorAll('.agent-tab').forEach((t, i) => {
+            t.classList.remove('active');
+        });
+        document.querySelectorAll('.agent-panel').forEach(p => p.classList.remove('active'));
+        
+        const tabs = ['analyze', 'chat', 'generate'];
+        const idx = tabs.indexOf(tab);
+        document.querySelectorAll('.agent-tab')[idx].classList.add('active');
+        document.getElementById('panel-' + tab).classList.add('active');
+    }
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ FILE UPLOAD Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    const uploadArea = document.getElementById('upload-area');
+
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('drag-over');
+    });
+    uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file) uploadAndAnalyze(file);
+    });
+
+    function handleFileSelect(input) {
+        if (input.files[0]) uploadAndAnalyze(input.files[0]);
+    }
+
+    async function uploadAndAnalyze(file) {
+        const allowed = [".pdf",".docx",".txt"];
+        const ext = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
+        if (!allowed.includes(ext)) { showError("Invalid file type. Upload PDF, DOCX, or TXT only."); return; }
+        if (file.size > 20971520) { showError("File too large. Max 20MB."); return; }
+        // Show loading
+        uploadArea.style.display = 'none';
+        document.getElementById('analysis-results').style.display = 'none';
+        document.getElementById('analysis-loading').style.display = 'block';
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('session_id', SESSION_ID);
+
+        const abortAnalyze = new AbortController();
+        setTimeout(() => abortAnalyze.abort(), 30000);
+        const ctrl1 = new AbortController(); setTimeout(() => ctrl1.abort(), 30000);
+        try {
+            const res = await fetch(`${API_BASE}/analyze`, {
+                method: 'POST',
+                signal: abortAnalyze.signal,
+                body: formData
+            });
+            const data = await res.json();
+
+            document.getElementById('analysis-loading').style.display = 'none';
+
+            if (data.success) {
+                currentContractLoaded = true;
+                currentAnalysis = data.analysis;
+                renderAnalysis(data);
+                document.getElementById('analysis-results').style.display = 'block';
+                updateChatContractInfo(data);
+            } else {
+                showError(data.detail || 'Analysis failed. Please try again.');
+                uploadArea.style.display = 'block';
+            }
+        } catch (err) {
+            document.getElementById('analysis-loading').style.display = 'none';
+            showError('Network error. Please check your connection and try again.');
+            uploadArea.style.display = 'block';
+        }
+    }
+
+    function resetAnalysis() {
+        document.getElementById('analysis-results').style.display = 'none';
+        document.getElementById('analysis-loading').style.display = 'none';
+        uploadArea.style.display = 'block';
+        document.getElementById('file-input').value = '';
+    }
+
+    function renderAnalysis(data) {
+        const a = data.analysis;
+        
+        // Header
+        document.getElementById('analysis-filename').textContent = 'Ã°Å¸â€œâ€ž ' + data.filename;
+        document.getElementById('analysis-contract-type').textContent = a.contract_type || 'Contract Analysis';
+        document.getElementById('analysis-summary').textContent = a.summary || '';
+        
+        // Overall risk
+        const riskEl = document.getElementById('overall-risk-badge');
+        const risk = (a.overall_risk || 'medium').toLowerCase();
+        const riskMap = {
+            'high': ['Ã°Å¸â€Â´ HIGH RISK', 'risk-high'],
+            'medium': ['Ã°Å¸Å¸Â¡ MEDIUM RISK', 'risk-medium'],
+            'low': ['Ã°Å¸Å¸Â¢ LOW RISK', 'risk-low']
+        };
+        const [riskLabel, riskClass] = riskMap[risk] || riskMap['medium'];
+        riskEl.textContent = riskLabel;
+        riskEl.className = 'risk-badge ' + riskClass;
+
+        // Parties
+        const partiesEl = document.getElementById('parties-list');
+        partiesEl.innerHTML = '';
+        const parties = Array.isArray(a.parties) ? a.parties : [];
+        if (parties.length === 0) {
+            partiesEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">No parties identified</div>';
+        }
+        parties.forEach(p => {
+            const avatarEmoji = p.type === 'Corporation' ? 'Ã°Å¸ÂÂ¢' : 'Ã°Å¸â€˜Â¤';
+            partiesEl.innerHTML += `
+                <div class="party-item">
+                    <div class="party-avatar">${avatarEmoji}</div>
+                    <div>
+                        <div class="party-name">${escHtml(p.name || 'Unknown')}</div>
+                        <div class="party-role">${escHtml(p.role || '')}${p.type ? ' Ã‚Â· ' + p.type : ''}</div>
+                        ${p.notes ? `<div style="color:#fbbf24;font-size:0.75rem;margin-top:0.2rem">Ã¢Å¡Â  ${escHtml(p.notes)}</div>` : ''}
+                    </div>
+                </div>`;
+        });
+
+        // Dates & Payment
+        const datesEl = document.getElementById('dates-payment-list');
+        datesEl.innerHTML = '';
+        const dates = Array.isArray(a.key_dates) ? a.key_dates : [];
+        const payment = a.payment_terms || {};
+        
+        if (payment.total_amount) {
+            datesEl.innerHTML += `
+                <div class="obligation-item">
+                    <div class="obligation-party">Ã°Å¸â€™Â° Payment</div>
+                    <div>${escHtml(payment.currency || 'PHP')} ${escHtml(payment.total_amount)}</div>
+                    ${payment.schedule ? `<div style="color:var(--muted);font-size:0.8rem">${escHtml(payment.schedule)}</div>` : ''}
+                    ${payment.penalties ? `<div style="color:#f87171;font-size:0.8rem">Penalty: ${escHtml(payment.penalties)}</div>` : ''}
+                </div>`;
+        }
+        dates.forEach(d => {
+            const riskColor = d.risk === 'high' ? '#f87171' : d.risk === 'medium' ? '#fbbf24' : 'var(--text)';
+            datesEl.innerHTML += `
+                <div class="obligation-item">
+                    <div class="obligation-party">Ã°Å¸â€œâ€¦ ${escHtml(d.label || 'Date')}</div>
+                    <div style="color:${riskColor}">${escHtml(d.date || 'N/A')}</div>
+                    ${d.note ? `<div style="color:var(--muted);font-size:0.8rem">${escHtml(d.note)}</div>` : ''}
+                </div>`;
+        });
+        if (!payment.total_amount && dates.length === 0) {
+            datesEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">No specific dates or payment terms extracted</div>';
+        }
+
+        // Risk Flags
+        const flagsEl = document.getElementById('risk-flags-list');
+        flagsEl.innerHTML = '';
+        const flags = Array.isArray(a.risk_flags) ? a.risk_flags : [];
+        if (flags.length === 0) {
+            flagsEl.innerHTML = '<div style="color:var(--teal);font-size:0.875rem">Ã¢Å“â€œ No significant risk flags identified</div>';
+        }
+        flags.forEach(f => {
+            const sev = (f.severity || 'info').toLowerCase();
+            const icons = { high: 'Ã°Å¸â€Â´', medium: 'Ã°Å¸Å¸Â¡', low: 'Ã°Å¸Å¸Â¢', info: 'Ã¢â€žÂ¹Ã¯Â¸Â' };
+            flagsEl.innerHTML += `
+                <div class="flag-item flag-${sev}">
+                    <div class="flag-icon">${icons[sev] || 'Ã¢â€žÂ¹Ã¯Â¸Â'}</div>
+                    <div>
+                        <div class="flag-title">${escHtml(f.title || 'Issue')}</div>
+                        <div class="flag-desc">${escHtml(f.description || '')}</div>
+                        ${f.law_reference ? `<div class="flag-law">Ã°Å¸â€œâ€“ ${escHtml(f.law_reference)}</div>` : ''}
+                        ${f.recommendation ? `<div style="color:#a78bfa;font-size:0.78rem;margin-top:0.25rem">Ã¢â€ â€™ ${escHtml(f.recommendation)}</div>` : ''}
+                    </div>
+                </div>`;
+        });
+
+        // Obligations
+        const oblEl = document.getElementById('obligations-list');
+        oblEl.innerHTML = '';
+        const obligations = Array.isArray(a.obligations) ? a.obligations : [];
+        if (obligations.length === 0) {
+            oblEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">No specific obligations extracted</div>';
+        }
+        obligations.slice(0, 8).forEach(o => {
+            oblEl.innerHTML += `
+                <div class="obligation-item">
+                    <div class="obligation-party">${escHtml(o.party || 'Party')}</div>
+                    <div style="font-size:0.875rem">${escHtml(o.obligation || '')}</div>
+                    ${o.deadline ? `<div style="color:var(--muted);font-size:0.78rem">Due: ${escHtml(o.deadline)}</div>` : ''}
+                </div>`;
+        });
+
+        // Compliance
+        const compEl = document.getElementById('compliance-list');
+        compEl.innerHTML = '';
+        const comp = a.compliance_check || {};
+        const compItems = [
+            ['Civil Code of the Philippines', comp.civil_code],
+            ['Electronic Commerce Act', comp.electronic_commerce_act],
+            ['E-Notarization Ready', comp.notarization_ready],
+        ];
+        compItems.forEach(([label, status]) => {
+            if (!status) return;
+            const isOk = status.toLowerCase().includes('compliant') || status === 'Yes';
+            const isWarn = status.toLowerCase().includes('review') || status.toLowerCase().includes('update') || status === 'N/A';
+            const cls = isOk ? 'compliance-status-ok' : isWarn ? 'compliance-status-warn' : 'compliance-status-fail';
+            const icon = isOk ? 'Ã¢Å“â€œ' : isWarn ? '~' : 'Ã¢Å“â€”';
+            compEl.innerHTML += `
+                <div class="compliance-row">
+                    <span>${label}</span>
+                    <span class="${cls}">${icon} ${escHtml(status)}</span>
+                </div>`;
+        });
+        if (comp.notarization_notes) {
+            compEl.innerHTML += `<div style="color:var(--muted);font-size:0.8rem;margin-top:0.5rem">${escHtml(comp.notarization_notes)}</div>`;
+        }
+        if (!Object.keys(comp).length) {
+            compEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">Compliance data not available</div>';
+        }
+
+        // Missing Clauses
+        const missEl = document.getElementById('missing-clauses-list');
+        missEl.innerHTML = '';
+        const missing = Array.isArray(a.missing_clauses) ? a.missing_clauses : [];
+        if (missing.length === 0) {
+            missEl.innerHTML = '<div style="color:var(--teal);font-size:0.875rem">Ã¢Å“â€œ All standard clauses appear to be present</div>';
+        }
+        missing.forEach(m => {
+            const impColor = m.importance === 'high' ? '#f87171' : m.importance === 'medium' ? '#fbbf24' : 'var(--muted)';
+            missEl.innerHTML += `
+                <div class="flag-item flag-${m.importance || 'medium'}">
+                    <div class="flag-icon">Ã¢Å¡Â Ã¯Â¸Â</div>
+                    <div>
+                        <div class="flag-title">${escHtml(m.clause || 'Missing clause')}</div>
+                        <div class="flag-desc">${escHtml(m.why_needed || '')}</div>
+                        ${m.recommendation ? `<div style="color:#a78bfa;font-size:0.78rem;margin-top:0.25rem">Ã¢â€ â€™ ${escHtml(m.recommendation)}</div>` : ''}
+                    </div>
+                </div>`;
+        });
+
+        // Recommendation
+        document.getElementById('ai-recommendation').textContent = a.recommendation || 'Review this contract with a licensed Philippine attorney before signing.';
+    }
+
+    function updateChatContractInfo(data) {
+        const a = data.analysis;
+        const infoEl = document.getElementById('chat-contract-info');
+        infoEl.innerHTML = `
+            <div style="font-size:0.875rem;color:var(--muted);margin-bottom:0.25rem">Ã°Å¸â€œâ€ž ${escHtml(data.filename)}</div>
+            <div style="font-weight:600;margin-bottom:0.5rem">${escHtml(a.contract_type || 'Contract')}</div>
+            <div style="font-size:0.85rem;color:var(--muted)">${escHtml(a.summary || '')}</div>
+            <div style="margin-top:0.75rem">
+                <span class="risk-badge risk-${(a.overall_risk||'medium').toLowerCase()}" style="font-size:0.75rem">
+                    ${(a.overall_risk||'medium').toUpperCase()} RISK
+                </span>
+                ${a.overall_score ? `<span style="font-size:0.8rem;color:var(--muted);margin-left:0.75rem">Score: ${a.overall_score}/100</span>` : ''}
+            </div>`;
+        document.getElementById('suggested-divider').style.display = 'block';
+        document.getElementById('suggested-questions-section').style.display = 'block';
+    }
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ CONTRACT CHAT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    async function sendContractChat() {
+        const input = document.getElementById('contract-chat-input');
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        if (!currentContractLoaded) {
+            appendChatMsg('Please upload a contract first in the Analyze tab.', 'system');
+            return;
+        }
+
+        appendChatMsg(msg, 'user');
+        input.value = '';
+
+        const btn = document.getElementById('chat-send-btn');
+        btn.disabled = true;
+        btn.textContent = '...';
+
+        const typingEl = appendChatMsg('Thinking...', 'ai');
+
+        const abortChat = new AbortController();
+        setTimeout(() => abortChat.abort(), 20000);
+        const ctrl2 = new AbortController(); setTimeout(() => ctrl2.abort(), 20000);
+        try {
+            const res = await fetch(`${API_BASE}/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ session_id: SESSION_ID, message: msg })
+            });
+            const data = await res.json();
+            typingEl.remove();
+
+            if (data.success) {
+                appendChatMsg(data.response, 'ai');
+            } else {
+                appendChatMsg('Error: ' + (data.detail || 'Failed to get response'), 'system');
+            }
+        } catch (err) {
+            typingEl.remove();
+            appendChatMsg('Network error. Please try again.', 'system');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Send Ã¢â€ â€™';
+        }
+    }
+
+    function appendChatMsg(text, type) {
+        const msgs = document.getElementById('contract-chat-messages');
+        const el = document.createElement('div');
+        el.className = `chat-msg chat-msg-${type}`;
+        el.textContent = text;
+        msgs.appendChild(el);
+        msgs.scrollTop = msgs.scrollHeight;
+        return el;
+    }
+
+    function askQuestion(el) {
+        const input = document.getElementById('contract-chat-input');
+        input.value = el.textContent;
+        switchTab('chat');
+        sendContractChat();
+    }
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ GENERATE CONTRACT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    const TEMPLATES = [
+        { id: 'deed_of_sale', name: 'Deed of Absolute Sale', icon: 'Ã°Å¸ÂÂ¡', category: 'Real Estate' },
+        { id: 'lease_agreement', name: 'Contract of Lease', icon: 'Ã°Å¸ÂÂ¢', category: 'Real Estate' },
+        { id: 'employment_contract', name: 'Employment Contract', icon: 'Ã°Å¸â€˜â€', category: 'Labor' },
+        { id: 'service_agreement', name: 'Service Agreement', icon: 'Ã°Å¸Â¤Â', category: 'Business' },
+        { id: 'loan_agreement', name: 'Loan Agreement', icon: 'Ã°Å¸â€™Â°', category: 'Finance' },
+        { id: 'partnership_agreement', name: 'Partnership Agreement', icon: 'Ã°Å¸Ââ€ºÃ¯Â¸Â', category: 'Corporate' },
+        { id: 'nda', name: 'Non-Disclosure Agreement', icon: 'Ã°Å¸â€â€™', category: 'Corporate' },
+        { id: 'memorandum_of_agreement', name: 'Memorandum of Agreement', icon: 'Ã°Å¸â€œâ€¹', category: 'Business' },
+        { id: 'power_of_attorney', name: 'Special Power of Attorney', icon: 'Ã¢Å¡â€“Ã¯Â¸Â', category: 'Legal' },
+    ];
+
+    const TEMPLATE_FIELDS = {
+        deed_of_sale: [
+            { id: 'seller_name', label: 'Seller Full Name', placeholder: 'Juan dela Cruz' },
+            { id: 'buyer_name', label: 'Buyer Full Name', placeholder: 'Maria Santos' },
+            { id: 'property_description', label: 'Property Description', placeholder: 'Lot 123, Block 4, Phase 2, Subdivision, Barangay, City/Municipality, Province' },
+            { id: 'purchase_price', label: 'Purchase Price (PHP)', placeholder: '5,000,000.00' },
+            { id: 'payment_terms', label: 'Payment Terms', placeholder: 'Full payment upon signing' },
+            { id: 'execution_date', label: 'Date of Execution', placeholder: 'April 5, 2026' },
+            { id: 'city', label: 'City / Place of Execution', placeholder: 'Legazpi City, Albay' },
+        ],
+        lease_agreement: [
+            { id: 'lessor_name', label: 'Lessor (Landlord) Full Name', placeholder: 'Juan dela Cruz' },
+            { id: 'lessee_name', label: 'Lessee (Tenant) Full Name', placeholder: 'Maria Santos' },
+            { id: 'property_address', label: 'Property Address', placeholder: 'Unit 301, Building, Street, Barangay, City' },
+            { id: 'monthly_rent', label: 'Monthly Rent (PHP)', placeholder: '25,000.00' },
+            { id: 'lease_duration', label: 'Lease Duration', placeholder: '1 year (January 1, 2026 to December 31, 2026)' },
+            { id: 'security_deposit', label: 'Security Deposit (PHP)', placeholder: '50,000.00' },
+            { id: 'advance_payment', label: 'Advance Payment', placeholder: '1 month advance' },
+        ],
+        employment_contract: [
+            { id: 'employer_name', label: 'Employer / Company Name', placeholder: 'Quanby Solutions, Inc.' },
+            { id: 'employee_name', label: 'Employee Full Name', placeholder: 'Maria Santos' },
+            { id: 'position', label: 'Position / Job Title', placeholder: 'Software Engineer' },
+            { id: 'monthly_salary', label: 'Monthly Salary (PHP)', placeholder: '50,000.00' },
+            { id: 'start_date', label: 'Start Date', placeholder: 'April 5, 2026' },
+            { id: 'employment_type', label: 'Employment Type', placeholder: 'Regular / Probationary' },
+            { id: 'work_schedule', label: 'Work Schedule', placeholder: 'Monday to Friday, 8AM-5PM' },
+        ],
+        service_agreement: [
+            { id: 'client_name', label: 'Client Name', placeholder: 'ABC Corporation' },
+            { id: 'provider_name', label: 'Service Provider Name', placeholder: 'XYZ Services, Inc.' },
+            { id: 'services', label: 'Services to be Provided', type: 'textarea', placeholder: 'Describe the services in detail...' },
+            { id: 'contract_amount', label: 'Contract Amount (PHP)', placeholder: '500,000.00' },
+            { id: 'duration', label: 'Duration / Timeline', placeholder: '6 months from signing' },
+            { id: 'payment_schedule', label: 'Payment Schedule', placeholder: '50% upon signing, 50% upon completion' },
+        ],
+        loan_agreement: [
+            { id: 'lender_name', label: 'Lender Full Name', placeholder: 'Juan dela Cruz' },
+            { id: 'borrower_name', label: 'Borrower Full Name', placeholder: 'Maria Santos' },
+            { id: 'loan_amount', label: 'Loan Amount (PHP)', placeholder: '500,000.00' },
+            { id: 'interest_rate', label: 'Interest Rate', placeholder: '12% per annum' },
+            { id: 'loan_term', label: 'Loan Term', placeholder: '24 months' },
+            { id: 'repayment_schedule', label: 'Repayment Schedule', placeholder: 'Monthly installments of PHP 25,000' },
+            { id: 'purpose', label: 'Purpose of Loan', placeholder: 'Business capital' },
+        ],
+        nda: [
+            { id: 'disclosing_party', label: 'Disclosing Party', placeholder: 'Quanby Solutions, Inc.' },
+            { id: 'receiving_party', label: 'Receiving Party', placeholder: 'Juan dela Cruz' },
+            { id: 'purpose', label: 'Purpose of Disclosure', placeholder: 'Business partnership evaluation' },
+            { id: 'duration', label: 'Confidentiality Duration', placeholder: '3 years from signing' },
+            { id: 'confidential_info', label: 'Confidential Information (describe)', type: 'textarea', placeholder: 'Trade secrets, financial data, client lists, proprietary software...' },
+        ],
+        memorandum_of_agreement: [
+            { id: 'party1_name', label: 'First Party Name', placeholder: 'Quanby Solutions, Inc.' },
+            { id: 'party2_name', label: 'Second Party Name', placeholder: 'ABC Corporation' },
+            { id: 'purpose', label: 'Purpose / Agreement', type: 'textarea', placeholder: 'Describe the purpose and scope of this MOA...' },
+            { id: 'obligations_party1', label: 'Obligations of First Party', type: 'textarea', placeholder: 'List the obligations...' },
+            { id: 'obligations_party2', label: 'Obligations of Second Party', type: 'textarea', placeholder: 'List the obligations...' },
+            { id: 'duration', label: 'Duration', placeholder: '1 year, renewable by mutual agreement' },
+        ],
+        power_of_attorney: [
+            { id: 'principal_name', label: 'Principal (Grantor) Full Name', placeholder: 'Juan dela Cruz' },
+            { id: 'attorney_name', label: 'Attorney-in-Fact Full Name', placeholder: 'Maria Santos' },
+            { id: 'relationship', label: 'Relationship to Principal', placeholder: 'Spouse / Child / Authorized Representative' },
+            { id: 'specific_powers', label: 'Specific Powers Granted', type: 'textarea', placeholder: 'List specific acts the attorney-in-fact is authorized to do...' },
+            { id: 'scope', label: 'Scope / Limitations', placeholder: 'Limited to real property transactions in Albay Province' },
+        ],
+        partnership_agreement: [
+            { id: 'partner1_name', label: 'Partner 1 Full Name', placeholder: 'Juan dela Cruz' },
+            { id: 'partner2_name', label: 'Partner 2 Full Name', placeholder: 'Maria Santos' },
+            { id: 'partnership_name', label: 'Partnership Name', placeholder: 'dela Cruz & Santos Partnership' },
+            { id: 'business_purpose', label: 'Business Purpose', placeholder: 'General trading and retail' },
+            { id: 'capital_contribution', label: 'Capital Contributions', type: 'textarea', placeholder: 'Partner 1: PHP 500,000; Partner 2: PHP 500,000' },
+            { id: 'profit_sharing', label: 'Profit/Loss Sharing', placeholder: '50-50 equal sharing' },
+        ],
+    };
+
+    function initTemplates() {
+        const list = document.getElementById('template-list');
+        list.innerHTML = '';
+        TEMPLATES.forEach(t => {
+            const el = document.createElement('div');
+            el.className = 'template-item' + (t.id === selectedTemplate ? ' active' : '');
+            el.innerHTML = `<div class="template-icon">${t.icon}</div><div><div class="template-name">${t.name}</div><div class="template-cat">${t.category}</div></div>`;
+            el.onclick = () => selectTemplate(t.id, t.name, t.icon);
+            list.appendChild(el);
+        });
+        renderGenerateForm(selectedTemplate);
+    }
+
+    function selectTemplate(id, name, icon) {
+        selectedTemplate = id;
+        document.querySelectorAll('.template-item').forEach(el => el.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        const t = TEMPLATES.find(t => t.id === id);
+        document.getElementById('generate-form-title').textContent = `${t.icon} ${t.name}`;
+        document.getElementById('generated-contract').style.display = 'none';
+        renderGenerateForm(id);
+    }
+
+    function renderGenerateForm(templateId) {
+        const fields = TEMPLATE_FIELDS[templateId] || TEMPLATE_FIELDS['service_agreement'];
+        const container = document.getElementById('generate-form-fields');
+        container.innerHTML = '';
+        fields.forEach(f => {
+            const div = document.createElement('div');
+            div.className = 'form-row';
+            if (f.type === 'textarea') {
+                div.innerHTML = `<label class="form-label">${f.label}</label><textarea class="form-textarea" id="gen_${f.id}" placeholder="${f.placeholder || ''}"></textarea>`;
+            } else {
+                div.innerHTML = `<label class="form-label">${f.label}</label><input type="text" class="form-input" id="gen_${f.id}" placeholder="${f.placeholder || ''}">`;
+            }
+            container.appendChild(div);
+        });
+    }
+
+    async function generateContract() {
+        const fields = TEMPLATE_FIELDS[selectedTemplate] || [];
+        const params = {};
+        fields.forEach(f => {
+            const el = document.getElementById('gen_' + f.id);
+            if (el && el.value.trim()) params[f.id] = el.value.trim();
+        });
+
+        const resultBox = document.getElementById('generated-contract');
+        const loadingEl = document.getElementById('generate-loading');
+        const textEl = document.getElementById('generated-contract-text');
+        const btn = document.getElementById('generate-btn');
+
+        resultBox.style.display = 'block';
+        loadingEl.style.display = 'flex';
+        textEl.textContent = '';
+        btn.disabled = true;
+        btn.textContent = 'Ã¢ÂÂ³ Generating...';
+
+        const t = TEMPLATES.find(t => t.id === selectedTemplate);
+        document.getElementById('generated-title').textContent = `${t.icon} ${t.name}`;
+
+        const abortGen = new AbortController();
+        setTimeout(() => abortGen.abort(), 60000);
+        const ctrl3 = new AbortController(); setTimeout(() => ctrl3.abort(), 60000);
+        try {
+            const res = await fetch(`${API_BASE}/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ template_type: selectedTemplate, parameters: params })
+            });
+            const data = await res.json();
+            loadingEl.style.display = 'none';
+
+            if (data.success) {
+                generatedContractText = data.contract_text;
+                textEl.textContent = data.contract_text;
+            } else {
+                textEl.textContent = 'Error: ' + (data.detail || 'Generation failed');
+            }
+        } catch (err) {
+            loadingEl.style.display = 'none';
+            textEl.textContent = 'Network error. Please try again.';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Ã¢Å“Â¨ Generate Contract with AI';
+        }
+    }
+
+    function copyContract() {
+        if (!generatedContractText) return;
+        navigator.clipboard.writeText(generatedContractText).then(() => {
+            const btn = event.currentTarget;
+            btn.textContent = 'Ã¢Å“â€œ Copied!';
+            setTimeout(() => btn.textContent = 'Ã°Å¸â€œâ€¹ Copy', 2000);
+        });
+    }
+
+    function downloadContract() {
+        if (!generatedContractText) return;
+        const t = TEMPLATES.find(t => t.id === selectedTemplate);
+        const blob = new Blob([generatedContractText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = (t ? t.name : 'contract').replace(/ /g, '_') + '.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ CONTACT CHAT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    const botResponses = {
+        enp: "To find a certified Electronic Notary Public (ENP), you can browse our verified ENP directory. We have accredited notaries available for both In-Person (IEN) and Remote (REN) notarization. Would you like help finding one near you?",
+        lawyer: "To apply as a certified ENP on Quanby Legal, you'll need your IBP ID and must complete our identity verification via DICT National PKI. The process takes about 3-5 business days. Shall I walk you through the requirements?",
+        investor: "Thank you for your interest in Quanby Legal! We are the Philippines' first and only Supreme Court-accredited electronic notarization platform. We're currently exploring strategic investment opportunities. Please contact us at invest@quanby.legal or book a call with our CTO.",
+        question: "Happy to help! You can ask about our pricing, how e-notarization works, compliance requirements, the Contract AI Agent, or anything else about Quanby Legal."
+    };
+
+    document.querySelectorAll('.topic-card').forEach(card => {
+        card.addEventListener('click', () => {
+            document.querySelectorAll('.topic-card').forEach(t => t.classList.remove('active'));
+            card.classList.add('active');
+            const msgs = document.getElementById('chat-messages');
+            msgs.innerHTML = '';
+            const msg = document.createElement('div');
+            msg.className = 'message bot-message';
+            msg.textContent = botResponses[card.dataset.topic] || botResponses.question;
+            msgs.appendChild(msg);
+            const input = document.getElementById('contact-chat-input');
+            input.disabled = false;
+            input.focus();
+        });
+    });
+
+    document.getElementById('send-btn').addEventListener('click', sendContactChat);
+    document.getElementById('contact-chat-input').addEventListener('keypress', e => {
+        if (e.key === 'Enter') sendContactChat();
+    });
+
+    function sendContactChat() {
+        const input = document.getElementById('contact-chat-input');
+        const text = input.value.trim();
+        if (!text) return;
+        const msgs = document.getElementById('chat-messages');
+        const userMsg = document.createElement('div');
+        userMsg.className = 'message user-message';
+        userMsg.textContent = text;
+        msgs.appendChild(userMsg);
+        input.value = '';
+        setTimeout(() => {
+            const botMsg = document.createElement('div');
+            botMsg.className = 'message bot-message';
+            botMsg.textContent = "Thank you for reaching out! Our team will get back to you within 1 business day. For urgent matters, email us at legal@quanby.legal.";
+            msgs.appendChild(botMsg);
+            msgs.scrollTop = msgs.scrollHeight;
+        }, 600);
+    }
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ UTILITIES Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    function escHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function showError(msg) {
+        alert('Error: ' + msg);
+    }
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ SSO / ONBOARDING Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+
+    let _ssoRole = 'attorney';
+    let _providerUrls = null;
+
+    async function _loadProviders() {
+        if (_providerUrls) return _providerUrls;
+        try {
+            const res = await fetch('/api/auth/providers');
+            const data = await res.json();
+            _providerUrls = data.providers || {};
+        } catch(e) {
+            _providerUrls = {};
+        }
+        return _providerUrls;
+    }
+
+    function openSSO(role) {
+        _ssoRole = role;
+        const modal = document.getElementById('sso-modal');
+        const badge = document.getElementById('sso-role-badge');
+        const title = document.getElementById('sso-title');
+        const desc  = document.getElementById('sso-desc');
+
+        if (role === 'attorney') {
+            badge.className = 'sso-role-badge attorney';
+            badge.textContent = 'Ã¢Å¡â€“Ã¯Â¸Â Law Firm / Attorney';
+            title.textContent = 'Start Your ENP Certification';
+            desc.textContent = 'Sign in to begin your Electronic Notary Public (ENP) certification Ã¢â‚¬â€ required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.';
+        } else {
+            badge.className = 'sso-role-badge client';
+            badge.textContent = 'Ã°Å¸â€˜Â¤ Public Client';
+            title.textContent = 'Create Your Client Account';
+            desc.textContent = 'Sign in to access e-notarization services, upload contracts for AI analysis, and connect with certified Electronic Notary Publics (ENPs).';
+        }
+
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        _loadProviders(); // pre-fetch
+    }
+
+    function closeSSO() {
+        document.getElementById('sso-modal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    // Close modal on overlay click
+    document.getElementById('sso-modal').addEventListener('click', function(e) {
+        if (e.target === this) closeSSO();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeSSO();
+    });
+
+    async function ssoLogin(provider) {
+        const btn = document.getElementById('sso-' + provider + '-btn');
+        const origText = btn.innerHTML;
+
+        // Show loading state
+        btn.innerHTML = btn.innerHTML.replace(/Continue with \w+/, 'Connecting...');
+        btn.disabled = true;
+
+        // Store role in sessionStorage so we can read it after OAuth redirect
+        sessionStorage.setItem('ql_pending_role', _ssoRole);
+
+        const providers = await _loadProviders();
+        const url = providers[provider];
+
+        if (!url) {
+            // OAuth not configured yet Ã¢â‚¬â€ show friendly message
+            btn.innerHTML = origText;
+            btn.disabled = false;
+            showSSOError(provider);
+            return;
+        }
+
+        // Redirect to OAuth provider Ã¢â‚¬â€ it will callback to /api/auth/callback/{provider}
+        // which issues JWT and redirects to /auth-complete?token=...&step=...
+        window.location.href = url + '&state=' + encodeURIComponent(_ssoRole);
+    }
+
+    function showSSOError(provider) {
+        const names = { google: 'Google' };
+        const msg = document.createElement('div');
+        msg.style.cssText = 'background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;padding:0.75rem 1rem;border-radius:0.5rem;font-size:0.85rem;margin-top:0.75rem;';
+        msg.textContent = `${names[provider]} sign-in is being configured. Please check back shortly or contact legal@quanby.legal.`;
+        const modal = document.querySelector('.sso-modal');
+        const existing = modal.querySelector('.sso-error');
+        if (existing) existing.remove();
+        msg.className = 'sso-error';
+        modal.appendChild(msg);
+        setTimeout(() => msg.remove(), 5000);
+    }
+
+    // Handle return from OAuth (backend sets HttpOnly cookie, redirects with ?step=)
+    (function handleAuthReturn() {
+        const params = new URLSearchParams(window.location.search);
+        const step = params.get('step');
+        if (!step) return;
+        const role = sessionStorage.getItem('ql_pending_role') || 'attorney';
+        sessionStorage.removeItem('ql_pending_role');
+        window.history.replaceState({}, '', '/');
+        routeToStep(step, role);
+    })();
+
+    function routeToStep(step, role) {
+        switch(step) {
+            case 'role_select': openOnboard('role', role); break;
+            case 'profile':     openOnboard('profile', role); break;
+            case 'test':        openOnboard('test', role); break;
+            case 'liveness':    openOnboard('liveness', role); break;
+            case 'survey':      openOnboard('survey', role); break;
+            case 'certified':   openOnboard('certified', role); break;
+            default:            openOnboard('role', role); break;
+        }
+    }
+
+    // Ã¢â€¢ÂÃ¢â€¢Â ONBOARDING MODAL ENGINE Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+
+    const OB_STEPS  = ['role','profile','test','liveness','certified'];
+    const OB_LABELS = ['Role','Profile','15-Q Test','Liveness','Certificate'];
+    let _obRole      = 'attorney';
+    let _obAnswers   = {};
+    let _obQuestions = [];
+
+    function openOnboard(step, role) {
+        _obRole = role || 'attorney';
+        var overlay = document.getElementById('onboard-overlay');
+        if (!overlay) { console.error('onboard-overlay missing from DOM'); return; }
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        _renderObStep(step);
+    }
+    function closeOnboard() {
+        var overlay = document.getElementById('onboard-overlay');
+        if (overlay) overlay.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    // Legacy alias
+    function showOnboardingModal(step, role) { openOnboard(step, role); }
+
+    function _renderObProgress(activeStep) {
+        const idx = OB_STEPS.indexOf(activeStep);
+        document.getElementById('ob-progress').innerHTML = OB_STEPS.map((s, i) => {
+            const cls = i < idx ? 'done' : (i === idx ? 'active' : '');
+            const lbl = i < idx ? '&#10003;' : (i + 1);
+            return (i > 0 ? '<div class="ob-line"></div>' : '') +
+                '<div class="ob-step"><div class="ob-step-num ' + cls + '">' + lbl + '</div><span>' + OB_LABELS[i] + '</span></div>';
+        }).join('');
+    }
+
+    async function _renderObStep(step) {
+        _renderObProgress(step);
+        const el = document.getElementById('ob-content');
+        if (step === 'role') {
+            el.innerHTML = `
+                <h3>Choose Your Role</h3>
+                <p class="sub">Select your role to begin your Electronic Notary Public (ENP) certification under A.M. No. 24-10-14-SC.</p>
+                <div class="onboard-role-cards">
+                    <div class="role-card ${_obRole==='attorney'?'selected':''}" onclick="_selectRole('attorney',this)">
+                        <div class="role-icon">&#9878;&#65039;</div>
+                        <div class="role-title">Attorney / Law Firm</div>
+                        <div class="role-desc">IBP-accredited, practicing notary public</div>
+                    </div>
+                    <div class="role-card ${_obRole==='client'?'selected':''}" onclick="_selectRole('client',this)">
+                        <div class="role-icon">&#128100;</div>
+                        <div class="role-title">Client / Individual</div>
+                        <div class="role-desc">Get documents notarized electronically</div>
+                    </div>
+                </div>
+                <button class="onboard-btn" onclick="_submitRole()">Continue &#8594;</button>
+                <div id="ob-err" class="ob-error"></div>`;
+        } else if (step === 'profile') {
+            el.innerHTML = `
+                <h3>Complete Your Profile</h3>
+                <p class="sub">Required for ENP certification under A.M. No. 24-10-14-SC.</p>
+                <div class="onboard-field"><label>Full Name *</label><input type="text" id="ob-name" placeholder="Juan dela Cruz"></div>
+                <div class="onboard-field"><label>IBP Roll No. ${_obRole==='attorney'?'*':'(if applicable)'}</label><input type="text" id="ob-ibp" placeholder="e.g. 12345"></div>
+                <div class="onboard-field"><label>PTR No. (if applicable)</label><input type="text" id="ob-ptr" placeholder="e.g. 98765"></div>
+                <div class="onboard-field"><label>Province / City *</label><input type="text" id="ob-province" placeholder="e.g. Legazpi City, Albay"></div>
+                <div class="onboard-field"><label>Notarial Jurisdiction</label><input type="text" id="ob-jurisdiction" placeholder="e.g. Albay"></div>
+                <button class="onboard-btn" onclick="_submitProfile()">Continue &#8594;</button>
+                <div id="ob-err" class="ob-error"></div>`;
+        } else if (step === 'test') {
+            el.innerHTML = '<h3>ENP Certification Test</h3><p class="sub">Loading your 15-question test&#8230;</p>';
+            await _loadTest();
+        } else if (step === 'liveness') {
+            el.innerHTML = `
+                <h3>Identity Verification</h3>
+                <p class="sub">A quick liveness check is required under BSP Circular 944 (eKYC).</p>
+                <div style="border:1px solid rgba(255,255,255,0.1);border-radius:0.75rem;padding:1.5rem;text-align:center;margin-bottom:1.25rem;background:rgba(255,255,255,0.03);">
+                    <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#128248;</div>
+                    <p style="color:var(--muted);font-size:0.88rem;margin:0 0 1rem;">Your camera will be used to verify your identity. Ensure good lighting and look directly at the camera.</p>
+                    <button class="onboard-btn" style="max-width:220px;margin:0 auto;display:block;" onclick="_startLiveness(event)">Start Liveness Check</button>
+                </div>
+                <div id="ob-err" class="ob-error"></div>`;
+        } else if (step === 'certified') {
+            el.innerHTML = `
+                <h3>&#127881; Certification Complete!</h3>
+                <div class="ob-cert-card">
+                    <div class="cert-icon">&#127963;&#65039;</div>
+                    <h4>You are now ENP Certified</h4>
+                    <p>Your Electronic Notary Public certificate has been issued and sent to your email.</p>
+                </div>
+                <p class="sub" style="text-align:center;">You can now perform electronic notarizations in compliance with A.M. No. 24-10-14-SC.</p>
+                <button class="onboard-btn" onclick="closeOnboard()">Done</button>`;
+        }
+    }
+
+    function _selectRole(role, el) {
+        _obRole = role;
+        document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    async function _submitRole() {
+        const btn = document.querySelector('#ob-content .onboard-btn');
+        btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Saving&#8230;';
+        try {
+            const res = await fetch('/api/onboarding/role', {
+                method: 'POST', credentials: 'include',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ role: _obRole })
+            });
+            if (!res.ok) throw new Error((await res.json()).detail || 'Failed');
+            _renderObStep('profile');
+        } catch(e) {
+            btn.disabled = false; btn.textContent = 'Continue Ã¢â€ â€™';
+            document.getElementById('ob-err').textContent = e.message;
+        }
+    }
+
+    async function _submitProfile() {
+        const name = document.getElementById('ob-name').value.trim();
+        const province = document.getElementById('ob-province').value.trim();
+        if (!name || !province) {
+            document.getElementById('ob-err').textContent = 'Full name and province are required.'; return;
+        }
+        const btn = document.querySelector('#ob-content .onboard-btn');
+        btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Saving&#8230;';
+        try {
+            const res = await fetch('/api/onboarding/profile', {
+                method: 'POST', credentials: 'include',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    full_name: name,
+                    ibp_number: document.getElementById('ob-ibp').value.trim(),
+                    ptr_number: document.getElementById('ob-ptr').value.trim(),
+                    province: province,
+                    notarial_jurisdiction: document.getElementById('ob-jurisdiction').value.trim()
+                })
+            });
+            if (!res.ok) throw new Error((await res.json()).detail || 'Failed');
+            _renderObStep('test');
+        } catch(e) {
+            btn.disabled = false; btn.textContent = 'Continue Ã¢â€ â€™';
+            document.getElementById('ob-err').textContent = e.message;
+        }
+    }
+
+    async function _loadTest() {
+        try {
+            const res = await fetch('/api/onboarding/test/start', { method: 'POST', credentials: 'include' });
+            if (!res.ok) throw new Error((await res.json()).detail || 'Failed to start test');
+            const data = await res.json();
+            _obQuestions = data.questions; _obAnswers = {};
+            _renderTestUI();
+        } catch(e) {
+            document.getElementById('ob-content').innerHTML =
+                '<h3>Test</h3><div class="ob-error">' + e.message + '</div>';
+        }
+    }
+
+    function _renderTestUI() {
+        const qs = _obQuestions.map((q, i) =>
+            '<div class="ob-question" id="q-' + q.id + '">' +
+            '<p>' + (i+1) + '. ' + q.question + '</p>' +
+            q.choices.map(c =>
+                '<div class="ob-choice" onclick="_pickAnswer(\'' + q.id + '\',this)">' + c + '</div>'
+            ).join('') +
+            '</div>'
+        ).join('');
+        document.getElementById('ob-content').innerHTML =
+            '<h3>ENP Certification Test</h3>' +
+            '<p class="sub">Answer all 15 questions. You need 80% (12/15) to pass.</p>' +
+            qs +
+            '<button class="onboard-btn" id="ob-submit-btn" onclick="_submitTest()">Submit Test</button>' +
+            '<div id="ob-err" class="ob-error"></div>';
+    }
+
+    function _pickAnswer(qid, el) {
+        const text = el.textContent;
+        _obAnswers[qid] = text;
+        const block = document.getElementById('q-' + qid);
+        block.querySelectorAll('.ob-choice').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    async function _submitTest() {
+        if (Object.keys(_obAnswers).length < _obQuestions.length) {
+            document.getElementById('ob-err').textContent =
+                'Please answer all questions (' + Object.keys(_obAnswers).length + '/' + _obQuestions.length + ' answered).';
+            return;
+        }
+        const btn = document.getElementById('ob-submit-btn');
+        btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Grading&#8230;';
+        try {
+            const res = await fetch('/api/onboarding/test/submit', {
+                method: 'POST', credentials: 'include',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ answers: _obAnswers })
+            });
+            _renderTestResult(await res.json());
+        } catch(e) {
+            btn.disabled = false; btn.textContent = 'Submit Test';
+            document.getElementById('ob-err').textContent = 'Submission failed. Please try again.';
+        }
+    }
+
+    function _renderTestResult(data) {
+        const passed = data.passed, score = data.score, total = data.total;
+        document.getElementById('ob-content').innerHTML =
+            '<h3>Test Result</h3>' +
+            '<div class="ob-result-banner ' + (passed?'pass':'fail') + '">' +
+            (passed ? '&#127881; Passed!' : '&#10060; Not Passed') +
+            ' &mdash; ' + score + '/' + total + ' correct (' + Math.round(score/total*100) + '%)</div>' +
+            '<p class="sub">' + (passed
+                ? 'Congratulations! Proceed to the final identity verification step.'
+                : 'You need 80% to pass. Review the Philippine ENP rules and try again.') + '</p>' +
+            (passed
+                ? '<button class="onboard-btn" onclick="_renderObStep(\'liveness\')">Continue to Liveness Check &#8594;</button>'
+                : '<button class="onboard-btn" onclick="_loadTest()">Retake Test</button>');
+        _renderObProgress(passed ? 'liveness' : 'test');
+    }
+
+    async function _startLiveness(evt) {
+        const btn = evt.target;
+        btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Starting camera&#8230;';
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            stream.getTracks().forEach(t => t.stop());
+            const res = await fetch('/api/onboarding/liveness', {
+                method: 'POST', credentials: 'include',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ verified: true, method: 'camera_check' })
+            });
+            if (!res.ok) throw new Error((await res.json()).detail || 'Liveness check failed');
+            _renderObStep('certified');
+        } catch(e) {
+            btn.disabled = false; btn.textContent = 'Start Liveness Check';
+            document.getElementById('ob-err').textContent =
+                e.name === 'NotAllowedError'
+                    ? 'Camera access denied. Please allow camera access and try again.'
+                    : e.message;
+        }
+    }
+
+
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ INIT Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    initTemplates();
+    
+    // --- MOBILE MENU ---
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        const btn = document.getElementById('hamburger-btn');
+        const isOpen = menu.classList.toggle('open');
+        btn.classList.toggle('open', isOpen);
+        btn.setAttribute('aria-expanded', String(isOpen));
+    }
+    function closeMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        const btn = document.getElementById('hamburger-btn');
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+    }
+    document.addEventListener('click', function(e) {
+        const menu = document.getElementById('mobile-menu');
+        const btn = document.getElementById('hamburger-btn');
+        if (menu && btn && menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+            closeMobileMenu();
+        }
+    });
+
+    // Mobile menu
+    function toggleMobileMenu() {
+        const m = document.getElementById('mobile-menu');
+        const b = document.getElementById('hamburger-btn');
+        const open = m.classList.toggle('open');
+        b.classList.toggle('open', open);
+        b.setAttribute('aria-expanded', String(open));
+        b.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+    }
+    function closeMobileMenu() {
+        const m = document.getElementById('mobile-menu');
+        const b = document.getElementById('hamburger-btn');
+        m.classList.remove('open');
+        b.classList.remove('open');
+        b.setAttribute('aria-expanded', 'false');
+        b.setAttribute('aria-label', 'Open navigation menu');
+    }
+    document.addEventListener('click', function(e) {
+        const m = document.getElementById('mobile-menu');
+        const b = document.getElementById('hamburger-btn');
+        if (m && b && m.classList.contains('open') && !m.contains(e.target) && !b.contains(e.target)) closeMobileMenu();
+    });
+</script>
+
+<!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+     QUANBY LEGAL AI CHATBOT WIDGET
+     Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+<style>
+/* Ã¢â€â‚¬Ã¢â€â‚¬ Chatbot Widget Styles Ã¢â€â‚¬Ã¢â€â‚¬ */
+#ql-chat-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 24px rgba(124, 58, 237, 0.55);
+    z-index: 9999;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+}
+#ql-chat-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 32px rgba(124, 58, 237, 0.75);
+}
+#ql-chat-btn svg { pointer-events: none; }
+#ql-chat-btn .ql-chat-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 16px;
+    height: 16px;
+    background: #10b981;
+    border-radius: 50%;
+    border: 2px solid #05060f;
+}
+
+#ql-chat-window {
+    position: fixed;
+    bottom: 104px;
+    right: 28px;
+    width: 380px;
+    height: 520px;
+    background: #0d0e1c;
+    border: 1px solid rgba(124, 58, 237, 0.35);
+    border-radius: 16px;
+    box-shadow: 0 8px 48px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(124,58,237,0.15);
+    display: flex;
+    flex-direction: column;
+    z-index: 9998;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+#ql-chat-window.ql-open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+/* Header */
+#ql-chat-header {
+    padding: 14px 18px;
+    background: linear-gradient(135deg, rgba(124,58,237,0.25) 0%, rgba(109,40,217,0.15) 100%);
+    border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+.ql-chat-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.ql-chat-avatar {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+.ql-chat-header-info h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin: 0;
+    line-height: 1.2;
+}
+.ql-chat-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    color: #94a3b8;
+}
+.ql-status-dot {
+    width: 7px;
+    height: 7px;
+    background: #10b981;
+    border-radius: 50%;
+    animation: ql-pulse 2s infinite;
+}
+@keyframes ql-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+#ql-chat-close {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s, background 0.15s;
+}
+#ql-chat-close:hover {
+    color: #f1f5f9;
+    background: rgba(255,255,255,0.08);
+}
+
+/* Messages */
+#ql-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scroll-behavior: smooth;
+}
+#ql-chat-messages::-webkit-scrollbar { width: 4px; }
+#ql-chat-messages::-webkit-scrollbar-track { background: transparent; }
+#ql-chat-messages::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.4); border-radius: 4px; }
+
+.ql-msg {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    max-width: 90%;
+    animation: ql-msg-in 0.2s ease;
+}
+@keyframes ql-msg-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.ql-msg.ql-user { align-self: flex-end; flex-direction: row-reverse; }
+.ql-msg.ql-bot  { align-self: flex-start; }
+
+.ql-msg-bubble {
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+.ql-user .ql-msg-bubble {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+.ql-bot .ql-msg-bubble {
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-bottom-left-radius: 4px;
+}
+.ql-bot .ql-msg-bubble strong { color: #c4b5fd; }
+.ql-bot .ql-msg-bubble a { color: #a78bfa; text-decoration: underline; }
+
+/* Typing indicator */
+.ql-typing-bubble {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 14px;
+    border-bottom-left-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+.ql-dot {
+    width: 7px;
+    height: 7px;
+    background: #7c3aed;
+    border-radius: 50%;
+    animation: ql-typing 1.2s infinite;
+}
+.ql-dot:nth-child(2) { animation-delay: 0.2s; }
+.ql-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes ql-typing {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40%           { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Suggested questions */
+#ql-suggestions {
+    padding: 0 14px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+}
+#ql-suggestions-title {
+    font-size: 0.72rem;
+    color: #64748b;
+    padding-left: 2px;
+    margin-bottom: 2px;
+}
+.ql-suggestion-btn {
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.3);
+    color: #c4b5fd;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, border-color 0.15s;
+    line-height: 1.3;
+}
+.ql-suggestion-btn:hover {
+    background: rgba(124,58,237,0.2);
+    border-color: rgba(124,58,237,0.55);
+    color: #e9d5ff;
+}
+
+/* Input area */
+#ql-chat-input-area {
+    padding: 12px 14px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    background: rgba(5,6,15,0.6);
+    flex-shrink: 0;
+}
+#ql-chat-input {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(124,58,237,0.25);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #f1f5f9;
+    font-size: 0.875rem;
+    resize: none;
+    outline: none;
+    transition: border-color 0.15s;
+    min-height: 42px;
+    max-height: 120px;
+    font-family: inherit;
+    line-height: 1.4;
+}
+#ql-chat-input:focus { border-color: rgba(124,58,237,0.6); }
+#ql-chat-input::placeholder { color: #475569; }
+#ql-send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: opacity 0.15s, transform 0.15s;
+}
+#ql-send-btn:hover { opacity: 0.85; transform: scale(1.05); }
+#ql-send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* Error message */
+.ql-error-msg {
+    background: rgba(239,68,68,0.12);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: #fca5a5;
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+    #ql-chat-window {
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 80vh;
+        border-radius: 16px 16px 0 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+    }
+    #ql-chat-btn {
+        bottom: 20px;
+        right: 20px;
+    }
+}
+</style>
+
+<!-- Chat Toggle Button -->
+<button id="ql-chat-btn" aria-label="Open Quanby Legal AI Chat" onclick="qlToggleChat()">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2.546 20.9a1 1 0 001.277 1.277l3.732-.892A9.957 9.957 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" fill="white" opacity="0.9"/>
+        <path d="M8 10h8M8 14h5" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <span class="ql-chat-badge" aria-hidden="true"></span>
+</button>
+
+<!-- Chat Window -->
+<div id="ql-chat-window" role="dialog" aria-label="Quanby Legal AI Chat" aria-modal="true">
+    <!-- Header -->
+    <div id="ql-chat-header">
+        <div class="ql-chat-header-left">
+            <div class="ql-chat-avatar">Ã¢Å¡â€“Ã¯Â¸Â</div>
+            <div class="ql-chat-header-info">
+                <h4>Quanby Legal AI</h4>
+                <div class="ql-status-dot-wrap ql-chat-status">
+                    <div class="ql-status-dot"></div>
+                    <span>Philippine Legal Expert</span>
+                </div>
+            </div>
+        </div>
+        <button id="ql-chat-close" onclick="qlToggleChat()" aria-label="Close chat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+
+    <!-- Messages -->
+    <div id="ql-chat-messages" role="log" aria-live="polite" aria-label="Chat messages"></div>
+
+    <!-- Suggested questions -->
+    <div id="ql-suggestions">
+        <div id="ql-suggestions-title">Suggested questions</div>
+        <button class="ql-suggestion-btn" onclick="qlSendSuggestion(this)">How do I become a certified ENP?</button>
+        <button class="ql-suggestion-btn" onclick="qlSendSuggestion(this)">What documents can be e-notarized?</button>
+        <button class="ql-suggestion-btn" onclick="qlSendSuggestion(this)">What is A.M. No. 24-10-14-SC?</button>
+        <button class="ql-suggestion-btn" onclick="qlSendSuggestion(this)">How much does certification cost?</button>
+        <button class="ql-suggestion-btn" onclick="qlSendSuggestion(this)">Is e-notarization legally binding in PH?</button>
+    </div>
+
+    <!-- Input -->
+    <div id="ql-chat-input-area">
+        <textarea
+            id="ql-chat-input"
+            placeholder="Ask about e-notarization, Philippine law..."
+            rows="1"
+            aria-label="Chat message input"
+            onkeydown="qlHandleKey(event)"
+            oninput="qlAutoResize(this)"
+        ></textarea>
+        <button id="ql-send-btn" onclick="qlSendMessage()" aria-label="Send message">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ State Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    const CHAT_API = '/api/chatbot';
+    let qlIsOpen = false;
+    let qlIsWaiting = false;
+    let qlSessionId = '';
+    const qlGreeting = "Hello! \u{1F44B} I'm **Quanby Legal AI**, your Philippine legal assistant.\n\nI can help you with e-notarization, ENP certification, and Philippine legal frameworks (A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, SEC MC 28-2020).\n\nWhat can I help you with today?";
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Init Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    (function qlInit() {
+        // Restore session_id from sessionStorage
+        try {
+            qlSessionId = sessionStorage.getItem('ql_chat_session') || '';
+        } catch(e) { qlSessionId = ''; }
+
+        if (!qlSessionId) {
+            qlSessionId = 'ql-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+            try { sessionStorage.setItem('ql_chat_session', qlSessionId); } catch(e) {}
+        }
+    })();
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Toggle chat window Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    window.qlToggleChat = function() {
+        qlIsOpen = !qlIsOpen;
+        const win = document.getElementById('ql-chat-window');
+        const btn = document.getElementById('ql-chat-btn');
+
+        if (qlIsOpen) {
+            win.classList.add('ql-open');
+            btn.setAttribute('aria-expanded', 'true');
+            // Show greeting if first open
+            const msgs = document.getElementById('ql-chat-messages');
+            if (msgs.children.length === 0) {
+                qlAddBotMessage(qlGreeting);
+            }
+            setTimeout(() => {
+                document.getElementById('ql-chat-input').focus();
+            }, 250);
+        } else {
+            win.classList.remove('ql-open');
+            btn.setAttribute('aria-expanded', 'false');
+        }
+    };
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Send suggestion Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    window.qlSendSuggestion = function(btn) {
+        const text = btn.textContent.trim();
+        // Hide suggestions panel
+        document.getElementById('ql-suggestions').style.display = 'none';
+        qlDispatch(text);
+    };
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Handle keyboard Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    window.qlHandleKey = function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            qlSendMessage();
+        }
+    };
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Auto-resize textarea Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    window.qlAutoResize = function(el) {
+        el.style.height = 'auto';
+        el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    };
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Send message Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    window.qlSendMessage = function() {
+        const input = document.getElementById('ql-chat-input');
+        const text = input.value.trim();
+        if (!text || qlIsWaiting) return;
+        input.value = '';
+        input.style.height = 'auto';
+        // Hide suggestions after first user message
+        document.getElementById('ql-suggestions').style.display = 'none';
+        qlDispatch(text);
+    };
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Core dispatch: add user msg, call API, show bot reply Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    function qlDispatch(text) {
+        if (qlIsWaiting) return;
+        qlAddUserMessage(text);
+        qlSetWaiting(true);
+        qlShowTyping();
+
+        const payload = JSON.stringify({ message: text, session_id: qlSessionId });
+
+        fetch(CHAT_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: payload
+        })
+        .then(function(resp) {
+            if (resp.status === 429) {
+                throw new Error('Rate limit reached. Please wait a moment before sending more messages.');
+            }
+            if (!resp.ok) {
+                return resp.json().then(function(d) {
+                    throw new Error(d.detail || 'Server error. Please try again.');
+                });
+            }
+            return resp.json();
+        })
+        .then(function(data) {
+            qlRemoveTyping();
+            if (data.session_id) {
+                qlSessionId = data.session_id;
+                try { sessionStorage.setItem('ql_chat_session', qlSessionId); } catch(e) {}
+            }
+            qlAddBotMessage(data.reply || 'No response received.');
+        })
+        .catch(function(err) {
+            qlRemoveTyping();
+            qlAddErrorMessage(err.message || 'Connection error. Please try again.');
+        })
+        .finally(function() {
+            qlSetWaiting(false);
+        });
+    }
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Render helpers Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    function qlAddUserMessage(text) {
+        const msgs = document.getElementById('ql-chat-messages');
+        const div = document.createElement('div');
+        div.className = 'ql-msg ql-user';
+        const bubble = document.createElement('div');
+        bubble.className = 'ql-msg-bubble';
+        bubble.textContent = text;
+        div.appendChild(bubble);
+        msgs.appendChild(div);
+        qlScrollBottom();
+    }
+
+    function qlAddBotMessage(text) {
+        const msgs = document.getElementById('ql-chat-messages');
+        const div = document.createElement('div');
+        div.className = 'ql-msg ql-bot';
+        const bubble = document.createElement('div');
+        bubble.className = 'ql-msg-bubble';
+        // Render basic markdown: bold, bullet points, line breaks
+        bubble.innerHTML = qlRenderMarkdown(text);
+        div.appendChild(bubble);
+        msgs.appendChild(div);
+        qlScrollBottom();
+    }
+
+    function qlAddErrorMessage(msg) {
+        const msgs = document.getElementById('ql-chat-messages');
+        const div = document.createElement('div');
+        div.className = 'ql-error-msg';
+        div.textContent = '\u26A0\uFE0F ' + msg;
+        msgs.appendChild(div);
+        qlScrollBottom();
+    }
+
+    function qlShowTyping() {
+        const msgs = document.getElementById('ql-chat-messages');
+        const div = document.createElement('div');
+        div.className = 'ql-msg ql-bot';
+        div.id = 'ql-typing-indicator';
+        const bubble = document.createElement('div');
+        bubble.className = 'ql-typing-bubble';
+        bubble.innerHTML = '<div class="ql-dot"></div><div class="ql-dot"></div><div class="ql-dot"></div>';
+        div.appendChild(bubble);
+        msgs.appendChild(div);
+        qlScrollBottom();
+    }
+
+    function qlRemoveTyping() {
+        const el = document.getElementById('ql-typing-indicator');
+        if (el) el.remove();
+    }
+
+    function qlSetWaiting(val) {
+        qlIsWaiting = val;
+        const btn = document.getElementById('ql-send-btn');
+        const input = document.getElementById('ql-chat-input');
+        if (btn) btn.disabled = val;
+        if (input) input.disabled = val;
+    }
+
+    function qlScrollBottom() {
+        const msgs = document.getElementById('ql-chat-messages');
+        if (msgs) msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Minimal secure markdown renderer (no innerHTML from user input) Ã¢â€â‚¬Ã¢â€â‚¬
+    // Only used for BOT messages (controlled server output)
+    function qlRenderMarkdown(text) {
+        // Escape HTML first (defensive)
+        let s = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        // Bold: **text**
+        s = s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+        // Line breaks
+        s = s.replace(/\n/g, '<br>');
+
+        return s;
+    }
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Close on Escape Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && qlIsOpen) qlToggleChat();
+    });
+
+    // Ã¢â€â‚¬Ã¢â€â‚¬ Close on outside click Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
+    document.addEventListener('click', function(e) {
+        if (!qlIsOpen) return;
+        const win = document.getElementById('ql-chat-window');
+        const btn = document.getElementById('ql-chat-btn');
+        if (win && btn && !win.contains(e.target) && !btn.contains(e.target)) {
+            qlToggleChat();
+        }
+    });
+})();
+</script>
+<!-- Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+     END QUANBY LEGAL AI CHATBOT WIDGET
+     Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â -->
+
+
+    <!-- ONBOARDING MODAL -->
+    <div class="onboard-overlay" id="onboard-overlay" role="dialog" aria-modal="true" aria-label="ENP Certification Onboarding">
+        <div class="onboard-modal" id="onboard-modal">
+            <button class="onboard-close" onclick="closeOnboard()" aria-label="Close">&times;</button>
+            <div class="onboard-progress" id="ob-progress"></div>
+            <div id="ob-content"></div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
