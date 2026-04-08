@@ -2113,7 +2113,7 @@
     let _providerUrls = null;
 
     async function _loadProviders() {
-        if (_providerUrls) return _providerUrls;
+        
         try {
             const res = await fetch('/api/auth/providers');
             const data = await res.json();
