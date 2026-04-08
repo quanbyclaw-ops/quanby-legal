@@ -47,6 +47,7 @@ from onboarding import (
     lookup_user_by_certificate_id,
 )
 from question_bank import get_randomized_test, grade_test
+from email_service import send_welcome_email
 
 load_dotenv()
 
@@ -397,6 +398,10 @@ async def google_callback(
     redirect_uri = f"{APP_URL}/api/auth/callback/google"
     user_info = await google_get_user_info(code, redirect_uri)
     user = await get_or_create_user(user_info)
+
+    # Send welcome email on first login (onboarding_step == 'role_select' = brand new user)
+    if user.get("onboarding_step", "role_select") == "role_select":
+        send_welcome_email(user)  # fire-and-forget, non-blocking
 
     # FIX-1: Deliver token via HttpOnly Secure cookie, NOT query param
     response = RedirectResponse(
