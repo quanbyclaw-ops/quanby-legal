@@ -205,3 +205,69 @@ def send_welcome_email(user: dict) -> None:
         name=f"welcome-email-{user.get('id', 'unknown')}",
     )
     t.start()
+
+
+def send_test_fail_email(user: dict, score_pct: float, retake_url: str = "https://legal.quanbyai.com/?retake=1") -> None:
+    """Send exam failure notification with retake link. Fire-and-forget."""
+    to_email = user.get("email", "")
+    if not to_email:
+        return
+    first_name = user.get("first_name", "Attorney")
+    last_name = user.get("last_name", "")
+    full_name = f"{first_name} {last_name}".strip()
+
+    subject = "ENP Certification Exam Result \u2014 Quanby Legal"
+
+    text_body = f"""Hello {full_name},
+
+Thank you for taking the ENP Certification Exam on the Quanby Legal Platform.
+
+Your Score: {score_pct}%
+Required to Pass: 70%
+Result: NOT PASSED
+
+To retake the exam, a \u20b1500 retake fee is required. Click the link below to proceed with payment and schedule your retake:
+
+Retake Exam: {retake_url}
+
+We encourage you to review the course module before retaking:
+https://legal.quanbyai.com/mastering-quanby-legal.pdf
+
+If you have any questions, please contact us at legal@quanby.legal.
+
+The Quanby Legal Team
+"""
+
+    html_body = f"""<!DOCTYPE html>
+<html>
+<body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+  <div style="background:#0a1628;padding:20px;border-radius:8px;text-align:center;margin-bottom:24px;">
+    <h1 style="color:#c9a84c;margin:0;">&#9878;&#65039; Quanby Legal</h1>
+    <p style="color:#fff;margin:8px 0 0;">ENP Certification Platform</p>
+  </div>
+  <h2 style="color:#0a1628;">Hello {full_name},</h2>
+  <p>Thank you for taking the ENP Certification Exam.</p>
+  <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:20px;margin:20px 0;text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:8px;">&#10060;</div>
+    <h3 style="color:#dc2626;margin:0 0 8px;">Not Passed</h3>
+    <p style="margin:0;color:#666;">Your Score: <strong>{score_pct}%</strong> &nbsp;|&nbsp; Required: <strong>70%</strong></p>
+  </div>
+  <p>Don't be discouraged! You may retake the exam after paying the <strong>&#8369;500 retake fee</strong>.</p>
+  <p>We recommend reviewing the course module before retaking:</p>
+  <p><a href="https://legal.quanbyai.com/mastering-quanby-legal.pdf" style="color:#c9a84c;">&#128218; Download Course Module (PDF)</a></p>
+  <div style="text-align:center;margin:28px 0;">
+    <a href="{retake_url}" style="background:#0a1628;color:#c9a84c;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:1rem;">
+      &#127891; Retake Exam (&#8369;500 fee) &rarr;
+    </a>
+  </div>
+  <p style="color:#666;font-size:0.85rem;">If you have questions, contact us at <a href="mailto:legal@quanby.legal">legal@quanby.legal</a></p>
+  <p style="color:#666;font-size:12px;text-align:center;">The Quanby Legal Team | legal.quanbyai.com</p>
+</body>
+</html>"""
+
+    def _send():
+        send_email(to_email, subject, html_body, text_body)
+
+    t = threading.Thread(target=_send, daemon=True, name=f"fail-email-{user.get('id', 'unknown')}")
+    t.start()
+
