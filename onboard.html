@@ -895,6 +895,18 @@ async function init() {
             } catch(e) {}
         }
         if (!res.ok) {
+            // Not logged in ? auto-redirect to Google SSO immediately
+            try {
+                const pr = await fetch('/api/auth/providers', { credentials: 'include' });
+                const pd = await pr.json();
+                const url = (pd.providers && pd.providers.google) || null;
+                if (url) {
+                    sessionStorage.setItem('post_login_redirect', '/onboard');
+                    window.location.href = url;
+                    return;
+                }
+            } catch(e) {}
+            // Fallback: show auth gate if providers fetch fails
             showScreen('auth-gate');
             return;
         }
