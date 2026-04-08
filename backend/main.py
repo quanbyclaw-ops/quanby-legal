@@ -1,5 +1,5 @@
 """
-main.py — Quanby Legal Backend
+main.py Ã¢â‚¬â€ Quanby Legal Backend
 FastAPI application: Contract AI + SSO Auth + Onboarding + Certification
 
 Security fixes applied:
@@ -8,7 +8,7 @@ Security fixes applied:
   FIX-4  Cert verification uses O(1) CERT_INDEX + rate limiting
   FIX-6  Test retake blocking: retake_count >= 3 returns 403 until payment confirmed
   FIX-7  CORS: restricted to FRONTEND_URL env var (not "*")
-  FIX-8  update_user / get_or_create_user are async — awaited correctly
+  FIX-8  update_user / get_or_create_user are async Ã¢â‚¬â€ awaited correctly
   FIX-10 File upload: os.path.basename() sanitization on all filenames
   FIX-11 JWT: refresh token endpoint; tokens via HttpOnly Secure cookie
   FIX-12 /api/health: no sensitive config details exposed
@@ -37,7 +37,7 @@ from auth import (
     create_jwt, create_access_token, create_refresh_token,
     verify_jwt, verify_refresh_token,
     get_oauth_urls, validate_oauth_state,
-    google_get_user_info, facebook_get_user_info, linkedin_get_user_info,
+    google_get_user_info,
     APP_URL, FRONTEND_URL,
 )
 from onboarding import (
@@ -50,7 +50,7 @@ from question_bank import get_randomized_test, grade_test
 
 load_dotenv()
 
-# ─── Rate limiter (FIX-4) ────────────────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Rate limiter (FIX-4) Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 limiter = Limiter(key_func=get_remote_address)
 
 app = FastAPI(
@@ -61,7 +61,7 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# ─── FIX-7: CORS — restrict to FRONTEND_URL, not "*" ────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ FIX-7: CORS Ã¢â‚¬â€ restrict to FRONTEND_URL, not "*" Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 _allowed_origins_raw = os.getenv("FRONTEND_URL", "https://legal.quanbyai.com")
 # Support comma-separated list of origins
 _allowed_origins = [o.strip() for o in _allowed_origins_raw.split(",") if o.strip()]
@@ -77,7 +77,7 @@ app.add_middleware(
 # In-memory contract session store (production: Redis)
 sessions: dict = {}
 
-# ─── Cookie settings ──────────────────────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Cookie settings Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 _COOKIE_SECURE   = os.getenv("COOKIE_SECURE", "true").lower() != "false"
 _COOKIE_SAMESITE = "lax"
 _ACCESS_COOKIE   = "ql_access"
@@ -109,7 +109,7 @@ def _set_auth_cookies(response: Response, user_id: str, email: str) -> None:
     )
 
 
-# ─── Models ───────────────────────────────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Models Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 class ChatRequest(BaseModel):
     session_id: str
@@ -158,7 +158,7 @@ class LegalChatRequest(BaseModel):
     message: str
     session_id: str = ""
 
-# ─── Auth helpers ─────────────────────────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Auth helpers Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 def _token_from_request(
     authorization: Optional[str],
@@ -189,7 +189,7 @@ def get_current_user(
     return get_user(payload.get("user_id", ""))
 
 
-# ─── Endpoints ────────────────────────────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Endpoints Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 @app.get("/api/health")
 async def health_check():
@@ -211,7 +211,7 @@ async def analyze_endpoint(
     session_id: str = Form(default="default"),
 ):
     """Upload a PDF/DOCX contract and get AI analysis."""
-    # FIX-10: Sanitize filename — strip path traversal
+    # FIX-10: Sanitize filename Ã¢â‚¬â€ strip path traversal
     raw_name = file.filename or "contract"
     filename = os.path.basename(raw_name).replace("..", "").strip() or "contract"
 
@@ -317,25 +317,25 @@ async def list_templates():
     """List available contract templates."""
     return {
         "templates": [
-            {"id": "deed_of_sale", "name": "Deed of Absolute Sale", "icon": "🏡", "category": "Real Estate"},
-            {"id": "lease_agreement", "name": "Contract of Lease", "icon": "🏢", "category": "Real Estate"},
-            {"id": "employment_contract", "name": "Employment Contract", "icon": "👔", "category": "Labor"},
-            {"id": "service_agreement", "name": "Service Agreement", "icon": "🤝", "category": "Business"},
-            {"id": "loan_agreement", "name": "Loan Agreement", "icon": "💰", "category": "Finance"},
-            {"id": "partnership_agreement", "name": "Partnership Agreement", "icon": "🏛️", "category": "Corporate"},
-            {"id": "nda", "name": "Non-Disclosure Agreement", "icon": "🔒", "category": "Corporate"},
-            {"id": "memorandum_of_agreement", "name": "Memorandum of Agreement", "icon": "📋", "category": "Business"},
-            {"id": "joint_venture", "name": "Joint Venture Agreement", "icon": "🤲", "category": "Corporate"},
-            {"id": "power_of_attorney", "name": "Special Power of Attorney", "icon": "⚖️", "category": "Legal"},
+            {"id": "deed_of_sale", "name": "Deed of Absolute Sale", "icon": "Ã°Å¸ÂÂ¡", "category": "Real Estate"},
+            {"id": "lease_agreement", "name": "Contract of Lease", "icon": "Ã°Å¸ÂÂ¢", "category": "Real Estate"},
+            {"id": "employment_contract", "name": "Employment Contract", "icon": "Ã°Å¸â€˜â€", "category": "Labor"},
+            {"id": "service_agreement", "name": "Service Agreement", "icon": "Ã°Å¸Â¤Â", "category": "Business"},
+            {"id": "loan_agreement", "name": "Loan Agreement", "icon": "Ã°Å¸â€™Â°", "category": "Finance"},
+            {"id": "partnership_agreement", "name": "Partnership Agreement", "icon": "Ã°Å¸Ââ€ºÃ¯Â¸Â", "category": "Corporate"},
+            {"id": "nda", "name": "Non-Disclosure Agreement", "icon": "Ã°Å¸â€â€™", "category": "Corporate"},
+            {"id": "memorandum_of_agreement", "name": "Memorandum of Agreement", "icon": "Ã°Å¸â€œâ€¹", "category": "Business"},
+            {"id": "joint_venture", "name": "Joint Venture Agreement", "icon": "Ã°Å¸Â¤Â²", "category": "Corporate"},
+            {"id": "power_of_attorney", "name": "Special Power of Attorney", "icon": "Ã¢Å¡â€“Ã¯Â¸Â", "category": "Legal"},
         ]
     }
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 # AUTH & ONBOARDING ENDPOINTS
-# ═══════════════════════════════════════════════════════════════════════════
+# Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
-# ─── OAuth URLs ───────────────────────────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ OAuth URLs Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 @app.get("/api/auth/providers")
 async def auth_providers():
@@ -343,7 +343,7 @@ async def auth_providers():
     return {"providers": get_oauth_urls()}
 
 
-# ─── FIX-11: Token refresh endpoint ──────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ FIX-11: Token refresh endpoint Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 @app.post("/api/auth/refresh")
 async def refresh_token_endpoint(
@@ -379,7 +379,7 @@ async def refresh_token_endpoint(
     return {"success": True, "message": "Access token refreshed"}
 
 
-# ─── Google OAuth ─────────────────────────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Google OAuth Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 @app.get("/api/auth/callback/google")
 async def google_callback(
@@ -392,7 +392,7 @@ async def google_callback(
         raise HTTPException(400, "Missing OAuth state parameter")
     entry = validate_oauth_state(state)
     if not entry:
-        raise HTTPException(400, "Invalid or expired OAuth state — possible CSRF attempt")
+        raise HTTPException(400, "Invalid or expired OAuth state Ã¢â‚¬â€ possible CSRF attempt")
 
     redirect_uri = f"{APP_URL}/api/auth/callback/google"
     user_info = await google_get_user_info(code, redirect_uri)
@@ -407,58 +407,6 @@ async def google_callback(
     return response
 
 
-@app.get("/api/auth/callback/facebook")
-async def facebook_callback(
-    request: Request,
-    code: str,
-    state: Optional[str] = None,
-):
-    """Handle Facebook OAuth callback. FIX-2: validate state."""
-    if not state:
-        raise HTTPException(400, "Missing OAuth state parameter")
-    entry = validate_oauth_state(state)
-    if not entry:
-        raise HTTPException(400, "Invalid or expired OAuth state — possible CSRF attempt")
-
-    redirect_uri = f"{APP_URL}/api/auth/callback/facebook"
-    user_info = await facebook_get_user_info(code, redirect_uri)
-    user = await get_or_create_user(user_info)
-
-    response = RedirectResponse(
-        url=f"{FRONTEND_URL}/auth-complete?step={user.get('onboarding_step', 'role_select')}",
-        status_code=302,
-    )
-    _set_auth_cookies(response, user["id"], user["email"])
-    return response
-
-
-@app.get("/api/auth/callback/linkedin")
-async def linkedin_callback(
-    request: Request,
-    code: str,
-    state: Optional[str] = None,
-):
-    """Handle LinkedIn OAuth callback. FIX-2: validate state."""
-    if not state:
-        raise HTTPException(400, "Missing OAuth state parameter")
-    entry = validate_oauth_state(state)
-    if not entry:
-        raise HTTPException(400, "Invalid or expired OAuth state — possible CSRF attempt")
-
-    redirect_uri = f"{APP_URL}/api/auth/callback/linkedin"
-    user_info = await linkedin_get_user_info(code, redirect_uri)
-    user = await get_or_create_user(user_info)
-
-    response = RedirectResponse(
-        url=f"{FRONTEND_URL}/auth-complete?step={user.get('onboarding_step', 'role_select')}",
-        status_code=302,
-    )
-    _set_auth_cookies(response, user["id"], user["email"])
-    return response
-
-
-# ─── Logout ───────────────────────────────────────────────────────────────────
-
 @app.post("/api/auth/logout")
 async def logout(response: Response):
     """Clear auth cookies."""
@@ -467,7 +415,7 @@ async def logout(response: Response):
     return {"success": True}
 
 
-# ─── User Session ─────────────────────────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ User Session Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 @app.get("/api/auth/me")
 async def get_me(
@@ -493,7 +441,7 @@ async def get_me(
     }
 
 
-# ─── Onboarding Step 1: Role Selection ───────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Onboarding Step 1: Role Selection Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 @app.post("/api/onboarding/role")
 async def set_role(
@@ -512,7 +460,7 @@ async def set_role(
     return {"success": True, "next_step": "profile"}
 
 
-# ─── Onboarding Step 2: Profile ───────────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Onboarding Step 2: Profile Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 @app.post("/api/onboarding/profile")
 async def save_profile(
@@ -557,7 +505,7 @@ async def save_profile(
     return {"success": True, "next_step": "test"}
 
 
-# ─── Onboarding Step 3: Certification Test ───────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Onboarding Step 3: Certification Test Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 _MAX_FREE_RETAKES = 3  # FIX-6
 
@@ -588,20 +536,20 @@ async def start_test(
                     "error": "retake_limit_reached",
                     "message": (
                         f"You have used all {_MAX_FREE_RETAKES} free attempts. "
-                        "Please pay the ₱500 retake fee to continue."
+                        "Please pay the Ã¢â€šÂ±500 retake fee to continue."
                     ),
                     "retake_count": retake_count,
                     "payment_required": True,
                 },
             )
-        # Payment confirmed — consume it and allow one more attempt
+        # Payment confirmed Ã¢â‚¬â€ consume it and allow one more attempt
         await update_user(user["id"], {"retake_payment_confirmed": False})
 
     # Generate randomized test (returns (client_questions, answer_key))
     client_questions, answer_key = get_randomized_test(role=user["role"], count=15)
     test_session_id = str(uuid.uuid4())
 
-    # Store answer key server-side — never sent to client
+    # Store answer key server-side Ã¢â‚¬â€ never sent to client
     save_test_session(test_session_id, {
         "user_id": user["id"],
         "questions": client_questions,
@@ -675,7 +623,7 @@ async def submit_test(
     if result["passed"]:
         response.update({
             "certificate_id": updates["certificate_id"],
-            "message": "🎉 Congratulations! You passed. Your probationary certificate has been issued.",
+            "message": "Ã°Å¸Å½â€° Congratulations! You passed. Your probationary certificate has been issued.",
             "next_step": "liveness",
         })
     else:
@@ -688,7 +636,7 @@ async def submit_test(
             "payment_required": remaining == 0,
             "message": (
                 f"You scored {result['score_pct']}%. The passing score is 80% (12/15). "
-                + (f"{remaining} free attempt(s) remaining." if remaining > 0 else "No free attempts left — ₱500 retake fee required.")
+                + (f"{remaining} free attempt(s) remaining." if remaining > 0 else "No free attempts left Ã¢â‚¬â€ Ã¢â€šÂ±500 retake fee required.")
             ),
             "payment_options": ["gcash", "bank_transfer"],
             "gcash_number": os.getenv("GCASH_NUMBER", "09XXXXXXXXX"),
@@ -700,13 +648,13 @@ async def submit_test(
     return response
 
 
-# ─── Onboarding Step 4: Liveness + National ID ───────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Onboarding Step 4: Liveness + National ID Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 _ALLOWED_IMAGE_TYPES = {".jpg", ".jpeg", ".png", ".webp"}
 
 
 def _safe_upload_ext(filename: Optional[str], default: str = "jpg") -> str:
-    """FIX-10: Sanitize upload filename — return safe extension only."""
+    """FIX-10: Sanitize upload filename Ã¢â‚¬â€ return safe extension only."""
     if not filename:
         return default
     name = os.path.basename(filename).strip()
@@ -730,7 +678,7 @@ async def submit_liveness(
 
     selfie_bytes = await selfie.read()
     if len(selfie_bytes) < 1000:
-        raise HTTPException(400, "Invalid image — file too small")
+        raise HTTPException(400, "Invalid image Ã¢â‚¬â€ file too small")
 
     # FIX-10: Sanitize filename
     ext = _safe_upload_ext(selfie.filename)
@@ -750,9 +698,9 @@ async def submit_liveness(
     updated = get_user(user["id"])
     if updated and updated.get("national_id_uploaded"):
         await update_user(user["id"], {"onboarding_step": "survey"})
-        return {"success": True, "message": "Liveness verified ✅", "next_step": "survey"}
+        return {"success": True, "message": "Liveness verified Ã¢Å“â€¦", "next_step": "survey"}
 
-    return {"success": True, "message": "Liveness verified ✅", "next_step": "national_id"}
+    return {"success": True, "message": "Liveness verified Ã¢Å“â€¦", "next_step": "national_id"}
 
 
 @app.post("/api/onboarding/national-id")
@@ -788,19 +736,19 @@ async def upload_national_id(
     updated = get_user(user["id"])
     if updated and updated.get("liveness_verified"):
         await update_user(user["id"], {"onboarding_step": "survey"})
-        return {"success": True, "message": "National ID uploaded ✅", "next_step": "survey"}
+        return {"success": True, "message": "National ID uploaded Ã¢Å“â€¦", "next_step": "survey"}
 
-    return {"success": True, "message": "National ID uploaded ✅", "next_step": "liveness"}
+    return {"success": True, "message": "National ID uploaded Ã¢Å“â€¦", "next_step": "liveness"}
 
 
-# ─── Onboarding Step 5: Full Certification ───────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Onboarding Step 5: Full Certification Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 @app.post("/api/onboarding/complete")
 async def complete_onboarding(
     authorization: Optional[str] = Header(None),
     ql_access: Optional[str] = Cookie(default=None),
 ):
-    """Mark onboarding complete → upgrade cert to fully certified."""
+    """Mark onboarding complete Ã¢â€ â€™ upgrade cert to fully certified."""
     user = get_current_user(authorization, ql_access)
     if not user:
         raise HTTPException(401, "Unauthorized")
@@ -820,12 +768,12 @@ async def complete_onboarding(
     return {
         "success": True,
         "certificate_id": user["certificate_id"],
-        "message": "🎉 Full certification complete! Download your certificate and present it to the Supreme Court.",
+        "message": "Ã°Å¸Å½â€° Full certification complete! Download your certificate and present it to the Supreme Court.",
         "next_step": "certified",
     }
 
 
-# ─── Certificate Download ─────────────────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Certificate Download Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 @app.get("/api/certificate/{certificate_id}")
 async def get_certificate(
@@ -865,7 +813,7 @@ async def verify_certificate(request: Request, certificate_id: str):
     }
 
 
-# ─── Retake Payment ───────────────────────────────────────────────────────────
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Retake Payment Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 @app.post("/api/certification/retake-payment")
 async def submit_retake_payment(
@@ -881,16 +829,16 @@ async def submit_retake_payment(
     if not user:
         raise HTTPException(401, "Unauthorized")
 
-    # Mark payment as pending — admin/webhook must confirm
+    # Mark payment as pending Ã¢â‚¬â€ admin/webhook must confirm
     await update_user(user["id"], {"retake_payment_pending": True, "retake_payment_confirmed": False})
 
     return {
         "success": True,
         "message": f"Payment via {req.payment_method} recorded. Once confirmed by our team, you may retake the test.",
         "instructions": {
-            "gcash": f"Send ₱500 to {os.getenv('GCASH_NUMBER', '09XX-XXX-XXXX')} with reference: RETAKE-{user['id'][:8].upper()}",
+            "gcash": f"Send Ã¢â€šÂ±500 to {os.getenv('GCASH_NUMBER', '09XX-XXX-XXXX')} with reference: RETAKE-{user['id'][:8].upper()}",
             "bank_transfer": (
-                f"Transfer ₱500 to {os.getenv('BANK_NAME', 'BDO')} "
+                f"Transfer Ã¢â€šÂ±500 to {os.getenv('BANK_NAME', 'BDO')} "
                 f"Acc: {os.getenv('BANK_ACCOUNT', 'XXXX')} | "
                 f"Account Name: Quanby Solutions, Inc. | "
                 f"Ref: RETAKE-{user['id'][:8].upper()}"
@@ -899,7 +847,7 @@ async def submit_retake_payment(
     }
 
 
-# ─── Admin: confirm retake payment (protected — add admin auth in production) ─
+# Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ Admin: confirm retake payment (protected Ã¢â‚¬â€ add admin auth in production) Ã¢â€â‚¬
 
 @app.post("/api/admin/confirm-retake/{user_id}")
 async def admin_confirm_retake(
@@ -911,7 +859,7 @@ async def admin_confirm_retake(
     Admin endpoint to confirm a retake payment and unlock next attempt.
     TODO: Add admin-role check before production deployment.
     """
-    # Placeholder admin check — replace with proper role-based auth
+    # Placeholder admin check Ã¢â‚¬â€ replace with proper role-based auth
     admin_secret = os.getenv("ADMIN_SECRET", "")
     token = _token_from_request(authorization, ql_access)
     if not admin_secret or token != admin_secret:
@@ -928,9 +876,9 @@ async def admin_confirm_retake(
     return {"success": True, "message": f"Retake unlocked for user {user_id}"}
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# LEGAL AI CHATBOT — POST /api/chatbot
-# ═══════════════════════════════════════════════════════════════════════════
+# Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
+# LEGAL AI CHATBOT Ã¢â‚¬â€ POST /api/chatbot
+# Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
 
 # Chat session store: { session_id: { history, created_at, last_active, msg_timestamps } }
 legal_chat_sessions: dict = {}
@@ -940,7 +888,7 @@ _CHAT_SESSION_TTL  = 7200  # 2-hour idle TTL
 _CHAT_RATE_LIMIT   = 20    # max messages per session per hour
 _CHAT_RATE_WINDOW  = 3600  # 1-hour sliding window
 
-_LEGAL_CHATBOT_SYSTEM_PROMPT = """You are Quanby Legal AI — the official AI assistant for Quanby Legal, the Philippines' first and only Supreme Court-accredited Electronic Notarization Facility (ENF).
+_LEGAL_CHATBOT_SYSTEM_PROMPT = """You are Quanby Legal AI Ã¢â‚¬â€ the official AI assistant for Quanby Legal, the Philippines' first and only Supreme Court-accredited Electronic Notarization Facility (ENF).
 
 ## YOUR SPECIALIZATIONS
 
@@ -959,7 +907,7 @@ _LEGAL_CHATBOT_SYSTEM_PROMPT = """You are Quanby Legal AI — the official AI as
 ## PLATFORM INFORMATION
 
 ### ENP Certification Process
-1. Register via Google/Facebook/LinkedIn SSO
+1. Register via Google SSO
 2. Select role: Attorney (IBP member) or Client
 3. Complete professional profile
 4. Pass certification exam: 15 questions, 80% passing score; covers A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, SEC MC 28-2020
@@ -981,7 +929,7 @@ NOT eligible: Wills, testaments, documents requiring exclusive physical appearan
 ## RESPONSE GUIDELINES
 - Be professional, clear, and helpful
 - Cite specific laws/rules when relevant
-- Always include: "This is general information only — not legal advice. For your specific situation, consult a licensed Philippine attorney or one of our certified ENPs."
+- Always include: "This is general information only Ã¢â‚¬â€ not legal advice. For your specific situation, consult a licensed Philippine attorney or one of our certified ENPs."
 - Support both English and Filipino (Tagalog)
 - Keep responses concise and focused
 - Never fabricate legal provisions or case citations
@@ -1019,7 +967,7 @@ def _chatbot_keyword_fallback(message: str) -> str:
     if any(k in msg for k in ["become", "enp", "certif", "how do i", "how to become", "process", "steps", "register"]):
         return (
             "**How to Become a Certified ENP on Quanby Legal**\n\n"
-            "1. **Register** \u2014 Sign up via Google, Facebook, or LinkedIn\n"
+            "1. **Register** \u2014 Sign up via Google\n"
             "2. **Select Role** \u2014 Choose *Attorney* (IBP member) or *Client*\n"
             "3. **Complete Profile** \u2014 Fill in your professional details\n"
             "4. **Pass the Certification Exam** \u2014 15 questions, 80% passing score\n"

@@ -1,6 +1,6 @@
 """
-auth.py — Quanby Legal SSO + Onboarding + Certification Auth Backend
-Supports Google, Facebook, LinkedIn OAuth2
+auth.py â€” Quanby Legal SSO + Onboarding + Certification Auth Backend
+Supports Google OAuth2
 JWT session tokens (via PyJWT)
 
 Security fixes applied:
@@ -28,13 +28,9 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-# ─── ENV CONFIG ───────────────────────────────────────────────────────────────
+# â”€â”€â”€ ENV CONFIG â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 GOOGLE_CLIENT_ID       = os.getenv("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET   = os.getenv("GOOGLE_CLIENT_SECRET", "")
-FACEBOOK_APP_ID        = os.getenv("FACEBOOK_APP_ID", "")
-FACEBOOK_APP_SECRET    = os.getenv("FACEBOOK_APP_SECRET", "")
-LINKEDIN_CLIENT_ID     = os.getenv("LINKEDIN_CLIENT_ID", "")
-LINKEDIN_CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET", "")
 FRONTEND_URL           = os.getenv("FRONTEND_URL", "https://legal.quanbyai.com")
 APP_URL                = os.getenv("APP_URL", "https://legal.quanbyai.com")
 
@@ -59,12 +55,12 @@ JWT_ALGORITHM  = "HS256"
 JWT_ISSUER     = "quanby-legal"
 JWT_AUDIENCE   = "quanby-legal-api"
 
-# FIX-2: CSRF state + PKCE storage — state -> {"expiry": float, "code_verifier": str}
+# FIX-2: CSRF state + PKCE storage â€” state -> {"expiry": float, "code_verifier": str}
 OAUTH_STATES: dict[str, dict] = {}
 _OAUTH_STATE_TTL = 600  # 10 minutes
 
 
-# ─── FIX-2: PKCE helpers ──────────────────────────────────────────────────────
+# â”€â”€â”€ FIX-2: PKCE helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def _generate_code_verifier() -> str:
     """Generate a PKCE code_verifier (43-128 chars, URL-safe)."""
@@ -109,7 +105,7 @@ def validate_oauth_state(state: str) -> Optional[dict]:
     return entry
 
 
-# ─── FIX-11: JWT with PyJWT ───────────────────────────────────────────────────
+# â”€â”€â”€ FIX-11: JWT with PyJWT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def create_access_token(payload: dict) -> str:
     """
@@ -195,7 +191,7 @@ def verify_refresh_token(token: str) -> Optional[dict]:
         return None
 
 
-# ─── OAUTH HELPERS ────────────────────────────────────────────────────────────
+# â”€â”€â”€ OAUTH HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 async def google_get_user_info(code: str, redirect_uri: str) -> dict:
     """Exchange Google auth code for user info."""
@@ -230,78 +226,6 @@ async def google_get_user_info(code: str, redirect_uri: str) -> dict:
         }
 
 
-async def facebook_get_user_info(code: str, redirect_uri: str) -> dict:
-    """Exchange Facebook auth code for user info."""
-    async with httpx.AsyncClient() as client:
-        token_resp = await client.get(
-            "https://graph.facebook.com/v18.0/oauth/access_token",
-            params={
-                "client_id": FACEBOOK_APP_ID,
-                "client_secret": FACEBOOK_APP_SECRET,
-                "redirect_uri": redirect_uri,
-                "code": code,
-            }
-        )
-        tokens = token_resp.json()
-        if "error" in tokens:
-            raise HTTPException(400, f"Facebook OAuth error: {tokens['error']}")
-
-        userinfo_resp = await client.get(
-            "https://graph.facebook.com/me",
-            params={
-                "fields": "id,first_name,last_name,email,picture",
-                "access_token": tokens["access_token"]
-            }
-        )
-        info = userinfo_resp.json()
-        return {
-            "provider": "facebook",
-            "provider_id": info.get("id"),
-            "email": info.get("email", ""),
-            "first_name": info.get("first_name", ""),
-            "last_name": info.get("family_name", info.get("last_name", "")),
-            "picture": (
-                info.get("picture", {}).get("data", {}).get("url", "")
-                if isinstance(info.get("picture"), dict) else ""
-            ),
-            "email_verified": True,
-        }
-
-
-async def linkedin_get_user_info(code: str, redirect_uri: str) -> dict:
-    """Exchange LinkedIn auth code for user info."""
-    async with httpx.AsyncClient() as client:
-        token_resp = await client.post(
-            "https://www.linkedin.com/oauth/v2/accessToken",
-            data={
-                "grant_type": "authorization_code",
-                "code": code,
-                "client_id": LINKEDIN_CLIENT_ID,
-                "client_secret": LINKEDIN_CLIENT_SECRET,
-                "redirect_uri": redirect_uri,
-            },
-            headers={"Content-Type": "application/x-www-form-urlencoded"}
-        )
-        tokens = token_resp.json()
-        if "error" in tokens:
-            raise HTTPException(400, f"LinkedIn OAuth error: {tokens['error']}")
-
-        profile_resp = await client.get(
-            "https://api.linkedin.com/v2/userinfo",
-            headers={"Authorization": f"Bearer {tokens['access_token']}"}
-        )
-        info = profile_resp.json()
-        return {
-            "provider": "linkedin",
-            "provider_id": info.get("sub"),
-            "email": info.get("email", ""),
-            "first_name": info.get("given_name", ""),
-            "last_name": info.get("family_name", ""),
-            "picture": info.get("picture", ""),
-            "email_verified": info.get("email_verified", False),
-        }
-
-
 def get_oauth_urls() -> dict:
     """
     Return OAuth login URLs with CSRF state tokens + PKCE for all providers.
@@ -324,31 +248,4 @@ def get_oauth_urls() -> dict:
         result["google"] = f"https://accounts.google.com/o/oauth2/v2/auth?{params}"
     else:
         result["google"] = None
-
-    if FACEBOOK_APP_ID:
-        state, _verifier, _challenge = generate_oauth_state("facebook")
-        # Facebook does not support PKCE for server-side flows; state alone is sufficient
-        params = urllib.parse.urlencode({
-            "client_id": FACEBOOK_APP_ID,
-            "redirect_uri": f"{APP_URL}/api/auth/callback/facebook",
-            "scope": "email,public_profile",
-            "state": state,
-        })
-        result["facebook"] = f"https://www.facebook.com/v18.0/dialog/oauth?{params}"
-    else:
-        result["facebook"] = None
-
-    if LINKEDIN_CLIENT_ID:
-        state, _verifier, _challenge = generate_oauth_state("linkedin")
-        params = urllib.parse.urlencode({
-            "response_type": "code",
-            "client_id": LINKEDIN_CLIENT_ID,
-            "redirect_uri": f"{APP_URL}/api/auth/callback/linkedin",
-            "scope": "openid profile email",
-            "state": state,
-        })
-        result["linkedin"] = f"https://www.linkedin.com/oauth/v2/authorization?{params}"
-    else:
-        result["linkedin"] = None
-
-    return result
+return result
