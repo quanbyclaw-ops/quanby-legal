@@ -2187,7 +2187,7 @@
 
         // Redirect to OAuth provider — it will callback to /api/auth/callback/{provider}
         // which issues JWT and redirects to /auth-complete?token=...&step=...
-        window.location.href = url + '&state=' + encodeURIComponent(_ssoRole);
+        window.location.href = url;
     }
 
     function showSSOError(provider) {
