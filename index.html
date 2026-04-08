@@ -102,27 +102,19 @@
         }
         .onboard-strip .container { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; }
         .onboard-label { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
-        .btn-lawfirm {
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
-            color: white; border: none;
-            padding: 0.6rem 1.5rem; border-radius: 0.5rem;
-            font-weight: 700; font-size: 0.9rem; cursor: pointer;
-            display: flex; align-items: center; gap: 0.5rem;
-            transition: all 0.2s; box-shadow: 0 2px 12px rgba(124,58,237,0.35);
-            white-space: nowrap;
+        .btn-signup {
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.75rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.02em;
         }
-        .btn-lawfirm:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,58,237,0.5); }
-        .btn-publicclient {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white; border: none;
-            padding: 0.6rem 1.5rem; border-radius: 0.5rem;
-            font-weight: 700; font-size: 0.9rem; cursor: pointer;
-            display: flex; align-items: center; gap: 0.5rem;
-            transition: all 0.2s; box-shadow: 0 2px 12px rgba(16,185,129,0.35);
-            white-space: nowrap;
-        }
-        .btn-publicclient:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(16,185,129,0.5); }
-        .onboard-divider { color: var(--muted); font-size: 0.8rem; }
+        .btn-signup:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(124,58,237,0.45); }
 
         /* ── SSO MODAL ── */
         .sso-modal-overlay {
@@ -810,12 +802,8 @@
     <div class="onboard-strip" id="onboard-strip">
         <div class="container">
             <span class="onboard-label">⚖️ Supreme Court-accredited — Get certified today:</span>
-            <button class="btn-lawfirm" onclick="openSSO('attorney')" aria-label="Law Firms — Start ENP certification">
-                🏛️ Law Firms
-            </button>
-            <span class="onboard-divider">or</span>
-            <button class="btn-publicclient" onclick="openSSO('client')" aria-label="Public Clients — Create account">
-                👤 Public Clients
+            <button class="btn-signup" onclick="openSSO('attorney')" aria-label="Sign Up — Get certified today">
+                ✍️ Sign Up
             </button>
         </div>
     </div>
