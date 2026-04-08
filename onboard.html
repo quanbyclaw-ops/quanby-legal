@@ -887,9 +887,14 @@ const OB_LABELS = ['Role','Profile','Course','Exam','Certificate','SC Submit'];
 // ═══════════════════════════════════════════════
 async function init() {
     try {
-        const res = await fetch('/api/auth/me', { credentials: 'include' });
+        let res = await fetch('/api/auth/me', { credentials: 'include' });
+        if (res.status === 401) {
+            try {
+                const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+                if (ref.ok) res = await fetch('/api/auth/me', { credentials: 'include' });
+            } catch(e) {}
+        }
         if (!res.ok) {
-            // Not logged in
             showScreen('auth-gate');
             return;
         }
@@ -933,8 +938,10 @@ function mapApiStepToLocal(apiStep) {
         'role_select': 'role',
         'profile':     'profile',
         'test':        'course',
-        'kyc':         'course',    // Skip KYC for now, go to course/exam
-        'liveness':    'course',
+        'kyc':         'course',
+        'kyc_id':      'certificate',
+        'liveness':    'certificate',
+        'survey':      'certificate',
         'certificate': 'certificate',
         'sc_redirect': 'sc',
         'certified':   'certified'

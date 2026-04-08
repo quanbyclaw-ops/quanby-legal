@@ -2496,9 +2496,21 @@
         window.location.reload();
     }
 
+    async function _authFetch(url, opts) {
+        // Try request; if 401 attempt token refresh then retry once
+        let res = await fetch(url, opts);
+        if (res.status === 401) {
+            try {
+                const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+                if (ref.ok) res = await fetch(url, opts);
+            } catch(e) {}
+        }
+        return res;
+    }
+
     async function initNavUser() {
         try {
-            const res = await fetch('/api/auth/me', { credentials: 'include' });
+            const res = await _authFetch('/api/auth/me', { credentials: 'include' });
             if (!res.ok) return;
             const user = await res.json();
             const nameEl = document.getElementById('nav-user-name');
