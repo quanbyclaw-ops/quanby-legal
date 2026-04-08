@@ -2331,6 +2331,7 @@
             case 'certified':   openOnboard('certified', role); break;
             default:            openOnboard('role', role); break;
         }
+        if (params.get('exam') === '1' && step !== 'certified') { setTimeout(function(){ openOnboard('test', role); }, 250); }
     }
 
     // ══ ONBOARDING MODAL ENGINE ════════════════════════════════════════════════
@@ -2342,6 +2343,7 @@
     let _obQuestions = [];
     let _obTestSessionId = null;
     let _obTimerInterval = null;
+    let _obCertificateId = null;
 
     function openOnboard(step, role) {
         _obRole = role || 'attorney';
@@ -2351,6 +2353,46 @@
         document.body.style.overflow = 'hidden';
         _renderObStep(step);
     }
+
+    function _renderCertificateStep() {
+        var ob = document.getElementById('ob-content');
+        var certId = _obCertificateId || '';
+        ob.innerHTML =
+            '<h3>&#127891; Download Your Certificate</h3>' +
+            '<p class="sub">Your ENP Course Completion Certificate is ready. Download it and submit it to the Supreme Court of the Philippines.</p>' +
+            '<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:0.75rem;padding:2rem;text-align:center;margin:1.5rem 0;">' +
+                '<div style="font-size:3rem;margin-bottom:1rem;">&#128220;</div>' +
+                '<p style="font-weight:600;color:#c9a84c;margin-bottom:0.5rem;">Certificate ID: <span style="letter-spacing:0.05em;">' + certId + '</span></p>' +
+                '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1.5rem;">Keep this ID &#8212; you will need it for Supreme Court submission.</p>' +
+                '<a href="/api/certificate/' + certId + '" target="_blank" style="display:inline-block;background:#c9a84c;color:#000;font-weight:700;padding:0.875rem 2rem;border-radius:0.5rem;text-decoration:none;font-size:1rem;">&#11015;&#65039; Download Certificate (PDF)</a>' +
+            '</div>' +
+            '<button class="onboard-btn" onclick="_renderSCRedirectStep()" style="margin-top:0.5rem;">Continue to Supreme Court Submission &#8594;</button>';
+        _renderObProgress('certified');
+    }
+
+    function _renderSCRedirectStep() {
+        var ob = document.getElementById('ob-content');
+        ob.innerHTML =
+            '<h3>&#128203; Submit to the Supreme Court</h3>' +
+            '<p class="sub">You are required to submit your certificate to the Supreme Court of the Philippines Electronic Notarization Portal.</p>' +
+            '<div style="background:rgba(27,42,107,0.3);border:1px solid rgba(201,168,76,0.35);border-radius:0.75rem;padding:2rem;text-align:center;margin:1.5rem 0;">' +
+                '<div style="font-size:3rem;margin-bottom:1rem;">&#9878;&#65039;</div>' +
+                '<p style="font-weight:600;color:#c9a84c;font-size:1.1rem;margin-bottom:0.5rem;">Supreme Court of the Philippines</p>' +
+                '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1.5rem;">Electronic Notarization Portal</p>' +
+                '<a href="https://efiling.sc.judiciary.gov.ph" target="_blank" style="display:inline-block;background:#1B2A6B;color:#fff;font-weight:700;padding:0.875rem 2rem;border-radius:0.5rem;text-decoration:none;font-size:1rem;border:2px solid #c9a84c;">Go to Supreme Court Portal &#8594;</a>' +
+            '</div>' +
+            '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:0.5rem;padding:1rem;margin:1rem 0;font-size:0.875rem;color:var(--muted);line-height:1.6;">' +
+                'After submitting your certificate on the Supreme Court portal, your ENP accreditation will be processed. You will receive confirmation from the Supreme Court directly.' +
+            '</div>' +
+            '<button class="onboard-btn" onclick="_completeOnboarding()" style="margin-top:0.5rem;">&#9989; Done &#8212; Return to Dashboard</button>';
+    }
+
+    async function _completeOnboarding() {
+        try { await fetch('/api/onboarding/complete', { method: 'POST', credentials: 'include' }); } catch(e) {}
+        closeOnboard();
+        window.location.reload();
+    }
+
     function closeOnboard() {
         var overlay = document.getElementById('onboard-overlay');
         if (overlay) overlay.classList.remove('open');
@@ -2575,7 +2617,7 @@
         document.getElementById('ob-content').innerHTML =
             '<h3>ENP Certification Test</h3>' +
             '<div id="ob-timer" style="text-align:center;font-size:1.1rem;font-weight:600;color:var(--accent,#c8a45c);margin-bottom:0.75rem;">&#9203; Time Remaining: --:--</div>' +
-            '<p class="sub">Answer all 15 questions. You need 80% (12/15) to pass.</p>' +
+            '<p class="sub">Answer all 50 questions. You need 70% (35/50) to pass.</p>' +
             qs +
             '<button class="onboard-btn" id="ob-submit-btn" onclick="_submitTest()">Submit Test</button>' +
             '<div id="ob-err" class="ob-error"></div>';
@@ -2634,6 +2676,7 @@
     }
 
     function _renderTestResult(data) {
+        if (data.certificate_id) { _obCertificateId = data.certificate_id; }
         const passed = data.passed;
         const score = data.score !== undefined ? data.score : data.correct;
         const total = data.total;
@@ -2651,7 +2694,7 @@
             ob.innerHTML =
                 '<h3>Test Result</h3>' +
                 '<div class="ob-result-banner fail">&#10060; Not Passed &mdash; ' + score + '/' + total + ' correct (' + scorePct + '%)</div>' +
-                '<p class="sub">You need 80% (12/15) to pass. A notification has been sent to your registered email with instructions on how to retake the exam.</p>' +
+                '<p class="sub">You need 70% (35/50) to pass. A notification has been sent to your registered email with instructions on how to retake the exam.</p>' +
                 '<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:0.5rem;padding:1rem;margin:1rem 0;font-size:0.875rem;color:var(--muted);">&#128231; Check your email for retake instructions and payment details.</div>' +
                 '<button class="onboard-btn" onclick="_showRetakePayment(' + safeData + ')">Retake Test (&#8369;500 fee) &rarr;</button>';
             _renderObProgress('test');

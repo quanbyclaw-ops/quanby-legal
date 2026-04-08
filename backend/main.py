@@ -555,7 +555,7 @@ async def start_test(
         await update_user(user["id"], {"retake_payment_confirmed": False})
 
     # Generate randomized test (returns (client_questions, answer_key))
-    client_questions, answer_key = get_randomized_test(role=user["role"], count=15)
+    client_questions, answer_key = get_randomized_test(role=user["role"], count=50)
     test_session_id = str(uuid.uuid4())
 
     # Store answer key server-side Ã¢â‚¬â€ never sent to client
@@ -573,7 +573,7 @@ async def start_test(
         "questions": client_questions,
         "total": 15,
         "passing_score": 80,
-        "time_limit_minutes": 60,
+        "time_limit_minutes": 90,
         "role": user["role"],
     }
 
