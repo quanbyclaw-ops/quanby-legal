@@ -162,11 +162,10 @@ def generate_oauth_state(provider: str) -> tuple[str, str, str]:
 
 def validate_oauth_state(state: str) -> Optional[dict]:
     """
-    Validate and consume an OAuth state token (one-time use).
-    File-locked so all uvicorn workers share the same state store.
-    Returns the stored metadata dict (including code_verifier) or None if invalid.
+    Validate a stateless JWT OAuth state token.
+    No storage needed — verifies signature and expiry only.
     """
-    return validate_oauth_state_entry(state)
+    return validate_stateless_state(state)
 
 
 # â"€â"€â"€ FIX-11: JWT with PyJWT â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
@@ -290,15 +289,50 @@ async def google_get_user_info(code: str, redirect_uri: str) -> dict:
         }
 
 
+def generate_stateless_state(provider: str) -> str:
+    """
+    Generate a stateless CSRF state token as a signed JWT.
+    No server-side storage needed — works across all workers and restarts.
+    """
+    payload = {
+        "provider": provider,
+        "nonce": secrets.token_hex(16),
+        "exp": time.time() + _OAUTH_STATE_TTL,
+        "iat": time.time(),
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+
+
+def validate_stateless_state(state: str) -> dict | None:
+    """
+    Validate a stateless JWT state token.
+    Returns the payload dict or None if invalid/expired.
+    """
+    try:
+        payload = jwt.decode(
+            state,
+            JWT_SECRET,
+            algorithms=["HS256"],
+            options={"verify_exp": False},  # we check exp manually
+        )
+        if time.time() > payload.get("exp", 0):
+            logger.warning("OAuth state expired")
+            return None
+        return payload
+    except Exception as e:
+        logger.warning(f"OAuth state JWT validation failed: {e}")
+        return None
+
+
 def get_oauth_urls() -> dict:
     """
-    Return OAuth login URLs with CSRF state tokens + PKCE for all providers.
-    FIX-2: state is unique per provider per call; PKCE code_challenge included.
+    Return OAuth login URLs with stateless JWT CSRF state tokens.
+    No server-side storage — works across all uvicorn workers.
     """
     result: dict = {}
 
     if GOOGLE_CLIENT_ID:
-        state, _verifier, challenge = generate_oauth_state("google")
+        state = generate_stateless_state("google")
         params = urllib.parse.urlencode({
             "client_id": GOOGLE_CLIENT_ID,
             "redirect_uri": f"{APP_URL}/api/auth/callback/google",
@@ -306,8 +340,6 @@ def get_oauth_urls() -> dict:
             "scope": "openid email profile",
             "access_type": "offline",
             "state": state,
-            "code_challenge": challenge,
-            "code_challenge_method": "S256",
         })
         result["google"] = f"https://accounts.google.com/o/oauth2/v2/auth?{params}"
     else:
