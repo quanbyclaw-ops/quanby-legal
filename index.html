@@ -2321,6 +2321,34 @@
     }
     initNavUser();
 
+    // Handle ?exam=1 email link — fires on direct page load (not OAuth redirect)
+    (function handleExamLink() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('exam') !== '1') return;
+        // Check if user is already logged in
+        fetch('/api/auth/me', { credentials: 'include' })
+            .then(r => r.ok ? r.json() : null)
+            .then(user => {
+                if (!user) {
+                    // Not logged in — show login prompt
+                    showToast('Please sign in to take the exam.', 'info');
+                    return;
+                }
+                const step = user.onboarding_step || 'test';
+                if (step === 'certified') {
+                    showToast('You are already certified! No need to retake the exam.', 'success');
+                    return;
+                }
+                // Clear ?exam=1 from URL cleanly
+                window.history.replaceState({}, '', '/');
+                const role = user.role || sessionStorage.getItem('ql_pending_role') || 'attorney';
+                setTimeout(function() { openOnboard('test', role); }, 300);
+            })
+            .catch(function() {
+                showToast('Could not verify your session. Please sign in.', 'error');
+            });
+    })();
+
         function routeToStep(step, role) {
         switch(step) {
             case 'role_select': openOnboard('role', role); break;
@@ -2331,7 +2359,6 @@
             case 'certified':   openOnboard('certified', role); break;
             default:            openOnboard('role', role); break;
         }
-        if (params.get('exam') === '1' && step !== 'certified') { setTimeout(function(){ openOnboard('test', role); }, 250); }
     }
 
     // ══ ONBOARDING MODAL ENGINE ════════════════════════════════════════════════
