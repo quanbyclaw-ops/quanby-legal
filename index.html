@@ -780,6 +780,137 @@
             /* Upload area: less padding on mobile */
             .upload-area { padding: 1.75rem 1rem; }
         }
+
+        /* ── ONBOARDING MODAL ── */
+        .onboard-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .onboard-overlay.open { display: flex; }
+        .onboard-modal {
+            background: #0f1020;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 640px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .onboard-close {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            transition: color 0.2s;
+        }
+        .onboard-close:hover { color: #fff; }
+        .onboard-progress {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .ob-step {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            min-width: 30px;
+        }
+        .ob-step.done { background: var(--teal, #10b981); }
+        .ob-step.active { background: var(--purple, #7c3aed); }
+        .onboard-modal h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        .onboard-modal .sub {
+            color: var(--muted, #94a3b8);
+            font-size: 0.9rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+        .onboard-btn {
+            display: block;
+            width: 100%;
+            padding: 0.875rem 1.5rem;
+            background: var(--purple, #7c3aed);
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.25rem;
+            transition: background 0.2s;
+        }
+        .onboard-btn:hover { background: var(--purple-light, #9d5ff3); }
+        .onboard-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .onboard-field { margin-bottom: 1rem; }
+        .onboard-field label { display: block; font-size: 0.85rem; color: var(--muted,#94a3b8); margin-bottom: 0.35rem; }
+        .onboard-field input, .onboard-field select {
+            width: 100%;
+            padding: 0.6rem 0.875rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.4rem;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+        .onboard-field input:focus { outline: none; border-color: var(--purple,#7c3aed); }
+        .onboard-role-cards { display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+        .onboard-role-card {
+            flex: 1; min-width: 140px;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .onboard-role-card:hover, .onboard-role-card.selected {
+            border-color: var(--purple,#7c3aed);
+            background: rgba(124,58,237,0.1);
+        }
+        .ob-question { margin-bottom: 1.25rem; }
+        .ob-question p { font-weight: 500; margin-bottom: 0.75rem; line-height: 1.5; }
+        .ob-choice {
+            padding: 0.6rem 0.875rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.4rem;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.15s;
+        }
+        .ob-choice:hover { background: rgba(124,58,237,0.15); border-color: rgba(124,58,237,0.4); }
+        .ob-choice.selected { background: rgba(124,58,237,0.2); border-color: var(--purple,#7c3aed); color: #fff; }
+        .ob-result-banner { padding: 1rem 1.25rem; border-radius: 0.5rem; font-weight: 600; font-size: 1rem; margin-bottom: 1rem; text-align: center; }
+        .ob-result-banner.pass { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399; }
+        .ob-result-banner.fail { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #f87171; }
+        .ob-error { color: #f87171; font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2em; }
+        .ob-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: ob-spin 0.7s linear infinite; margin-right: 0.5rem; vertical-align: middle; }
+        @keyframes ob-spin { to { transform: rotate(360deg); } }
+        .ob-cam-container { text-align: center; margin: 1rem 0; }
+        .ob-cam-container video, .ob-cam-container canvas { border-radius: 0.5rem; max-width: 100%; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
@@ -2412,12 +2543,12 @@
             .then(user => {
                 if (!user) {
                     // Not logged in — show login prompt
-                    showToast('Please sign in to take the exam.', 'info');
+                    var s=document.getElementById('sso-modal'); if(s) s.classList.add('open'); else alert('Please sign in to take the exam.');
                     return;
                 }
                 const step = user.onboarding_step || 'test';
                 if (step === 'certified') {
-                    showToast('You are already certified! No need to retake the exam.', 'success');
+                    alert('\u2705 You are already ENP Certified! No need to retake the exam.');
                     return;
                 }
                 // Clear ?exam=1 from URL cleanly
@@ -2426,7 +2557,7 @@
                 setTimeout(function() { openOnboard('test', role); }, 300);
             })
             .catch(function() {
-                showToast('Could not verify your session. Please sign in.', 'error');
+                var s=document.getElementById('sso-modal'); if(s) s.classList.add('open');
             });
     })();
 
