@@ -2454,6 +2454,12 @@
     // Handle return from OAuth (backend sets HttpOnly cookie, redirects with ?step=)
     (function handleAuthReturn() {
         const params = new URLSearchParams(window.location.search);
+        // Handle ?sso=1 — open SSO modal directly
+        if (params.get('sso') === '1') {
+            window.history.replaceState({}, '', '/');
+            setTimeout(function(){ var m = document.getElementById('sso-modal'); if(m) m.classList.add('open'); }, 200);
+            return;
+        }
         const step = params.get('step');
         if (!step) return;
         const role = sessionStorage.getItem('ql_pending_role') || 'attorney';
@@ -2471,6 +2477,13 @@
             })
             .catch(() => { /* toast is nice-to-have, never block routing */ })
             .finally(() => {
+                // Check if user wanted to go to /onboard after login
+                const redirect = sessionStorage.getItem('post_login_redirect');
+                if (redirect) {
+                    sessionStorage.removeItem('post_login_redirect');
+                    window.location.href = redirect;
+                    return;
+                }
                 routeToStep(step, role);
             });
     })();

@@ -608,10 +608,12 @@
     <div id="auth-gate" class="auth-gate" style="display:none;">
         <div class="gate-icon">🔒</div>
         <h2>Sign In Required</h2>
-        <p>You need to sign in to access the ENP Certification process.</p>
-        <a href="/?sso=1" class="btn-primary" style="display:inline-flex;text-decoration:none;max-width:240px;">
-            🔑 Sign In to Continue
-        </a>
+        <p>You need to sign in with Google to access the ENP Certification process.</p>
+        <button onclick="signInWithGoogle()" class="btn-primary" style="max-width:280px;margin-bottom:0.75rem;">
+            🔑 Sign In with Google
+        </button>
+        <br>
+        <a href="/" style="color:var(--muted);font-size:0.85rem;">← Back to Home</a>
     </div>
 
     <!-- ALREADY CERTIFIED -->
@@ -914,7 +916,15 @@ async function init() {
         goToStep(step);
 
     } catch(e) {
-        showScreen('auth-gate');
+        console.error('init error:', e);
+        // Show error on loading screen rather than auth gate (could be network issue)
+        var ls = document.getElementById('loading-screen');
+        if (ls) ls.innerHTML = '<div style="text-align:center;padding:2rem;">' +
+            '<p style="color:#f87171;font-weight:600;margin-bottom:0.5rem;">⚠️ Could not load page</p>' +
+            '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1rem;">' + e.message + '</p>' +
+            '<button onclick="window.location.reload()" style="background:var(--purple);color:#fff;border:none;padding:0.6rem 1.25rem;border-radius:0.5rem;cursor:pointer;margin-right:0.5rem;">🔄 Retry</button>' +
+            '<a href="/" style="color:var(--muted);font-size:0.875rem;">← Home</a>' +
+        '</div>';
     }
 }
 
@@ -1399,9 +1409,51 @@ async function signOut() {
 }
 
 // ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+async function signInWithGoogle() {
+    try {
+        // Store that we want to return to /onboard after login
+        sessionStorage.setItem('post_login_redirect', '/onboard');
+        const res = await fetch('/api/auth/google/url?role=attorney', { credentials: 'include' });
+        if (!res.ok) throw new Error('Could not get sign-in URL');
+        const data = await res.json();
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            throw new Error('No URL returned');
+        }
+    } catch(e) {
+        alert('Sign in failed: ' + e.message + '. Please go back to the homepage and sign in.');
+    }
+}
+
+// ═══════════════════════════════════════════════
 // START
 // ═══════════════════════════════════════════════
-init();
+window.onerror = function(msg, src, line, col, err) {
+    var ls = document.getElementById('loading-screen');
+    if (ls) ls.innerHTML = '<div style="color:#f87171;padding:2rem;text-align:center;"><h3>Page Error</h3><p style="font-size:0.85rem;margin-top:0.5rem;">' + msg + '<br>Line ' + line + '</p><a href="/" style="color:#c9a84c;margin-top:1rem;display:inline-block;">← Back to Home</a></div>';
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+
+// Failsafe: if still on loading screen after 6s, show error
+setTimeout(function() {
+    var ls = document.getElementById('loading-screen');
+    if (ls && ls.style.display !== 'none' && ls.innerHTML.indexOf('Page Error') === -1) {
+        ls.innerHTML = '<div style="text-align:center;padding:2rem;">' +
+            '<p style="color:#f87171;font-weight:600;margin-bottom:1rem;">⚠️ Page took too long to load.</p>' +
+            '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1.5rem;">This may be a network issue or your session expired.</p>' +
+            '<button onclick="window.location.reload()" style="background:var(--purple);color:#fff;border:none;padding:0.75rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-size:1rem;margin-right:0.75rem;">🔄 Retry</button>' +
+            '<a href="/" style="color:var(--muted);font-size:0.875rem;">← Home</a>' +
+        '</div>';
+    }
+}, 6000);
 </script>
 </body>
 </html>
