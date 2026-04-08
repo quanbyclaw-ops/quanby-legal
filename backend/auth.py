@@ -291,36 +291,43 @@ async def google_get_user_info(code: str, redirect_uri: str) -> dict:
 
 def generate_stateless_state(provider: str) -> str:
     """
-    Generate a stateless CSRF state token as a signed JWT.
-    No server-side storage needed — works across all workers and restarts.
+    Generate a compact stateless CSRF state token.
+    Format: base64(expiry_hex + nonce) + "." + HMAC signature
+    Short enough for Google OAuth (~60 chars total).
     """
-    payload = {
-        "provider": provider,
-        "nonce": secrets.token_hex(16),
-        "exp": time.time() + _OAUTH_STATE_TTL,
-        "iat": time.time(),
-    }
-    return jwt.encode(payload, JWT_SECRET, algorithm="HS256")
+    nonce = secrets.token_hex(8)  # 16 chars
+    exp = int(time.time()) + _OAUTH_STATE_TTL
+    msg = f"{exp}:{nonce}:{provider}"
+    sig = hashlib.new("sha256", (JWT_SECRET + msg).encode()).hexdigest()[:16]
+    token = base64.urlsafe_b64encode(msg.encode()).decode().rstrip("=")
+    return f"{token}.{sig}"
 
 
 def validate_stateless_state(state: str) -> dict | None:
     """
-    Validate a stateless JWT state token.
-    Returns the payload dict or None if invalid/expired.
+    Validate a compact stateless CSRF state token.
+    Returns payload dict or None if invalid/expired.
     """
     try:
-        payload = jwt.decode(
-            state,
-            JWT_SECRET,
-            algorithms=["HS256"],
-            options={"verify_exp": False},  # we check exp manually
-        )
-        if time.time() > payload.get("exp", 0):
+        if "." not in state:
+            return None
+        token, sig = state.rsplit(".", 1)
+        # Restore padding
+        padding = 4 - len(token) % 4
+        msg = base64.urlsafe_b64decode(token + "=" * (padding % 4)).decode()
+        exp_str, nonce, provider = msg.split(":", 2)
+        # Verify signature
+        expected_sig = hashlib.new("sha256", (JWT_SECRET + msg).encode()).hexdigest()[:16]
+        if not secrets.compare_digest(sig, expected_sig):
+            logger.warning("OAuth state HMAC validation failed")
+            return None
+        # Check expiry
+        if time.time() > int(exp_str):
             logger.warning("OAuth state expired")
             return None
-        return payload
+        return {"provider": provider, "nonce": nonce}
     except Exception as e:
-        logger.warning(f"OAuth state JWT validation failed: {e}")
+        logger.warning(f"OAuth state validation failed: {e}")
         return None
 
 
