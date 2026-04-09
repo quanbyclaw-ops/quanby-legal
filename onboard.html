@@ -711,7 +711,7 @@
             <div class="field-row">
                 <div class="ob-field">
                     <label>IBP No. *</label>
-                    <input type="text" id="ob-ibp-no" placeholder="e.g. 123456">
+                    <input type="text" id="ob-ibp-no" placeholder="e.g. 12345" maxlength="5" inputmode="numeric" pattern="[0-9]{5}">
                     <span class="ob-field-error" id="err-ibp-no"></span>
                 </div>
                 <div class="ob-field">
@@ -1183,7 +1183,11 @@ async function submitProfile() {
         _req(ptrNo,           'err-ptr-no',           'ob-ptr-no',           'PTR No. is required.');
         _req(ptrLocation,     'err-ptr-location',     'ob-ptr-location',     'PTR location is required.');
         _req(ptrDate,         'err-ptr-date',         'ob-ptr-date',         'PTR date is required.');
-        _req(ibpNo,           'err-ibp-no',           'ob-ibp-no',           'IBP No. is required.');
+        if (!ibpNo) {
+            _fieldErr('err-ibp-no', 'IBP No. is required.'); _fieldInvalid('ob-ibp-no', true); hasError = true;
+        } else if (!/^[0-9]{5}$/.test(ibpNo)) {
+            _fieldErr('err-ibp-no', 'IBP No. must be exactly 5 digits (numbers only).'); _fieldInvalid('ob-ibp-no', true); hasError = true;
+        }
         _req(ibpDate,         'err-ibp-date',         'ob-ibp-date',         'IBP date is required.');
         _req(notaryAddress,   'err-notary-address',   'ob-notary-address',   'Notary address is required.');
         _req(mclePeriod,      'err-mcle-period',      'ob-mcle-period',      'MCLE period is required.');
