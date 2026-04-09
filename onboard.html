@@ -1484,10 +1484,14 @@ async function init() {
         _role = _user.role || 'attorney';
         const step = mapApiStepToLocal(_user.onboarding_step || 'role_select');
         showProgress();
-        goToStep(step);
-        // Certificate step needs cert ID populated
         if (step === 'certificate') {
-            setTimeout(function() { loadCertStep(); }, 100);
+            // Go direct — skip goToStep routing to avoid patched wrapper interference
+            const certId = _user.certificate_id || '';
+            goToDownloadCert(certId);
+        } else if (step === 'certified') {
+            showScreen('certified-screen');
+        } else {
+            goToStep(step);
         }
 
     } catch(e) {
@@ -2188,6 +2192,14 @@ function goToDownloadCert(certId) {
     try { updateProgress('certificate'); } catch(e) {}
     _populateCertUI(certId);
     window.scrollTo({top:0, behavior:'smooth'});
+    // Safeguard: re-show in case something hides it afterward
+    setTimeout(function() {
+        var el = document.getElementById('step-certificate');
+        if (el && (el.style.display === 'none' || el.style.display === '')) {
+            el.style.display = '';
+        }
+        _populateCertUI(_certificateId);
+    }, 400);
 }
 
 // ═══════════════════════════════════════════════
