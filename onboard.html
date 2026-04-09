@@ -1485,6 +1485,10 @@ async function init() {
         const step = mapApiStepToLocal(_user.onboarding_step || 'role_select');
         showProgress();
         goToStep(step);
+        // Certificate step needs cert ID populated
+        if (step === 'certificate') {
+            setTimeout(function() { loadCertStep(); }, 100);
+        }
 
     } catch(e) {
         console.error('init error:', e);
@@ -2166,11 +2170,13 @@ function renderResult(data) {
 
 function goToDownloadCert(certId) {
     if (certId) _certificateId = certId;
-    const certIdEl = document.getElementById('cert-id-display');
-    const dlLink = document.getElementById('cert-download-link');
-    if (certIdEl) certIdEl.textContent = _certificateId || '';
-    if (dlLink) dlLink.href = '/api/certificate/' + (_certificateId || '');
     goToStep('certificate');
+    setTimeout(function() {
+        var certIdEl = document.getElementById('cert-id-display');
+        var dlLink = document.getElementById('cert-download-link');
+        if (certIdEl) certIdEl.textContent = _certificateId || '';
+        if (dlLink) dlLink.href = '/api/certificate/' + (_certificateId || '');
+    }, 50);
 }
 
 // ═══════════════════════════════════════════════
