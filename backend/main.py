@@ -45,7 +45,10 @@ from onboarding import (
     save_test_session, get_test_session,
     generate_certificate_id, get_certificate_html, get_certificate_email_html,
     lookup_user_by_certificate_id,
+    _load_test_sessions,
 )
+# Load persisted test sessions on startup
+_load_test_sessions()
 from question_bank import get_randomized_test, grade_test
 from email_service import send_welcome_email, send_test_fail_email
 
@@ -581,7 +584,7 @@ async def start_test(
         "questions": client_questions,
         "answer_key": answer_key,
         "started_at": time.time(),
-        "expires_at": time.time() + 3600,
+        "expires_at": time.time() + 86400,  # 24 hours
     })
 
     return {

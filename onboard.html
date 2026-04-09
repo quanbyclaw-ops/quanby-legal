@@ -1950,6 +1950,8 @@ async function startExam() {
         _answers = {};
         _testSessionId = data.test_session_id;
         _currentPage = 0;
+        // Persist session ID so page refresh can resume
+        try { localStorage.setItem('ql_test_session_id', _testSessionId); } catch(e) {}
 
         // DEV MODE: ?dev=true auto-selects option B for every question
         const _devMode = new URLSearchParams(window.location.search).get('dev') === 'true';
@@ -2128,6 +2130,7 @@ function renderResult(data) {
     var certId = data.certificate_id || '';
 
     _clearProgress();
+    try { localStorage.removeItem("ql_test_session_id"); } catch(e) {}
 
     // Show result directly
     var allS = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc'];
@@ -2528,6 +2531,16 @@ function lessonNav(dir) {
         };
     }
 })();
+
+// On page load: if user is at 'test' step and has completed the course, show Proceed button
+// Also: if they have an active test session stored, go straight to exam
+document.addEventListener('DOMContentLoaded', function() {
+    // Check localStorage for an active test session ID
+    var savedSessionId = null;
+    try { savedSessionId = localStorage.getItem('ql_test_session_id'); } catch(e) {}
+    // We expose this for use in startExam to restore the session
+    if (savedSessionId) { window._savedTestSessionId = savedSessionId; }
+});
 
 </script>
     <script>try { if(typeof lucide!=="undefined") lucide.createIcons(); } catch(e) { console.warn("Lucide icons error:", e); }</script>

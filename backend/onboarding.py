@@ -104,6 +104,32 @@ TEST_SESSIONS: dict[str, dict] = {}
 DATA_DIR = Path(__file__).parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
 USERS_FILE = DATA_DIR / "users.json"
+TEST_SESSIONS_FILE = DATA_DIR / "test_sessions.json"
+
+
+def _load_test_sessions() -> None:
+    """Load persisted test sessions from disk."""
+    global TEST_SESSIONS
+    try:
+        if TEST_SESSIONS_FILE.exists():
+            import json as _json, time as _time
+            with open(TEST_SESSIONS_FILE, "r") as f:
+                all_sessions = _json.load(f)
+            # Drop expired sessions (>2h old)
+            now = _time.time()
+            TEST_SESSIONS = {k: v for k, v in all_sessions.items() if v.get("expires_at", 0) > now}
+    except Exception:
+        TEST_SESSIONS = {}
+
+
+def _save_test_sessions() -> None:
+    """Persist test sessions to disk."""
+    try:
+        import json as _json
+        with open(TEST_SESSIONS_FILE, "w") as f:
+            _json.dump(TEST_SESSIONS, f)
+    except Exception:
+        pass
 
 # FIX-8: asyncio lock for USERS + file I/O, threading lock for TEST_SESSIONS
 _users_lock = asyncio.Lock()
@@ -238,6 +264,7 @@ async def update_user(user_id: str, updates: dict) -> Optional[dict]:
 def save_test_session(session_id: str, data: dict) -> None:
     with _sessions_lock:
         TEST_SESSIONS[session_id] = data
+        _save_test_sessions()
 
 
 def get_test_session(session_id: str) -> Optional[dict]:
