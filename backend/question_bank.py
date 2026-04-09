@@ -886,9 +886,9 @@ def get_randomized_test(role: str = "attorney", count: int = 50) -> tuple[list, 
 
     for i, q in enumerate(selected):
         choices = q["choices"].copy()
-        # Get the full text of the correct answer before shuffling
+        # Keep choices in original A/B/C/D order — only questions are shuffled
         correct_answer_text = choices[ord(q["answer"]) - ord("A")]
-        random.shuffle(choices)
+        # random.shuffle(choices)  # disabled: keep ABCD order
 
         qid = q["id"]
 
