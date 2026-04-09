@@ -295,6 +295,7 @@
 
         /* ERROR */
         .ob-field-error { color: #f87171; font-size: 0.78rem; margin-top: 0.3rem; min-height: 1em; display: block; }
+        .ob-field input[type= date] { color-scheme: dark; }
         .ob-field input.invalid { border-color: #f87171 !important; }
         .ob-error {
             color: #f87171;
@@ -687,7 +688,7 @@
             </div>
             <div class="ob-field">
                 <label>Commission Valid Until *</label>
-                <input type="text" id="ob-commission-valid" placeholder="e.g. Dec 31, 2025">
+                <input type="date" id="ob-commission-valid">
                 <span class="ob-field-error" id="err-commission-valid"></span>
             </div>
             <div class="field-row">
@@ -704,7 +705,7 @@
             </div>
             <div class="ob-field">
                 <label>PTR Date *</label>
-                <input type="text" id="ob-ptr-date" placeholder="e.g. Jan 02, 2025">
+                <input type="date" id="ob-ptr-date">
                 <span class="ob-field-error" id="err-ptr-date"></span>
             </div>
             <div class="field-row">
@@ -715,7 +716,7 @@
                 </div>
                 <div class="ob-field">
                     <label>IBP Date *</label>
-                    <input type="text" id="ob-ibp-date" placeholder="e.g. Dec 18, 2024">
+                    <input type="date" id="ob-ibp-date">
                     <span class="ob-field-error" id="err-ibp-date"></span>
                 </div>
             </div>
@@ -743,7 +744,7 @@
             </div>
             <div class="ob-field">
                 <label>MCLE Date *</label>
-                <input type="text" id="ob-mcle-date" placeholder="e.g. Jun 12, 2024">
+                <input type="date" id="ob-mcle-date">
                 <span class="ob-field-error" id="err-mcle-date"></span>
             </div>
             <div class="ob-field">
