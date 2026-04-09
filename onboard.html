@@ -806,41 +806,58 @@
 
         /* === INLINE COURSE MODULE === */
         .course-module { display:flex; flex-direction:column; gap:1.25rem; }
-        .course-tabs { display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.25rem; }
+        /* ── Course Module ─────────────────────────────────── */
+        .course-tabs {
+            display:flex; overflow-x:auto; gap:0.375rem; margin-bottom:1.25rem;
+            padding-bottom:0.25rem; scrollbar-width:none;
+        }
+        .course-tabs::-webkit-scrollbar { display:none; }
         .course-tab {
-            padding:0.45rem 1rem; border-radius:999px; font-size:0.8rem; font-weight:600;
-            background:rgba(255,255,255,0.07); color:#94a3b8;
-            border:none; cursor:pointer; transition:background 0.2s, color 0.2s;
+            flex-shrink:0; padding:0.4rem 0.875rem; border-radius:999px; font-size:0.78rem; font-weight:600;
+            background:rgba(255,255,255,0.06); color:#94a3b8;
+            border:1px solid rgba(255,255,255,0.1); cursor:pointer; transition:all 0.15s;
         }
-        .course-tab.active { background:#7c3aed; color:#fff; }
-        .course-tab.done { background:rgba(124,58,237,0.25); color:#a78bfa; }
-        .lesson-pane { display:flex; flex-direction:column; gap:1rem; }
-        .lesson-pane h3 { color:#c9a84c; font-size:1rem; margin:0 0 0.25rem; }
-        .lesson-pane p { color:#f1f5f9; font-size:0.875rem; line-height:1.65; margin:0; }
-        .lesson-pane ul, .lesson-pane ol { color:#f1f5f9; font-size:0.875rem; line-height:1.7; padding-left:1.25rem; margin:0; }
-        .lesson-pane li { margin-bottom:0.3rem; }
+        .course-tab:hover { background:rgba(255,255,255,0.1); color:#f1f5f9; }
+        .course-tab.active { background:#7c3aed; color:#fff; border-color:#7c3aed; }
+        .course-tab.done { background:rgba(124,58,237,0.15); color:#a78bfa; border-color:rgba(124,58,237,0.3); }
+        /* Progress */
+        .course-progress-row { display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem; }
+        #lesson-label { font-size:0.75rem; font-weight:600; color:#94a3b8; white-space:nowrap; }
+        .course-progress-bar { flex:1; height:3px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; }
+        .course-progress-fill { height:100%; background:linear-gradient(90deg,#7c3aed,#a78bfa); border-radius:999px; transition:width 0.4s; }
+        /* Lesson content */
+        .lesson-pane { display:flex; flex-direction:column; gap:1rem; min-height:220px; }
+        .lesson-pane h3 { color:#c9a84c; font-size:1rem; font-weight:700; margin:0 0 0.5rem; letter-spacing:0.01em; }
+        .lesson-pane p { color:#cbd5e1; font-size:0.875rem; line-height:1.7; margin:0; }
+        .lesson-pane ul, .lesson-pane ol { color:#cbd5e1; font-size:0.875rem; line-height:1.7; padding-left:1.25rem; margin:0; }
+        .lesson-pane li { margin-bottom:0.4rem; }
+        /* Key term cards */
         .key-term-card {
-            background:#111827; border-left:3px solid #7c3aed;
-            padding:0.75rem 1rem; border-radius:0.5rem;
-            font-size:0.85rem; color:#f1f5f9; line-height:1.6;
+            background:rgba(17,24,39,0.8); border-left:3px solid #7c3aed;
+            padding:0.875rem 1rem; border-radius:0 0.5rem 0.5rem 0;
+            font-size:0.85rem; line-height:1.6;
         }
-        .key-term-card strong { color:#a78bfa; }
-        .key-term-card em { color:#94a3b8; font-style:normal; font-size:0.82rem; }
-        .course-progress-row { display:flex; align-items:center; gap:0.75rem; font-size:0.78rem; color:#94a3b8; }
-        .course-progress-bar { flex:1; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; }
-        .course-progress-fill { height:100%; background:#7c3aed; border-radius:2px; transition:width 0.3s; }
-        .lesson-nav { display:flex; gap:0.75rem; margin-top:0.5rem; }
-        .lesson-nav button { flex:1; padding:0.6rem 1rem; border-radius:8px; font-size:0.85rem; font-weight:600; border:none; cursor:pointer; transition:background 0.2s; }
-        .btn-lesson-prev { background:rgba(255,255,255,0.08); color:#f1f5f9; }
-        .btn-lesson-prev:hover { background:rgba(255,255,255,0.14); }
+        .key-term-card strong { color:#a78bfa; display:block; margin-bottom:0.2rem; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.05em; }
+        .key-term-card span { color:#94a3b8; }
+        /* Nav */
+        .lesson-nav { display:grid; grid-template-columns:1fr 1fr; gap:0.625rem; margin-top:1.5rem; border-top:1px solid rgba(255,255,255,0.07); padding-top:1.25rem; }
+        .lesson-nav button { padding:0.65rem 1rem; border-radius:0.5rem; font-size:0.85rem; font-weight:600; border:none; cursor:pointer; transition:all 0.15s; font-family:"Inter",sans-serif; }
+        .btn-lesson-prev { background:rgba(255,255,255,0.06); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); }
+        .btn-lesson-prev:hover:not(:disabled) { background:rgba(255,255,255,0.1); color:#f1f5f9; }
         .btn-lesson-next { background:#7c3aed; color:#fff; }
-        .btn-lesson-next:hover { background:#6d28d9; }
-        .btn-lesson-next:disabled, .btn-lesson-prev:disabled { opacity:0.35; cursor:not-allowed; }
+        .btn-lesson-next:hover:not(:disabled) { background:#6d28d9; }
+        .btn-lesson-next:disabled, .btn-lesson-prev:disabled { opacity:0.3; cursor:not-allowed; }
+        /* Completion */
         .course-complete-notice {
-            display:none; background:rgba(124,58,237,0.12); border:1px solid rgba(124,58,237,0.35);
-            border-radius:10px; padding:1rem 1.25rem; color:#a78bfa; font-size:0.875rem; text-align:center;
+            display:none; align-items:center; justify-content:center; gap:0.5rem;
+            background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25);
+            border-radius:0.5rem; padding:0.875rem 1rem; color:#34d399; font-size:0.85rem;
+            font-weight:600; margin-top:1.25rem;
         }
-        .course-complete-notice.visible { display:block; }
+        .course-complete-notice.visible { display:flex; }
+        /* Proceed button */
+        #course-btn-row { justify-content:center; margin-top:1rem; }
+        #btn-proceed-exam { font-size:0.9rem; padding:0.75rem 2rem; border-radius:0.5rem; max-width:240px; }
     </style>
 </head>
 <body>
@@ -1219,7 +1236,8 @@
         </div>
 
         <div class="course-complete-notice" id="course-complete-notice">
-            &#10003; You&#39;ve completed all course lessons. You may now proceed to the exam.
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            All lessons complete &mdash; you may now proceed to the exam.
         </div>
 
         <div id="err-course" class="ob-error"></div>
