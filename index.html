@@ -1032,16 +1032,16 @@
                 <button id="nav-cert-badge" class="nav-cert-badge" style="display:none;" onclick="_navBadgeClick()"></button>
                 <!-- User avatar trigger -->
                 <div class="nav-profile-wrap" id="nav-profile-wrap" onclick="toggleUserMenu()">
-                    <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" style="display:none;" onload="this.style.display='block'" onerror="this.style.display='none'">
-                    <div class="nav-user-initials" id="nav-user-initials"></div>
+                    <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" style="display:none;" onload="this.style.display='block';document.getElementById('nav-user-initials').style.display='none';" onerror="this.style.display='none';document.getElementById('nav-user-initials').style.display='flex';">
+                    <div class="nav-user-initials" id="nav-user-initials" style="display:none;"></div>
                     <span class="nav-user-name" id="nav-user-name"></span>
                     <svg class="nav-profile-chevron" id="nav-profile-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </div>
                 <!-- Dropdown menu -->
                 <div class="nav-user-menu" id="nav-user-menu" style="display:none;">
                     <div class="num-header">
-                        <img class="num-avatar" id="num-avatar" src="" alt="" style="display:none;" onload="this.style.display='block'" onerror="this.style.display='none'">
-                        <div class="num-initials" id="num-initials"></div>
+                        <img class="num-avatar" id="num-avatar" src="" alt="" style="display:none;" onload="this.style.display='block';document.getElementById('num-initials').style.display='none';" onerror="this.style.display='none';document.getElementById('num-initials').style.display='flex';">
+                        <div class="num-initials" id="num-initials" style="display:none;"></div>
                         <div class="num-info">
                             <span class="num-name" id="num-name"></span>
                             <span class="num-email" id="num-email"></span>
@@ -2635,17 +2635,21 @@
             const displayName = (user.first_name || '') + (user.last_name ? ' ' + user.last_name : '') || user.email || 'Account';
             const initials = ((user.first_name || '?')[0] + (user.last_name || '')[0]).toUpperCase();
             if (nameEl) nameEl.textContent = user.first_name || user.email || 'Account';
-            if (avatarEl) { if (user.picture) { avatarEl.src = user.picture; } else { avatarEl.style.display = "none"; } }
-            // Populate initials fallback
+            // Show initials immediately as fallback; photo onload will hide them
             const initialsEl = document.getElementById('nav-user-initials');
-            if (initialsEl) initialsEl.textContent = initials;
+            if (initialsEl) { initialsEl.textContent = initials; initialsEl.style.display = 'flex'; }
+            if (avatarEl) {
+                if (user.picture) { avatarEl.src = user.picture; }
+                else { avatarEl.style.display = 'none'; initialsEl && (initialsEl.style.display = 'flex'); }
+            }
             // Populate dropdown header
             const numAvatar = document.getElementById('num-avatar');
             const numInitials = document.getElementById('num-initials');
             const numName = document.getElementById('num-name');
             const numEmail = document.getElementById('num-email');
+            if (numInitials) { numInitials.textContent = initials; numInitials.style.display = 'flex'; }
             if (numAvatar && user.picture) { numAvatar.src = user.picture; }
-            if (numInitials) numInitials.textContent = initials;
+            else if (numInitials) { numInitials.style.display = 'flex'; }
             if (numName) numName.textContent = displayName;
             if (numEmail) numEmail.textContent = user.email || '';
             if (navUser) navUser.classList.add('visible');
