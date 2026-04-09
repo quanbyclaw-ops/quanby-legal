@@ -976,7 +976,7 @@
             </div>
             <button class="nav-signin-btn" id="nav-signin-btn" onclick="openSSO('attorney')" style="display:none;">Sign In</button>
             <div class="nav-user" id="nav-user">
-                <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" onerror="this.style.display='none'">
+                <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" style="display:none;" onload="this.style.display='block'" onerror="this.style.display='none'">
                 <span class="nav-user-name" id="nav-user-name"></span>
                 <button id="nav-cert-badge" class="nav-cert-badge" style="display:none;" onclick="_navBadgeClick()"></button>
                 <button class="nav-signout-btn" onclick="signOut()">Sign Out</button>
@@ -2524,7 +2524,7 @@
             const avatarEl = document.getElementById('nav-user-avatar');
             const navUser = document.getElementById('nav-user');
             if (nameEl) nameEl.textContent = user.first_name || user.email || 'Account';
-            if (avatarEl && user.picture) avatarEl.src = user.picture;
+            if (avatarEl) { if (user.picture) { avatarEl.src = user.picture; } else { avatarEl.style.display = "none"; } }
             if (navUser) navUser.classList.add('visible');
             if (signinBtn) signinBtn.style.display = 'none';
             _updateCertBadge(user);
