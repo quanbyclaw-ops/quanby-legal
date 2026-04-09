@@ -2088,12 +2088,20 @@ async function submitExam() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ answers: _answers, test_session_id: _testSessionId })
         });
-        const data = await res.json();
+        let data;
+        try { data = await res.json(); } catch(jsonErr) { throw new Error('Server error — could not parse response.'); }
+        if (!res.ok) {
+            const msg = (data && (typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail))) || 'Submission failed.';
+            throw new Error(msg);
+        }
+        if (data.passed === undefined && data.success === undefined) {
+            throw new Error('Invalid response from server. Please try again.');
+        }
         renderResult(data);
     } catch(e) {
         btn.disabled = false;
         btn.textContent = 'Submit Test';
-        document.getElementById('err-exam').textContent = 'Submission failed. Please try again.';
+        document.getElementById('err-exam').textContent = e.message || 'Submission failed. Please try again.';
     }
 }
 
@@ -2101,11 +2109,15 @@ async function submitExam() {
 // EXAM RESULT
 // ═══════════════════════════════════════════════
 function renderResult(data) {
+    if (!data || data.passed === undefined) {
+        document.getElementById('err-exam').textContent = 'Could not load results. Please refresh and try again.';
+        return;
+    }
     if (data.certificate_id) _certificateId = data.certificate_id;
     const passed = data.passed;
-    const score = data.score !== undefined ? data.score : data.correct;
-    const total = data.total;
-    const scorePct = data.score_pct || Math.round(score / total * 100);
+    const score = data.score !== undefined ? data.score : (data.correct !== undefined ? data.correct : 0);
+    const total = data.total || 50;
+    const scorePct = data.score_pct || data.score || Math.round(score / total * 100);
 
     goToStep('result');
 
