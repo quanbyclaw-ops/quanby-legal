@@ -2745,13 +2745,13 @@
             'role_select': { cls: 'step-profile',     icon: '📋', label: 'Complete Profile' },
             'profile':     { cls: 'step-profile',     icon: '📋', label: 'Complete Profile' },
             'test':        { cls: 'step-exam',         icon: '📝', label: 'Take Exam' },
-            'kyc':         { cls: 'step-certificate',  icon: '🎓', label: 'Download Certificate' },
-            'kyc_id':      { cls: 'step-certificate',  icon: '🎓', label: 'Download Certificate' },
-            'liveness':    { cls: 'step-certificate',  icon: '🎓', label: 'Download Certificate' },
-            'survey':      { cls: 'step-certificate',  icon: '🎓', label: 'Download Certificate' },
-            'certificate': { cls: 'step-certificate',  icon: '🎓', label: 'Download Certificate' },
-            'sc_redirect': { cls: 'step-certificate',  icon: '⚖️', label: 'Submit to SC' },
-            'certified':   { cls: 'step-certified',    icon: '✅', label: 'ENP Certified' },
+            'kyc':         { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'kyc_id':      { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'liveness':    { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'survey':      { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'certificate': { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'sc_redirect': { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'certified':   { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
         };
         var cfg = config[step] || config['test'];
         badge.className = 'nav-cert-badge ' + cfg.cls;
@@ -2765,20 +2765,10 @@
         var badge = document.getElementById('nav-cert-badge');
         if (!badge) return;
         var step = badge._step || '';
-        // For certified - go to dashboard
-        if (step === 'certified') { window.location.href = '/dashboard'; return; }
-        // For certificate steps - open cert modal directly on home page
-        var certSteps = ['kyc','kyc_id','liveness','survey','certificate'];
-        if (certSteps.indexOf(step) >= 0) {
-            // Get cert ID from the user object already loaded
-            var certId = (window._currentUser && window._currentUser.certificate_id) ? window._currentUser.certificate_id : '';
-            _obCertificateId = certId;
-            openOnboard('certificate', badge._role || 'attorney');
-            return;
-        }
-        // For sc_redirect step
-        if (step === 'sc_redirect') {
-            openOnboard('sc_redirect', badge._role || 'attorney');
+        // Post-exam steps all go to dashboard
+        var dashSteps = ['kyc','kyc_id','liveness','survey','certificate','sc_redirect','certified'];
+        if (dashSteps.indexOf(step) >= 0) {
+            window.location.href = '/dashboard';
             return;
         }
         // All other steps: go to /onboard
