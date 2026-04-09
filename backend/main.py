@@ -144,7 +144,6 @@ class ProfileRequest(BaseModel):
     mcle_no_period: Optional[str] = None
     mcle_no: Optional[str] = None
     mcle_no_date: Optional[str] = None
-    mode_of_notarization: Optional[str] = None
     # Client fields
     organization: Optional[str] = None
     position: Optional[str] = None
@@ -508,7 +507,6 @@ async def save_profile(
             "mcle_no_period": req.mcle_no_period or "",
             "mcle_no": req.mcle_no or "",
             "mcle_no_date": req.mcle_no_date or "",
-            "mode_of_notarization": req.mode_of_notarization or "",
         })
     else:
         profile.update({

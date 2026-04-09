@@ -931,22 +931,7 @@
                 </div>
                 <span class="ob-field-error" id="err-mcle-date"></span>
             </div>
-            <div class="ob-field">
-                <label>Mode of Notarization *</label>
-                <div class="custom-select" id="custom-mode-notarization">
-                    <div class="custom-select-trigger" id="ob-mode-notarization-trigger" onclick="toggleCustomSelect('mode-notarization')">
-                        <span id="ob-mode-notarization-label">-- Select --</span>
-                        <svg class="custom-select-arrow" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    </div>
-                    <div class="custom-select-dropdown" id="mode-notarization-dropdown">
-                        <div class="custom-select-option" data-value="IEN" onclick="selectCustomOption('mode-notarization','IEN','IEN — In-Person Electronic Notarization')">IEN — In-Person Electronic Notarization</div>
-                        <div class="custom-select-option" data-value="REN" onclick="selectCustomOption('mode-notarization','REN','REN — Remote Electronic Notarization')">REN — Remote Electronic Notarization</div>
-                        <div class="custom-select-option" data-value="Both" onclick="selectCustomOption('mode-notarization','Both','Both IEN and REN')">Both IEN and REN</div>
-                    </div>
-                    <input type="hidden" id="ob-mode-notarization" value="">
-                </div>
-                <span class="ob-field-error" id="err-mode-notarization"></span>
-            </div>
+
         </div>
         <!-- Client fields -->
         <div id="client-fields" style="display:none;">
@@ -1497,15 +1482,14 @@ async function submitProfile() {
     const mclePeriod      = (document.getElementById('ob-mcle-period')      || {}).value?.trim() || '';
     const mcleNo          = (document.getElementById('ob-mcle-no')          || {}).value?.trim() || '';
     const mcleDate        = (document.getElementById('ob-mcle-date')        || {}).value?.trim() || '';
-    const modeNotarize    = (document.getElementById('ob-mode-notarization')|| {}).value?.trim() || '';
 
     const errIds = ['err-first-name','err-last-name','err-phone','err-commission-no','err-commission-valid',
         'err-ptr-no','err-ptr-location','err-ptr-date','err-ibp-no','err-ibp-date',
-        'err-notary-email','err-notary-address','err-mcle-period','err-mcle-no','err-mcle-date','err-mode-notarization'];
+        'err-notary-email','err-notary-address','err-mcle-period','err-mcle-no','err-mcle-date'];
     errIds.forEach(id => _fieldErr(id, ''));
     const inputIds = ['ob-first-name','ob-last-name','ob-phone','ob-commission-no','ob-commission-valid',
         'ob-ptr-no','ob-ptr-location','ob-ptr-date','ob-ibp-no','ob-ibp-date',
-        'ob-notary-email','ob-notary-address','ob-mcle-period','ob-mcle-no','ob-mcle-date','ob-mode-notarization'];
+        'ob-notary-email','ob-notary-address','ob-mcle-period','ob-mcle-no','ob-mcle-date'];
     inputIds.forEach(id => _fieldInvalid(id, false));
     document.getElementById('err-profile').textContent = '';
 
@@ -1532,7 +1516,6 @@ async function submitProfile() {
         _req(mclePeriod,      'err-mcle-period',      'ob-mcle-period',      'MCLE period is required.');
         _req(mcleNo,          'err-mcle-no',          'ob-mcle-no',          'MCLE No. is required.');
         _req(mcleDate,        'err-mcle-date',        'ob-mcle-date',        'MCLE date is required.');
-        _req(modeNotarize,    'err-mode-notarization','ob-mode-notarization','Mode of notarization is required.');
         if (!notaryEmail || notaryEmail.indexOf('@') < 1) {
             _fieldErr('err-notary-email', 'A valid notary email is required.');
             _fieldInvalid('ob-notary-email', true); hasError = true;
@@ -1563,7 +1546,6 @@ async function submitProfile() {
         mcle_no_period:            mclePeriod,
         mcle_no:                   mcleNo,
         mcle_no_date:              mcleDate,
-        mode_of_notarization:      modeNotarize,
         organization: (document.getElementById('ob-org')      || {}).value?.trim() || '',
         position:     (document.getElementById('ob-position') || {}).value?.trim() || '',
     };
