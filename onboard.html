@@ -1363,31 +1363,53 @@ function dpNav(id, dir) {
 function dpRender(id) {
     dpInit(id);
     const s = _dpState[id];
-    document.getElementById('dp-title-' + id).textContent = _dpMonths[s.month] + ' ' + s.year;
+    const titleEl = document.getElementById('dp-title-' + id);
+    if (titleEl) titleEl.textContent = _dpMonths[s.month] + ' ' + s.year;
     const container = document.getElementById('dp-days-' + id);
+    if (!container) return;
     const today = new Date();
     const firstDay = new Date(s.year, s.month, 1).getDay();
     const daysInMonth = new Date(s.year, s.month + 1, 0).getDate();
     const daysInPrev = new Date(s.year, s.month, 0).getDate();
-    let html = '';
+    const cells = [];
     // Prev month trailing days
     for (let i = firstDay - 1; i >= 0; i--) {
-        html += '<button type="button" class="dp-day other-month" onclick="dpSelect('' + id + '',' + (s.year) + ',' + (s.month - 1 < 0 ? s.year - 1 : s.year) + ',' + (s.month - 1 < 0 ? 11 : s.month - 1) + ',' + (daysInPrev - i) + ')">' + (daysInPrev - i) + '</button>';
+        const py = s.month - 1 < 0 ? s.year - 1 : s.year;
+        const pm = s.month - 1 < 0 ? 11 : s.month - 1;
+        const pd = daysInPrev - i;
+        cells.push({d: pd, y: py, m: pm, ny: s.year, cls: 'dp-day other-month'});
     }
     // Current month days
     for (let d = 1; d <= daysInMonth; d++) {
         const isToday = (d === today.getDate() && s.month === today.getMonth() && s.year === today.getFullYear());
-        const isSel = s.selected && (s.selected.d === d && s.selected.m === s.month && s.selected.y === s.year);
+        const isSel = s.selected && s.selected.d === d && s.selected.m === s.month && s.selected.y === s.year;
         const cls = 'dp-day' + (isToday ? ' today' : '') + (isSel ? ' selected' : '');
-        html += '<button type="button" class="' + cls + '" onclick="dpSelect('' + id + '',' + s.year + ',' + s.year + ',' + s.month + ',' + d + ')">' + d + '</button>';
+        cells.push({d: d, y: s.year, m: s.month, ny: s.year, cls: cls});
     }
     // Next month leading days
-    const cells = firstDay + daysInMonth;
-    const remainder = cells % 7 === 0 ? 0 : 7 - (cells % 7);
-    for (let d = 1; d <= remainder; d++) {
-        html += '<button type="button" class="dp-day other-month" onclick="dpSelect('' + id + '',' + (s.month + 1 > 11 ? s.year + 1 : s.year) + ',' + (s.month + 1 > 11 ? s.year + 1 : s.year) + ',' + (s.month + 1 > 11 ? 0 : s.month + 1) + ',' + d + ')">' + d + '</button>';
+    const remainder = (firstDay + daysInMonth) % 7;
+    const fill = remainder === 0 ? 0 : 7 - remainder;
+    for (let d = 1; d <= fill; d++) {
+        const ny = s.month + 1 > 11 ? s.year + 1 : s.year;
+        const nm = s.month + 1 > 11 ? 0 : s.month + 1;
+        cells.push({d: d, y: ny, m: nm, ny: ny, cls: 'dp-day other-month'});
     }
-    container.innerHTML = html;
+    container.innerHTML = '';
+    cells.forEach(function(c) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = c.cls;
+        btn.textContent = c.d;
+        btn.dataset.did = id;
+        btn.dataset.ny = c.ny;
+        btn.dataset.y = c.y;
+        btn.dataset.m = c.m;
+        btn.dataset.d = c.d;
+        btn.addEventListener('click', function() {
+            dpSelect(this.dataset.did, +this.dataset.ny, +this.dataset.y, +this.dataset.m, +this.dataset.d);
+        });
+        container.appendChild(btn);
+    });
 }
 function dpSelect(id, navYear, y, m, d) {
     dpInit(id);
