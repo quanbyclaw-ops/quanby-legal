@@ -859,7 +859,16 @@ async def get_certificate(
         raise HTTPException(403, "Certificate not found for this account")
 
     html = get_certificate_html(user)
-    return HTMLResponse(content=html, status_code=200)
+    return HTMLResponse(
+        content=html,
+        status_code=200,
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate, private",
+            "Pragma": "no-cache",
+            "CDN-Cache-Control": "no-store",
+            "Cloudflare-CDN-Cache-Control": "no-store",
+        }
+    )
 
 
 
