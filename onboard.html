@@ -863,7 +863,7 @@
         </div>
         <div class="ob-field">
             <label>Phone Number *</label>
-            <input type="tel" id="ob-phone" placeholder="+63 9XX XXX XXXX">
+            <input type="tel" id="ob-phone" placeholder="09XX XXX XXXX or +63 9XX XXX XXXX">
             <span class="ob-field-error" id="err-phone"></span>
         </div>
         <!-- Attorney / ENP fields -->
@@ -1605,7 +1605,17 @@ async function submitProfile() {
     }
     _req(firstName, 'err-first-name', 'ob-first-name', 'First name is required.');
     _req(lastName,  'err-last-name',  'ob-last-name',  'Last name is required.');
-    _req(phone,     'err-phone',      'ob-phone',      'Phone number is required.');
+    if (!phone) {
+        _fieldErr('err-phone', 'Phone number is required.'); _fieldInvalid('ob-phone', true); hasError = true;
+    } else {
+        // Accept: +63XXXXXXXXXX, 09XXXXXXXXX, 9XXXXXXXXX (PH mobile numbers)
+        const cleanPhone = phone.replace(/[\s\-().]/g, '');
+        const validPH = /^(\+639|639|09|9)\d{9}$/.test(cleanPhone);
+        if (!validPH) {
+            _fieldErr('err-phone', 'Enter a valid Philippine mobile number (e.g. 09XX XXX XXXX).');
+            _fieldInvalid('ob-phone', true); hasError = true;
+        }
+    }
     if (_role === 'attorney') {
         _req(rollNo,          'err-roll-no',          'ob-roll-no',          'IBP Roll No. is required.');
         if (rollNo && !/^[0-9]{5}$/.test(rollNo)) { _fieldErr('err-roll-no', 'Roll No. must be exactly 5 digits.'); _fieldInvalid('ob-roll-no', true); hasError = true; }
