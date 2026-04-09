@@ -546,7 +546,8 @@
     "kyc_id_uploaded": true,
     "hyperverge_transaction_id": "ql-297dd411-1775733185",
     "hyperverge_status": "auto_approved",
-    "kyc_verified_at": "2026-04-09T11:13:54.696769+00:00"
+    "kyc_verified_at": "2026-04-09T11:13:54.696769+00:00",
+    "sc_commission_status": "pending"
   },
   "22edd02a-4f9f-45b2-945d-d8f74a09bd29": {
     "id": "22edd02a-4f9f-45b2-945d-d8f74a09bd29",

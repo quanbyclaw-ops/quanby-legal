@@ -197,6 +197,11 @@
         <div class="card-value" id="stat-kyc">…</div>
         <div class="card-sub" id="stat-kyc-sub">…</div>
       </div>
+      <div class="card" id="sc-card" style="display:none;">
+        <h3>⚖️ SC Commission</h3>
+        <div class="card-value" id="stat-sc">…</div>
+        <div class="card-sub" id="stat-sc-sub">…</div>
+      </div>
     </div>
 
     <!-- KYC SECTION -->
@@ -225,6 +230,33 @@
       <button class="btn-teal" onclick="redoKyc()" id="btn-redo-kyc" style="max-width:260px;display:none;">🔄 Redo KYC Verification</button>
       <div id="kyc-done-msg" style="display:none;color:#10B981;font-size:0.875rem;font-weight:600;">✅ KYC Verified — <span id="kyc-done-date"></span></div>
       <div id="kyc-msg" style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem;display:none;"></div>
+    </div>
+
+    <!-- SC COMMISSION STATUS -->
+    <div class="cert-box" id="sc-section" style="display:none;">
+      <h3>⚖️ Supreme Court ENP Commission Status</h3>
+      <div id="sc-status-block" style="margin-bottom:1rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;padding:1rem;border-radius:0.5rem;margin-bottom:0.75rem;" id="sc-status-banner">
+          <div style="font-size:1.75rem;" id="sc-status-icon">⏳</div>
+          <div>
+            <div style="font-weight:700;font-size:1rem;" id="sc-status-label">Pending SC Activation</div>
+            <div style="font-size:0.8rem;color:var(--muted);margin-top:0.2rem;" id="sc-status-desc">Your ENP commission must be activated by the Supreme Court before you can legally practice as an Electronic Notary Public.</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:0.5rem;padding:1rem;font-size:0.8rem;color:var(--muted);line-height:1.7;">
+          <strong style="color:var(--text);display:block;margin-bottom:0.4rem;">Required steps after certification:</strong>
+          <ol style="padding-left:1.25rem;margin:0;">
+            <li>Print your ENP certificate and submit it to the <strong style="color:var(--text);">Supreme Court of the Philippines</strong></li>
+            <li>Complete the SC e-filing at <a href="https://efiling.sc.judiciary.gov.ph" target="_blank" style="color:var(--teal);">efiling.sc.judiciary.gov.ph</a></li>
+            <li>Wait for SC to add you to the national ENP registry</li>
+            <li>Commission status will be updated once SC activates your account</li>
+          </ol>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
+        <a href="https://efiling.sc.judiciary.gov.ph" target="_blank" class="btn-teal" style="font-size:0.875rem;padding:0.6rem 1.25rem;">⚖️ Go to SC e-Filing Portal</a>
+        <a id="sc-cert-link" href="#" target="_blank" class="btn-outline" style="font-size:0.875rem;padding:0.6rem 1.25rem;display:none;">📄 Download Certificate for SC Submission</a>
+      </div>
     </div>
 
     <!-- ACTIONS -->
@@ -384,6 +416,48 @@ async function loadDashboard() {
     } else {
       if (navInitials) { navInitials.textContent = initials; navInitials.style.display = 'flex'; }
       if (numInitials) { numInitials.textContent = initials; numInitials.style.display = 'flex'; }
+    }
+
+    // SC Commission Status (attorneys only)
+    if (user.role === 'attorney' && user.certificate_id) {
+      const scStatus = user.sc_commission_status || 'pending';
+      const scCard = document.getElementById('sc-card');
+      const scSection = document.getElementById('sc-section');
+      const statSc = document.getElementById('stat-sc');
+      const statScSub = document.getElementById('stat-sc-sub');
+      const scBanner = document.getElementById('sc-status-banner');
+      const scIcon = document.getElementById('sc-status-icon');
+      const scLabel = document.getElementById('sc-status-label');
+      const scDesc = document.getElementById('sc-status-desc');
+      const scCertLink = document.getElementById('sc-cert-link');
+
+      if (scCard) scCard.style.display = '';
+      if (scSection) scSection.style.display = '';
+      if (scCertLink && user.certificate_id) {
+        scCertLink.href = `/api/certificate/${user.certificate_id}`;
+        scCertLink.style.display = '';
+      }
+
+      if (scStatus === 'active') {
+        if (statSc) statSc.innerHTML = '<span style="color:#10B981;">✅ Active</span>';
+        if (statScSub) statScSub.textContent = 'Commission active — you may practice';
+        if (scBanner) scBanner.style.background = 'rgba(16,185,129,0.08)';
+        if (scIcon) scIcon.textContent = '✅';
+        if (scLabel) scLabel.textContent = 'Commission Active';
+        if (scDesc) scDesc.textContent = 'Your ENP commission has been activated by the Supreme Court. You are authorized to perform electronic notarizations.';
+      } else if (scStatus === 'rejected') {
+        if (statSc) statSc.innerHTML = '<span style="color:#F87171;">❌ Rejected</span>';
+        if (statScSub) statScSub.textContent = 'Contact the SC for details';
+        if (scBanner) scBanner.style.background = 'rgba(239,68,68,0.08)';
+        if (scIcon) scIcon.textContent = '❌';
+        if (scLabel) scLabel.textContent = 'Commission Rejected';
+        if (scDesc) scDesc.textContent = 'Your application was rejected by the Supreme Court. Please contact the SC directly for further guidance.';
+      } else {
+        // pending (default)
+        if (statSc) statSc.innerHTML = '<span style="color:#F59E0B;">⏳ Pending</span>';
+        if (statScSub) statScSub.textContent = 'Awaiting SC activation';
+        if (scBanner) scBanner.style.background = 'rgba(245,158,11,0.06)';
+      }
     }
 
     document.getElementById('loading').style.display = 'none';

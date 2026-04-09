@@ -460,6 +460,7 @@ async def get_me(
         "retake_payment_pending": user.get("retake_payment_pending", False),
         "retake_payment_confirmed": user.get("retake_payment_confirmed", False),
         "kyc_verified_at": user.get("kyc_verified_at"),
+        "sc_commission_status": user.get("sc_commission_status", "pending"),
     }
 
 
