@@ -319,8 +319,12 @@
         .card-desc { color: var(--muted); font-size: 0.9rem; }
 
         /* PARTNERS */
-        #partners { padding: 2rem 0; background: var(--card-bg); }
-        .partners-row { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; color: var(--muted); }
+        #partners { padding: 2.5rem 0 3rem; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .partners-row { display: flex; justify-content: center; align-items: center; gap: 2.5rem; flex-wrap: wrap; }
+        .partner-logo-wrap { display: flex; align-items: center; justify-content: center; opacity: 0.55; transition: opacity 0.2s; }
+        .partner-logo-wrap:hover { opacity: 1; }
+        .partner-logo { height: 36px; width: auto; object-fit: contain; filter: brightness(0) invert(1); }
+        .partner-logo-sq { height: 42px; }
 
         /* FEATURES */
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
@@ -1154,11 +1158,28 @@
 
     <!-- PARTNERS -->
     <section id="partners">
-        <div class="container partners-row">
-            <span>DOCONCHAIN Group</span>
-            <span>Hyperledger Fabric</span>
-            <span>Supreme Court of the Philippines</span>
-            <span>DICT National PKI</span>
+        <div class="container">
+            <p style="text-align:center;font-size:0.78rem;color:rgba(148,163,184,0.5);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.5rem;">Powered by &amp; Accredited with</p>
+            <div class="partners-row">
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/doc-logo-white.png" alt="DOCONCHAIN" class="partner-logo">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/hyperledger-logo.png" alt="Hyperledger Fabric" class="partner-logo">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/sc-logo.png" alt="Supreme Court of the Philippines" class="partner-logo partner-logo-sq">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/dict-logo.png" alt="DICT" class="partner-logo">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/pnpki-logo.jpg" alt="PNPKI" class="partner-logo">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/linux-foundation-logo.png" alt="Linux Foundation" class="partner-logo">
+                </div>
+            </div>
         </div>
     </section>
 
