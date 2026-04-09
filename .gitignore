@@ -8,3 +8,8 @@ node_modules/
 test_payload.json
 create_repo.ps1
 create_repo2.ps1
+backend/data/users.json
+backend/data/test_sessions.json
+*.bak
+*.bak2
+backend/.env
