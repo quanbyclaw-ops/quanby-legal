@@ -338,6 +338,50 @@
         }
         .ob-field select:focus { outline: none; border-color: var(--purple); }
         .ob-field select option { background: #0f1020; color: var(--text); }
+        /* ── Custom Date Picker ─────────────────────────────────── */
+        .ql-datepicker { position: relative; width: 100%; }
+        .ql-datepicker-trigger {
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 0.5rem;
+            padding: 0.65rem 0.875rem; color: var(--text);
+            font-family: "Inter", sans-serif; font-size: 0.9rem;
+            cursor: pointer; transition: border-color 0.2s; text-align: left;
+        }
+        .ql-datepicker-trigger:hover { border-color: rgba(255,255,255,0.25); }
+        .ql-datepicker-trigger.open { border-color: var(--purple); }
+        .ql-datepicker-trigger.invalid-dp { border-color: #f87171 !important; }
+        .dp-placeholder { color: rgba(148,163,184,0.5); }
+        .dp-selected-val { color: var(--text); }
+        .ql-datepicker-popup {
+            position: absolute; top: calc(100% + 6px); left: 0; z-index: 100;
+            background: #111827; border: 1px solid rgba(124,58,237,0.35);
+            border-radius: 0.75rem; padding: 1rem; min-width: 260px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+        }
+        .dp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+        .dp-nav {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text); border-radius: 0.375rem; width: 28px; height: 28px;
+            cursor: pointer; font-size: 1.1rem; display: flex; align-items: center;
+            justify-content: center; transition: background 0.15s;
+        }
+        .dp-nav:hover { background: rgba(124,58,237,0.25); border-color: rgba(124,58,237,0.5); }
+        .dp-month-year { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+        .dp-weekdays { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 0.35rem; }
+        .dp-weekdays span { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 0.2rem 0; font-weight: 500; }
+        .dp-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+        .dp-day {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            font-size: 0.82rem; border-radius: 0.375rem; cursor: pointer;
+            color: var(--text); transition: background 0.12s;
+            background: transparent; border: none;
+        }
+        .dp-day:hover { background: rgba(124,58,237,0.2); color: #fff; }
+        .dp-day.today { color: var(--purple-light, #9d5ff3); font-weight: 700; }
+        .dp-day.selected { background: var(--purple); color: #fff; font-weight: 600; }
+        .dp-day.other-month { color: rgba(148,163,184,0.3); }
+        .dp-day.other-month:hover { background: rgba(255,255,255,0.05); }
         /* Custom select dropdown */
         .custom-select { position: relative; width: 100%; }
         .custom-select-trigger {
@@ -772,7 +816,22 @@
             </div>
             <div class="ob-field">
                 <label>Commission Valid Until *</label>
-                <input type="date" id="ob-commission-valid">
+                <div class="ql-datepicker" id="dp-wrap-ob-commission-valid">
+                    <button type="button" class="ql-datepicker-trigger" id="dp-trigger-ob-commission-valid" onclick="dpToggle('ob-commission-valid')">
+                        <span id="dp-display-ob-commission-valid" class="dp-placeholder">Pick a date</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#94a3b8" stroke-width="1.3"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    </button>
+                    <div class="ql-datepicker-popup" id="dp-popup-ob-commission-valid" style="display:none;">
+                        <div class="dp-header">
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-commission-valid',-1)">&#8249;</button>
+                            <span class="dp-month-year" id="dp-title-ob-commission-valid"></span>
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-commission-valid',1)">&#8250;</button>
+                        </div>
+                        <div class="dp-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+                        <div class="dp-days" id="dp-days-ob-commission-valid"></div>
+                    </div>
+                    <input type="hidden" id="ob-commission-valid" value="">
+                </div>
                 <span class="ob-field-error" id="err-commission-valid"></span>
             </div>
             <div class="field-row">
@@ -789,7 +848,22 @@
             </div>
             <div class="ob-field">
                 <label>PTR Date *</label>
-                <input type="date" id="ob-ptr-date">
+                <div class="ql-datepicker" id="dp-wrap-ob-ptr-date">
+                    <button type="button" class="ql-datepicker-trigger" id="dp-trigger-ob-ptr-date" onclick="dpToggle('ob-ptr-date')">
+                        <span id="dp-display-ob-ptr-date" class="dp-placeholder">Pick a date</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#94a3b8" stroke-width="1.3"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    </button>
+                    <div class="ql-datepicker-popup" id="dp-popup-ob-ptr-date" style="display:none;">
+                        <div class="dp-header">
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-ptr-date',-1)">&#8249;</button>
+                            <span class="dp-month-year" id="dp-title-ob-ptr-date"></span>
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-ptr-date',1)">&#8250;</button>
+                        </div>
+                        <div class="dp-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+                        <div class="dp-days" id="dp-days-ob-ptr-date"></div>
+                    </div>
+                    <input type="hidden" id="ob-ptr-date" value="">
+                </div>
                 <span class="ob-field-error" id="err-ptr-date"></span>
             </div>
             <div class="field-row">
@@ -800,7 +874,22 @@
                 </div>
                 <div class="ob-field">
                     <label>IBP Date *</label>
-                    <input type="date" id="ob-ibp-date">
+                    <div class="ql-datepicker" id="dp-wrap-ob-ibp-date">
+                    <button type="button" class="ql-datepicker-trigger" id="dp-trigger-ob-ibp-date" onclick="dpToggle('ob-ibp-date')">
+                        <span id="dp-display-ob-ibp-date" class="dp-placeholder">Pick a date</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#94a3b8" stroke-width="1.3"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    </button>
+                    <div class="ql-datepicker-popup" id="dp-popup-ob-ibp-date" style="display:none;">
+                        <div class="dp-header">
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-ibp-date',-1)">&#8249;</button>
+                            <span class="dp-month-year" id="dp-title-ob-ibp-date"></span>
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-ibp-date',1)">&#8250;</button>
+                        </div>
+                        <div class="dp-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+                        <div class="dp-days" id="dp-days-ob-ibp-date"></div>
+                    </div>
+                    <input type="hidden" id="ob-ibp-date" value="">
+                </div>
                     <span class="ob-field-error" id="err-ibp-date"></span>
                 </div>
             </div>
@@ -828,7 +917,22 @@
             </div>
             <div class="ob-field">
                 <label>MCLE Date *</label>
-                <input type="date" id="ob-mcle-date">
+                <div class="ql-datepicker" id="dp-wrap-ob-mcle-date">
+                    <button type="button" class="ql-datepicker-trigger" id="dp-trigger-ob-mcle-date" onclick="dpToggle('ob-mcle-date')">
+                        <span id="dp-display-ob-mcle-date" class="dp-placeholder">Pick a date</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#94a3b8" stroke-width="1.3"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    </button>
+                    <div class="ql-datepicker-popup" id="dp-popup-ob-mcle-date" style="display:none;">
+                        <div class="dp-header">
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-mcle-date',-1)">&#8249;</button>
+                            <span class="dp-month-year" id="dp-title-ob-mcle-date"></span>
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-mcle-date',1)">&#8250;</button>
+                        </div>
+                        <div class="dp-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+                        <div class="dp-days" id="dp-days-ob-mcle-date"></div>
+                    </div>
+                    <input type="hidden" id="ob-mcle-date" value="">
+                </div>
                 <span class="ob-field-error" id="err-mcle-date"></span>
             </div>
             <div class="ob-field">
@@ -1224,6 +1328,88 @@ function toggleProfileFields() {
     document.getElementById('client-fields').style.display = isAttorney ? 'none' : '';
 }
 
+/* ── Custom Date Picker Engine ─────────────────────────── */
+const _dpState = {};
+const _dpMonths = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function dpInit(id) {
+    if (!_dpState[id]) {
+        const now = new Date();
+        _dpState[id] = { year: now.getFullYear(), month: now.getMonth(), selected: null };
+    }
+}
+function dpToggle(id) {
+    dpInit(id);
+    const popup = document.getElementById('dp-popup-' + id);
+    const trigger = document.getElementById('dp-trigger-' + id);
+    const isOpen = popup.style.display !== 'none';
+    // Close all open pickers
+    document.querySelectorAll('.ql-datepicker-popup').forEach(p => { p.style.display = 'none'; });
+    document.querySelectorAll('.ql-datepicker-trigger.open').forEach(t => t.classList.remove('open'));
+    if (!isOpen) {
+        popup.style.display = 'block';
+        trigger.classList.add('open');
+        dpRender(id);
+    }
+}
+function dpNav(id, dir) {
+    dpInit(id);
+    _dpState[id].month += dir;
+    if (_dpState[id].month > 11) { _dpState[id].month = 0; _dpState[id].year++; }
+    if (_dpState[id].month < 0)  { _dpState[id].month = 11; _dpState[id].year--; }
+    dpRender(id);
+}
+function dpRender(id) {
+    dpInit(id);
+    const s = _dpState[id];
+    document.getElementById('dp-title-' + id).textContent = _dpMonths[s.month] + ' ' + s.year;
+    const container = document.getElementById('dp-days-' + id);
+    const today = new Date();
+    const firstDay = new Date(s.year, s.month, 1).getDay();
+    const daysInMonth = new Date(s.year, s.month + 1, 0).getDate();
+    const daysInPrev = new Date(s.year, s.month, 0).getDate();
+    let html = '';
+    // Prev month trailing days
+    for (let i = firstDay - 1; i >= 0; i--) {
+        html += '<button type="button" class="dp-day other-month" onclick="dpSelect('' + id + '',' + (s.year) + ',' + (s.month - 1 < 0 ? s.year - 1 : s.year) + ',' + (s.month - 1 < 0 ? 11 : s.month - 1) + ',' + (daysInPrev - i) + ')">' + (daysInPrev - i) + '</button>';
+    }
+    // Current month days
+    for (let d = 1; d <= daysInMonth; d++) {
+        const isToday = (d === today.getDate() && s.month === today.getMonth() && s.year === today.getFullYear());
+        const isSel = s.selected && (s.selected.d === d && s.selected.m === s.month && s.selected.y === s.year);
+        const cls = 'dp-day' + (isToday ? ' today' : '') + (isSel ? ' selected' : '');
+        html += '<button type="button" class="' + cls + '" onclick="dpSelect('' + id + '',' + s.year + ',' + s.year + ',' + s.month + ',' + d + ')">' + d + '</button>';
+    }
+    // Next month leading days
+    const cells = firstDay + daysInMonth;
+    const remainder = cells % 7 === 0 ? 0 : 7 - (cells % 7);
+    for (let d = 1; d <= remainder; d++) {
+        html += '<button type="button" class="dp-day other-month" onclick="dpSelect('' + id + '',' + (s.month + 1 > 11 ? s.year + 1 : s.year) + ',' + (s.month + 1 > 11 ? s.year + 1 : s.year) + ',' + (s.month + 1 > 11 ? 0 : s.month + 1) + ',' + d + ')">' + d + '</button>';
+    }
+    container.innerHTML = html;
+}
+function dpSelect(id, navYear, y, m, d) {
+    dpInit(id);
+    _dpState[id] = { year: navYear, month: m, selected: { y, m, d } };
+    const val = y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    document.getElementById(id).value = val;
+    const display = document.getElementById('dp-display-' + id);
+    display.textContent = _dpMonths[m] + ' ' + String(d).padStart(2,'0') + ', ' + y;
+    display.className = 'dp-selected-val';
+    const trigger = document.getElementById('dp-trigger-' + id);
+    if (trigger) { trigger.classList.remove('open', 'invalid-dp'); }
+    document.getElementById('dp-popup-' + id).style.display = 'none';
+    _fieldErr('err-' + id, '');
+    dpRender(id);
+}
+// Close pickers on outside click
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.ql-datepicker')) {
+        document.querySelectorAll('.ql-datepicker-popup').forEach(p => { p.style.display = 'none'; });
+        document.querySelectorAll('.ql-datepicker-trigger.open').forEach(t => t.classList.remove('open'));
+    }
+});
+
 function toggleCustomSelect(name) {
     const trigger = document.getElementById('ob-' + name + '-trigger');
     const dropdown = document.getElementById(name + '-dropdown');
@@ -1265,9 +1451,12 @@ function _fieldErr(id, msg) {
 function _fieldInvalid(inputId, invalid) {
     const el = document.getElementById(inputId);
     if (el) el.classList.toggle('invalid', !!invalid);
-    // Also style custom-select trigger if present
+    // custom-select trigger
     const trigger = document.getElementById(inputId + '-trigger');
     if (trigger) trigger.classList.toggle('invalid-select', !!invalid);
+    // custom datepicker trigger
+    const dpTrigger = document.getElementById('dp-trigger-' + inputId);
+    if (dpTrigger) dpTrigger.classList.toggle('invalid-dp', !!invalid);
 }
 async function submitProfile() {
     const firstName = (document.getElementById('ob-first-name') || {}).value?.trim() || '';
