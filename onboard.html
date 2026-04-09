@@ -2121,41 +2121,43 @@ function renderResult(data) {
         return;
     }
     if (data.certificate_id) _certificateId = data.certificate_id;
-    const passed = data.passed;
-    const score = data.score !== undefined ? data.score : (data.correct !== undefined ? data.correct : 0);
-    const total = data.total || 50;
-    const scorePct = data.score_pct || data.score || Math.round(score / total * 100);
+    var passed = data.passed;
+    var correct = data.correct !== undefined ? data.correct : 0;
+    var total = data.total || 50;
+    var scorePct = data.score_pct !== undefined ? Math.round(data.score_pct) : Math.round(correct / total * 100);
+    var certId = data.certificate_id || '';
 
-    _clearProgress(); // Reset course progress after exam submitted
-    goToStep('result');
+    _clearProgress();
 
-    const bannerEl = document.getElementById('result-banner');
-    const contentEl = document.getElementById('result-content');
+    // Show result directly
+    var allS = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc'];
+    allS.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
+    var re = document.getElementById('step-result');
+    if (re) re.style.display = '';
+    var pw = document.getElementById('progress-wrap');
+    if (pw) pw.style.display = 'block';
+    try { updateProgress('exam'); } catch(e) {}
+    window.scrollTo({top:0, behavior:'smooth'});
+
+    var bannerEl = document.getElementById('result-banner');
+    var contentEl = document.getElementById('result-content');
 
     if (passed) {
-        bannerEl.innerHTML = `<div class="result-banner pass">🎉 Passed! — ${score}/${total} correct (${scorePct}%)</div>`;
-        contentEl.innerHTML = `
-            <p style="color:var(--muted);margin-bottom:1.5rem;">Congratulations! Your certificate is ready to download.</p>
-            <div style="text-align:center;">
-                <button class="btn-primary" onclick="goToDownloadCert('${data.certificate_id || ''}')" style="max-width:280px;margin:0 auto;">
-                    🎓 Proceed to Download Certificate →
-                </button>
-            </div>`;
+        bannerEl.innerHTML = '<div class="result-banner pass">Passed! ' + correct + ' / ' + total + ' correct (' + scorePct + '%)</div>';
+        var html = '<p style="color:var(--muted);margin-bottom:1.5rem;text-align:center;">Congratulations! Your ENP certificate is ready to download.</p>';
+        html += '<div style="text-align:center;">';
+        html += '<button class="btn-primary" onclick="goToDownloadCert(\'' + certId + '\')" style="max-width:280px;margin:0 auto;display:inline-flex;align-items:center;gap:0.5rem;justify-content:center;">Download Certificate</button>';
+        html += '</div>';
+        contentEl.innerHTML = html;
     } else {
-        bannerEl.innerHTML = `<div class="result-banner fail">❌ Not Passed — ${score}/${total} correct (${scorePct}%)</div>`;
-        contentEl.innerHTML = `
-            <p style="color:var(--muted);margin-bottom:1rem;">You need 70% (35/50) to pass. Review the course material and try again.</p>
-            <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:0.5rem;padding:1rem;margin-bottom:1.5rem;font-size:0.875rem;color:var(--muted);">
-                📧 A notification has been sent to your registered email with retake instructions.
-            </div>
-            <div style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;">
-                <a href="/mastering-quanby-legal.pdf" target="_blank" class="btn-gold" style="text-align:center;width:100%;max-width:300px;">
-                    📖 Review Course Material
-                </a>
-                <button class="btn-primary" onclick="openRetakeModal()" style="max-width:300px;">
-                    🔄 Retake Exam (₱500 fee)
-                </button>
-            </div>`;
+        bannerEl.innerHTML = '<div class="result-banner fail">Not Passed &mdash; ' + correct + ' / ' + total + ' correct (' + scorePct + '%)</div>';
+        var html2 = '<p style="color:var(--muted);margin-bottom:1rem;text-align:center;">You need 70% (35/50) to pass. Review the course material and try again.</p>';
+        html2 += '<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:0.5rem;padding:1rem;margin-bottom:1.5rem;font-size:0.875rem;color:var(--muted);text-align:center;">A fail notification has been sent to your registered email.</div>';
+        html2 += '<div style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;">';
+        html2 += '<a href="/mastering-quanby-legal.pdf" target="_blank" class="btn-gold" style="text-align:center;width:100%;max-width:300px;">Review Course Material</a>';
+        html2 += '<button class="btn-primary" onclick="goToStep(\'course\')" style="max-width:300px;">Go to Course</button>';
+        html2 += '</div>';
+        contentEl.innerHTML = html2;
     }
 }
 
