@@ -1623,11 +1623,29 @@ function selectRole(role) {
 async function submitRole() {
     document.getElementById("err-role").textContent = "";
     try {
-        const res = await fetch("/api/onboarding/role", {
+        let res = await fetch("/api/onboarding/role", {
             method: "POST", credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ role: _role })
         });
+        // Auto-refresh token on 401 and retry once
+        if (res.status === 401) {
+            try {
+                const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+                if (ref.ok) {
+                    res = await fetch("/api/onboarding/role", {
+                        method: "POST", credentials: "include",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ role: _role })
+                    });
+                } else {
+                    // Refresh failed — session truly expired, redirect to sign in
+                    sessionStorage.setItem('post_login_redirect', '/onboard');
+                    window.location.href = '/';
+                    return;
+                }
+            } catch(e) {}
+        }
         if (!res.ok) throw new Error((await res.json()).detail || "Failed");
         goToStep("profile");
     } catch(e) {

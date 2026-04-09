@@ -99,7 +99,7 @@ def _set_auth_cookies(response: Response, user_id: str, email: str) -> None:
         httponly=True,
         secure=_COOKIE_SECURE,
         samesite=_COOKIE_SAMESITE,
-        max_age=15 * 60,         # 15 minutes
+        max_age=60 * 60,          # 1 hour
         path="/",
     )
     response.set_cookie(
@@ -386,7 +386,7 @@ async def refresh_token_endpoint(
         httponly=True,
         secure=_COOKIE_SECURE,
         samesite=_COOKIE_SAMESITE,
-        max_age=15 * 60,
+        max_age=60 * 60,  # 1 hour
         path="/",
     )
     return {"success": True, "message": "Access token refreshed"}

@@ -52,7 +52,7 @@ if len(_jwt_secret) < 32:
 JWT_SECRET = _jwt_secret
 
 # FIX-11: Token lifetimes
-ACCESS_TOKEN_EXPIRES_SECONDS  = 15 * 60        # 15 minutes
+ACCESS_TOKEN_EXPIRES_SECONDS  = 60 * 60  # 1 hour        # 15 minutes
 REFRESH_TOKEN_EXPIRES_SECONDS = 7 * 24 * 3600  # 7 days
 JWT_ALGORITHM  = "HS256"
 JWT_ISSUER     = "quanby-legal"
