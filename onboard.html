@@ -338,6 +338,48 @@
         }
         .ob-field select:focus { outline: none; border-color: var(--purple); }
         .ob-field select option { background: #0f1020; color: var(--text); }
+        /* Custom select dropdown */
+        .custom-select { position: relative; width: 100%; }
+        .custom-select-trigger {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.5rem;
+            padding: 0.65rem 0.875rem;
+            color: var(--muted);
+            font-family: "Inter", sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            user-select: none;
+        }
+        .custom-select-trigger:hover { border-color: rgba(255,255,255,0.25); }
+        .custom-select-trigger.selected { color: var(--text); }
+        .custom-select-trigger.open { border-color: var(--purple); }
+        .custom-select-trigger.invalid-select { border-color: #f87171 !important; }
+        .custom-select-arrow { width: 12px; height: 12px; flex-shrink: 0; transition: transform 0.2s; }
+        .custom-select-trigger.open .custom-select-arrow { transform: rotate(180deg); }
+        .custom-select-arrow path { stroke: #94a3b8; }
+        .custom-select-trigger.open .custom-select-arrow path { stroke: var(--purple-light, #9d5ff3); }
+        .custom-select-dropdown {
+            display: none;
+            position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 50;
+            background: #111827;
+            border: 1px solid rgba(124,58,237,0.4);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        .custom-select-dropdown.open { display: block; }
+        .custom-select-option {
+            padding: 0.65rem 0.875rem;
+            font-size: 0.9rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .custom-select-option:hover { background: rgba(124,58,237,0.2); color: #fff; }
+        .custom-select-option.selected { background: rgba(124,58,237,0.3); color: #fff; font-weight: 600; }
         .ob-field input.invalid { border-color: #f87171 !important; }
         .ob-error {
             color: #f87171;
@@ -791,12 +833,18 @@
             </div>
             <div class="ob-field">
                 <label>Mode of Notarization *</label>
-                <select id="ob-mode-notarization">
-                    <option value="">-- Select --</option>
-                    <option value="IEN">IEN (In-Person Electronic Notarization)</option>
-                    <option value="REN">REN (Remote Electronic Notarization)</option>
-                    <option value="Both">Both IEN and REN</option>
-                </select>
+                <div class="custom-select" id="custom-mode-notarization">
+                    <div class="custom-select-trigger" id="ob-mode-notarization-trigger" onclick="toggleCustomSelect('mode-notarization')">
+                        <span id="ob-mode-notarization-label">-- Select --</span>
+                        <svg class="custom-select-arrow" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div class="custom-select-dropdown" id="mode-notarization-dropdown">
+                        <div class="custom-select-option" data-value="IEN" onclick="selectCustomOption('mode-notarization','IEN','IEN — In-Person Electronic Notarization')">IEN — In-Person Electronic Notarization</div>
+                        <div class="custom-select-option" data-value="REN" onclick="selectCustomOption('mode-notarization','REN','REN — Remote Electronic Notarization')">REN — Remote Electronic Notarization</div>
+                        <div class="custom-select-option" data-value="Both" onclick="selectCustomOption('mode-notarization','Both','Both IEN and REN')">Both IEN and REN</div>
+                    </div>
+                    <input type="hidden" id="ob-mode-notarization" value="">
+                </div>
                 <span class="ob-field-error" id="err-mode-notarization"></span>
             </div>
         </div>
@@ -1176,6 +1224,40 @@ function toggleProfileFields() {
     document.getElementById('client-fields').style.display = isAttorney ? 'none' : '';
 }
 
+function toggleCustomSelect(name) {
+    const trigger = document.getElementById('ob-' + name + '-trigger');
+    const dropdown = document.getElementById(name + '-dropdown');
+    const isOpen = dropdown.classList.contains('open');
+    // Close all open custom selects first
+    document.querySelectorAll('.custom-select-dropdown.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.custom-select-trigger.open').forEach(t => t.classList.remove('open'));
+    if (!isOpen) {
+        trigger.classList.add('open');
+        dropdown.classList.add('open');
+    }
+}
+function selectCustomOption(name, value, label) {
+    document.getElementById('ob-' + name).value = value;
+    const lbl = document.getElementById('ob-' + name + '-label');
+    if (lbl) lbl.textContent = label;
+    const trigger = document.getElementById('ob-' + name + '-trigger');
+    if (trigger) { trigger.classList.add('selected'); trigger.classList.remove('open', 'invalid-select'); }
+    const dropdown = document.getElementById(name + '-dropdown');
+    if (dropdown) dropdown.classList.remove('open');
+    // Mark selected option
+    document.querySelectorAll('#custom-' + name + ' .custom-select-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.value === value);
+    });
+    _fieldErr('err-' + name, '');
+}
+// Close custom selects on outside click
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.custom-select')) {
+        document.querySelectorAll('.custom-select-dropdown.open').forEach(d => d.classList.remove('open'));
+        document.querySelectorAll('.custom-select-trigger.open').forEach(t => t.classList.remove('open'));
+    }
+});
+
 function _fieldErr(id, msg) {
     const el = document.getElementById(id);
     if (el) el.textContent = msg || '';
@@ -1183,6 +1265,9 @@ function _fieldErr(id, msg) {
 function _fieldInvalid(inputId, invalid) {
     const el = document.getElementById(inputId);
     if (el) el.classList.toggle('invalid', !!invalid);
+    // Also style custom-select trigger if present
+    const trigger = document.getElementById(inputId + '-trigger');
+    if (trigger) trigger.classList.toggle('invalid-select', !!invalid);
 }
 async function submitProfile() {
     const firstName = (document.getElementById('ob-first-name') || {}).value?.trim() || '';
