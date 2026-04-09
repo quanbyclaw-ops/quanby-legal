@@ -53,7 +53,7 @@
     "provider_id": "116682404850871914869",
     "email_verified": true,
     "role": "attorney",
-    "onboarding_step": "kyc_id",
+    "onboarding_step": "certificate",
     "profile": {
       "prefix": "",
       "first_name": "Mj",
@@ -535,17 +535,18 @@
       ],
       "retake_fee_php": 0
     },
-    "liveness_verified": false,
-    "national_id_uploaded": false,
+    "liveness_verified": true,
+    "national_id_uploaded": true,
     "certificate_status": "probationary",
     "certificate_id": "QL-ENP-20260409-7D89A3A5809747C5",
     "retake_count": 0,
     "retake_payment_confirmed": false,
     "created_at": "2026-04-08T04:44:28.607987+00:00",
     "last_login": "2026-04-09T04:30:39.787246+00:00",
-    "kyc_id_uploaded": false,
-    "hyperverge_transaction_id": null,
-    "hyperverge_status": null
+    "kyc_id_uploaded": true,
+    "hyperverge_transaction_id": "ql-297dd411-1775733185",
+    "hyperverge_status": "auto_approved",
+    "kyc_verified_at": "2026-04-09T11:13:54.696769+00:00"
   },
   "22edd02a-4f9f-45b2-945d-d8f74a09bd29": {
     "id": "22edd02a-4f9f-45b2-945d-d8f74a09bd29",
@@ -609,6 +610,6 @@
     "retake_count": 0,
     "retake_payment_confirmed": false,
     "created_at": "2026-04-09T10:39:37.071014+00:00",
-    "last_login": "2026-04-09T10:54:19.591093+00:00"
+    "last_login": "2026-04-09T11:07:42.579132+00:00"
   }
 }

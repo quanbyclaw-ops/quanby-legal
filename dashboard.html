@@ -159,7 +159,8 @@
       <div id="kyc-expired-warning" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.85rem;color:#F87171;margin-bottom:1rem;">
         ❌ Your KYC has expired. Please redo your identity verification.
       </div>
-      <button class="btn-teal" onclick="redoKyc()" id="btn-redo-kyc" style="max-width:260px;">🔄 Redo KYC Verification</button>
+      <button class="btn-teal" onclick="redoKyc()" id="btn-redo-kyc" style="max-width:260px;display:none;">🔄 Redo KYC Verification</button>
+      <div id="kyc-done-msg" style="display:none;color:#10B981;font-size:0.875rem;font-weight:600;">✅ KYC Verified — <span id="kyc-done-date"></span></div>
       <div id="kyc-msg" style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem;display:none;"></div>
     </div>
 
@@ -256,6 +257,10 @@ async function loadDashboard() {
     // Expiry countdown
     const statKyc = document.getElementById('stat-kyc');
     const statKycSub = document.getElementById('stat-kyc-sub');
+    const redoBtn = document.getElementById('btn-redo-kyc');
+    const doneMsgEl = document.getElementById('kyc-done-msg');
+    const doneDateEl = document.getElementById('kyc-done-date');
+
     if (kycVerified && kycVerifiedAt) {
       const verifiedDate = new Date(kycVerifiedAt);
       const expiryDate = new Date(verifiedDate.getTime() + KYC_EXPIRY_DAYS * 86400000);
@@ -268,24 +273,35 @@ async function loadDashboard() {
         document.getElementById('kyc-expired-warning').style.display = '';
         statKyc.innerHTML = '<span style="color:#F87171;">Expired</span>';
         statKycSub.textContent = 'Redo KYC required';
+        if (redoBtn) redoBtn.style.display = '';
+        if (doneMsgEl) doneMsgEl.style.display = 'none';
       } else if (daysLeft <= 5) {
         document.getElementById('kyc-warning').style.display = '';
         document.getElementById('kyc-days-left').textContent = daysLeft;
         statKyc.innerHTML = `<span style="color:#F59E0B;">Expiring soon</span>`;
         statKycSub.textContent = `${daysLeft} days left`;
+        if (redoBtn) redoBtn.style.display = '';
+        if (doneMsgEl) { doneMsgEl.style.display = ''; if (doneDateEl) doneDateEl.textContent = `expires ${expiryStr}`; }
       } else {
         statKyc.innerHTML = '<span style="color:#10B981;">✅ Valid</span>';
         statKycSub.textContent = `Expires in ${daysLeft} days`;
+        // Hide redo button, show done message
+        if (redoBtn) redoBtn.style.display = 'none';
+        if (doneMsgEl) { doneMsgEl.style.display = ''; if (doneDateEl) doneDateEl.textContent = `expires ${expiryStr}`; }
       }
     } else if (kycVerified) {
-      // Verified but no timestamp — show as valid but no expiry info
+      // Verified but no timestamp stored
       document.getElementById('kyc-expiry').innerHTML = '<span style="color:#8B90A8;">Unknown</span>';
       statKyc.innerHTML = '<span style="color:#10B981;">✅ Verified</span>';
-      statKycSub.textContent = 'Expiry date unavailable — consider redoing KYC';
+      statKycSub.textContent = 'KYC complete';
+      if (redoBtn) redoBtn.style.display = 'none';
+      if (doneMsgEl) { doneMsgEl.style.display = ''; if (doneDateEl) doneDateEl.textContent = 'verified'; }
     } else {
       document.getElementById('kyc-expiry').innerHTML = '<span style="color:#8B90A8;">N/A</span>';
       statKyc.innerHTML = '<span style="color:#F59E0B;">Not done</span>';
       statKycSub.textContent = 'Complete KYC verification';
+      if (redoBtn) redoBtn.style.display = '';
+      if (doneMsgEl) doneMsgEl.style.display = 'none';
     }
 
     document.getElementById('loading').style.display = 'none';
