@@ -405,7 +405,7 @@ def get_certificate_html(user: dict) -> str:
     position: relative;
     z-index: 10;
     width: 100%;
-    padding: 10mm 55mm 0 30mm;
+    padding: 10mm 20mm 0 20mm;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -490,9 +490,9 @@ def get_certificate_html(user: dict) -> str:
   /* SIGNATURES */
   .sig-row {{
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: flex-end;
-    width: 90%;
+    width: 85%;
     margin: 2mm auto 0;
     padding-top: 2mm;
     border-top: none;
@@ -599,7 +599,7 @@ def get_certificate_html(user: dict) -> str:
     <!-- Signatures -->
     <div class="sig-row">
       <div class="sig-block">
-        <div class="sig-name">Michael Balcueva</div>
+        <div class="sig-name">&nbsp;</div>
         <div class="sig-line"></div>
         <div class="sig-role">Chief Executive Officer</div>
       </div>
@@ -609,7 +609,7 @@ def get_certificate_html(user: dict) -> str:
         <div class="sig-role">{role_label}</div>
       </div>
       <div class="sig-block">
-        <div class="sig-name">Quanby Legal Platform</div>
+        <div class="sig-name">&nbsp;</div>
         <div class="sig-line"></div>
         <div class="sig-role">SC-Accredited ENF</div>
       </div>
