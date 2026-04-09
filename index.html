@@ -364,8 +364,9 @@
         .use-cases-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
 
         /* PRICING */
-        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 1.5rem; }
         .pricing-card { position: relative; }
+        .pricing-card.popular { padding-top: 2rem; }
         .popular-badge {
             position: absolute; top: -1rem; left: 50%; transform: translateX(-50%);
             background: var(--pink); padding: 0.25rem 0.75rem;
@@ -1699,7 +1700,7 @@
                     </ul>
                     <button class="btn btn-outline" style="width:100%;margin-top:1.5rem">Get started</button>
                 </div>
-                <div class="pricing-card card" style="border-color:var(--purple);position:relative">
+                <div class="pricing-card popular card" style="border-color:var(--purple);position:relative">
                     <div class="popular-badge">MOST POPULAR</div>
                     <div class="tier-name">Professional</div>
                     <div class="tier-price">₱2,999<span style="font-size:1rem;color:var(--muted)">/mo</span></div>
