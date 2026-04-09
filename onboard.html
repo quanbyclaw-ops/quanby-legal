@@ -800,6 +800,8 @@
             .role-cards { grid-template-columns: 1fr; }
             .field-row { flex-direction: column; gap: 0; }
             .ob-card { padding: 1.5rem 1.25rem; }
+            .course-tabs { gap:0.25rem; }
+            .course-tab { padding:0.3rem 0.6rem; font-size:0.72rem; }
             .ob-line { width: 24px; }
             .ob-step { min-width: 48px; font-size: 0.65rem; }
         }
@@ -809,6 +811,7 @@
         /* ── Course Module ─────────────────────────────────── */
         .course-tabs {
             display:flex; flex-wrap:wrap; gap:0.375rem; margin-bottom:1.25rem;
+            width:100%; box-sizing:border-box;
         }
         .course-tab {
             padding:0.35rem 0.75rem; border-radius:999px; font-size:0.75rem; font-weight:600;
@@ -1210,7 +1213,7 @@
     </div>
 
     <!-- STEP 3: COURSE + DISCLAIMER -->
-    <div id="step-course" class="ob-card" style="display:none;">
+    <div id="step-course" class="ob-card" style="display:none;overflow-x:hidden;">
         <h2><i data-lucide="book" class="qi"></i> Course Module</h2>
         <p class="sub">Complete all lessons before taking your certification exam.</p>
 
