@@ -333,11 +333,12 @@
         .ob-field-error { color: #f87171; font-size: 0.78rem; margin-top: 0.3rem; min-height: 1em; display: block; }
         /* Phone picker */
         .phone-input-wrap {
-            display: flex; align-items: stretch;
+            display: flex; align-items: center;
             background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 0.5rem; overflow: visible;
+            border-radius: 0.5rem; overflow: hidden;
             transition: border-color 0.2s; position: relative;
+            height: 44px;
         }
         .phone-input-wrap:focus-within { border-color: var(--purple); }
         .phone-input-wrap.invalid-phone { border-color: #f87171 !important; }
@@ -346,9 +347,9 @@
             padding: 0 0.75rem; background: rgba(255,255,255,0.04);
             border: none; border-right: 1px solid rgba(255,255,255,0.1);
             color: var(--text); font-size: 0.9rem; cursor: pointer;
-            white-space: nowrap; border-radius: 0.5rem 0 0 0.5rem;
+            white-space: nowrap; height: 100%;
             font-family: "Inter", sans-serif; flex-shrink: 0;
-            transition: background 0.15s;
+            transition: background 0.15s; position: relative;
         }
         .phone-country-btn:hover { background: rgba(255,255,255,0.08); }
         .phone-country-flag { font-size: 1.1rem; line-height: 1; }
@@ -356,9 +357,9 @@
         .phone-country-chevron { opacity: 0.5; }
         .phone-number-input {
             flex: 1; background: transparent; border: none;
-            padding: 0.65rem 0.875rem; color: var(--text);
+            padding: 0 0.875rem; color: var(--text);
             font-family: "Inter", sans-serif; font-size: 0.9rem; outline: none;
-            min-width: 0;
+            min-width: 0; height: 100%;
         }
         .phone-number-input::placeholder { color: rgba(148,163,184,0.5); }
         .phone-country-dropdown {
@@ -964,7 +965,7 @@
                     <span class="phone-country-flag" id="phone-flag">🇵🇭</span>
                     <span class="phone-country-code" id="phone-code">+63</span>
                     <svg class="phone-country-chevron" width="10" height="10" viewBox="0 0 12 12"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <div class="phone-country-dropdown" id="phone-country-dropdown" style="display:none;" onclick="event.stopPropagation()">
+                    <div class="phone-country-dropdown" id="phone-country-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:200;" onclick="event.stopPropagation()">
                         <div class="phone-country-option selected" data-code="+63" data-flag="🇵🇭" data-name="Philippines" onclick="selectCountry('+63','🇵🇭','PH')">🇵🇭 Philippines <span class="opt-code">+63</span></div>
                         <div class="phone-country-option" data-code="+1" data-flag="🇺🇸" data-name="United States" onclick="selectCountry('+1','🇺🇸','US')">🇺🇸 United States <span class="opt-code">+1</span></div>
                         <div class="phone-country-option" data-code="+44" data-flag="🇬🇧" data-name="United Kingdom" onclick="selectCountry('+44','🇬🇧','GB')">🇬🇧 United Kingdom <span class="opt-code">+44</span></div>
