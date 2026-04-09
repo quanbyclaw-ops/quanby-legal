@@ -2422,8 +2422,17 @@ function renderLesson() {
     var nextBtn = document.getElementById('btn-lesson-next');
     nextBtn.disabled = isLast;
     nextBtn.textContent = isLast ? '\u2713 All Done' : 'Next \u2192';
+    if (isLast) {
+        nextBtn.onclick = function() {
+            var _br = document.getElementById('course-btn-row');
+            if (_br) { _br.style.display = 'flex'; _br.scrollIntoView({behavior:'smooth',block:'center'}); }
+            document.getElementById('course-complete-notice').classList.add('visible');
+        };
+    } else {
+        nextBtn.onclick = function() { lessonNav(1); };
+    }
     try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch(e) {}
-    if (viewedCount === TOTAL_LESSONS) {
+    if (viewedCount >= TOTAL_LESSONS) {
         document.getElementById('course-complete-notice').classList.add('visible');
         // Show the Proceed to Exam button row
         var _br = document.getElementById('course-btn-row');
