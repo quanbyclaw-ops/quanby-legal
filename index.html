@@ -318,6 +318,7 @@
         .card-icon { font-size: 2rem; margin-bottom: 1rem; }
         .card-icon svg { width: 2rem; height: 2rem; stroke: var(--purple-light, #9d5ff3); stroke-width: 1.5; }
         .qi { display: inline-flex; align-items: center; justify-content: center; }
+        .qi svg, span svg, div > svg { vertical-align: middle; flex-shrink: 0; }
         .qi svg { width: 1em; height: 1em; stroke: currentColor; stroke-width: 1.75; fill: none; vertical-align: -0.15em; flex-shrink: 0; }
         .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
         .card-desc { color: var(--muted); font-size: 0.9rem; }
@@ -1138,11 +1139,11 @@
                 <h1><span class="gradient-text">AI-Powered Legal</span><br>Platform for the Philippines</h1>
                 <p class="hero-subtitle">Analyze contracts, generate legally compliant documents, and get instant notarization — powered by AI and fully compliant with Philippine law — A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and SEC MC 28-2020.</p>
                 <div style="display:flex; flex-wrap:wrap; gap:0.6rem; margin-bottom:1.25rem;">
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">⚖️ A.M. No. 24-10-14-SC</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg> A.M. No. 24-10-14-SC</span>
                     <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">📜 RA 8792 E-Commerce</span>
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">🔒 RA 10173 Data Privacy</span>
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">🏦 BSP Circular 944</span>
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">📋 SEC MC 28-2020</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> RA 10173 Data Privacy</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10V21M19 10V21M12 3L3 10h18L12 3z"/></svg> BSP Circular 944</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> SEC MC 28-2020</span>
                 </div>
                 <div class="hero-buttons">
                     <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})"><i data-lucide="bot" class="qi"></i> Try Contract AI Agent →</button>
@@ -1150,13 +1151,13 @@
                 </div>
             </div>
             <div class="orbital">
-                <div class="orbital-center">⚖️</div>
+                <div class="orbital-center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg></div>
                 <div class="ring ring1"></div>
                 <div class="ring ring2"></div>
-                <div class="orbital-icon icon1">📄</div>
-                <div class="orbital-icon icon2">🛡️</div>
-                <div class="orbital-icon icon3">✍️</div>
-                <div class="orbital-icon icon4">⛓️</div>
+                <div class="orbital-icon icon1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                <div class="orbital-icon icon2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="orbital-icon icon3"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                <div class="orbital-icon icon4"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
             </div>
         </div>
     </section>
@@ -1241,7 +1242,7 @@
 
             <!-- TABS -->
             <div class="agent-tabs">
-                <button class="agent-tab active" onclick="switchTab('analyze')">📋 Analyze Contract</button>
+                <button class="agent-tab active" onclick="switchTab('analyze')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Analyze Contract</button>
                 <button class="agent-tab" onclick="switchTab('chat')">💬 Ask AI</button>
                 <button class="agent-tab" onclick="switchTab('generate')">✨ Generate Contract</button>
             </div>
@@ -1251,7 +1252,7 @@
                 <!-- Upload Area -->
                 <div class="upload-area" id="upload-area">
                     <input type="file" id="file-input" accept=".pdf,.docx,.txt" onchange="handleFileSelect(this)">
-                    <div class="upload-icon">📄</div>
+                    <div class="upload-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div>
                     <div class="upload-title">Drop your contract here</div>
                     <p class="upload-desc">Upload a PDF or DOCX contract for instant AI-powered legal analysis under Philippine law</p>
                     <div class="upload-types">
@@ -1311,19 +1312,19 @@
 
                         <!-- Compliance -->
                         <div class="analysis-card">
-                            <div class="analysis-card-title">✅ Compliance Check</div>
+                            <div class="analysis-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Compliance Check</div>
                             <div id="compliance-list"></div>
                         </div>
 
                         <!-- Missing Clauses -->
                         <div class="analysis-card" style="grid-column: 1 / -1">
-                            <div class="analysis-card-title">⚠️ Missing Clauses</div>
+                            <div class="analysis-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Missing Clauses</div>
                             <div id="missing-clauses-list"></div>
                         </div>
                     </div>
 
                     <div style="margin-top:1.5rem;padding:1.25rem;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:0.75rem">
-                        <div style="font-weight:600;margin-bottom:0.5rem">🤖 AI Recommendation</div>
+                        <div style="font-weight:600;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.4rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V7M8 7h8a2 2 0 000-4H8a2 2 0 000 4zM8 15h2M14 15h2"/></svg> AI Recommendation</div>
                         <div id="ai-recommendation" style="color:var(--muted);font-size:0.9rem;line-height:1.6"></div>
                         <div style="margin-top:1rem;font-size:0.75rem;color:var(--muted);font-style:italic">⚖️ This AI analysis is for informational purposes only and does not constitute legal advice. Consult a licensed Philippine attorney for final decisions. Quanby Legal's certified ENPs are available for e-notarization.</div>
                     </div>
@@ -1406,7 +1407,7 @@
                             <div class="generated-contract-header">
                                 <div style="font-weight:600" id="generated-title">Generated Contract</div>
                                 <div style="display:flex;gap:0.5rem">
-                                    <button class="btn btn-outline btn-sm" onclick="copyContract()">📋 Copy</button>
+                                    <button class="btn btn-outline btn-sm" onclick="copyContract()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button>
                                     <button class="btn btn-teal btn-sm" onclick="downloadContract()">⬇ Download</button>
                                 </div>
                             </div>
@@ -1431,7 +1432,7 @@
             <!-- Compliance trust bar -->
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:0.75rem; margin-bottom:2.5rem;">
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">⚖️</div>
+                    <div style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg></div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">A.M. No. 24-10-14-SC</div>
                     <div style="font-size:0.65rem;color:#64748b;">Supreme Court</div>
                 </div>
@@ -1441,22 +1442,22 @@
                     <div style="font-size:0.65rem;color:#64748b;">E-Commerce Act</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">🔒</div>
+                    <div style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">RA 10173</div>
                     <div style="font-size:0.65rem;color:#64748b;">Data Privacy Act</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">🏦</div>
+                    <div style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10V21M19 10V21M12 3L3 10h18L12 3z"/></svg></div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">BSP Circular 944</div>
                     <div style="font-size:0.65rem;color:#64748b;">eKYC Standards</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">📋</div>
+                    <div style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">SEC MC 28-2020</div>
                     <div style="font-size:0.65rem;color:#64748b;">Remote Notarization</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">🛡️</div>
+                    <div style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">DICT PNPKI</div>
                     <div style="font-size:0.65rem;color:#64748b;">Gov. Identity Verified</div>
                 </div>
@@ -1517,7 +1518,7 @@
 
             <!-- Supreme Court & Judiciary -->
             <div style="margin-bottom: 3rem;">
-                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">⚖️ Supreme Court of the Philippines</h3>
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg> Supreme Court of the Philippines</h3>
                 <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
                     <div class="card" style="padding: 1.5rem;">
                         <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">A.M. No. 24-10-14-SC</div>
@@ -1557,7 +1558,7 @@
 
             <!-- Data Privacy -->
             <div style="margin-bottom: 3rem;">
-                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">🔒 Data Privacy (NPC / RA 10173)</h3>
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Data Privacy (NPC / RA 10173)</h3>
                 <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
                     <div class="card" style="padding: 1.5rem;">
                         <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">RA 10173 — Data Privacy Act of 2012</div>
@@ -1615,7 +1616,7 @@
 
             <!-- Disclaimer -->
             <div class="card" style="padding: 1.75rem 2rem; border-left: 3px solid rgba(124,58,237,0.5); background: rgba(124,58,237,0.06);">
-                <div style="font-weight: 700; margin-bottom: 0.75rem; color: #f1f5f9; font-size: 0.95rem;">⚠️ Regulatory Disclaimer</div>
+                <div style="font-weight: 700; margin-bottom: 0.75rem; color: #f1f5f9; font-size: 0.95rem; display:flex; align-items:center; gap:0.4rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Regulatory Disclaimer</div>
                 <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.8;">This page is provided for informational purposes and does not constitute legal advice. Regulatory frameworks are subject to change. Quanby Legal makes no warranty that all information is current at the time of reading. For the most up-to-date regulatory guidance, consult the Supreme Court of the Philippines, the National Privacy Commission (NPC), Bangko Sentral ng Pilipinas (BSP), or the Securities and Exchange Commission (SEC). Businesses and individuals should seek independent legal counsel for compliance advice specific to their situation.</p>
                 <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.825rem;">
                     <a href="https://sc.judiciary.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">Supreme Court ↗</a>
@@ -1643,14 +1644,14 @@
                 <div class="connecting-line"></div>
                 <div class="step">
                     <div class="step-number">2</div>
-                    <div class="step-icon">🪪</div>
+                    <div class="step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/><circle cx="8" cy="14" r="2"/><path d="M12 14h4M12 17h4"/></svg></div>
                     <div class="step-title">Verify Identity</div>
                     <p style="color:var(--muted);font-size:0.9rem">eKYC with DICT PKI — legally binding identity</p>
                 </div>
                 <div class="connecting-line"></div>
                 <div class="step">
                     <div class="step-number">3</div>
-                    <div class="step-icon">✅</div>
+                    <div class="step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
                     <div class="step-title">Certified & Notarized</div>
                     <p style="color:var(--muted);font-size:0.9rem">Instant blockchain-anchored notarized document</p>
                 </div>
@@ -1725,17 +1726,17 @@
             <div class="contact-section">
                 <div class="topics">
                     <div class="topic-card" data-topic="enp">
-                        <div class="topic-icon">📄</div>
+                        <div class="topic-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
                         <div class="topic-title">I Need an ENP</div>
                         <p class="topic-desc">ENP is an Electronic Notary Public</p>
                     </div>
                     <div class="topic-card" data-topic="lawyer">
-                        <div class="topic-icon">⚖️</div>
+                        <div class="topic-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg></div>
                         <div class="topic-title">I'm a Lawyer</div>
                         <p class="topic-desc">Apply to become a certified ENP on the platform</p>
                     </div>
                     <div class="topic-card" data-topic="investor">
-                        <div class="topic-icon">💼</div>
+                        <div class="topic-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2M12 12v4M8 12h8"/></svg></div>
                         <div class="topic-title">Investment Inquiry</div>
                         <p class="topic-desc">Quanby Legal is seeking strategic investors</p>
                     </div>
@@ -1746,10 +1747,10 @@
                     </div>
                 </div>
                 <div class="chat-panel">
-                    <div class="chat-header">🤖 Quanby Assistant <span class="online-dot"></span></div>
+                    <div class="chat-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V7M8 7h8a2 2 0 000-4H8a2 2 0 000 4zM8 15h2M14 15h2"/></svg> Quanby Assistant <span class="online-dot"></span></div>
                     <div class="chat-messages" id="chat-messages">
                         <div class="empty-state">
-                            <div style="font-size:2.5rem;margin-bottom:0.5rem">🤖</div>
+                            <div style="margin-bottom:0.5rem;display:flex;justify-content:center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V7M8 7h8a2 2 0 000-4H8a2 2 0 000 4zM8 15h2M14 15h2"/></svg></div>
                             <div style="font-weight:500">Quanby Legal Assistant</div>
                             <p style="font-size:0.875rem;margin-top:0.25rem">Select a topic to start</p>
                         </div>
@@ -2042,7 +2043,7 @@
             const impColor = m.importance === 'high' ? '#f87171' : m.importance === 'medium' ? '#fbbf24' : 'var(--muted)';
             missEl.innerHTML += `
                 <div class="flag-item flag-${m.importance || 'medium'}">
-                    <div class="flag-icon">⚠️</div>
+                    <div class="flag-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
                     <div>
                         <div class="flag-title">${escHtml(m.clause || 'Missing clause')}</div>
                         <div class="flag-desc">${escHtml(m.why_needed || '')}</div>
@@ -2318,7 +2319,7 @@
         navigator.clipboard.writeText(generatedContractText).then(() => {
             const btn = event.currentTarget;
             btn.textContent = '✓ Copied!';
-            setTimeout(() => btn.textContent = '📋 Copy', 2000);
+            setTimeout(() => btn.textContent = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy', 2000);
         });
     }
 
