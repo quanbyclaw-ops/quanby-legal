@@ -52,12 +52,52 @@
         .logo-img { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; margin-right: 0.4rem; image-rendering: -webkit-optimize-contrast; background: transparent; }
         .logo-text { font-weight: bold; font-size: 1.25rem; white-space: nowrap; color: var(--text); }
         .nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
-        .nav-user { display: none; align-items: center; gap: 0.625rem; }
+        .nav-user { display: none; align-items: center; gap: 0.625rem; position: relative; }
         .nav-user.visible { display: flex; }
-        .nav-user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); }
-        .nav-user-name { font-size: 0.85rem; color: var(--muted); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .nav-signout-btn { background: transparent; border: 1px solid rgba(239,68,68,0.35); color: #f87171; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-        .nav-signout-btn:hover { background: rgba(239,68,68,0.12); border-color: #f87171; }
+        .nav-signout-btn { display: none; }
+        /* Profile trigger */
+        .nav-profile-wrap {
+            display: flex; align-items: center; gap: 0.5rem;
+            cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: background 0.15s, border-color 0.15s; position: relative; user-select: none;
+        }
+        .nav-profile-wrap:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.2); }
+        .nav-user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); flex-shrink: 0; }
+        .nav-user-initials {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            display: none; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .nav-user-name { font-size: 0.85rem; color: var(--muted); max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nav-profile-chevron { transition: transform 0.2s; flex-shrink: 0; }
+        .nav-profile-wrap.open .nav-profile-chevron { transform: rotate(180deg); }
+        /* Dropdown */
+        .nav-user-menu {
+            position: absolute; top: calc(100% + 8px); right: 0;
+            background: #111827; border: 1px solid rgba(124,58,237,0.3);
+            border-radius: 0.75rem; min-width: 220px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6); z-index: 200; overflow: hidden;
+        }
+        .num-header { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1rem; background: rgba(124,58,237,0.08); }
+        .num-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); flex-shrink: 0; }
+        .num-initials {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            display: none; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .num-info { display: flex; flex-direction: column; min-width: 0; }
+        .num-name { font-size: 0.85rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .num-email { font-size: 0.72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .num-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 0.25rem 0; }
+        .num-item { display: flex; align-items: center; gap: 0.625rem; width: 100%; padding: 0.6rem 1rem; font-size: 0.85rem; color: var(--text); background: none; border: none; cursor: pointer; transition: background 0.12s; text-align: left; font-family: "Inter", sans-serif; }
+        .num-item:hover { background: rgba(255,255,255,0.06); }
+        .num-item svg { opacity: 0.6; flex-shrink: 0; }
+        .num-signout { color: #f87171; }
+        .num-signout svg { opacity: 0.8; }
+        .num-signout:hover { background: rgba(239,68,68,0.08); }
         .nav-home-link { color: var(--muted); font-size: 0.85rem; text-decoration: none; }
         .nav-home-link:hover { color: var(--text); }
 
@@ -710,9 +750,32 @@
         <div class="nav-right">
             <a class="nav-home-link" href="/">← Back to Home</a>
             <div class="nav-user" id="nav-user">
-                <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" onerror="this.style.display='none'">
-                <span class="nav-user-name" id="nav-user-name"></span>
-                <button class="nav-signout-btn" onclick="signOut()">Sign Out</button>
+                <div class="nav-profile-wrap" id="nav-profile-wrap" onclick="toggleUserMenu()">
+                    <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" style="display:none;" onload="this.style.display='block';document.getElementById('nav-user-initials').style.display='none';" onerror="this.style.display='none';document.getElementById('nav-user-initials').style.display='flex';">
+                    <div class="nav-user-initials" id="nav-user-initials" style="display:none;"></div>
+                    <span class="nav-user-name" id="nav-user-name"></span>
+                    <svg class="nav-profile-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="nav-user-menu" id="nav-user-menu" style="display:none;">
+                    <div class="num-header">
+                        <img class="num-avatar" id="num-avatar" src="" alt="" style="display:none;" onload="this.style.display='block';document.getElementById('num-initials').style.display='none';" onerror="this.style.display='none';document.getElementById('num-initials').style.display='flex';">
+                        <div class="num-initials" id="num-initials" style="display:none;"></div>
+                        <div class="num-info">
+                            <span class="num-name" id="num-name"></span>
+                            <span class="num-email" id="num-email"></span>
+                        </div>
+                    </div>
+                    <div class="num-divider"></div>
+                    <button class="num-item" onclick="toggleUserMenu()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm0 1c-3.31 0-6 1.79-6 4v1h12v-1c0-2.21-2.69-4-6-4z" fill="currentColor"/></svg>
+                        My Certification
+                    </button>
+                    <div class="num-divider"></div>
+                    <button class="num-item num-signout" onclick="signOut()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Sign Out
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1192,7 +1255,21 @@ async function init() {
         const avatarEl = document.getElementById('nav-user-avatar');
         const navUser = document.getElementById('nav-user');
         if (nameEl) nameEl.textContent = _user.first_name || _user.email || 'Account';
-        if (avatarEl && _user.picture) avatarEl.src = _user.picture;
+        // Avatar + initials
+        const initials = ((_user.first_name || '?')[0] + (_user.last_name || '')[0]).toUpperCase();
+        const initialsEl = document.getElementById('nav-user-initials');
+        if (initialsEl) { initialsEl.textContent = initials; initialsEl.style.display = 'flex'; }
+        if (avatarEl) { if (_user.picture) { avatarEl.src = _user.picture; } else { avatarEl.style.display = 'none'; } }
+        // Populate dropdown
+        const numAvatar = document.getElementById('num-avatar');
+        const numInitials = document.getElementById('num-initials');
+        const numName = document.getElementById('num-name');
+        const numEmail = document.getElementById('num-email');
+        const displayName = ((_user.first_name || '') + (_user.last_name ? ' ' + _user.last_name : '')) || _user.email || 'Account';
+        if (numInitials) { numInitials.textContent = initials; numInitials.style.display = 'flex'; }
+        if (numAvatar && _user.picture) { numAvatar.src = _user.picture; }
+        if (numName) numName.textContent = displayName;
+        if (numEmail) numEmail.textContent = _user.email || '';
         if (navUser) navUser.classList.add('visible');
 
         // Already certified?
@@ -1907,6 +1984,21 @@ async function completeOnboarding() {
 // ═══════════════════════════════════════════════
 // SIGN OUT
 // ═══════════════════════════════════════════════
+function toggleUserMenu() {
+    const menu = document.getElementById('nav-user-menu');
+    const wrap = document.getElementById('nav-profile-wrap');
+    const isOpen = menu.style.display !== 'none';
+    menu.style.display = isOpen ? 'none' : 'block';
+    if (wrap) wrap.classList.toggle('open', !isOpen);
+}
+document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('nav-profile-wrap');
+    const menu = document.getElementById('nav-user-menu');
+    if (menu && wrap && !wrap.contains(e.target) && !menu.contains(e.target)) {
+        menu.style.display = 'none';
+        if (wrap) wrap.classList.remove('open');
+    }
+});
 async function signOut() {
     try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch(e) {}
     window.location.href = '/';
