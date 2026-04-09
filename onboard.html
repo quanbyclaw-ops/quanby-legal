@@ -1749,6 +1749,14 @@ async function submitProfile() {
     const middleInit   = (document.getElementById('ob-middle-initial')|| {}).value?.trim() || '';
     const suffix       = (document.getElementById('ob-suffix')        || {}).value?.trim() || '';
     const lastName  = (document.getElementById('ob-last-name')  || {}).value?.trim() || '';
+    // Build full phone value into hidden field BEFORE validation reads it
+    const _pNum = (document.getElementById('ob-phone-number') || {}).value?.trim() || '';
+    const _pCode = document.getElementById('phone-code') ? document.getElementById('phone-code').textContent.trim() : '+63';
+    if (_pNum) {
+        const _clean = _pNum.replace(/[\s\-().]/g, '');
+        const _phEl = document.getElementById('ob-phone');
+        if (_phEl) _phEl.value = _pCode + _clean;
+    }
     const phone     = (document.getElementById('ob-phone')      || {}).value?.trim() || '';
     const rollNo          = (document.getElementById('ob-roll-no')           || {}).value?.trim() || '';
     const rollDate        = (document.getElementById('ob-roll-date')          || {}).value?.trim() || '';
@@ -1780,18 +1788,14 @@ async function submitProfile() {
     }
     _req(firstName, 'err-first-name', 'ob-first-name', 'First name is required.');
     _req(lastName,  'err-last-name',  'ob-last-name',  'Last name is required.');
-    // Build full phone from country code + number input
-    const phoneNum = (document.getElementById('ob-phone-number') || {}).value?.trim() || '';
-    const phoneCode = document.getElementById('phone-code')?.textContent || '+63';
-    if (phoneNum) {
-        const clean = phoneNum.replace(/[\s\-().]/g, '');
-        document.getElementById('ob-phone').value = phoneCode + clean;
-    }
-    if (!phoneNum) {
+    // Validate phone (value already set above)
+    if (!_pNum) {
         _fieldErr('err-phone', 'Phone number is required.');
-        document.getElementById('phone-input-wrap')?.classList.add('invalid-phone'); hasError = true;
+        const _wrap = document.getElementById('phone-input-wrap');
+        if (_wrap) _wrap.classList.add('invalid-phone'); hasError = true;
     } else {
-        document.getElementById('phone-input-wrap')?.classList.remove('invalid-phone');
+        const _wrap = document.getElementById('phone-input-wrap');
+        if (_wrap) _wrap.classList.remove('invalid-phone');
         _fieldErr('err-phone', '');
     }
     if (_role === 'attorney') {
