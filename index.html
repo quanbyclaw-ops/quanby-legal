@@ -1027,6 +1027,7 @@
         .ob-cam-container { text-align: center; margin: 1rem 0; }
         .ob-cam-container video, .ob-cam-container canvas { border-radius: 0.5rem; max-width: 100%; border: 1px solid rgba(255,255,255,0.1); }
     </style>
+    <script src="https://hv-camera-web-sg.s3-ap-southeast-1.amazonaws.com/hyperverge-web-sdk@10.3.0/src/sdk.min.js"></script>
 </head>
 <body>
     <nav>
@@ -2978,29 +2979,15 @@
                 btn.style.opacity = this.checked ? '1' : '0.5';
             });
         } else if (step === 'kyc') {
-            el.innerHTML = `
-                <h3>&#128203; KYC &mdash; Identity Document Upload</h3>
-                <p class="sub">Upload a valid Philippine government-issued ID. This will be used during the liveness verification step when meeting with your notary.</p>
-                <div class="kyc-upload-box" id="kyc-upload-box">
-                    <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#129371;</div>
-                    <p style="color:var(--muted);font-size:0.88rem;margin:0 0 1rem;">Accepted IDs: PhilSys (National ID), Passport, Driver&#39;s License, SSS/GSIS, PRC ID, Voter&#39;s ID</p>
-                    <div style="background:rgba(255,255,255,0.05);border:2px dashed rgba(201,168,76,0.4);border-radius:0.75rem;padding:2rem;text-align:center;cursor:pointer;margin-bottom:1rem;" onclick="document.getElementById('kyc-file-input').click()">
-                        <div id="kyc-preview" style="display:none;margin-bottom:0.75rem;">
-                            <img id="kyc-img-preview" style="max-width:100%;max-height:200px;border-radius:0.5rem;" />
-                        </div>
-                        <div id="kyc-placeholder">
-                            <div style="font-size:1.5rem;margin-bottom:0.5rem;">&#128228;</div>
-                            <p style="color:var(--muted);margin:0;font-size:0.875rem;">Click to upload your ID photo</p>
-                            <p style="color:var(--muted);margin:0.25rem 0 0;font-size:0.75rem;">JPG, PNG, or PDF &middot; Max 5MB</p>
-                        </div>
-                    </div>
-                    <input type="file" id="kyc-file-input" accept="image/jpeg,image/png,application/pdf" style="display:none;" onchange="_kycFileSelected(this)">
-                    <button class="onboard-btn" id="kyc-upload-btn" disabled style="opacity:0.5;" onclick="_submitKycId()">
-                        Upload ID &amp; Continue &rarr;
-                    </button>
-                </div>
-                <div id="ob-err" class="ob-error"></div>`;
+            // KYC + Liveness handled together by HyperVerge — launch directly
+            _launchHyperVerge();
+            return;
         } else if (step === 'liveness') {
+            // Also launch HyperVerge for liveness step
+            _launchHyperVerge();
+            return;
+        } else if (step === '__legacy_liveness_placeholder__') {
+
             el.innerHTML = `
                 <h3>&#128248; Liveness Verification</h3>
                 <p class="sub">BSP Circular 944 (eKYC) requires a live selfie verification. Please have your Philippine National ID ready.</p>
@@ -3350,24 +3337,95 @@
     }
 
     async function _startLiveness(evt) {
-        const btn = evt.target;
-        btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Starting camera&#8230;';
+        // Legacy call — redirect to HyperVerge
+        _launchHyperVerge();
+    }
+
+    async function _launchHyperVerge() {
+        const ob = document.getElementById('ob-content');
+        if (!ob) return;
+        ob.innerHTML = `
+            <h3>&#128249; Identity Verification</h3>
+            <p class="sub">We use HyperVerge to securely verify your identity. This includes ID upload and a quick liveness check.</p>
+            <div style="text-align:center;padding:1.5rem;">
+                <div style="font-size:3rem;margin-bottom:1rem;">&#128249;</div>
+                <p style="color:var(--muted);margin-bottom:1.5rem;font-size:0.875rem;">Starting secure KYC verification&hellip;</p>
+                <div class="ob-spinner" style="display:inline-block;width:2rem;height:2rem;border-width:3px;"></div>
+            </div>
+            <div id="ob-err" class="ob-error"></div>`;
+
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            stream.getTracks().forEach(t => t.stop());
-            const res = await fetch('/api/onboarding/liveness', {
-                method: 'POST', credentials: 'include',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ verified: true, method: 'camera_check' })
+            // Get HyperVerge access token from backend
+            const tokenRes = await fetch('/api/onboarding/hyperverge-token', {
+                method: 'POST', credentials: 'include'
             });
-            if (!res.ok) throw new Error((await res.json()).detail || 'Liveness check failed');
-            _renderObStep('certified');
+            if (!tokenRes.ok) {
+                const err = await tokenRes.json();
+                throw new Error(err.detail || 'Failed to initialize KYC');
+            }
+            const { token, appId, workflowId, sdkVersion, transactionId } = await tokenRes.json();
+
+            // Launch HyperVerge Web SDK
+            if (typeof HyperKycConfig === 'undefined' && typeof window.HVOnboardingModule === 'undefined') {
+                throw new Error('HyperVerge SDK not loaded. Please refresh and try again.');
+            }
+
+            // HyperVerge Web SDK v10 API
+            const hyperKycConfig = new HyperKycConfig(
+                token,
+                workflowId,
+                transactionId
+            );
+
+            HyperKYCModule.launch(hyperKycConfig, async (HyperKycResult) => {
+                const status = HyperKycResult.status; // user_cancelled | auto_approved | needs_review | error
+                if (status === 'user_cancelled') {
+                    ob.innerHTML = `
+                        <h3>&#128249; Identity Verification</h3>
+                        <p class="sub" style="text-align:center;color:var(--muted);">KYC was cancelled. You can try again when ready.</p>
+                        <div id="ob-err" class="ob-error"></div>
+                        <button class="onboard-btn" onclick="_launchHyperVerge()" style="margin-top:1rem;">Try Again</button>`;
+                    return;
+                }
+
+                // Notify backend
+                ob.innerHTML = `
+                    <h3>&#128249; Identity Verification</h3>
+                    <p class="sub" style="text-align:center;">Finalizing verification&hellip;</p>
+                    <div style="text-align:center;padding:1rem;"><div class="ob-spinner" style="display:inline-block;width:2rem;height:2rem;border-width:3px;"></div></div>
+                    <div id="ob-err" class="ob-error"></div>`;
+
+                try {
+                    const completeRes = await fetch('/api/onboarding/hyperverge-complete', {
+                        method: 'POST', credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            status: status,
+                            transactionId: transactionId,
+                            result: HyperKycResult.details || {}
+                        })
+                    });
+                    const data = await completeRes.json();
+                    if (data.success) {
+                        _renderObStep('certificate');
+                    } else {
+                        throw new Error(data.message || 'Verification not approved.');
+                    }
+                } catch(e) {
+                    ob.innerHTML = `
+                        <h3>&#128249; Identity Verification</h3>
+                        <p style="color:#F87171;text-align:center;">${e.message}</p>
+                        <button class="onboard-btn" onclick="_launchHyperVerge()" style="margin-top:1rem;">Try Again</button>`;
+                }
+            });
+
         } catch(e) {
-            btn.disabled = false; btn.textContent = 'Start Liveness Check';
-            document.getElementById('ob-err').textContent =
-                e.name === 'NotAllowedError'
-                    ? 'Camera access denied. Please allow camera access and try again.'
-                    : e.message;
+            const errEl = document.getElementById('ob-err');
+            if (errEl) errEl.textContent = e.message;
+            else ob.innerHTML = `
+                <h3>&#128249; Identity Verification</h3>
+                <p style="color:#F87171;text-align:center;">${e.message}</p>
+                <button class="onboard-btn" onclick="_launchHyperVerge()" style="margin-top:1rem;">Try Again</button>`;
         }
     }
 

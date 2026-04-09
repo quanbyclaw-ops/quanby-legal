@@ -901,6 +901,97 @@ async def regenerate_certificate(
         "message": "Certificate regenerated successfully. Use the new certificate ID to download your certificate.",
     }
 
+
+# ─── HyperVerge KYC Token ──────────────────────────────────────────────────
+
+@app.post("/api/onboarding/hyperverge-token")
+async def get_hyperverge_token(
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Generate a short-lived HyperVerge access token for the Web SDK."""
+    import httpx
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+
+    hv_app_id  = os.getenv("HYPERVERGE_APP_ID", "")
+    hv_app_key = os.getenv("HYPERVERGE_APP_KEY", "")
+    hv_api_url = os.getenv("HYPERVERGE_API_URL", "https://auth.hyperverge.co")
+
+    if not hv_app_id or not hv_app_key:
+        raise HTTPException(500, "HyperVerge credentials not configured")
+
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.post(
+                f"{hv_api_url}/login",
+                json={"appId": hv_app_id, "appKey": hv_app_key, "expiry": 600},
+                headers={"Content-Type": "application/json"},
+            )
+        resp.raise_for_status()
+        data = resp.json()
+        token = (data.get("result") or {}).get("token") or data.get("token")
+        if not token:
+            raise ValueError(f"No token in response: {data}")
+    except Exception as exc:
+        import sys
+        print(f"[HyperVerge] token error: {exc}", file=sys.stderr)
+        raise HTTPException(502, f"HyperVerge auth failed: {exc}")
+
+    return {
+        "token": token,
+        "appId": hv_app_id,
+        "workflowId": os.getenv("HYPERVERGE_WORKFLOW_ID", "workflow_onboarding"),
+        "sdkVersion": os.getenv("HYPERVERGE_WEB_SDK_VERSION", "10.3.0"),
+        "transactionId": f"ql-{user['id'][:8]}-{int(__import__('time').time())}",
+    }
+
+
+@app.post("/api/onboarding/hyperverge-complete")
+async def hyperverge_complete(
+    request: Request,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Called by frontend after HyperVerge SDK completes. Marks liveness verified."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+
+    body = await request.json()
+    status = body.get("status", "")
+    result = body.get("result", {})
+    transaction_id = body.get("transactionId", "")
+
+    # Accept: user_cancelled → don't advance, just return
+    if status == "user_cancelled":
+        return {"success": False, "message": "KYC cancelled by user."}
+
+    # Any non-error outcome from HV = verified (auto_approved / needs_review / error handled server-side)
+    if status in ("auto_approved", "needs_review", "success", "complete"):
+        await update_user(user["id"], {
+            "liveness_verified": True,
+            "kyc_id_uploaded": True,
+            "national_id_uploaded": True,
+            "hyperverge_transaction_id": transaction_id,
+            "hyperverge_status": status,
+            "onboarding_step": "certificate",
+        })
+        # Issue cert if not already issued
+        updated = get_user(user["id"])
+        if updated and not updated.get("certificate_id"):
+            from onboarding import generate_certificate_id
+            cert_id = generate_certificate_id(updated.get("role", "client"))
+            await update_user(user["id"], {
+                "certificate_id": cert_id,
+                "certificate_status": "probationary",
+            })
+        return {"success": True, "message": "KYC complete.", "next_step": "certificate"}
+
+    # error / rejected
+    return {"success": False, "message": f"KYC not approved (status: {status}). Please try again.", "status": status}
+
 @app.get("/api/verify/{certificate_id}")
 @limiter.limit("20/minute")  # FIX-4: Rate limit certificate verification
 async def verify_certificate(request: Request, certificate_id: str):
