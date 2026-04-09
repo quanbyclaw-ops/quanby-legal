@@ -1044,7 +1044,7 @@
                 <a href="#pricing">Pricing</a>
                 <a href="#about">About</a>
             </div>
-            <button class="nav-signin-btn" id="nav-signin-btn" onclick="openSSO('attorney')" style="display:none;">Sign In</button>
+            <button class="nav-signin-btn" id="nav-signin-btn" onclick="openSSO()" style="display:none;">Sign In</button>
             <div class="nav-user" id="nav-user">
                 <button id="nav-cert-badge" class="nav-cert-badge" style="display:none;" onclick="_navBadgeClick()"></button>
                 <!-- User avatar trigger -->
@@ -1095,22 +1095,22 @@
         <div class="sso-modal">
             <button class="sso-modal-close" onclick="closeSSO()" aria-label="Close">&times;</button>
 
-            <div id="sso-role-badge" class="sso-role-badge attorney">⚖️ Law Firm / Attorney</div>
+            <div id="sso-role-badge" class="sso-role-badge" style="display:none;"></div>
 
-            <h3 id="sso-title">Start Your ENP Certification</h3>
-            <p id="sso-desc">Sign in to begin your Electronic Notary Public certification — required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.</p>
+            <h3 id="sso-title">Sign in to Quanby Legal</h3>
+            <p id="sso-desc">Access e-notarization services, contract AI analysis, and connect with certified Electronic Notary Publics (ENPs).</p>
 
-            <!-- Progress steps -->
-            <div class="sso-steps">
+            <!-- Progress steps — shown only for role-specific flows -->
+            <div class="sso-steps" id="sso-steps-row" style="display:none;">
                 <div class="sso-step"><div class="sso-step-num" style="background:rgba(124,58,237,0.4);border-color:#7c3aed;color:white;">1</div><span>Sign In</span></div>
                 <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
                 <div class="sso-step"><div class="sso-step-num">2</div><span>Profile</span></div>
                 <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
-                <div class="sso-step"><div class="sso-step-num">3</div><span>15-Q Test</span></div>
+                <div class="sso-step" id="sso-step-exam"><div class="sso-step-num">3</div><span>15-Q Test</span></div>
+                <div class="sso-step-line" id="sso-step-exam-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
+                <div class="sso-step"><div class="sso-step-num" id="sso-step-4-num">4</div><span id="sso-step-4-label">Liveness</span></div>
                 <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
-                <div class="sso-step"><div class="sso-step-num">4</div><span>Liveness</span></div>
-                <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
-                <div class="sso-step"><div class="sso-step-num">5</div><span>Certificate</span></div>
+                <div class="sso-step"><div class="sso-step-num" id="sso-step-5-num">5</div><span id="sso-step-5-label">Certificate</span></div>
             </div>
 
             <!-- SSO Buttons -->
@@ -1121,6 +1121,9 @@
                 Continue with Google
             </button>
 
+            <div id="sso-role-hint" class="sso-note" style="display:none;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:0.5rem;padding:0.6rem 0.875rem;margin-bottom:0.75rem;color:var(--text-secondary,#a0aec0);font-size:0.8rem;">
+                You'll choose your role (Attorney/ENP or Client) after signing in.
+            </div>
             <div class="sso-note">
                 By continuing, you agree to Quanby Legal's Terms of Service and Privacy Policy.<br>
                 Your data is protected under RA 10173 (Data Privacy Act).
@@ -2464,22 +2467,52 @@
     }
 
     function openSSO(role) {
-        _ssoRole = role;
+        _ssoRole = role || null;
         const modal = document.getElementById('sso-modal');
         const badge = document.getElementById('sso-role-badge');
         const title = document.getElementById('sso-title');
         const desc  = document.getElementById('sso-desc');
+        const stepsRow = document.getElementById('sso-steps-row');
+
+        const hint = document.getElementById('sso-role-hint');
+        if (hint) hint.style.display = 'none';
 
         if (role === 'attorney') {
             badge.className = 'sso-role-badge attorney';
             badge.textContent = '⚖️ Law Firm / Attorney';
+            badge.style.display = '';
             title.textContent = 'Start Your ENP Certification';
             desc.textContent = 'Sign in to begin your Electronic Notary Public (ENP) certification — required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.';
-        } else {
+            // Show all 5 steps for ENP
+            stepsRow.style.display = '';
+            document.getElementById('sso-step-exam').style.display = '';
+            document.getElementById('sso-step-exam-line').style.display = '';
+            document.getElementById('sso-step-4-num').textContent = '4';
+            document.getElementById('sso-step-4-label').textContent = 'Liveness';
+            document.getElementById('sso-step-5-num').textContent = '5';
+            document.getElementById('sso-step-5-label').textContent = 'Certificate';
+        } else if (role === 'client') {
             badge.className = 'sso-role-badge client';
             badge.textContent = '👤 Public Client';
+            badge.style.display = '';
             title.textContent = 'Create Your Client Account';
             desc.textContent = 'Sign in to access e-notarization services, upload contracts for AI analysis, and connect with certified Electronic Notary Publics (ENPs).';
+            // Show 3 steps for Client (no exam)
+            stepsRow.style.display = '';
+            document.getElementById('sso-step-exam').style.display = 'none';
+            document.getElementById('sso-step-exam-line').style.display = 'none';
+            document.getElementById('sso-step-4-num').textContent = '3';
+            document.getElementById('sso-step-4-label').textContent = 'Verify';
+            document.getElementById('sso-step-5-num').textContent = '4';
+            document.getElementById('sso-step-5-label').textContent = 'Done';
+        } else {
+            // Generic sign-in — no role context
+            badge.style.display = 'none';
+            title.textContent = 'Sign in to Quanby Legal';
+            desc.textContent = 'Access e-notarization services, contract AI analysis, and connect with certified Electronic Notary Publics (ENPs).';
+            stepsRow.style.display = 'none';
+            const hint = document.getElementById('sso-role-hint');
+            if (hint) hint.style.display = '';
         }
 
         modal.classList.add('open');
