@@ -53,7 +53,7 @@
     "provider_id": "116682404850871914869",
     "email_verified": true,
     "role": "attorney",
-    "onboarding_step": "certificate",
+    "onboarding_step": "certified",
     "profile": {
       "prefix": "",
       "first_name": "Mj",
@@ -537,7 +537,7 @@
     },
     "liveness_verified": true,
     "national_id_uploaded": true,
-    "certificate_status": "probationary",
+    "certificate_status": "certified",
     "certificate_id": "QL-ENP-20260409-7D89A3A5809747C5",
     "retake_count": 0,
     "retake_payment_confirmed": false,

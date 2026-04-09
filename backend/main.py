@@ -635,7 +635,7 @@ async def submit_test(
         cert_id = generate_certificate_id(user.get("role", "client"))
         updates.update({
             "certificate_id": cert_id,
-            "certificate_status": "probationary",
+            "certificate_status": "certified",
             "onboarding_step": "kyc_id",
         })
 
@@ -657,7 +657,7 @@ async def submit_test(
     if result["passed"]:
         response.update({
             "certificate_id": updates["certificate_id"],
-            "message": "Ã°Å¸Å½â€° Congratulations! You passed. Your probationary certificate has been issued.",
+            "message": "Ã°Å¸Å½â€° Congratulations! You passed. Your ENP certificate has been issued.",
             "next_step": "kyc_id",
         })
     else:
@@ -988,7 +988,7 @@ async def hyperverge_complete(
             cert_id = generate_certificate_id(updated.get("role", "client"))
             await update_user(user["id"], {
                 "certificate_id": cert_id,
-                "certificate_status": "probationary",
+                "certificate_status": "certified",
             })
         return {"success": True, "message": "KYC complete.", "next_step": "certificate"}
 

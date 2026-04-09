@@ -213,8 +213,6 @@ async function loadDashboard() {
     const chip = document.getElementById('status-chip');
     if (certStatus === 'certified') {
       chip.className = 'status-chip certified'; chip.textContent = '✅ ENP Certified';
-    } else if (certStatus === 'probationary') {
-      chip.className = 'status-chip probationary'; chip.textContent = '🕐 Probationary';
     } else {
       chip.className = 'status-chip pending'; chip.textContent = '⏳ Pending Certification';
     }
@@ -230,7 +228,7 @@ async function loadDashboard() {
     document.getElementById('stat-step-sub').textContent = step === 'certified' ? 'All steps complete' : 'In progress';
 
     // Cert stats
-    document.getElementById('stat-cert').textContent = certStatus === 'none' ? 'Not Issued' : certStatus.charAt(0).toUpperCase() + certStatus.slice(1);
+    document.getElementById('stat-cert').textContent = certStatus === 'none' ? 'Not Issued' : certStatus === 'certified' ? 'ENP Certified' : certStatus.charAt(0).toUpperCase() + certStatus.slice(1);
     document.getElementById('stat-cert-sub').textContent = user.certificate_id ? `ID: ${user.certificate_id.slice(-8)}` : 'Complete onboarding to receive';
 
     // Cert box
