@@ -2764,8 +2764,8 @@
         var badge = document.getElementById('nav-cert-badge');
         if (!badge) return;
         var step = badge._step || '';
-        // For certified - do nothing (already done)
-        if (step === 'certified') return;
+        // For certified - go to dashboard
+        if (step === 'certified') { window.location.href = '/dashboard'; return; }
         // For certificate steps - open cert modal directly on home page
         var certSteps = ['kyc','kyc_id','liveness','survey','certificate'];
         if (certSteps.indexOf(step) >= 0) {
@@ -2862,7 +2862,7 @@
     async function _completeOnboarding() {
         try { await fetch('/api/onboarding/complete', { method: 'POST', credentials: 'include' }); } catch(e) {}
         closeOnboard();
-        window.location.reload();
+        window.location.href = '/dashboard';
     }
 
     function closeOnboard() {
