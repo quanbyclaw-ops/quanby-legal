@@ -2728,7 +2728,8 @@
             if (numEmail) numEmail.textContent = user.email || '';
             if (navUser) navUser.classList.add('visible');
             if (signinBtn) signinBtn.style.display = 'none';
-            _updateCertBadge(user);
+            window._currentUser = user;
+        _updateCertBadge(user);
         } catch(e) {
             if (signinBtn) signinBtn.style.display = 'inline-block';
         }
@@ -2761,7 +2762,25 @@
 
     function _navBadgeClick() {
         var badge = document.getElementById('nav-cert-badge');
-        if (badge && badge._step === 'certified') return;
+        if (!badge) return;
+        var step = badge._step || '';
+        // For certified - do nothing (already done)
+        if (step === 'certified') return;
+        // For certificate steps - open cert modal directly on home page
+        var certSteps = ['kyc','kyc_id','liveness','survey','certificate'];
+        if (certSteps.indexOf(step) >= 0) {
+            // Get cert ID from the user object already loaded
+            var certId = (window._currentUser && window._currentUser.certificate_id) ? window._currentUser.certificate_id : '';
+            _obCertificateId = certId;
+            openOnboard('certificate', badge._role || 'attorney');
+            return;
+        }
+        // For sc_redirect step
+        if (step === 'sc_redirect') {
+            openOnboard('sc_redirect', badge._role || 'attorney');
+            return;
+        }
+        // All other steps: go to /onboard
         window.location.href = '/onboard';
     }
 
@@ -2867,6 +2886,16 @@
     async function _renderObStep(step) {
         _renderObProgress(step);
         const el = document.getElementById('ob-content');
+        // Certificate / download step
+        if (step === 'certificate' || step === 'kyc_id' || step === 'liveness' || step === 'survey') {
+            _renderCertificateStep();
+            return;
+        }
+        // SC redirect step
+        if (step === 'sc_redirect') {
+            _renderSCRedirectStep();
+            return;
+        }
         if (step === 'role') {
             el.innerHTML = `
                 <h3>Choose Your Role</h3>
