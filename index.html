@@ -147,7 +147,12 @@
             border: none;
             font-size: 0.95rem;
             transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
         }
+        .btn i[data-lucide], .btn .qi { display: inline-flex; align-items: center; }
+        .btn i[data-lucide] svg, .btn .qi svg { width: 1em; height: 1em; flex-shrink: 0; }
         .btn-outline { border: 1px solid var(--purple); color: var(--purple); background: transparent; }
         .btn-outline:hover { background: rgba(124,58,237,0.1); }
         .btn-filled { background: var(--purple); color: white; }
