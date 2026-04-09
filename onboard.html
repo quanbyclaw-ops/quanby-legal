@@ -1222,36 +1222,50 @@
             &#10003; You&#39;ve completed all course lessons. You may now proceed to the exam.
         </div>
 
-        <div class="disclaimer-box" id="exam-disclaimer" style="display:none;">
-            <div class="disc-title"><i data-lucide="triangle-alert" class="qi"></i> Exam Notice</div>
-            <p style="color:var(--muted);font-size:0.875rem;margin-bottom:0.5rem;">Please read before proceeding:</p>
-            <ul>
-                <li>This exam consists of <strong>50 questions</strong> and is <strong>timed at 90 minutes</strong>.</li>
-                <li>Once started, the timer <strong>cannot be paused</strong>.</li>
-                <li>You must score <strong>70% (35 out of 50)</strong> to pass.</li>
-                <li>If you do not pass, you will be redirected to the course material.</li>
-                <li><strong>Retaking the exam requires a &#8369;500 GCash fee.</strong></li>
-                <li>Ensure you are ready before proceeding.</li>
-            </ul>
-        </div>
-
-        <div class="check-row" id="exam-check-row" style="display:none;">
-            <label>
-                <input type="checkbox" id="course-checkbox" onchange="toggleStartBtn()">
-                <span>I have read the course module and understand the exam conditions above.</span>
-            </label>
-        </div>
         <div id="err-course" class="ob-error"></div>
         <div class="btn-row">
             <button class="btn-back" onclick="goToStep('profile')">&#8592; Back</button>
-            <button class="btn-primary" id="btn-start-exam" disabled onclick="startExam()"><i data-lucide="graduation-cap" class="qi"></i> Start Exam</button>
+            <button class="btn-primary" id="btn-proceed-exam" disabled onclick="goToStep('exam')"><i data-lucide="arrow-right" class="qi"></i> Proceed to Exam</button>
         </div>
     </div>
 
         <!-- STEP 4: EXAM -->
     <div id="step-exam" style="display:none;" class="exam-wrap">
+
+        <!-- PRE-EXAM RULES SCREEN -->
+        <div id="exam-pre-screen" class="ob-card" style="max-width:680px;margin:0 auto;">
+            <h2 style="display:flex;align-items:center;gap:0.5rem;"><i data-lucide="graduation-cap" class="qi" style="color:var(--gold);"></i> ENP Certification Exam</h2>
+            <p class="sub" style="margin-bottom:1.5rem;">Please read the rules before you begin.</p>
+            <div class="disclaimer-box" style="margin-bottom:1.5rem;">
+                <div class="disc-title"><i data-lucide="triangle-alert" class="qi"></i> Exam Rules</div>
+                <p style="color:var(--muted);font-size:0.875rem;margin-bottom:0.75rem;">Read carefully before starting:</p>
+                <ul>
+                    <li>This exam consists of <strong>50 questions</strong> and is <strong>timed at 90 minutes</strong>.</li>
+                    <li>Once started, the timer <strong>cannot be paused</strong>.</li>
+                    <li>You must score <strong>70% (35 out of 50)</strong> to pass.</li>
+                    <li>If you do not pass, you will be redirected to the course material.</li>
+                    <li><strong>Retaking the exam requires a &#8369;500 GCash fee.</strong></li>
+                    <li>Ensure you are in a quiet environment and ready before proceeding.</li>
+                </ul>
+            </div>
+            <div class="check-row" style="margin-bottom:1.5rem;">
+                <label>
+                    <input type="checkbox" id="exam-ready-checkbox" onchange="toggleExamStart()">
+                    <span>I have read and understood the exam rules above and I am ready to begin.</span>
+                </label>
+            </div>
+            <div class="btn-row">
+                <button class="btn-back" onclick="goToStep('course')">&#8592; Back to Course</button>
+                <button class="btn-primary" id="btn-begin-exam" disabled onclick="beginExam()">
+                    <i data-lucide="play" class="qi"></i> Begin Exam
+                </button>
+            </div>
+        </div>
+
+        <!-- EXAM QUESTIONS (hidden until Begin is clicked) -->
+        <div id="exam-questions-wrap" style="display:none;width:100%;">
         <div class="exam-header">
-            <h2>📝 ENP Certification Exam</h2>
+            <h2>ENP Certification Exam</h2>
             <p class="sub">Answer all 50 questions. You need 70% (35/50) to pass.</p>
             <div class="answer-progress" id="answer-progress">
                 <span id="answer-count">0/50 answered</span>
@@ -1265,8 +1279,8 @@
             <button class="btn-primary" id="btn-submit-exam" onclick="submitExam()" style="max-width:280px;margin:0 auto;">
                 Submit Test
             </button>
-        </div>
-    </div>
+        </div><!-- end exam-questions-wrap -->
+    </div><!-- end step-exam -->
 
     <!-- EXAM RESULT -->
     <div id="step-result" class="ob-card" style="display:none;">
@@ -1538,6 +1552,15 @@ function goToStep(step) {
     // Hide timer if not on exam
     if (step !== 'exam') {
         document.getElementById('timer-banner').style.display = 'none';
+    } else {
+        var _pre = document.getElementById('exam-pre-screen');
+        var _qw = document.getElementById('exam-questions-wrap');
+        var _ec = document.getElementById('exam-ready-checkbox');
+        var _eb = document.getElementById('btn-begin-exam');
+        if (_pre) _pre.style.display = '';
+        if (_qw) _qw.style.display = 'none';
+        if (_ec) _ec.checked = false;
+        if (_eb) _eb.disabled = true;
     }
 
     // Scroll to top
@@ -1881,18 +1904,24 @@ async function submitProfile() {
 // ═══════════════════════════════════════════════
 // STEP 3: COURSE / DISCLAIMER
 // ═══════════════════════════════════════════════
-function toggleStartBtn() {
-    const cb = document.getElementById('course-checkbox');
-    const btn = document.getElementById('btn-start-exam');
-    btn.disabled = !cb.checked;
-    btn.style.opacity = cb.checked ? '1' : '0.45';
+function toggleStartBtn() { /* no-op - proceed button controlled by course completion */ }
+function toggleExamStart() {
+    const cb = document.getElementById('exam-ready-checkbox');
+    const btn = document.getElementById('btn-begin-exam');
+    if (btn) btn.disabled = !cb.checked;
+}
+function beginExam() {
+    const pre = document.getElementById('exam-pre-screen');
+    const qw = document.getElementById('exam-questions-wrap');
+    if (pre) pre.style.display = 'none';
+    if (qw) qw.style.display = 'block';
+    startExam();
 }
 
 // ═══════════════════════════════════════════════
 // STEP 4: EXAM
 // ═══════════════════════════════════════════════
 async function startExam() {
-    goToStep('exam');
     document.getElementById('exam-questions').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);"><div class="big-spinner" style="width:36px;height:36px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;"></div>Loading your 50-question exam…</div>';
     document.getElementById('page-nav').innerHTML = '';
     try {
