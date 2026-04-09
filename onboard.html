@@ -1797,12 +1797,17 @@ async function submitProfile() {
             body: JSON.stringify(payload)
         });
         if (!res.ok) {
-            const errData = await res.json();
-            const detail = errData.detail;
-            let msg = 'Failed to save profile.';
-            if (typeof detail === 'string') msg = detail;
-            else if (Array.isArray(detail)) msg = detail.map(e => e.msg || e.message || JSON.stringify(e)).join('; ');
-            else if (detail) msg = JSON.stringify(detail);
+            let msg = 'Failed to save profile. Please try again.';
+            try {
+                const errData = await res.json();
+                const detail = errData.detail;
+                if (typeof detail === 'string') msg = detail;
+                else if (Array.isArray(detail)) msg = detail.map(function(e) { return e.msg || e.message || JSON.stringify(e); }).join('; ');
+                else if (detail) msg = JSON.stringify(detail);
+            } catch(jsonErr) {
+                // Server returned non-JSON (e.g. 500 HTML error page)
+                msg = 'Server error (' + res.status + '). Please try again.';
+            }
             throw new Error(msg);
         }
         goToStep('course');

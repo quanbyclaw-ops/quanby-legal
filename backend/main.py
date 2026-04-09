@@ -511,7 +511,6 @@ async def save_profile(
             "ptr_no_date": req.ptr_no_date or "",
             "ibp_no": req.ibp_no or "",
             "ibp_no_date": req.ibp_no_date or "",
-            "notary_email": req.notary_email or "",
             "notary_address": req.notary_address or "",
             "mcle_no_period": req.mcle_no_period or "",
             "mcle_no": req.mcle_no or "",
