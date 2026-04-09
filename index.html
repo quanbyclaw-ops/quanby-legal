@@ -69,14 +69,67 @@
         .nav-links a { white-space: nowrap; }
         .nav-links a:hover { color: var(--purple-light); }
         .nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
-        .nav-user { display: none; align-items: center; gap: 0.625rem; }
+        .nav-user { display: none; align-items: center; gap: 0.625rem; position: relative; }
         .nav-user.visible { display: flex; }
         .nav-user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); }
         .nav-user-name { font-size: 0.85rem; color: var(--muted); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .nav-signin-btn { background: var(--purple); border: none; color: #fff; font-size: 0.82rem; font-weight: 600; padding: 0.4rem 1rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: "Inter", sans-serif; }
         .nav-signin-btn:hover { background: var(--purple-light, #9d5ff3); transform: translateY(-1px); }
-        .nav-signout-btn { background: transparent; border: 1px solid rgba(239,68,68,0.35); color: #f87171; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-        .nav-signout-btn:hover { background: rgba(239,68,68,0.12); border-color: #f87171; }
+        .nav-signout-btn { display: none; } /* replaced by menu */
+        /* Profile trigger */
+        .nav-profile-wrap {
+            display: flex; align-items: center; gap: 0.5rem;
+            cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: background 0.15s, border-color 0.15s;
+            position: relative; user-select: none;
+        }
+        .nav-profile-wrap:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.2); }
+        .nav-user-initials {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .nav-profile-chevron { transition: transform 0.2s; flex-shrink: 0; }
+        .nav-profile-wrap.open .nav-profile-chevron { transform: rotate(180deg); }
+        /* Dropdown */
+        .nav-user-menu {
+            position: absolute; top: calc(100% + 8px); right: 0;
+            background: #111827; border: 1px solid rgba(124,58,237,0.3);
+            border-radius: 0.75rem; min-width: 220px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6); z-index: 200;
+            overflow: hidden;
+        }
+        .num-header {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            background: rgba(124,58,237,0.08);
+        }
+        .num-avatar, .nav-user-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); flex-shrink: 0; }
+        .num-initials {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .num-info { display: flex; flex-direction: column; min-width: 0; }
+        .num-name { font-size: 0.85rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .num-email { font-size: 0.72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .num-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 0.25rem 0; }
+        .num-item {
+            display: flex; align-items: center; gap: 0.625rem;
+            width: 100%; padding: 0.6rem 1rem; font-size: 0.85rem;
+            color: var(--text); background: none; border: none;
+            cursor: pointer; transition: background 0.12s; text-align: left;
+            font-family: "Inter", sans-serif;
+        }
+        .num-item:hover { background: rgba(255,255,255,0.06); }
+        .num-item svg { opacity: 0.6; flex-shrink: 0; }
+        .num-badge { margin-left: auto; font-size: 0.65rem; background: rgba(124,58,237,0.2); color: #a78bfa; padding: 0.1rem 0.4rem; border-radius: 999px; border: 1px solid rgba(124,58,237,0.3); }
+        .num-signout { color: #f87171; }
+        .num-signout svg { opacity: 0.8; }
+        .num-signout:hover { background: rgba(239,68,68,0.08); }
         .nav-cert-badge {
             display: inline-flex; align-items: center; gap: 0.35rem;
             font-size: 0.78rem; font-weight: 600; padding: 0.35rem 1rem;
@@ -976,10 +1029,44 @@
             </div>
             <button class="nav-signin-btn" id="nav-signin-btn" onclick="openSSO('attorney')" style="display:none;">Sign In</button>
             <div class="nav-user" id="nav-user">
-                <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" style="display:none;" onload="this.style.display='block'" onerror="this.style.display='none'">
-                <span class="nav-user-name" id="nav-user-name"></span>
                 <button id="nav-cert-badge" class="nav-cert-badge" style="display:none;" onclick="_navBadgeClick()"></button>
-                <button class="nav-signout-btn" onclick="signOut()">Sign Out</button>
+                <!-- User avatar trigger -->
+                <div class="nav-profile-wrap" id="nav-profile-wrap" onclick="toggleUserMenu()">
+                    <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" style="display:none;" onload="this.style.display='block'" onerror="this.style.display='none'">
+                    <div class="nav-user-initials" id="nav-user-initials"></div>
+                    <span class="nav-user-name" id="nav-user-name"></span>
+                    <svg class="nav-profile-chevron" id="nav-profile-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <!-- Dropdown menu -->
+                <div class="nav-user-menu" id="nav-user-menu" style="display:none;">
+                    <div class="num-header">
+                        <img class="num-avatar" id="num-avatar" src="" alt="" style="display:none;" onload="this.style.display='block'" onerror="this.style.display='none'">
+                        <div class="num-initials" id="num-initials"></div>
+                        <div class="num-info">
+                            <span class="num-name" id="num-name"></span>
+                            <span class="num-email" id="num-email"></span>
+                        </div>
+                    </div>
+                    <div class="num-divider"></div>
+                    <button class="num-item" onclick="_navBadgeClick(); toggleUserMenu()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm0 1c-3.31 0-6 1.79-6 4v1h12v-1c0-2.21-2.69-4-6-4z" fill="currentColor"/></svg>
+                        My Profile
+                    </button>
+                    <button class="num-item" onclick="toggleUserMenu()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 2a5 5 0 110 10A5 5 0 018 3zm0 2a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm-2.5 6a2.5 2.5 0 015 0H5.5z" fill="currentColor"/></svg>
+                        Account Settings
+                        <span class="num-badge">Soon</span>
+                    </button>
+                    <button class="num-item" onclick="toggleTheme(); toggleUserMenu()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+                        <span id="num-theme-label">Light Mode</span>
+                    </button>
+                    <div class="num-divider"></div>
+                    <button class="num-item num-signout" onclick="signOut()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Sign Out
+                    </button>
+                </div>
             </div>
             <button class="hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
         </div>
@@ -2489,6 +2576,28 @@
             });
     })();
 
+    function toggleUserMenu() {
+        const menu = document.getElementById('nav-user-menu');
+        const wrap = document.getElementById('nav-profile-wrap');
+        const isOpen = menu.style.display !== 'none';
+        menu.style.display = isOpen ? 'none' : 'block';
+        wrap.classList.toggle('open', !isOpen);
+    }
+    // Close menu on outside click
+    document.addEventListener('click', function(e) {
+        const wrap = document.getElementById('nav-profile-wrap');
+        const menu = document.getElementById('nav-user-menu');
+        if (menu && wrap && !wrap.contains(e.target) && !menu.contains(e.target)) {
+            menu.style.display = 'none';
+            wrap.classList.remove('open');
+        }
+    });
+    let _isDark = true;
+    function toggleTheme() {
+        _isDark = !_isDark;
+        document.getElementById('num-theme-label').textContent = _isDark ? 'Light Mode' : 'Dark Mode';
+        // Theme toggle placeholder — full implementation TBD
+    }
     async function signOut() {
         try {
             await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
@@ -2523,8 +2632,22 @@
             const nameEl = document.getElementById('nav-user-name');
             const avatarEl = document.getElementById('nav-user-avatar');
             const navUser = document.getElementById('nav-user');
+            const displayName = (user.first_name || '') + (user.last_name ? ' ' + user.last_name : '') || user.email || 'Account';
+            const initials = ((user.first_name || '?')[0] + (user.last_name || '')[0]).toUpperCase();
             if (nameEl) nameEl.textContent = user.first_name || user.email || 'Account';
             if (avatarEl) { if (user.picture) { avatarEl.src = user.picture; } else { avatarEl.style.display = "none"; } }
+            // Populate initials fallback
+            const initialsEl = document.getElementById('nav-user-initials');
+            if (initialsEl) initialsEl.textContent = initials;
+            // Populate dropdown header
+            const numAvatar = document.getElementById('num-avatar');
+            const numInitials = document.getElementById('num-initials');
+            const numName = document.getElementById('num-name');
+            const numEmail = document.getElementById('num-email');
+            if (numAvatar && user.picture) { numAvatar.src = user.picture; }
+            if (numInitials) numInitials.textContent = initials;
+            if (numName) numName.textContent = displayName;
+            if (numEmail) numEmail.textContent = user.email || '';
             if (navUser) navUser.classList.add('visible');
             if (signinBtn) signinBtn.style.display = 'none';
             _updateCertBadge(user);
