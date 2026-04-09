@@ -1147,21 +1147,32 @@ async function init() {
             } catch(e) {}
         }
         if (!res.ok) {
-            // Not logged in ? auto-redirect to Google SSO immediately
-            try {
-                const pr = await fetch('/api/auth/providers', { credentials: 'include' });
-                const pd = await pr.json();
-                const url = (pd.providers && pd.providers.google) || null;
-                if (url) {
-                    sessionStorage.setItem('post_login_redirect', '/onboard');
-                    window.location.href = url;
-                    return;
-                }
-            } catch(e) {}
-            // Fallback: show auth gate if providers fetch fails
+            // Guard: if we just came back from OAuth (code in URL) or already tried once,
+            // don't redirect again — show auth gate instead to break any loop
+            const params = new URLSearchParams(window.location.search);
+            const justCameFromOAuth = params.has('code') || params.has('error') || params.has('state');
+            const alreadyTriedRedirect = sessionStorage.getItem('ql_sso_attempted') === '1';
+
+            if (!justCameFromOAuth && !alreadyTriedRedirect) {
+                try {
+                    const pr = await fetch('/api/auth/providers', { credentials: 'include' });
+                    const pd = await pr.json();
+                    const url = (pd.providers && pd.providers.google) || null;
+                    if (url) {
+                        sessionStorage.setItem('ql_sso_attempted', '1');
+                        sessionStorage.setItem('post_login_redirect', '/onboard');
+                        window.location.href = url;
+                        return;
+                    }
+                } catch(e) {}
+            }
+            // Clear the attempt flag and show auth gate
+            sessionStorage.removeItem('ql_sso_attempted');
             showScreen('auth-gate');
             return;
         }
+        // Successfully authenticated — clear the attempt flag
+        sessionStorage.removeItem('ql_sso_attempted');
         _user = await res.json();
 
         // Update nav
@@ -1186,14 +1197,16 @@ async function init() {
 
     } catch(e) {
         console.error('init error:', e);
-        // Show error on loading screen rather than auth gate (could be network issue)
         var ls = document.getElementById('loading-screen');
-        if (ls) ls.innerHTML = '<div style="text-align:center;padding:2rem;">' +
-            '<p style="color:#f87171;font-weight:600;margin-bottom:0.5rem;">⚠️ Could not load page</p>' +
-            '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1rem;">' + e.message + '</p>' +
-            '<button onclick="window.location.reload()" style="background:var(--purple);color:#fff;border:none;padding:0.6rem 1.25rem;border-radius:0.5rem;cursor:pointer;margin-right:0.5rem;">🔄 Retry</button>' +
-            '<a href="/" style="color:var(--muted);font-size:0.875rem;">← Home</a>' +
-        '</div>';
+        if (ls) {
+            ls.style.display = 'block';
+            ls.innerHTML = '<div style="text-align:center;padding:2rem;">' +
+                '<p style="color:#f87171;font-weight:600;margin-bottom:0.5rem;">Could not load page</p>' +
+                '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1rem;">' + (e.message || 'Unknown error') + '</p>' +
+                '<button onclick="window.location.reload()" style="background:var(--purple);color:#fff;border:none;padding:0.6rem 1.25rem;border-radius:0.5rem;cursor:pointer;margin-right:0.5rem;">Retry</button>' +
+                '<a href="/" style="color:var(--muted);font-size:0.875rem;">Back to Home</a>' +
+            '</div>';
+        }
     }
 }
 
@@ -1231,16 +1244,8 @@ function showScreen(id) {
 function goToStep(step) {
     _currentStep = step;
     updateProgress(step);
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('auth-gate').style.display = 'none';
-    document.getElementById('certified-screen').style.display = 'none';
-    document.getElementById('step-role').style.display = 'none';
-    document.getElementById('step-profile').style.display = 'none';
-    document.getElementById('step-course').style.display = 'none';
-    document.getElementById('step-exam').style.display = 'none';
-    document.getElementById('step-result').style.display = 'none';
-    document.getElementById('step-certificate').style.display = 'none';
-    document.getElementById('step-sc').style.display = 'none';
+    var _screens = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc'];
+    _screens.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
 
     const stepMap = {
         'role':        'step-role',
@@ -1920,6 +1925,6 @@ setTimeout(function() {
     }
 }, 6000);
 </script>
-    <script>if(typeof lucide!=="undefined")lucide.createIcons();</script>
+    <script>try { if(typeof lucide!=="undefined") lucide.createIcons(); } catch(e) { console.warn("Lucide icons error:", e); }</script>
 </body>
 </html>
