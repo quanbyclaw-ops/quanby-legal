@@ -2147,6 +2147,8 @@ function renderResult(data) {
     if (re) re.style.display = '';
     var pw = document.getElementById('progress-wrap');
     if (pw) pw.style.display = 'block';
+    var wrap = document.getElementById('page-wrap') || document.querySelector('.page-wrap');
+    if (wrap) wrap.style.display = 'flex';
     try { updateProgress('exam'); } catch(e) {}
     window.scrollTo({top:0, behavior:'smooth'});
 
@@ -2183,21 +2185,21 @@ function goToDownloadCert(certId) {
     if (certId) _certificateId = certId;
     // Hide all other screens and show certificate step directly
     var allScreens = ['loading-screen','auth-gate','certified-screen','step-role','step-profile',
-        'step-course','step-exam','step-result','step-certificate','step-sc'];
+        'step-course','step-exam','step-result','step-sc'];
     allScreens.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
     var certEl = document.getElementById('step-certificate');
-    if (certEl) certEl.style.display = '';
+    if (certEl) certEl.style.display = 'block';
     var pw = document.getElementById('progress-wrap');
     if (pw) pw.style.display = 'block';
+    var wrap = document.getElementById('page-wrap') || document.querySelector('.page-wrap');
+    if (wrap) wrap.style.display = 'flex';
     try { updateProgress('certificate'); } catch(e) {}
     _populateCertUI(certId);
     window.scrollTo({top:0, behavior:'smooth'});
     // Safeguard: re-show in case something hides it afterward
     setTimeout(function() {
         var el = document.getElementById('step-certificate');
-        if (el && (el.style.display === 'none' || el.style.display === '')) {
-            el.style.display = '';
-        }
+        if (el) el.style.display = 'block';
         _populateCertUI(_certificateId);
     }, 400);
 }
