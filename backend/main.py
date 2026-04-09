@@ -862,6 +862,36 @@ async def get_certificate(
     return HTMLResponse(content=html, status_code=200)
 
 
+
+@app.post("/api/certificate/regenerate")
+async def regenerate_certificate(
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Regenerate certificate: issues a new certificate ID for the authenticated user."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+
+    # Must have an existing cert to regenerate
+    if not user.get("certificate_id"):
+        raise HTTPException(400, "No certificate found for this account. Complete onboarding first.")
+
+    # Generate a fresh certificate ID
+    new_cert_id = generate_certificate_id(user.get("role", "client"))
+
+    await update_user(user["id"], {
+        "certificate_id": new_cert_id,
+        # preserve existing certificate_status (probationary/certified)
+    })
+
+    return {
+        "success": True,
+        "old_certificate_id": user["certificate_id"],
+        "certificate_id": new_cert_id,
+        "message": "Certificate regenerated successfully. Use the new certificate ID to download your certificate.",
+    }
+
 @app.get("/api/verify/{certificate_id}")
 @limiter.limit("20/minute")  # FIX-4: Rate limit certificate verification
 async def verify_certificate(request: Request, certificate_id: str):
