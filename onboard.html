@@ -2119,6 +2119,7 @@ function renderResult(data) {
     const total = data.total || 50;
     const scorePct = data.score_pct || data.score || Math.round(score / total * 100);
 
+    _clearProgress(); // Reset course progress after exam submitted
     goToStep('result');
 
     const bannerEl = document.getElementById('result-banner');
@@ -2416,8 +2417,28 @@ COURSE_MODULES.forEach(function(mod, mi) {
 });
 var TOTAL_LESSONS = ALL_LESSONS.length;
 var currentLesson = 0;
+
+// Persist course progress across page reloads
+var _QL_PROGRESS_KEY = 'ql_course_progress_v1';
+function _saveProgress() {
+    try { localStorage.setItem(_QL_PROGRESS_KEY, JSON.stringify({ viewedLessons: viewedLessons, currentLesson: currentLesson })); } catch(e) {}
+}
+function _loadProgress() {
+    try {
+        var saved = JSON.parse(localStorage.getItem(_QL_PROGRESS_KEY) || 'null');
+        if (saved && saved.viewedLessons) {
+            viewedLessons = saved.viewedLessons;
+            viewedCount = Object.keys(viewedLessons).filter(function(k){ return viewedLessons[k]; }).length;
+            if (saved.currentLesson !== undefined) currentLesson = Math.min(saved.currentLesson, TOTAL_LESSONS - 1);
+        }
+    } catch(e) {}
+}
+function _clearProgress() {
+    try { localStorage.removeItem(_QL_PROGRESS_KEY); } catch(e) {}
+}
 var viewedLessons = {};
 var viewedCount = 0;
+_loadProgress();
 
 function switchModule(modIdx) {
     var idx = -1;
@@ -2444,6 +2465,7 @@ function renderLesson() {
     if (!viewedLessons[currentLesson]) {
         viewedLessons[currentLesson] = true;
         viewedCount++;
+        _saveProgress();
     }
     var pct = Math.round((viewedCount / TOTAL_LESSONS) * 100);
     document.getElementById('course-progress-fill').style.width = pct + '%';
@@ -2483,8 +2505,16 @@ function lessonNav(dir) {
         var _orig = goToStep;
         window.goToStep = function(step) {
             _orig(step);
-            if (step === 'course' && viewedCount === 0) {
-                setTimeout(function(){ renderLesson(); }, 50);
+            if (step === 'course') {
+                setTimeout(function(){
+                    renderLesson();
+                    // Restore completed state if progress was saved
+                    if (viewedCount >= TOTAL_LESSONS) {
+                        document.getElementById('course-complete-notice').classList.add('visible');
+                        var _br = document.getElementById('course-btn-row');
+                        if (_br) _br.style.display = 'flex';
+                    }
+                }, 50);
             }
         };
     }
