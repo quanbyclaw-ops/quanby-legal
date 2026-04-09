@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         :root {
             --bg-color: #05060f;
@@ -287,6 +288,8 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* ERROR */
+        .qi { display: inline-flex; align-items: center; justify-content: center; margin-right: 0.3em; vertical-align: -0.15em; }
+        .qi svg { width: 1em; height: 1em; stroke: currentColor; stroke-width: 1.75; fill: none; }
         .ob-field-error { color: #f87171; font-size: 0.78rem; margin-top: 0.3rem; min-height: 1em; display: block; }
         .ob-field input[type="date"] {
             color-scheme: dark;
@@ -717,7 +720,7 @@
 
 <!-- TIMER (shown during exam) -->
 <div id="timer-banner" class="timer-banner" style="display:none;">
-    ⏱ Time Remaining: <span id="timer-display">90:00</span>
+    <i data-lucide="timer" class="qi"></i> Time Remaining: <span id="timer-display">90:00</span>
 </div>
 
 <!-- MAIN CONTENT -->
@@ -734,7 +737,7 @@
         <h2>Sign In Required</h2>
         <p>You need to sign in with Google to access the ENP Certification process.</p>
         <button onclick="signInWithGoogle()" class="btn-primary" style="max-width:280px;margin-bottom:0.75rem;">
-            🔑 Sign In with Google
+            <i data-lucide="log-in" class="qi"></i> Sign In with Google
         </button>
         <br>
         <a href="/" style="color:var(--muted);font-size:0.85rem;">← Back to Home</a>
@@ -747,7 +750,7 @@
             <h2>You Are ENP Certified!</h2>
             <p>Your Electronic Notary Public certification is on file. No further action is needed.</p>
             <a href="/" class="btn-primary" style="display:inline-flex;text-decoration:none;max-width:240px;">
-                🏠 Return to Home
+                <i data-lucide="house" class="qi"></i> Return to Home
             </a>
         </div>
     </div>
@@ -965,18 +968,18 @@
 
     <!-- STEP 3: COURSE + DISCLAIMER -->
     <div id="step-course" class="ob-card" style="display:none;">
-        <h2>📚 Course Module</h2>
+        <h2><i data-lucide="book" class="qi"></i> Course Module</h2>
         <p class="sub">Read the course module before taking your certification exam.</p>
         <div class="course-box">
             <div style="font-size:2rem;margin-bottom:0.5rem;">📚</div>
             <h4>Course Module: Mastering Quanby Legal</h4>
             <p>This course covers Philippine ENP certification law including A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and the 2004 Rules on Notarial Practice.</p>
             <a href="/mastering-quanby-legal.pdf" target="_blank" class="btn-gold" style="font-size:0.9rem;padding:0.625rem 1.25rem;">
-                📖 Download Course Module (PDF)
+                <i data-lucide="book-open" class="qi"></i> Download Course Module (PDF)
             </a>
         </div>
         <div class="disclaimer-box">
-            <div class="disc-title">⚠️ Exam Notice</div>
+            <div class="disc-title"><i data-lucide="triangle-alert" class="qi"></i> Exam Notice</div>
             <p style="color:var(--muted);font-size:0.875rem;margin-bottom:0.5rem;">Please read before proceeding:</p>
             <ul>
                 <li>This exam consists of <strong>50 questions</strong> and is <strong>timed at 90 minutes</strong>.</li>
@@ -996,7 +999,7 @@
         <div id="err-course" class="ob-error"></div>
         <div class="btn-row">
             <button class="btn-back" onclick="goToStep('profile')">← Back</button>
-            <button class="btn-primary" id="btn-start-exam" disabled onclick="startExam()">🎓 Start Exam</button>
+            <button class="btn-primary" id="btn-start-exam" disabled onclick="startExam()"><i data-lucide="graduation-cap" class="qi"></i> Start Exam</button>
         </div>
     </div>
 
@@ -1022,14 +1025,14 @@
 
     <!-- EXAM RESULT -->
     <div id="step-result" class="ob-card" style="display:none;">
-        <h2>📊 Exam Result</h2>
+        <h2><i data-lucide="chart-bar" class="qi"></i> Exam Result</h2>
         <div id="result-banner"></div>
         <div id="result-content"></div>
     </div>
 
     <!-- STEP 5: DOWNLOAD CERTIFICATE -->
     <div id="step-certificate" class="ob-card" style="display:none;">
-        <h2>🎓 Download Your Certificate</h2>
+        <h2><i data-lucide="award" class="qi"></i> Download Your Certificate</h2>
         <p class="sub">Your ENP Course Completion Certificate is ready. Download it and submit it to the Supreme Court.</p>
         <div class="cert-box">
             <div class="cert-emoji">📜</div>
@@ -1917,5 +1920,6 @@ setTimeout(function() {
     }
 }, 6000);
 </script>
+    <script>if(typeof lucide!=="undefined")lucide.createIcons();</script>
 </body>
 </html>

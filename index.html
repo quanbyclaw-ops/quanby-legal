@@ -23,6 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <meta property="og:image" content="https://legal.quanbyai.com/favicon-512.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         :root {
             --bg-color: #05060f;
@@ -315,6 +316,9 @@
         }
         .card:hover { border-color: rgba(124,58,237,0.4); }
         .card-icon { font-size: 2rem; margin-bottom: 1rem; }
+        .card-icon svg { width: 2rem; height: 2rem; stroke: var(--purple-light, #9d5ff3); stroke-width: 1.5; }
+        .qi { display: inline-flex; align-items: center; justify-content: center; }
+        .qi svg { width: 1em; height: 1em; stroke: currentColor; stroke-width: 1.75; fill: none; vertical-align: -0.15em; flex-shrink: 0; }
         .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
         .card-desc { color: var(--muted); font-size: 0.9rem; }
 
@@ -1140,7 +1144,7 @@
                     <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">📋 SEC MC 28-2020</span>
                 </div>
                 <div class="hero-buttons">
-                    <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})">🤖 Try Contract AI Agent →</button>
+                    <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})"><i data-lucide="bot" class="qi"></i> Try Contract AI Agent →</button>
                     <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">View Compliance →</button>
                 </div>
             </div>
@@ -1190,32 +1194,32 @@
             <p class="section-subtitle">Comprehensive ENF platform compliant with A.M. No. 24-10-14-SC</p>
             <div class="features-grid">
                 <div class="card">
-                    <div class="card-icon">🤖</div>
+                    <div class="card-icon"><i data-lucide="bot"></i></div>
                     <div class="card-title">Contract AI Agent</div>
                     <p class="card-desc">Upload any contract and get instant AI analysis — parties, risks, obligations, Philippine law compliance flags</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">📹</div>
+                    <div class="card-icon"><i data-lucide="video"></i></div>
                     <div class="card-title">IEN & REN Services</div>
                     <p class="card-desc">In-Person and Remote Electronic Notarization with HD videoconferencing</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">🛡️</div>
+                    <div class="card-icon"><i data-lucide="shield-check"></i></div>
                     <div class="card-title">DICT National PKI Authentication</div>
                     <p class="card-desc">Official digital certificates for identity verification</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">✍️</div>
+                    <div class="card-icon"><i data-lucide="pen-line"></i></div>
                     <div class="card-title">Electronic Signatures & Seal</div>
                     <p class="card-desc">Legally binding electronic notarial seal compliant with Philippine law</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">⛓️</div>
+                    <div class="card-icon"><i data-lucide="link"></i></div>
                     <div class="card-title">Immutable Blockchain Audit</div>
                     <p class="card-desc">Hyperledger Fabric blockchain audit trails — tamper-proof notarization records</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">🌐</div>
+                    <div class="card-icon"><i data-lucide="globe"></i></div>
                     <div class="card-title">Global-Grade Security</div>
                     <p class="card-desc">Singapore-based blockchain security by DOCONCHAIN Group</p>
                 </div>
@@ -1658,10 +1662,10 @@
         <div class="container">
             <h2>Built for every industry that needs legal certainty</h2>
             <div class="use-cases-grid">
-                <div class="card"><div class="card-icon">🏘️</div><div class="card-title">Real Estate</div><p class="card-desc">Deeds of Sale, Lease Agreements, MOAs — fully analyzed and notarized</p></div>
-                <div class="card"><div class="card-icon">⚖️</div><div class="card-title">Legal & Law Firms</div><p class="card-desc">Faster document review and notarization for your clients</p></div>
-                <div class="card"><div class="card-icon">🏦</div><div class="card-title">Banking & Finance</div><p class="card-desc">Loan agreements, SPAs, and financial contracts with AI compliance checks</p></div>
-                <div class="card"><div class="card-icon">🏛️</div><div class="card-title">Government</div><p class="card-desc">Procurement, MOAs, and government contracts with full audit trail</p></div>
+                <div class="card"><div class="card-icon"><i data-lucide="building-2"></i></div><div class="card-title">Real Estate</div><p class="card-desc">Deeds of Sale, Lease Agreements, MOAs — fully analyzed and notarized</p></div>
+                <div class="card"><div class="card-icon"><i data-lucide="scale"></i></div><div class="card-title">Legal & Law Firms</div><p class="card-desc">Faster document review and notarization for your clients</p></div>
+                <div class="card"><div class="card-icon"><i data-lucide="landmark"></i></div><div class="card-title">Banking & Finance</div><p class="card-desc">Loan agreements, SPAs, and financial contracts with AI compliance checks</p></div>
+                <div class="card"><div class="card-icon"><i data-lucide="university"></i></div><div class="card-title">Government</div><p class="card-desc">Procurement, MOAs, and government contracts with full audit trail</p></div>
             </div>
         </div>
     </section>
@@ -3941,6 +3945,9 @@
             <div id="ob-content"></div>
         </div>
     </div>
+    <script>
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    </script>
 </body>
 </html>
 
