@@ -224,8 +224,10 @@ async function loadDashboard() {
       sc_redirect:'SC Submission', certified:'✅ Complete'
     };
     const step = user.onboarding_step || 'role_select';
-    document.getElementById('stat-step').textContent = stepMap[step] || step;
-    document.getElementById('stat-step-sub').textContent = step === 'certified' ? 'All steps complete' : 'In progress';
+    // If user has a cert or is certified, always show Complete regardless of step
+    const isComplete = step === 'certified' || user.certificate_id || certStatus === 'certified';
+    document.getElementById('stat-step').textContent = isComplete ? '✅ Complete' : (stepMap[step] || step);
+    document.getElementById('stat-step-sub').textContent = isComplete ? 'All steps complete' : 'In progress';
 
     // Cert stats
     document.getElementById('stat-cert').textContent = certStatus === 'none' ? 'Not Issued' : certStatus === 'certified' ? 'ENP Certified' : certStatus.charAt(0).toUpperCase() + certStatus.slice(1);
