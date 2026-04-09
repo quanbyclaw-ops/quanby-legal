@@ -144,7 +144,6 @@ class ProfileRequest(BaseModel):
     ptr_no_date: Optional[str] = None
     ibp_no: Optional[str] = None
     ibp_no_date: Optional[str] = None
-    notary_email: Optional[str] = None
     notary_address: Optional[str] = None
     mcle_no_period: Optional[str] = None
     mcle_no: Optional[str] = None
@@ -1313,26 +1312,41 @@ async def chatbot_endpoint(request: LegalChatRequest):
         session["last_active"] = now
         history_snapshot = list(session["history"])
 
-    # Generate response
+    # Generate response — try providers in order: GLM (ZhipuAI) > xAI > OpenAI > fallback
+    zhipu_key = os.getenv("ZHIPU_API_KEY")
+    zhipu_model = os.getenv("ZHIPU_MODEL", "glm-4-flash")
     xai_key = os.getenv("XAI_API_KEY")
     oai_key = os.getenv("OPENAI_API_KEY")
     reply: str
 
-    if xai_key or oai_key:
+    ai_key = None
+    ai_base_url = None
+    ai_model = None
+
+    if zhipu_key:
+        ai_key = zhipu_key
+        ai_base_url = "https://open.bigmodel.cn/api/paas/v4/"
+        ai_model = zhipu_model
+    elif xai_key:
+        ai_key = xai_key
+        ai_base_url = "https://api.x.ai/v1"
+        ai_model = "grok-3-fast-beta"
+    elif oai_key:
+        ai_key = oai_key
+        ai_base_url = None
+        ai_model = "gpt-4o-mini"
+
+    if ai_key:
         try:
             from openai import OpenAI as _OpenAI
-            client = _OpenAI(
-                api_key=xai_key or oai_key,
-                base_url="https://api.x.ai/v1" if xai_key else None,
-            )
-            model = "grok-3-fast-beta" if xai_key else "gpt-4o-mini"
+            client = _OpenAI(api_key=ai_key, base_url=ai_base_url)
 
             messages = [{"role": "system", "content": _LEGAL_CHATBOT_SYSTEM_PROMPT}]
             messages.extend(history_snapshot[-20:])
             messages.append({"role": "user", "content": message})
 
             completion = client.chat.completions.create(
-                model=model,
+                model=ai_model,
                 messages=messages,
                 max_tokens=800,
                 temperature=0.4,
@@ -1342,7 +1356,7 @@ async def chatbot_endpoint(request: LegalChatRequest):
                 reply = _chatbot_keyword_fallback(message)
         except Exception as exc:
             import sys
-            print(f"[chatbot] AI error: {exc}", file=sys.stderr)
+            print(f"[chatbot] AI error ({ai_model}): {exc}", file=sys.stderr)
             reply = _chatbot_keyword_fallback(message)
     else:
         reply = _chatbot_keyword_fallback(message)

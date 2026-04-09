@@ -1098,11 +1098,7 @@
                     <span class="ob-field-error" id="err-ibp-date"></span>
                 </div>
             </div>
-            <div class="ob-field">
-                <label>Notary Email *</label>
-                <input type="email" id="ob-notary-email" placeholder="e.g. juan.cruz@email.com">
-                <span class="ob-field-error" id="err-notary-email"></span>
-            </div>
+
             <div class="ob-field">
                 <label>Notary Address *</label>
                 <input type="text" id="ob-notary-address" placeholder="e.g. 123 The Actual Bldg., 1234 Avenue, Malate, Manila">
@@ -1708,7 +1704,6 @@ async function submitProfile() {
     const ptrDate         = (document.getElementById('ob-ptr-date')         || {}).value?.trim() || '';
     const ibpNo           = (document.getElementById('ob-ibp-no')           || {}).value?.trim() || '';
     const ibpDate         = (document.getElementById('ob-ibp-date')         || {}).value?.trim() || '';
-    const notaryEmail     = (document.getElementById('ob-notary-email')     || {}).value?.trim() || '';
     const notaryAddress   = (document.getElementById('ob-notary-address')   || {}).value?.trim() || '';
     const mclePeriod      = (document.getElementById('ob-mcle-period')      || {}).value?.trim() || '';
     const mcleNo          = (document.getElementById('ob-mcle-no')          || {}).value?.trim() || '';
@@ -1763,10 +1758,7 @@ async function submitProfile() {
         _req(mclePeriod,      'err-mcle-period',      'ob-mcle-period',      'MCLE period is required.');
         _req(mcleNo,          'err-mcle-no',          'ob-mcle-no',          'MCLE No. is required.');
         _req(mcleDate,        'err-mcle-date',        'ob-mcle-date',        'MCLE date is required.');
-        if (!notaryEmail || notaryEmail.indexOf('@') < 1) {
-            _fieldErr('err-notary-email', 'A valid notary email is required.');
-            _fieldInvalid('ob-notary-email', true); hasError = true;
-        }
+
 
     }
     if (hasError) return;
@@ -1790,7 +1782,7 @@ async function submitProfile() {
         ptr_no_date:               ptrDate,
         ibp_no:                    ibpNo,
         ibp_no_date:               ibpDate,
-        notary_email:              notaryEmail,
+        notary_email:              (_user && _user.email) ? _user.email : '',
         notary_address:            notaryAddress,
         mcle_no_period:            mclePeriod,
         mcle_no:                   mcleNo,
