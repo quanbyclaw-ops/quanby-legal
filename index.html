@@ -73,6 +73,8 @@
         .nav-user.visible { display: flex; }
         .nav-user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); }
         .nav-user-name { font-size: 0.85rem; color: var(--muted); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nav-signin-btn { background: var(--purple); border: none; color: #fff; font-size: 0.82rem; font-weight: 600; padding: 0.4rem 1rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: "Inter", sans-serif; }
+        .nav-signin-btn:hover { background: var(--purple-light, #9d5ff3); transform: translateY(-1px); }
         .nav-signout-btn { background: transparent; border: 1px solid rgba(239,68,68,0.35); color: #f87171; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
         .nav-signout-btn:hover { background: rgba(239,68,68,0.12); border-color: #f87171; }
         .nav-cert-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 999px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
@@ -966,6 +968,7 @@
                 <a href="#pricing">Pricing</a>
                 <a href="#about">About</a>
             </div>
+            <button class="nav-signin-btn" id="nav-signin-btn" onclick="openSSO('attorney')" style="display:none;">Sign In</button>
             <div class="nav-user" id="nav-user">
                 <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" onerror="this.style.display='none'">
                 <span class="nav-user-name" id="nav-user-name"></span>
@@ -2485,6 +2488,8 @@
             await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
         } catch(e) {}
         document.getElementById('nav-user').classList.remove('visible');
+        const sb = document.getElementById('nav-signin-btn');
+        if (sb) sb.style.display = 'inline-block';
         window.location.reload();
     }
 
@@ -2501,9 +2506,13 @@
     }
 
     async function initNavUser() {
+        const signinBtn = document.getElementById('nav-signin-btn');
         try {
             const res = await _authFetch('/api/auth/me', { credentials: 'include' });
-            if (!res.ok) return;
+            if (!res.ok) {
+                if (signinBtn) signinBtn.style.display = 'inline-block';
+                return;
+            }
             const user = await res.json();
             const nameEl = document.getElementById('nav-user-name');
             const avatarEl = document.getElementById('nav-user-avatar');
@@ -2511,8 +2520,11 @@
             if (nameEl) nameEl.textContent = user.first_name || user.email || 'Account';
             if (avatarEl && user.picture) avatarEl.src = user.picture;
             if (navUser) navUser.classList.add('visible');
+            if (signinBtn) signinBtn.style.display = 'none';
             _updateCertBadge(user);
-        } catch(e) {}
+        } catch(e) {
+            if (signinBtn) signinBtn.style.display = 'inline-block';
+        }
     }
 
     function _updateCertBadge(user) {
