@@ -1223,9 +1223,8 @@
         </div>
 
         <div id="err-course" class="ob-error"></div>
-        <div class="btn-row">
-            <button class="btn-back" onclick="goToStep('profile')">&#8592; Back</button>
-            <button class="btn-primary" id="btn-proceed-exam" disabled onclick="goToStep('exam')"><i data-lucide="arrow-right" class="qi"></i> Proceed to Exam</button>
+        <div class="btn-row" id="course-btn-row" style="display:none;margin-top:1rem;">
+            <button class="btn-primary" id="btn-proceed-exam" onclick="goToStep('exam')" style="width:100%;max-width:280px;margin:0 auto;"><i data-lucide="arrow-right" class="qi"></i> Proceed to Exam</button>
         </div>
     </div>
 
@@ -2426,8 +2425,9 @@ function renderLesson() {
     try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch(e) {}
     if (viewedCount === TOTAL_LESSONS) {
         document.getElementById('course-complete-notice').classList.add('visible');
-        document.getElementById('exam-disclaimer').style.display = 'block';
-        document.getElementById('exam-check-row').style.display = 'block';
+        // Show the Proceed to Exam button row
+        var _br = document.getElementById('course-btn-row');
+        if (_br) _br.style.display = 'flex';
     }
 }
 
