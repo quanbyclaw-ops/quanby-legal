@@ -48,14 +48,7 @@
         .container { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
         .nav-content { display: flex; justify-content: space-between; align-items: center; gap: 1rem; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
         .logo { display: flex; align-items: center; flex-shrink: 0; text-decoration: none; }
-        .logo-circle {
-            width: 40px; height: 40px;
-            background: var(--purple);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 1.25rem;
-            margin-right: 0.5rem;
-        }
+        .logo-img { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
         .logo-text { font-weight: bold; font-size: 1.25rem; white-space: nowrap; color: var(--text); }
         .nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
         .nav-user { display: none; align-items: center; gap: 0.625rem; }
@@ -708,7 +701,7 @@
 <nav>
     <div class="nav-content">
         <a class="logo" href="/">
-            <div class="logo-circle">Q</div>
+            <img src="/qlegal-logo.png" alt="Quanby Legal" class="logo-img">
             <span class="logo-text">Quanby Legal</span>
         </a>
         <div class="nav-right">

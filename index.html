@@ -56,13 +56,8 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
         .nav-content { display: flex; justify-content: space-between; align-items: center; gap: 2rem; }
         .logo { display: flex; align-items: center; flex-shrink: 0; }
-        .logo-circle {
-            width: 40px; height: 40px;
-            background: var(--purple);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 1.25rem;
-            margin-right: 0.5rem;
+        .logo-img {
+            width: 40px; height: 40px; object-fit: contain; flex-shrink: 0;
         }
         .logo-text { font-weight: bold; font-size: 1.25rem; white-space: nowrap; }
         .nav-links { display: flex; gap: 1.5rem; align-items: center; flex: 1; justify-content: center; }
@@ -1016,7 +1011,7 @@
     <nav>
         <div class="container nav-content">
             <div class="logo">
-                <div class="logo-circle">Q</div>
+                <img src="/qlegal-logo.png" alt="Quanby Legal" class="logo-img">
                 <span class="logo-text">Quanby Legal</span>
             </div>
             <div class="nav-links">
@@ -1747,7 +1742,7 @@
         <div class="container footer-grid">
             <div>
                 <div class="footer-logo">
-                    <div class="logo-circle">Q</div>
+                    <img src="/qlegal-logo.png" alt="Quanby Legal" class="logo-img" style="width:32px;height:32px;">
                     <span class="logo-text" style="margin-left:0.5rem">Quanby Legal</span>
                 </div>
                 <p class="footer-tagline">The Philippines' first Supreme Court-accredited AI-powered electronic notarization platform</p>
