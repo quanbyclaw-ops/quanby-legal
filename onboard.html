@@ -2168,15 +2168,26 @@ function renderResult(data) {
     }
 }
 
+function _populateCertUI(certId) {
+    if (certId) _certificateId = certId;
+    var certIdEl = document.getElementById('cert-id-display');
+    var dlLink = document.getElementById('cert-download-link');
+    if (certIdEl) certIdEl.textContent = _certificateId || '';
+    if (dlLink) dlLink.href = '/api/certificate/' + (_certificateId || '');
+}
 function goToDownloadCert(certId) {
     if (certId) _certificateId = certId;
-    goToStep('certificate');
-    setTimeout(function() {
-        var certIdEl = document.getElementById('cert-id-display');
-        var dlLink = document.getElementById('cert-download-link');
-        if (certIdEl) certIdEl.textContent = _certificateId || '';
-        if (dlLink) dlLink.href = '/api/certificate/' + (_certificateId || '');
-    }, 50);
+    // Hide all other screens and show certificate step directly
+    var allScreens = ['loading-screen','auth-gate','certified-screen','step-role','step-profile',
+        'step-course','step-exam','step-result','step-certificate','step-sc'];
+    allScreens.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
+    var certEl = document.getElementById('step-certificate');
+    if (certEl) certEl.style.display = '';
+    var pw = document.getElementById('progress-wrap');
+    if (pw) pw.style.display = 'block';
+    try { updateProgress('certificate'); } catch(e) {}
+    _populateCertUI(certId);
+    window.scrollTo({top:0, behavior:'smooth'});
 }
 
 // ═══════════════════════════════════════════════
@@ -2184,11 +2195,19 @@ function goToDownloadCert(certId) {
 // ═══════════════════════════════════════════════
 // Called on page load if user already has certificate step
 async function loadCertStep() {
-    // Try to get cert ID from user object or API
-    if (_user && _user.certificate_id) {
-        goToDownloadCert(_user.certificate_id);
+    var certId = (_user && _user.certificate_id) ? _user.certificate_id : _certificateId;
+    if (certId) {
+        goToDownloadCert(certId);
     } else {
-        goToStep('certificate');
+        // Try fetching from API in case _user not loaded yet
+        try {
+            var res = await fetch('/api/auth/me', { credentials: 'include' });
+            if (res.ok) {
+                var u = await res.json();
+                if (u.certificate_id) { goToDownloadCert(u.certificate_id); return; }
+            }
+        } catch(e) {}
+        goToDownloadCert('');
     }
 }
 
