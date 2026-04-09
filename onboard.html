@@ -294,6 +294,8 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* ERROR */
+        .ob-field-error { color: #f87171; font-size: 0.78rem; margin-top: 0.3rem; min-height: 1em; display: block; }
+        .ob-field input.invalid { border-color: #f87171 !important; }
         .ob-error {
             color: #f87171;
             font-size: 0.82rem;
@@ -663,15 +665,18 @@
             <div class="ob-field">
                 <label>First Name *</label>
                 <input type="text" id="ob-first-name" placeholder="Juan">
+                <span class="ob-field-error" id="err-first-name"></span>
             </div>
             <div class="ob-field">
                 <label>Last Name *</label>
                 <input type="text" id="ob-last-name" placeholder="dela Cruz">
+                <span class="ob-field-error" id="err-last-name"></span>
             </div>
         </div>
         <div class="ob-field">
             <label>Phone Number *</label>
             <input type="tel" id="ob-phone" placeholder="+63 9XX XXX XXXX">
+            <span class="ob-field-error" id="err-phone"></span>
         </div>
         <!-- Attorney fields -->
         <div id="attorney-fields">
@@ -682,6 +687,7 @@
             <div class="ob-field">
                 <label>IBP Roll No. *</label>
                 <input type="text" id="ob-ibp" placeholder="e.g. 12345">
+                <span class="ob-field-error" id="err-ibp"></span>
             </div>
             <div class="ob-field">
                 <label>PTC No. (if applicable)</label>
@@ -1068,18 +1074,34 @@ function toggleProfileFields() {
     document.getElementById('client-fields').style.display = isAttorney ? 'none' : '';
 }
 
+function _fieldErr(id, msg) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = msg || '';
+}
+function _fieldInvalid(inputId, invalid) {
+    const el = document.getElementById(inputId);
+    if (el) el.classList.toggle('invalid', !!invalid);
+}
 async function submitProfile() {
     const firstName = (document.getElementById('ob-first-name') || {}).value?.trim() || '';
     const lastName = (document.getElementById('ob-last-name') || {}).value?.trim() || '';
     const phone = (document.getElementById('ob-phone') || {}).value?.trim() || '';
-    if (!firstName || !lastName || !phone) {
-        document.getElementById('err-profile').textContent = 'First name, last name, and phone are required.';
-        return;
-    }
+    const ibp = (_role === 'attorney') ? ((document.getElementById('ob-ibp') || {}).value?.trim() || '') : 'ok';
+    // Clear all field errors
+    _fieldErr('err-first-name', ''); _fieldInvalid('ob-first-name', false);
+    _fieldErr('err-last-name', '');  _fieldInvalid('ob-last-name', false);
+    _fieldErr('err-phone', '');      _fieldInvalid('ob-phone', false);
+    _fieldErr('err-ibp', '');        _fieldInvalid('ob-ibp', false);
+    document.getElementById('err-profile').textContent = '';
+    let hasError = false;
+    if (!firstName) { _fieldErr('err-first-name', 'First name is required.'); _fieldInvalid('ob-first-name', true); hasError = true; }
+    if (!lastName)  { _fieldErr('err-last-name',  'Last name is required.');  _fieldInvalid('ob-last-name', true);  hasError = true; }
+    if (!phone)     { _fieldErr('err-phone', 'Phone number is required.');    _fieldInvalid('ob-phone', true);      hasError = true; }
+    if (_role === 'attorney' && !ibp) { _fieldErr('err-ibp', 'IBP Roll No. is required.'); _fieldInvalid('ob-ibp', true); hasError = true; }
+    if (hasError) return;
     const btn = document.getElementById('btn-profile-continue');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> Saving…';
-    document.getElementById('err-profile').textContent = '';
     const payload = {
         first_name: firstName,
         last_name: lastName,
