@@ -1001,9 +1001,15 @@ function goToStep(step) {
         if (el) el.style.display = '';
     }
 
-    // Profile fields toggle
+    // Profile fields toggle + prefill from Google SSO
     if (step === 'profile') {
         toggleProfileFields();
+        if (_user) {
+            const fn = document.getElementById('ob-first-name');
+            const ln = document.getElementById('ob-last-name');
+            if (fn && !fn.value && _user.first_name) fn.value = _user.first_name;
+            if (ln && !ln.value && _user.last_name) ln.value = _user.last_name;
+        }
     }
 
     // Hide timer if not on exam
