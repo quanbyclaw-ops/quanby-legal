@@ -295,7 +295,49 @@
 
         /* ERROR */
         .ob-field-error { color: #f87171; font-size: 0.78rem; margin-top: 0.3rem; min-height: 1em; display: block; }
-        .ob-field input[type= date] { color-scheme: dark; }
+        .ob-field input[type="date"] {
+            color-scheme: dark;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        .ob-field input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.6) sepia(1) saturate(3) hue-rotate(230deg) brightness(1.1);
+            cursor: pointer;
+            opacity: 0.7;
+            padding: 0;
+            margin-left: 0.25rem;
+        }
+        .ob-field input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+        .ob-field input[type="date"]::-webkit-datetime-edit-text { color: rgba(148,163,184,0.4); }
+        .ob-field input[type="date"]::-webkit-datetime-edit-month-field,
+        .ob-field input[type="date"]::-webkit-datetime-edit-day-field,
+        .ob-field input[type="date"]::-webkit-datetime-edit-year-field { color: var(--text); }
+        .ob-field input[type="date"]::-webkit-datetime-edit-month-field:focus,
+        .ob-field input[type="date"]::-webkit-datetime-edit-day-field:focus,
+        .ob-field input[type="date"]::-webkit-datetime-edit-year-field:focus {
+            background: rgba(124,58,237,0.35); color: #fff; border-radius: 2px; outline: none;
+        }
+        .ob-field select {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.5rem;
+            padding: 0.65rem 0.875rem;
+            color: var(--text);
+            font-family: "Inter", sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.875rem center;
+            padding-right: 2.5rem;
+        }
+        .ob-field select:focus { outline: none; border-color: var(--purple); }
+        .ob-field select option { background: #0f1020; color: var(--text); }
         .ob-field input.invalid { border-color: #f87171 !important; }
         .ob-error {
             color: #f87171;
