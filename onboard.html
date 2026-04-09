@@ -912,7 +912,7 @@
 <!-- MAIN CONTENT -->
 <div class="page-wrap">
     <!-- LOADING STATE -->
-    <div id="loading-screen" class="loading-screen">
+    <div id="loading-screen" class="loading-screen" style="display:none;">
         <div class="big-spinner"></div>
         <p>Checking your account…</p>
     </div>
@@ -1415,6 +1415,9 @@ const OB_LABELS = ['Role','Profile','Course','Exam','Certificate','SC Submit'];
 // INIT
 // ═══════════════════════════════════════════════
 async function init() {
+    // Show loading screen at start
+    var _ls = document.getElementById('loading-screen');
+    if (_ls) _ls.style.display = 'block';
     try {
         let res = await fetch('/api/auth/me', { credentials: 'include' });
         if (res.status === 401) {
@@ -2369,8 +2372,14 @@ async function signInWithGoogle() {
 // START
 // ═══════════════════════════════════════════════
 window.onerror = function(msg, src, line, col, err) {
+    // Ignore third-party script errors (Cloudflare beacon, etc.)
+    if (src && (src.indexOf('cloudflareinsights') >= 0 || src.indexOf('beacon.min') >= 0)) return true;
     var ls = document.getElementById('loading-screen');
-    if (ls) ls.innerHTML = '<div style="color:#f87171;padding:2rem;text-align:center;"><h3>Page Error</h3><p style="font-size:0.85rem;margin-top:0.5rem;">' + msg + '<br>Line ' + line + '</p><a href="/" style="color:#c9a84c;margin-top:1rem;display:inline-block;">← Back to Home</a></div>';
+    if (ls && ls.style.display !== 'none') {
+        ls.style.display = 'block';
+        ls.innerHTML = '<div style="color:#f87171;padding:2rem;text-align:center;"><h3>Page Error</h3><p style="font-size:0.85rem;margin-top:0.5rem;">' + msg + '<br>Line ' + line + '</p><a href="/" style="color:#c9a84c;margin-top:1rem;display:inline-block;">← Back to Home</a></div>';
+    }
+    return true;
 };
 
 if (document.readyState === 'loading') {
