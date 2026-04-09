@@ -132,6 +132,8 @@ class ProfileRequest(BaseModel):
     phone: str
     role: str
     # Attorney / ENP fields
+    roll_no: Optional[str] = None
+    roll_date: Optional[str] = None
     commission_no: Optional[str] = None
     commission_no_valid_until: Optional[str] = None
     ptr_no: Optional[str] = None
@@ -495,6 +497,8 @@ async def save_profile(
 
     if req.role == "attorney":
         profile.update({
+            "roll_no": req.roll_no or "",
+            "roll_date": req.roll_date or "",
             "commission_no": req.commission_no or "",
             "commission_no_valid_until": req.commission_no_valid_until or "",
             "ptr_no": req.ptr_no or "",

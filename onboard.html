@@ -805,9 +805,36 @@
         </div>
         <!-- Attorney / ENP fields -->
         <div id="attorney-fields">
+            <div class="field-row">
+                <div class="ob-field">
+                    <label>IBP Roll No. *</label>
+                    <input type="text" id="ob-roll-no" placeholder="e.g. 12345" maxlength="5" inputmode="numeric" pattern="[0-9]{5}">
+                    <span class="ob-field-error" id="err-roll-no"></span>
+                </div>
+                <div class="ob-field">
+                    <label>Roll Date *</label>
+                    <div class="ql-datepicker" id="dp-wrap-ob-roll-date">
+                        <button type="button" class="ql-datepicker-trigger" id="dp-trigger-ob-roll-date" onclick="dpToggle('ob-roll-date')">
+                            <span id="dp-display-ob-roll-date" class="dp-placeholder">Pick a date</span>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#94a3b8" stroke-width="1.3"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>
+                        </button>
+                        <div class="ql-datepicker-popup" id="dp-popup-ob-roll-date" style="display:none;">
+                            <div class="dp-header">
+                                <button type="button" class="dp-nav" onclick="dpNav('ob-roll-date',-1)">&#8249;</button>
+                                <span class="dp-month-year" id="dp-title-ob-roll-date"></span>
+                                <button type="button" class="dp-nav" onclick="dpNav('ob-roll-date',1)">&#8250;</button>
+                            </div>
+                            <div class="dp-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+                            <div class="dp-days" id="dp-days-ob-roll-date"></div>
+                        </div>
+                        <input type="hidden" id="ob-roll-date" value="">
+                    </div>
+                    <span class="ob-field-error" id="err-roll-date"></span>
+                </div>
+            </div>
             <div class="ob-field">
                 <label>Commission No. *</label>
-                <input type="text" id="ob-commission-no" placeholder="e.g. 2024-024">
+                <input type="text" id="ob-commission-no" placeholder="e.g. 2024 - 024">
                 <span class="ob-field-error" id="err-commission-no"></span>
             </div>
             <div class="ob-field">
@@ -865,7 +892,7 @@
             <div class="field-row">
                 <div class="ob-field">
                     <label>IBP No. *</label>
-                    <input type="text" id="ob-ibp-no" placeholder="e.g. 12345" maxlength="5" inputmode="numeric" pattern="[0-9]{5}">
+                    <input type="text" id="ob-ibp-no" placeholder="e.g. 123456" maxlength="6" inputmode="numeric" pattern="[0-9]{6}">
                     <span class="ob-field-error" id="err-ibp-no"></span>
                 </div>
                 <div class="ob-field">
@@ -896,7 +923,7 @@
             </div>
             <div class="ob-field">
                 <label>Notary Address *</label>
-                <input type="text" id="ob-notary-address" placeholder="e.g. 123 The Actual Bldg., Malate, Manila">
+                <input type="text" id="ob-notary-address" placeholder="e.g. 123 The Actual Bldg., 1234 Avenue, Malate, Manila">
                 <span class="ob-field-error" id="err-notary-address"></span>
             </div>
             <div class="field-row">
@@ -1470,6 +1497,8 @@ async function submitProfile() {
     const firstName = (document.getElementById('ob-first-name') || {}).value?.trim() || '';
     const lastName  = (document.getElementById('ob-last-name')  || {}).value?.trim() || '';
     const phone     = (document.getElementById('ob-phone')      || {}).value?.trim() || '';
+    const rollNo          = (document.getElementById('ob-roll-no')           || {}).value?.trim() || '';
+    const rollDate        = (document.getElementById('ob-roll-date')          || {}).value?.trim() || '';
     const commissionNo    = (document.getElementById('ob-commission-no')    || {}).value?.trim() || '';
     const commissionValid = (document.getElementById('ob-commission-valid') || {}).value?.trim() || '';
     const ptrNo           = (document.getElementById('ob-ptr-no')           || {}).value?.trim() || '';
@@ -1483,11 +1512,11 @@ async function submitProfile() {
     const mcleNo          = (document.getElementById('ob-mcle-no')          || {}).value?.trim() || '';
     const mcleDate        = (document.getElementById('ob-mcle-date')        || {}).value?.trim() || '';
 
-    const errIds = ['err-first-name','err-last-name','err-phone','err-commission-no','err-commission-valid',
+    const errIds = ['err-first-name','err-last-name','err-phone','err-roll-no','err-roll-date','err-commission-no','err-commission-valid',
         'err-ptr-no','err-ptr-location','err-ptr-date','err-ibp-no','err-ibp-date',
         'err-notary-email','err-notary-address','err-mcle-period','err-mcle-no','err-mcle-date'];
     errIds.forEach(id => _fieldErr(id, ''));
-    const inputIds = ['ob-first-name','ob-last-name','ob-phone','ob-commission-no','ob-commission-valid',
+    const inputIds = ['ob-first-name','ob-last-name','ob-phone','ob-roll-no','ob-roll-date','ob-commission-no','ob-commission-valid',
         'ob-ptr-no','ob-ptr-location','ob-ptr-date','ob-ibp-no','ob-ibp-date',
         'ob-notary-email','ob-notary-address','ob-mcle-period','ob-mcle-no','ob-mcle-date'];
     inputIds.forEach(id => _fieldInvalid(id, false));
@@ -1501,6 +1530,9 @@ async function submitProfile() {
     _req(lastName,  'err-last-name',  'ob-last-name',  'Last name is required.');
     _req(phone,     'err-phone',      'ob-phone',      'Phone number is required.');
     if (_role === 'attorney') {
+        _req(rollNo,          'err-roll-no',          'ob-roll-no',          'IBP Roll No. is required.');
+        if (rollNo && !/^[0-9]{5}$/.test(rollNo)) { _fieldErr('err-roll-no', 'Roll No. must be exactly 5 digits.'); _fieldInvalid('ob-roll-no', true); hasError = true; }
+        _req(rollDate,        'err-roll-date',        'ob-roll-date',        'Roll date is required.');
         _req(commissionNo,    'err-commission-no',    'ob-commission-no',    'Commission No. is required.');
         _req(commissionValid, 'err-commission-valid', 'ob-commission-valid', 'Commission validity date is required.');
         _req(ptrNo,           'err-ptr-no',           'ob-ptr-no',           'PTR No. is required.');
@@ -1508,8 +1540,8 @@ async function submitProfile() {
         _req(ptrDate,         'err-ptr-date',         'ob-ptr-date',         'PTR date is required.');
         if (!ibpNo) {
             _fieldErr('err-ibp-no', 'IBP No. is required.'); _fieldInvalid('ob-ibp-no', true); hasError = true;
-        } else if (!/^[0-9]{5}$/.test(ibpNo)) {
-            _fieldErr('err-ibp-no', 'IBP No. must be exactly 5 digits (numbers only).'); _fieldInvalid('ob-ibp-no', true); hasError = true;
+        } else if (!/^[0-9]{6}$/.test(ibpNo)) {
+            _fieldErr('err-ibp-no', 'IBP No. must be exactly 6 digits (numbers only).'); _fieldInvalid('ob-ibp-no', true); hasError = true;
         }
         _req(ibpDate,         'err-ibp-date',         'ob-ibp-date',         'IBP date is required.');
         _req(notaryAddress,   'err-notary-address',   'ob-notary-address',   'Notary address is required.');
@@ -1520,10 +1552,7 @@ async function submitProfile() {
             _fieldErr('err-notary-email', 'A valid notary email is required.');
             _fieldInvalid('ob-notary-email', true); hasError = true;
         }
-        if (notaryAddress && notaryAddress.length < 10) {
-            _fieldErr('err-notary-address', 'Please enter a complete address (min 10 chars).');
-            _fieldInvalid('ob-notary-address', true); hasError = true;
-        }
+
     }
     if (hasError) return;
     const btn = document.getElementById('btn-profile-continue');
@@ -1534,6 +1563,8 @@ async function submitProfile() {
         last_name:  lastName,
         phone:      phone,
         role:       _role,
+        roll_no:                   rollNo,
+        roll_date:                 rollDate,
         commission_no:             commissionNo,
         commission_no_valid_until: commissionValid,
         ptr_no:                    ptrNo,
