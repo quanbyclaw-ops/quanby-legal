@@ -150,10 +150,18 @@ async function loadDashboard() {
     if (!res.ok) throw new Error('Not authenticated');
     const user = await res.json();
 
-    // Avatar
+    // Avatar — use SSO picture if available, else initials
     const name = ((user.first_name || '') + ' ' + (user.last_name || '')).trim() || user.email || '?';
     const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    document.getElementById('avatar-initials').textContent = initials;
+    const avatarEl = document.getElementById('avatar-initials');
+    if (user.picture) {
+      avatarEl.innerHTML = '<img src="' + user.picture + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.textContent='' + initials + ''" />';
+      avatarEl.style.background = 'none';
+      avatarEl.style.border = '2px solid var(--gold)';
+      avatarEl.style.padding = '0';
+    } else {
+      avatarEl.textContent = initials;
+    }
 
     // Name / role / email
     document.getElementById('user-name').textContent = name;

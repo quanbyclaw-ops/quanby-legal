@@ -334,7 +334,7 @@ def get_certificate_html(user: dict) -> str:
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     padding: 0;
   }}
 
@@ -405,7 +405,7 @@ def get_certificate_html(user: dict) -> str:
     position: relative;
     z-index: 10;
     width: 100%;
-    padding: 10mm 20mm 0 20mm;
+    padding: 6mm 20mm 0 20mm;
     display: flex;
     flex-direction: column;
     align-items: center;
