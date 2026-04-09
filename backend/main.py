@@ -459,6 +459,7 @@ async def get_me(
         "retake_count": user.get("retake_count", 0),
         "retake_payment_pending": user.get("retake_payment_pending", False),
         "retake_payment_confirmed": user.get("retake_payment_confirmed", False),
+        "kyc_verified_at": user.get("kyc_verified_at"),
     }
 
 
@@ -970,12 +971,14 @@ async def hyperverge_complete(
 
     # Any non-error outcome from HV = verified (auto_approved / needs_review / error handled server-side)
     if status in ("auto_approved", "needs_review", "success", "complete"):
+        from datetime import datetime, timezone as _tz
         await update_user(user["id"], {
             "liveness_verified": True,
             "kyc_id_uploaded": True,
             "national_id_uploaded": True,
             "hyperverge_transaction_id": transaction_id,
             "hyperverge_status": status,
+            "kyc_verified_at": datetime.now(_tz.utc).isoformat(),
             "onboarding_step": "certificate",
         })
         # Issue cert if not already issued

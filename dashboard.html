@@ -128,6 +128,38 @@
         <div class="card-value" id="stat-cert">…</div>
         <div class="card-sub" id="stat-cert-sub">…</div>
       </div>
+      <div class="card" id="kyc-card">
+        <h3>KYC / Identity</h3>
+        <div class="card-value" id="stat-kyc">…</div>
+        <div class="card-sub" id="stat-kyc-sub">…</div>
+      </div>
+    </div>
+
+    <!-- KYC SECTION -->
+    <div class="cert-box" id="kyc-section">
+      <h3>🪪 Identity Verification (KYC)</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-start;margin-bottom:1rem;">
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:0.875rem;color:var(--muted);margin-bottom:0.5rem;">Liveness Check</div>
+          <div id="kyc-liveness-status" style="font-weight:600;"></div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:0.875rem;color:var(--muted);margin-bottom:0.5rem;">ID Upload</div>
+          <div id="kyc-id-status" style="font-weight:600;"></div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <div style="font-size:0.875rem;color:var(--muted);margin-bottom:0.5rem;">KYC Expiry</div>
+          <div id="kyc-expiry" style="font-weight:600;"></div>
+        </div>
+      </div>
+      <div id="kyc-warning" style="display:none;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.4);border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.85rem;color:#F59E0B;margin-bottom:1rem;">
+        ⚠️ Your KYC verification expires in <span id="kyc-days-left"></span> days. Redo KYC before it expires to maintain your certification status.
+      </div>
+      <div id="kyc-expired-warning" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.85rem;color:#F87171;margin-bottom:1rem;">
+        ❌ Your KYC has expired. Please redo your identity verification.
+      </div>
+      <button class="btn-teal" onclick="redoKyc()" id="btn-redo-kyc" style="max-width:260px;">🔄 Redo KYC Verification</button>
+      <div id="kyc-msg" style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem;display:none;"></div>
     </div>
 
     <!-- ACTIONS -->
@@ -203,6 +235,54 @@ async function loadDashboard() {
       document.getElementById('btn-regenerate').style.display = 'inline-block';
     }
 
+    // KYC status
+    const kycVerified = user.liveness_verified || false;
+    const idUploaded = user.kyc_id_uploaded || false;
+    const kycVerifiedAt = user.kyc_verified_at || null;
+    const KYC_EXPIRY_DAYS = 14;
+
+    document.getElementById('kyc-liveness-status').innerHTML = kycVerified
+      ? '<span style="color:#10B981;">✅ Verified</span>'
+      : '<span style="color:#F59E0B;">⏳ Pending</span>';
+    document.getElementById('kyc-id-status').innerHTML = idUploaded
+      ? '<span style="color:#10B981;">✅ Uploaded</span>'
+      : '<span style="color:#F59E0B;">⏳ Pending</span>';
+
+    // Expiry countdown
+    const statKyc = document.getElementById('stat-kyc');
+    const statKycSub = document.getElementById('stat-kyc-sub');
+    if (kycVerified && kycVerifiedAt) {
+      const verifiedDate = new Date(kycVerifiedAt);
+      const expiryDate = new Date(verifiedDate.getTime() + KYC_EXPIRY_DAYS * 86400000);
+      const daysLeft = Math.ceil((expiryDate - Date.now()) / 86400000);
+      const expiryStr = expiryDate.toLocaleDateString('en-PH', {month:'short',day:'numeric',year:'numeric'});
+      document.getElementById('kyc-expiry').innerHTML = daysLeft > 0
+        ? `<span style="color:${daysLeft <= 3 ? '#F87171' : daysLeft <= 7 ? '#F59E0B' : '#10B981'};">${daysLeft}d left (${expiryStr})</span>`
+        : '<span style="color:#F87171;">Expired</span>';
+      if (daysLeft <= 0) {
+        document.getElementById('kyc-expired-warning').style.display = '';
+        statKyc.innerHTML = '<span style="color:#F87171;">Expired</span>';
+        statKycSub.textContent = 'Redo KYC required';
+      } else if (daysLeft <= 5) {
+        document.getElementById('kyc-warning').style.display = '';
+        document.getElementById('kyc-days-left').textContent = daysLeft;
+        statKyc.innerHTML = `<span style="color:#F59E0B;">Expiring soon</span>`;
+        statKycSub.textContent = `${daysLeft} days left`;
+      } else {
+        statKyc.innerHTML = '<span style="color:#10B981;">✅ Valid</span>';
+        statKycSub.textContent = `Expires in ${daysLeft} days`;
+      }
+    } else if (kycVerified) {
+      // Verified but no timestamp — show as valid but no expiry info
+      document.getElementById('kyc-expiry').innerHTML = '<span style="color:#8B90A8;">Unknown</span>';
+      statKyc.innerHTML = '<span style="color:#10B981;">✅ Verified</span>';
+      statKycSub.textContent = 'Expiry date unavailable — consider redoing KYC';
+    } else {
+      document.getElementById('kyc-expiry').innerHTML = '<span style="color:#8B90A8;">N/A</span>';
+      statKyc.innerHTML = '<span style="color:#F59E0B;">Not done</span>';
+      statKycSub.textContent = 'Complete KYC verification';
+    }
+
     document.getElementById('loading').style.display = 'none';
     document.getElementById('dashboard').style.display = '';
 
@@ -237,6 +317,69 @@ async function regenerateCert() {
   } catch(e) {
     btn.disabled = false; btn.textContent = '🔄 Regenerate Certificate';
     alert('Regeneration failed. Try again.');
+  }
+}
+
+async function redoKyc() {
+  const btn = document.getElementById('btn-redo-kyc');
+  const msg = document.getElementById('kyc-msg');
+  btn.disabled = true;
+  btn.textContent = 'Initializing…';
+  msg.style.display = 'none';
+
+  try {
+    const tokenRes = await fetch('/api/onboarding/hyperverge-token', {
+      method: 'POST', credentials: 'include'
+    });
+    if (!tokenRes.ok) {
+      const err = await tokenRes.json();
+      throw new Error(err.detail || 'Failed to initialize KYC');
+    }
+    const { token, workflowId, transactionId } = await tokenRes.json();
+
+    if (typeof HyperKycConfig === 'undefined') {
+      throw new Error('HyperVerge SDK not loaded. Please refresh and try again.');
+    }
+
+    btn.textContent = '⏳ KYC in progress…';
+
+    const hyperKycConfig = new HyperKycConfig(token, workflowId, transactionId);
+    HyperKYCModule.launch(hyperKycConfig, async (result) => {
+      const status = result.status;
+      if (status === 'user_cancelled') {
+        btn.disabled = false;
+        btn.textContent = '🔄 Redo KYC Verification';
+        msg.textContent = 'KYC cancelled. You can try again anytime.';
+        msg.style.display = '';
+        return;
+      }
+      btn.textContent = 'Finalizing…';
+      try {
+        const completeRes = await fetch('/api/onboarding/hyperverge-complete', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status, transactionId, result: result.details || {} })
+        });
+        const data = await completeRes.json();
+        if (data.success) {
+          msg.innerHTML = '<span style="color:#10B981;">✅ KYC renewed successfully! Refreshing…</span>';
+          msg.style.display = '';
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          throw new Error(data.message || 'KYC not approved.');
+        }
+      } catch(e) {
+        btn.disabled = false;
+        btn.textContent = '🔄 Redo KYC Verification';
+        msg.innerHTML = '<span style="color:#F87171;">' + e.message + '</span>';
+        msg.style.display = '';
+      }
+    });
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '🔄 Redo KYC Verification';
+    msg.innerHTML = '<span style="color:#F87171;">' + e.message + '</span>';
+    msg.style.display = '';
   }
 }
 
