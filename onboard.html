@@ -678,24 +678,83 @@
             <input type="tel" id="ob-phone" placeholder="+63 9XX XXX XXXX">
             <span class="ob-field-error" id="err-phone"></span>
         </div>
-        <!-- Attorney fields -->
+        <!-- Attorney / ENP fields -->
         <div id="attorney-fields">
             <div class="ob-field">
-                <label>Law Firm / Office Name</label>
-                <input type="text" id="ob-firm" placeholder="e.g. Dela Cruz Law Offices">
+                <label>Commission No. *</label>
+                <input type="text" id="ob-commission-no" placeholder="e.g. 2024-024">
+                <span class="ob-field-error" id="err-commission-no"></span>
             </div>
             <div class="ob-field">
-                <label>IBP Roll No. *</label>
-                <input type="text" id="ob-ibp" placeholder="e.g. 12345">
-                <span class="ob-field-error" id="err-ibp"></span>
+                <label>Commission Valid Until *</label>
+                <input type="text" id="ob-commission-valid" placeholder="e.g. Dec 31, 2025">
+                <span class="ob-field-error" id="err-commission-valid"></span>
+            </div>
+            <div class="field-row">
+                <div class="ob-field">
+                    <label>PTR No. *</label>
+                    <input type="text" id="ob-ptr-no" placeholder="e.g. 1234567">
+                    <span class="ob-field-error" id="err-ptr-no"></span>
+                </div>
+                <div class="ob-field">
+                    <label>PTR Location *</label>
+                    <input type="text" id="ob-ptr-location" placeholder="e.g. Manila">
+                    <span class="ob-field-error" id="err-ptr-location"></span>
+                </div>
             </div>
             <div class="ob-field">
-                <label>PTC No. (if applicable)</label>
-                <input type="text" id="ob-ptc" placeholder="e.g. 98765">
+                <label>PTR Date *</label>
+                <input type="text" id="ob-ptr-date" placeholder="e.g. Jan 02, 2025">
+                <span class="ob-field-error" id="err-ptr-date"></span>
+            </div>
+            <div class="field-row">
+                <div class="ob-field">
+                    <label>IBP No. *</label>
+                    <input type="text" id="ob-ibp-no" placeholder="e.g. 123456">
+                    <span class="ob-field-error" id="err-ibp-no"></span>
+                </div>
+                <div class="ob-field">
+                    <label>IBP Date *</label>
+                    <input type="text" id="ob-ibp-date" placeholder="e.g. Dec 18, 2024">
+                    <span class="ob-field-error" id="err-ibp-date"></span>
+                </div>
             </div>
             <div class="ob-field">
-                <label>Legal Address</label>
-                <input type="text" id="ob-address" placeholder="e.g. Legazpi City, Albay">
+                <label>Notary Email *</label>
+                <input type="email" id="ob-notary-email" placeholder="e.g. juan.cruz@email.com">
+                <span class="ob-field-error" id="err-notary-email"></span>
+            </div>
+            <div class="ob-field">
+                <label>Notary Address *</label>
+                <input type="text" id="ob-notary-address" placeholder="e.g. 123 The Actual Bldg., Malate, Manila">
+                <span class="ob-field-error" id="err-notary-address"></span>
+            </div>
+            <div class="field-row">
+                <div class="ob-field">
+                    <label>MCLE Compliance Period *</label>
+                    <input type="text" id="ob-mcle-period" placeholder="e.g. VIII">
+                    <span class="ob-field-error" id="err-mcle-period"></span>
+                </div>
+                <div class="ob-field">
+                    <label>MCLE No. *</label>
+                    <input type="text" id="ob-mcle-no" placeholder="e.g. 1234567">
+                    <span class="ob-field-error" id="err-mcle-no"></span>
+                </div>
+            </div>
+            <div class="ob-field">
+                <label>MCLE Date *</label>
+                <input type="text" id="ob-mcle-date" placeholder="e.g. Jun 12, 2024">
+                <span class="ob-field-error" id="err-mcle-date"></span>
+            </div>
+            <div class="ob-field">
+                <label>Mode of Notarization *</label>
+                <select id="ob-mode-notarization">
+                    <option value="">-- Select --</option>
+                    <option value="IEN">IEN (In-Person Electronic Notarization)</option>
+                    <option value="REN">REN (Remote Electronic Notarization)</option>
+                    <option value="Both">Both IEN and REN</option>
+                </select>
+                <span class="ob-field-error" id="err-mode-notarization"></span>
             </div>
         </div>
         <!-- Client fields -->
@@ -1084,35 +1143,85 @@ function _fieldInvalid(inputId, invalid) {
 }
 async function submitProfile() {
     const firstName = (document.getElementById('ob-first-name') || {}).value?.trim() || '';
-    const lastName = (document.getElementById('ob-last-name') || {}).value?.trim() || '';
-    const phone = (document.getElementById('ob-phone') || {}).value?.trim() || '';
-    const ibp = (_role === 'attorney') ? ((document.getElementById('ob-ibp') || {}).value?.trim() || '') : 'ok';
-    // Clear all field errors
-    _fieldErr('err-first-name', ''); _fieldInvalid('ob-first-name', false);
-    _fieldErr('err-last-name', '');  _fieldInvalid('ob-last-name', false);
-    _fieldErr('err-phone', '');      _fieldInvalid('ob-phone', false);
-    _fieldErr('err-ibp', '');        _fieldInvalid('ob-ibp', false);
+    const lastName  = (document.getElementById('ob-last-name')  || {}).value?.trim() || '';
+    const phone     = (document.getElementById('ob-phone')      || {}).value?.trim() || '';
+    const commissionNo    = (document.getElementById('ob-commission-no')    || {}).value?.trim() || '';
+    const commissionValid = (document.getElementById('ob-commission-valid') || {}).value?.trim() || '';
+    const ptrNo           = (document.getElementById('ob-ptr-no')           || {}).value?.trim() || '';
+    const ptrLocation     = (document.getElementById('ob-ptr-location')     || {}).value?.trim() || '';
+    const ptrDate         = (document.getElementById('ob-ptr-date')         || {}).value?.trim() || '';
+    const ibpNo           = (document.getElementById('ob-ibp-no')           || {}).value?.trim() || '';
+    const ibpDate         = (document.getElementById('ob-ibp-date')         || {}).value?.trim() || '';
+    const notaryEmail     = (document.getElementById('ob-notary-email')     || {}).value?.trim() || '';
+    const notaryAddress   = (document.getElementById('ob-notary-address')   || {}).value?.trim() || '';
+    const mclePeriod      = (document.getElementById('ob-mcle-period')      || {}).value?.trim() || '';
+    const mcleNo          = (document.getElementById('ob-mcle-no')          || {}).value?.trim() || '';
+    const mcleDate        = (document.getElementById('ob-mcle-date')        || {}).value?.trim() || '';
+    const modeNotarize    = (document.getElementById('ob-mode-notarization')|| {}).value?.trim() || '';
+
+    const errIds = ['err-first-name','err-last-name','err-phone','err-commission-no','err-commission-valid',
+        'err-ptr-no','err-ptr-location','err-ptr-date','err-ibp-no','err-ibp-date',
+        'err-notary-email','err-notary-address','err-mcle-period','err-mcle-no','err-mcle-date','err-mode-notarization'];
+    errIds.forEach(id => _fieldErr(id, ''));
+    const inputIds = ['ob-first-name','ob-last-name','ob-phone','ob-commission-no','ob-commission-valid',
+        'ob-ptr-no','ob-ptr-location','ob-ptr-date','ob-ibp-no','ob-ibp-date',
+        'ob-notary-email','ob-notary-address','ob-mcle-period','ob-mcle-no','ob-mcle-date','ob-mode-notarization'];
+    inputIds.forEach(id => _fieldInvalid(id, false));
     document.getElementById('err-profile').textContent = '';
+
     let hasError = false;
-    if (!firstName) { _fieldErr('err-first-name', 'First name is required.'); _fieldInvalid('ob-first-name', true); hasError = true; }
-    if (!lastName)  { _fieldErr('err-last-name',  'Last name is required.');  _fieldInvalid('ob-last-name', true);  hasError = true; }
-    if (!phone)     { _fieldErr('err-phone', 'Phone number is required.');    _fieldInvalid('ob-phone', true);      hasError = true; }
-    if (_role === 'attorney' && !ibp) { _fieldErr('err-ibp', 'IBP Roll No. is required.'); _fieldInvalid('ob-ibp', true); hasError = true; }
+    function _req(val, errId, inputId, msg) {
+        if (!val) { _fieldErr(errId, msg); _fieldInvalid(inputId, true); hasError = true; }
+    }
+    _req(firstName, 'err-first-name', 'ob-first-name', 'First name is required.');
+    _req(lastName,  'err-last-name',  'ob-last-name',  'Last name is required.');
+    _req(phone,     'err-phone',      'ob-phone',      'Phone number is required.');
+    if (_role === 'attorney') {
+        _req(commissionNo,    'err-commission-no',    'ob-commission-no',    'Commission No. is required.');
+        _req(commissionValid, 'err-commission-valid', 'ob-commission-valid', 'Commission validity date is required.');
+        _req(ptrNo,           'err-ptr-no',           'ob-ptr-no',           'PTR No. is required.');
+        _req(ptrLocation,     'err-ptr-location',     'ob-ptr-location',     'PTR location is required.');
+        _req(ptrDate,         'err-ptr-date',         'ob-ptr-date',         'PTR date is required.');
+        _req(ibpNo,           'err-ibp-no',           'ob-ibp-no',           'IBP No. is required.');
+        _req(ibpDate,         'err-ibp-date',         'ob-ibp-date',         'IBP date is required.');
+        _req(notaryAddress,   'err-notary-address',   'ob-notary-address',   'Notary address is required.');
+        _req(mclePeriod,      'err-mcle-period',      'ob-mcle-period',      'MCLE period is required.');
+        _req(mcleNo,          'err-mcle-no',          'ob-mcle-no',          'MCLE No. is required.');
+        _req(mcleDate,        'err-mcle-date',        'ob-mcle-date',        'MCLE date is required.');
+        _req(modeNotarize,    'err-mode-notarization','ob-mode-notarization','Mode of notarization is required.');
+        if (!notaryEmail || notaryEmail.indexOf('@') < 1) {
+            _fieldErr('err-notary-email', 'A valid notary email is required.');
+            _fieldInvalid('ob-notary-email', true); hasError = true;
+        }
+        if (notaryAddress && notaryAddress.length < 10) {
+            _fieldErr('err-notary-address', 'Please enter a complete address (min 10 chars).');
+            _fieldInvalid('ob-notary-address', true); hasError = true;
+        }
+    }
     if (hasError) return;
     const btn = document.getElementById('btn-profile-continue');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span> Saving…';
+    btn.innerHTML = '<span class="spinner"></span> Saving...';
     const payload = {
         first_name: firstName,
-        last_name: lastName,
-        phone: phone,
-        role: _role,
-        firm_name: (document.getElementById('ob-firm') || {}).value?.trim() || '',
-        ibp_number: (document.getElementById('ob-ibp') || {}).value?.trim() || '',
-        ptc_number: (document.getElementById('ob-ptc') || {}).value?.trim() || '',
-        legal_address: (document.getElementById('ob-address') || {}).value?.trim() || '',
-        organization: (document.getElementById('ob-org') || {}).value?.trim() || '',
-        position: (document.getElementById('ob-position') || {}).value?.trim() || '',
+        last_name:  lastName,
+        phone:      phone,
+        role:       _role,
+        commission_no:             commissionNo,
+        commission_no_valid_until: commissionValid,
+        ptr_no:                    ptrNo,
+        ptr_no_location:           ptrLocation,
+        ptr_no_date:               ptrDate,
+        ibp_no:                    ibpNo,
+        ibp_no_date:               ibpDate,
+        notary_email:              notaryEmail,
+        notary_address:            notaryAddress,
+        mcle_no_period:            mclePeriod,
+        mcle_no:                   mcleNo,
+        mcle_no_date:              mcleDate,
+        mode_of_notarization:      modeNotarize,
+        organization: (document.getElementById('ob-org')      || {}).value?.trim() || '',
+        position:     (document.getElementById('ob-position') || {}).value?.trim() || '',
     };
     try {
         const res = await fetch('/api/onboarding/profile', {
@@ -1134,7 +1243,7 @@ async function submitProfile() {
         document.getElementById('err-profile').textContent = e.message;
     } finally {
         btn.disabled = false;
-        btn.textContent = 'Continue →';
+        btn.textContent = 'Continue';
     }
 }
 

@@ -131,14 +131,20 @@ class ProfileRequest(BaseModel):
     last_name: str
     phone: str
     role: str
-    # Attorney fields
-    firm_name: Optional[str] = None
-    ibp_number: Optional[str] = None
-    ptc_number: Optional[str] = None
-    legal_address: Optional[str] = None
-    num_employees: Optional[str] = None
-    mayors_permit: Optional[str] = None
-    bir_number: Optional[str] = None
+    # Attorney / ENP fields
+    commission_no: Optional[str] = None
+    commission_no_valid_until: Optional[str] = None
+    ptr_no: Optional[str] = None
+    ptr_no_location: Optional[str] = None
+    ptr_no_date: Optional[str] = None
+    ibp_no: Optional[str] = None
+    ibp_no_date: Optional[str] = None
+    notary_email: Optional[str] = None
+    notary_address: Optional[str] = None
+    mcle_no_period: Optional[str] = None
+    mcle_no: Optional[str] = None
+    mcle_no_date: Optional[str] = None
+    mode_of_notarization: Optional[str] = None
     # Client fields
     organization: Optional[str] = None
     position: Optional[str] = None
@@ -490,19 +496,24 @@ async def save_profile(
 
     if req.role == "attorney":
         profile.update({
-            "firm_name": req.firm_name or "",
-            "ibp_number": req.ibp_number or "",
-            "ptc_number": req.ptc_number or "",
-            "legal_address": req.legal_address or "",
-            "num_employees": req.num_employees or "",
-            "mayors_permit": req.mayors_permit or "",
-            "bir_number": req.bir_number or "",
+            "commission_no": req.commission_no or "",
+            "commission_no_valid_until": req.commission_no_valid_until or "",
+            "ptr_no": req.ptr_no or "",
+            "ptr_no_location": req.ptr_no_location or "",
+            "ptr_no_date": req.ptr_no_date or "",
+            "ibp_no": req.ibp_no or "",
+            "ibp_no_date": req.ibp_no_date or "",
+            "notary_email": req.notary_email or "",
+            "notary_address": req.notary_address or "",
+            "mcle_no_period": req.mcle_no_period or "",
+            "mcle_no": req.mcle_no or "",
+            "mcle_no_date": req.mcle_no_date or "",
+            "mode_of_notarization": req.mode_of_notarization or "",
         })
     else:
         profile.update({
             "organization": req.organization or "",
             "position": req.position or "",
-            "bir_number": req.bir_number or "",
         })
 
     await update_user(user["id"], {
