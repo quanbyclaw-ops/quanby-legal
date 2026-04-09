@@ -1903,6 +1903,18 @@ async function startExam() {
         _answers = {};
         _testSessionId = data.test_session_id;
         _currentPage = 0;
+
+        // DEV MODE: ?dev=true auto-selects option B for every question
+        const _devMode = new URLSearchParams(window.location.search).get('dev') === 'true';
+        if (_devMode) {
+            _questions.forEach(function(q) {
+                if (q.choices && q.choices.length > 1) {
+                    _answers[q.id] = q.choices[1]; // index 1 = option B
+                }
+            });
+            console.log('[DEV] Auto-filled', Object.keys(_answers).length, 'answers with option B');
+        }
+
         renderExamPage(0);
         startTimer(data.time_limit_minutes || 90);
         document.getElementById('timer-banner').style.display = 'block';
