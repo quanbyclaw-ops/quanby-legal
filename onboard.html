@@ -1956,7 +1956,7 @@ async function startExam() {
         if (_devMode) {
             _questions.forEach(function(q) {
                 if (q.choices && q.choices.length > 1) {
-                    _answers[q.id] = q.choices[1]; // index 1 = option B
+                    _answers[q.id] = 'B'; // option B
                 }
             });
             console.log('[DEV] Auto-filled', Object.keys(_answers).length, 'answers with option B');
@@ -1994,7 +1994,7 @@ function renderExamPage(page) {
         `<div class="ob-question" id="q-${q.id}">
             <p>${start + i + 1}. ${q.question}</p>
             ${q.choices.map(c =>
-                `<div class="ob-choice ${_answers[q.id] === c ? 'selected' : ''}" onclick="pickAnswer('${q.id}', this)">${c}</div>`
+                `<div class="ob-choice ${(function(){ var q2 = _questions.find(function(x){return x.id===q.id;}); var idx2 = q2 ? q2.choices.indexOf(c) : -1; return _answers[q.id] === String.fromCharCode(65+idx2) ? 'selected' : ''; })()}" onclick="pickAnswer('${q.id}', this)">${c}</div>`
             ).join('')}
         </div>`
     ).join('');
@@ -2025,7 +2025,14 @@ function updateAnswerProgress() {
 
 function pickAnswer(qid, el) {
     const text = el.textContent;
-    _answers[qid] = text;
+    // Store the letter (A/B/C/D) based on choice index
+    var q = _questions.find(function(q){ return q.id === qid; });
+    if (q) {
+        var idx = q.choices.indexOf(text);
+        _answers[qid] = idx >= 0 ? String.fromCharCode(65 + idx) : text;
+    } else {
+        _answers[qid] = text;
+    }
     const block = document.getElementById('q-' + qid);
     if (block) block.querySelectorAll('.ob-choice').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
