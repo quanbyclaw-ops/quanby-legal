@@ -331,6 +331,26 @@
         .qi { display: inline-flex; align-items: center; justify-content: center; margin-right: 0.3em; vertical-align: -0.15em; }
         .qi svg { width: 1em; height: 1em; stroke: currentColor; stroke-width: 1.75; fill: none; }
         .ob-field-error { color: #f87171; font-size: 0.78rem; margin-top: 0.3rem; min-height: 1em; display: block; }
+        .ob-select-field {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.5rem;
+            padding: 0.65rem 0.75rem;
+            color: var(--text);
+            font-family: "Inter", sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.6rem center;
+            padding-right: 2rem;
+        }
+        .ob-select-field:focus { outline: none; border-color: var(--purple); }
+        .ob-select-field option { background: #0f1020; color: var(--text); }
         .ob-field input[type="date"] {
             color-scheme: dark;
             appearance: none;
@@ -850,15 +870,45 @@
         <h2>Complete Your Profile</h2>
         <p class="sub">Required for ENP certification under A.M. No. 24-10-14-SC.</p>
         <div class="field-row">
+            <div class="ob-field" style="flex:0 0 100px;">
+                <label>Prefix</label>
+                <select id="ob-prefix" class="ob-select-field">
+                    <option value="">None</option>
+                    <option value="Atty.">Atty.</option>
+                    <option value="Dr.">Dr.</option>
+                    <option value="Mr.">Mr.</option>
+                    <option value="Mrs.">Mrs.</option>
+                    <option value="Ms.">Ms.</option>
+                    <option value="Engr.">Engr.</option>
+                    <option value="Arch.">Arch.</option>
+                </select>
+            </div>
             <div class="ob-field">
                 <label>First Name *</label>
                 <input type="text" id="ob-first-name" placeholder="Juan">
                 <span class="ob-field-error" id="err-first-name"></span>
             </div>
+            <div class="ob-field" style="flex:0 0 80px;">
+                <label>M.I.</label>
+                <input type="text" id="ob-middle-initial" placeholder="A." maxlength="3">
+            </div>
+        </div>
+        <div class="field-row">
             <div class="ob-field">
                 <label>Last Name *</label>
                 <input type="text" id="ob-last-name" placeholder="dela Cruz">
                 <span class="ob-field-error" id="err-last-name"></span>
+            </div>
+            <div class="ob-field" style="flex:0 0 100px;">
+                <label>Suffix</label>
+                <select id="ob-suffix" class="ob-select-field">
+                    <option value="">None</option>
+                    <option value="Jr.">Jr.</option>
+                    <option value="Sr.">Sr.</option>
+                    <option value="II">II</option>
+                    <option value="III">III</option>
+                    <option value="IV">IV</option>
+                </select>
             </div>
         </div>
         <div class="ob-field">
@@ -1359,6 +1409,9 @@ function goToStep(step) {
             const ln = document.getElementById('ob-last-name');
             if (fn && !fn.value && _user.first_name) fn.value = _user.first_name;
             if (ln && !ln.value && _user.last_name) ln.value = _user.last_name;
+            // Prefill middle initial from Google name if available
+            const mi = document.getElementById('ob-middle-initial');
+            if (mi && !mi.value && _user.middle_name) mi.value = _user.middle_name[0] + '.';
         }
     }
 
@@ -1571,7 +1624,10 @@ function _fieldInvalid(inputId, invalid) {
     if (dpTrigger) dpTrigger.classList.toggle('invalid-dp', !!invalid);
 }
 async function submitProfile() {
-    const firstName = (document.getElementById('ob-first-name') || {}).value?.trim() || '';
+    const prefix       = (document.getElementById('ob-prefix')        || {}).value?.trim() || '';
+    const firstName    = (document.getElementById('ob-first-name')    || {}).value?.trim() || '';
+    const middleInit   = (document.getElementById('ob-middle-initial')|| {}).value?.trim() || '';
+    const suffix       = (document.getElementById('ob-suffix')        || {}).value?.trim() || '';
     const lastName  = (document.getElementById('ob-last-name')  || {}).value?.trim() || '';
     const phone     = (document.getElementById('ob-phone')      || {}).value?.trim() || '';
     const rollNo          = (document.getElementById('ob-roll-no')           || {}).value?.trim() || '';
@@ -1646,7 +1702,10 @@ async function submitProfile() {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> Saving...';
     const payload = {
+        prefix:     prefix,
         first_name: firstName,
+        middle_initial: middleInit,
+        suffix:     suffix,
         last_name:  lastName,
         phone:      phone,
         role:       _role,

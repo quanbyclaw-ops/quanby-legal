@@ -127,8 +127,11 @@ class RoleSelectRequest(BaseModel):
 
 
 class ProfileRequest(BaseModel):
+    prefix: Optional[str] = None
     first_name: str
+    middle_initial: Optional[str] = None
     last_name: str
+    suffix: Optional[str] = None
     phone: str
     role: str
     # Attorney / ENP fields
@@ -490,8 +493,11 @@ async def save_profile(
         raise HTTPException(401, "Unauthorized")
 
     profile: dict = {
+        "prefix": req.prefix or "",
         "first_name": req.first_name,
+        "middle_initial": req.middle_initial or "",
         "last_name": req.last_name,
+        "suffix": req.suffix or "",
         "phone": req.phone,
     }
 
