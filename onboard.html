@@ -331,6 +331,52 @@
         .qi { display: inline-flex; align-items: center; justify-content: center; margin-right: 0.3em; vertical-align: -0.15em; }
         .qi svg { width: 1em; height: 1em; stroke: currentColor; stroke-width: 1.75; fill: none; }
         .ob-field-error { color: #f87171; font-size: 0.78rem; margin-top: 0.3rem; min-height: 1em; display: block; }
+        /* Phone picker */
+        .phone-input-wrap {
+            display: flex; align-items: stretch;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.5rem; overflow: visible;
+            transition: border-color 0.2s; position: relative;
+        }
+        .phone-input-wrap:focus-within { border-color: var(--purple); }
+        .phone-input-wrap.invalid-phone { border-color: #f87171 !important; }
+        .phone-country-btn {
+            display: flex; align-items: center; gap: 0.35rem;
+            padding: 0 0.75rem; background: rgba(255,255,255,0.04);
+            border: none; border-right: 1px solid rgba(255,255,255,0.1);
+            color: var(--text); font-size: 0.9rem; cursor: pointer;
+            white-space: nowrap; border-radius: 0.5rem 0 0 0.5rem;
+            font-family: "Inter", sans-serif; flex-shrink: 0;
+            transition: background 0.15s;
+        }
+        .phone-country-btn:hover { background: rgba(255,255,255,0.08); }
+        .phone-country-flag { font-size: 1.1rem; line-height: 1; }
+        .phone-country-code { font-size: 0.82rem; color: var(--muted); }
+        .phone-country-chevron { opacity: 0.5; }
+        .phone-number-input {
+            flex: 1; background: transparent; border: none;
+            padding: 0.65rem 0.875rem; color: var(--text);
+            font-family: "Inter", sans-serif; font-size: 0.9rem; outline: none;
+            min-width: 0;
+        }
+        .phone-number-input::placeholder { color: rgba(148,163,184,0.5); }
+        .phone-country-dropdown {
+            position: absolute; top: calc(100% + 4px); left: 0; z-index: 100;
+            background: #111827; border: 1px solid rgba(124,58,237,0.35);
+            border-radius: 0.5rem; min-width: 220px; max-height: 240px;
+            overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        }
+        .phone-country-option {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.55rem 0.875rem; cursor: pointer; font-size: 0.85rem;
+            color: var(--text); transition: background 0.12s;
+        }
+        .phone-country-option:hover { background: rgba(124,58,237,0.2); }
+        .phone-country-option.selected { background: rgba(124,58,237,0.3); font-weight: 600; }
+        .phone-country-option .opt-code { color: var(--muted); font-size: 0.78rem; margin-left: auto; }
+        /* Name row improvements */
+        .ob-field label { letter-spacing: 0.01em; }
         .ob-select-field {
             width: 100%;
             background: rgba(255,255,255,0.06);
@@ -913,7 +959,29 @@
         </div>
         <div class="ob-field">
             <label>Phone Number *</label>
-            <input type="tel" id="ob-phone" placeholder="09XX XXX XXXX or +63 9XX XXX XXXX">
+            <div class="phone-input-wrap" id="phone-input-wrap">
+                <button type="button" class="phone-country-btn" id="phone-country-btn" onclick="toggleCountryDropdown()">
+                    <span class="phone-country-flag" id="phone-flag">🇵🇭</span>
+                    <span class="phone-country-code" id="phone-code">+63</span>
+                    <svg class="phone-country-chevron" width="10" height="10" viewBox="0 0 12 12"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <div class="phone-country-dropdown" id="phone-country-dropdown" style="display:none;" onclick="event.stopPropagation()">
+                        <div class="phone-country-option selected" data-code="+63" data-flag="🇵🇭" data-name="Philippines" onclick="selectCountry('+63','🇵🇭','PH')">🇵🇭 Philippines <span class="opt-code">+63</span></div>
+                        <div class="phone-country-option" data-code="+1" data-flag="🇺🇸" data-name="United States" onclick="selectCountry('+1','🇺🇸','US')">🇺🇸 United States <span class="opt-code">+1</span></div>
+                        <div class="phone-country-option" data-code="+44" data-flag="🇬🇧" data-name="United Kingdom" onclick="selectCountry('+44','🇬🇧','GB')">🇬🇧 United Kingdom <span class="opt-code">+44</span></div>
+                        <div class="phone-country-option" data-code="+61" data-flag="🇦🇺" data-name="Australia" onclick="selectCountry('+61','🇦🇺','AU')">🇦🇺 Australia <span class="opt-code">+61</span></div>
+                        <div class="phone-country-option" data-code="+65" data-flag="🇸🇬" data-name="Singapore" onclick="selectCountry('+65','🇸🇬','SG')">🇸🇬 Singapore <span class="opt-code">+65</span></div>
+                        <div class="phone-country-option" data-code="+971" data-flag="🇦🇪" data-name="UAE" onclick="selectCountry('+971','🇦🇪','AE')">🇦🇪 UAE <span class="opt-code">+971</span></div>
+                        <div class="phone-country-option" data-code="+81" data-flag="🇯🇵" data-name="Japan" onclick="selectCountry('+81','🇯🇵','JP')">🇯🇵 Japan <span class="opt-code">+81</span></div>
+                        <div class="phone-country-option" data-code="+82" data-flag="🇰🇷" data-name="South Korea" onclick="selectCountry('+82','🇰🇷','KR')">🇰🇷 South Korea <span class="opt-code">+82</span></div>
+                        <div class="phone-country-option" data-code="+86" data-flag="🇨🇳" data-name="China" onclick="selectCountry('+86','🇨🇳','CN')">🇨🇳 China <span class="opt-code">+86</span></div>
+                        <div class="phone-country-option" data-code="+60" data-flag="🇲🇾" data-name="Malaysia" onclick="selectCountry('+60','🇲🇾','MY')">🇲🇾 Malaysia <span class="opt-code">+60</span></div>
+                        <div class="phone-country-option" data-code="+66" data-flag="🇹🇭" data-name="Thailand" onclick="selectCountry('+66','🇹🇭','TH')">🇹🇭 Thailand <span class="opt-code">+66</span></div>
+                        <div class="phone-country-option" data-code="+91" data-flag="🇮🇳" data-name="India" onclick="selectCountry('+91','🇮🇳','IN')">🇮🇳 India <span class="opt-code">+91</span></div>
+                    </div>
+                </button>
+                <input type="tel" id="ob-phone-number" class="phone-number-input" placeholder="9XX XXX XXXX" inputmode="numeric">
+                <input type="hidden" id="ob-phone" value="">
+            </div>
             <span class="ob-field-error" id="err-phone"></span>
         </div>
         <!-- Attorney / ENP fields -->
@@ -1661,16 +1729,19 @@ async function submitProfile() {
     }
     _req(firstName, 'err-first-name', 'ob-first-name', 'First name is required.');
     _req(lastName,  'err-last-name',  'ob-last-name',  'Last name is required.');
-    if (!phone) {
-        _fieldErr('err-phone', 'Phone number is required.'); _fieldInvalid('ob-phone', true); hasError = true;
+    // Build full phone from country code + number input
+    const phoneNum = (document.getElementById('ob-phone-number') || {}).value?.trim() || '';
+    const phoneCode = document.getElementById('phone-code')?.textContent || '+63';
+    if (phoneNum) {
+        const clean = phoneNum.replace(/[\s\-().]/g, '');
+        document.getElementById('ob-phone').value = phoneCode + clean;
+    }
+    if (!phoneNum) {
+        _fieldErr('err-phone', 'Phone number is required.');
+        document.getElementById('phone-input-wrap')?.classList.add('invalid-phone'); hasError = true;
     } else {
-        // Accept: +63XXXXXXXXXX, 09XXXXXXXXX, 9XXXXXXXXX (PH mobile numbers)
-        const cleanPhone = phone.replace(/[\s\-().]/g, '');
-        const validPH = /^(\+639|639|09|9)\d{9}$/.test(cleanPhone);
-        if (!validPH) {
-            _fieldErr('err-phone', 'Enter a valid Philippine mobile number (e.g. 09XX XXX XXXX).');
-            _fieldInvalid('ob-phone', true); hasError = true;
-        }
+        document.getElementById('phone-input-wrap')?.classList.remove('invalid-phone');
+        _fieldErr('err-phone', '');
     }
     if (_role === 'attorney') {
         _req(rollNo,          'err-roll-no',          'ob-roll-no',          'IBP Roll No. is required.');
@@ -2067,6 +2138,26 @@ document.addEventListener('click', function(e) {
         menu.style.display = 'none';
         if (wrap) wrap.classList.remove('open');
     }
+});
+let _selectedCountry = '+63';
+function toggleCountryDropdown() {
+    const dd = document.getElementById('phone-country-dropdown');
+    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+function selectCountry(code, flag, iso) {
+    _selectedCountry = code;
+    document.getElementById('phone-flag').textContent = flag;
+    document.getElementById('phone-code').textContent = code;
+    document.getElementById('phone-country-dropdown').style.display = 'none';
+    document.querySelectorAll('.phone-country-option').forEach(function(o) {
+        o.classList.toggle('selected', o.dataset.code === code);
+    });
+    document.getElementById('ob-phone-number').focus();
+}
+document.addEventListener('click', function(e) {
+    const btn = document.getElementById('phone-country-btn');
+    const dd = document.getElementById('phone-country-dropdown');
+    if (dd && btn && !btn.contains(e.target)) dd.style.display = 'none';
 });
 async function signOut() {
     try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch(e) {}
