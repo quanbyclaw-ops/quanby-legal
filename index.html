@@ -77,13 +77,19 @@
         .nav-signin-btn:hover { background: var(--purple-light, #9d5ff3); transform: translateY(-1px); }
         .nav-signout-btn { background: transparent; border: 1px solid rgba(239,68,68,0.35); color: #f87171; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
         .nav-signout-btn:hover { background: rgba(239,68,68,0.12); border-color: #f87171; }
-        .nav-cert-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.75rem; font-weight: 600; padding: 0.3rem 0.75rem; border-radius: 999px; white-space: nowrap; cursor: pointer; transition: all 0.2s; }
-        .nav-cert-badge.step-exam { background: rgba(234,179,8,0.15); border: 1px solid rgba(234,179,8,0.4); color: #fbbf24; }
-        .nav-cert-badge.step-exam:hover { background: rgba(234,179,8,0.25); }
-        .nav-cert-badge.step-liveness { background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.4); color: #60a5fa; }
-        .nav-cert-badge.step-certificate { background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); color: #c9a84c; }
-        .nav-cert-badge.step-certified { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.4); color: #34d399; cursor: default; }
-        .nav-cert-badge.step-profile { background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4); color: #c084fc; }
+        .nav-cert-badge {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            font-size: 0.78rem; font-weight: 600; padding: 0.35rem 1rem;
+            border-radius: 999px; white-space: nowrap; cursor: pointer;
+            transition: all 0.2s; border: none;
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            color: #fff; letter-spacing: 0.01em;
+        }
+        .nav-cert-badge:hover { opacity: 0.9; transform: translateY(-1px); }
+        .nav-cert-badge.step-certified {
+            background: linear-gradient(135deg, #10b981, #059669);
+            cursor: default; transform: none;
+        }
         .btn {
             padding: 0.5rem 1.25rem;
             border-radius: 0.375rem;
@@ -2556,35 +2562,7 @@
         window.location.href = '/onboard';
     }
 
-    function _updateOnboardStrip(user) {
-        var strip = document.getElementById('onboard-strip');
-        if (!strip) return;
-        var step = user.onboarding_step || 'test';
-        var role = user.role || 'attorney';
-        var name = user.first_name || 'there';
-        if (step === 'certified') {
-            strip.innerHTML = '<div class="container"><span class="onboard-label">✅ You are ENP Certified, ' + name + '! Your certificate is on file.</span></div>';
-            return;
-        }
-        var stepLabels = {
-            'role_select': 'Step 1: Complete your profile to begin certification.',
-            'profile':     'Step 1: Complete your profile to begin certification.',
-            'test':        'Step 2: Take your ENP Certification Exam to get certified.',
-            'kyc':         'Step 3: Upload your government ID to continue.',
-            'liveness':    'Step 4: Complete liveness verification.',
-            'certificate': 'Step 5: Download your certificate.',
-            'sc_redirect': 'Step 6: Submit your certificate to the Supreme Court.',
-        };
-        var actionLabels = {
-            'role_select': '📋 Complete Profile', 'profile': '📋 Complete Profile',
-            'test': '📝 Take the Exam Now', 'kyc': '🪪 Upload ID',
-            'liveness': '📷 Liveness Check', 'certificate': '🎓 Download Certificate',
-            'sc_redirect': '⚖️ Submit to Supreme Court',
-        };
-        var msg = stepLabels[step] || stepLabels['test'];
-        var action = actionLabels[step] || actionLabels['test'];
-        strip.innerHTML = '<div class="container"><span class="onboard-label">⚖️ ' + msg + '</span><button class="btn-signup" onclick="window.location.href=\'/onboard\'">' + action + '</button></div>';
-    }
+        function _updateOnboardStrip(user) { /* removed */ }
     initNavUser();
 
     // Handle ?exam=1 email link — fires on direct page load (not OAuth redirect)
