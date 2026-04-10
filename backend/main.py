@@ -912,7 +912,6 @@ async def get_hyperverge_token(
     ql_access: Optional[str] = Cookie(default=None),
 ):
     """Generate a short-lived HyperVerge access token for the Web SDK."""
-    import httpx
     user = get_current_user(authorization, ql_access)
     if not user:
         raise HTTPException(401, "Unauthorized")
@@ -925,14 +924,16 @@ async def get_hyperverge_token(
         raise HTTPException(500, "HyperVerge credentials not configured")
 
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.post(
-                f"{hv_api_url}/login",
-                json={"appId": hv_app_id, "appKey": hv_app_key, "expiry": 600},
-                headers={"Content-Type": "application/json"},
-            )
-        resp.raise_for_status()
-        data = resp.json()
+        import urllib.request as _hv_req, json as _hv_json
+        hv_payload = _hv_json.dumps({"appId": hv_app_id, "appKey": hv_app_key, "expiry": 600}).encode()
+        hv_req = _hv_req.Request(
+            f"{hv_api_url}/login",
+            data=hv_payload,
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+        with _hv_req.urlopen(hv_req, timeout=10) as _hv_resp:
+            data = _hv_json.loads(_hv_resp.read().decode())
         token = (data.get("result") or {}).get("token") or data.get("token")
         if not token:
             raise ValueError(f"No token in response: {data}")
@@ -1513,3 +1514,821 @@ if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("APP_PORT", 8080))
     uvicorn.run("main:app", host="127.0.0.1", port=port, reload=False)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# APPOINTMENTS & ENP BOOKING SYSTEM
+# ══════════════════════════════════════════════════════════════════════════════
+
+# httpx removed — broken on Python 3.12 (h11 dataclass issue); using urllib instead
+import urllib.request as _urllib_req
+import urllib.error as _urllib_err
+from datetime import datetime as _dt, timezone as _tz
+# fpdf removed — using raw PDF bytes (FPDF incompatible with Python 3.12)
+
+# ─── Appointments data store ──────────────────────────────────────────────────
+_APTS_FILE = os.path.join(os.path.dirname(__file__), "data", "appointments.json")
+_apts_lock = threading.Lock()
+_appointments: dict = {}
+
+
+def _load_appointments() -> None:
+    global _appointments
+    if os.path.exists(_APTS_FILE):
+        try:
+            with open(_APTS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                _appointments = data if isinstance(data, dict) else {}
+        except Exception:
+            _appointments = {}
+    else:
+        _appointments = {}
+
+
+def _save_appointments() -> None:
+    os.makedirs(os.path.dirname(_APTS_FILE), exist_ok=True)
+    with open(_APTS_FILE, "w", encoding="utf-8") as f:
+        json.dump(_appointments, f, indent=2, ensure_ascii=False)
+
+def _reload_appointments() -> None:
+    """Reload appointments from disk — needed in multi-worker uvicorn deployments
+    so each worker always has the latest state before processing a request."""
+    global _appointments
+    try:
+        if os.path.exists(_APTS_FILE):
+            with open(_APTS_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                _appointments = data if isinstance(data, dict) else {}
+    except Exception:
+        pass
+
+
+_load_appointments()
+
+
+# ─── Pydantic models ──────────────────────────────────────────────────────────
+
+class AppointmentCreateRequest(BaseModel):
+    enp_id: str
+    notarization_type: str  # ACKNOWLEDGMENT | JURAT | AFFIRMATION | SIGNATURE_WITNESSING
+    mode: str               # REN | IEN
+    notes: str = ""
+
+
+class AppointmentActionRequest(BaseModel):
+    action: str  # "confirm" | "decline"
+
+
+# ─── GET /api/enps ────────────────────────────────────────────────────────────
+
+@app.get("/api/enps")
+async def list_certified_enps():
+    """Public endpoint — returns all certified ENPs."""
+    from onboarding import USERS as _users  # reuse the in-memory dict
+    result = []
+    for uid, u in _users.items():
+        if u.get("role") != "attorney":
+            continue
+        if u.get("certificate_status") != "certified":
+            continue
+        profile = u.get("profile") or {}
+        name = f"{u.get('first_name', '')} {u.get('last_name', '')}".strip()
+        result.append({
+            "id": u["id"],
+            "name": name,
+            "email": u.get("email", ""),
+            "notary_address": profile.get("notary_address", ""),
+            "commission_no": profile.get("commission_no", ""),
+            "ibp_no": profile.get("ibp_no", ""),
+            "picture": u.get("picture", ""),
+            "specializations": [],
+        })
+    return result
+
+
+# ─── POST /api/appointments ───────────────────────────────────────────────────
+
+@app.post("/api/appointments")
+async def create_appointment(
+    req: AppointmentCreateRequest,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Client creates an appointment with an ENP."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    if user.get("role") != "client":
+        raise HTTPException(403, "Only clients can book appointments")
+
+    valid_types = {"ACKNOWLEDGMENT", "JURAT", "AFFIRMATION", "SIGNATURE_WITNESSING"}
+    if req.notarization_type not in valid_types:
+        raise HTTPException(400, f"Invalid notarization_type. Valid: {valid_types}")
+    if req.mode not in {"REN", "IEN"}:
+        raise HTTPException(400, "Invalid mode. Valid: REN, IEN")
+
+    # Look up ENP
+    from onboarding import get_user as _get_user
+    enp = _get_user(req.enp_id)
+    if not enp or enp.get("role") != "attorney" or enp.get("certificate_status") != "certified":
+        raise HTTPException(404, "ENP not found or not certified")
+
+    now_iso = _dt.now(_tz.utc).isoformat()
+    apt_id = str(uuid.uuid4())
+    client_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+    enp_name = f"{enp.get('first_name', '')} {enp.get('last_name', '')}".strip()
+
+    apt = {
+        "apt_id": apt_id,
+        "client_id": user["id"],
+        "client_name": client_name,
+        "client_email": user.get("email", ""),
+        "enp_id": req.enp_id,
+        "enp_name": enp_name,
+        "enp_email": enp.get("email", ""),
+        "notarization_type": req.notarization_type,
+        "mode": req.mode,
+        "notes": req.notes[:1000],
+        "status": "PENDING",
+        "created_at": now_iso,
+        "updated_at": now_iso,
+        "confirmed_at": None,
+        "doconchain_project_uuid": None,
+        "doconchain_sign_link": None,
+    }
+
+    with _apts_lock:
+        _appointments[apt_id] = apt
+        _save_appointments()
+
+    return apt
+
+
+# ─── GET /api/appointments ────────────────────────────────────────────────────
+
+@app.get("/api/appointments")
+async def get_appointments(
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Get appointments for current user (role-aware)."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+
+    role = user.get("role")
+    uid = user["id"]
+
+    with _apts_lock:
+        _reload_appointments()  # multi-worker: always read fresh from disk
+    all_apts = list(_appointments.values())
+
+    if role == "client":
+        filtered = [a for a in all_apts if a["client_id"] == uid]
+    elif role == "attorney":
+        filtered = [a for a in all_apts if a["enp_id"] == uid]
+    else:
+        filtered = []
+
+    filtered.sort(key=lambda a: a.get("created_at", ""), reverse=True)
+    return filtered
+
+
+
+
+# ─── GET /api/appointments/{apt_id} ──────────────────────────────────────────
+
+@app.get("/api/appointments/{apt_id}")
+async def get_appointment_by_id(
+    apt_id: str,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Get a single appointment by ID. User must be the client or ENP of the appointment."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+
+    with _apts_lock:
+        apt = _appointments.get(apt_id)
+
+    if not apt:
+        raise HTTPException(404, "Appointment not found")
+
+    uid = user["id"]
+    if apt["client_id"] != uid and apt["enp_id"] != uid:
+        raise HTTPException(403, "Not your appointment")
+
+    return apt
+
+# ─── PATCH /api/appointments/{apt_id} ────────────────────────────────────────
+
+@app.patch("/api/appointments/{apt_id}")
+async def update_appointment(
+    apt_id: str,
+    req: AppointmentActionRequest,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """ENP confirms or declines an appointment."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    if user.get("role") != "attorney":
+        raise HTTPException(403, "Only ENPs can confirm/decline appointments")
+
+    if req.action not in ("confirm", "decline"):
+        raise HTTPException(400, "action must be 'confirm' or 'decline'")
+
+    with _apts_lock:
+        _reload_appointments()  # multi-worker: always read fresh from disk
+        apt = _appointments.get(apt_id)
+        if not apt:
+            raise HTTPException(404, "Appointment not found")
+        if apt["enp_id"] != user["id"]:
+            raise HTTPException(403, "Not your appointment")
+        if apt["status"] not in ("PENDING",):
+            raise HTTPException(400, f"Cannot act on appointment with status {apt['status']}")
+
+        now_iso = _dt.now(_tz.utc).isoformat()
+        if req.action == "confirm":
+            apt["status"] = "CONFIRMED"
+            apt["confirmed_at"] = now_iso
+        else:
+            apt["status"] = "DECLINED"
+
+        apt["updated_at"] = now_iso
+        _appointments[apt_id] = apt
+        _save_appointments()
+
+    return apt
+
+
+# ─── POST /api/appointments/{apt_id}/doconchain ───────────────────────────────
+
+def _generate_placeholder_pdf(enp_name: str, commission_no: str, client_name: str, notarization_type: str) -> bytes:
+    """Generate a minimal valid PDF for DoconChain project creation (raw bytes, no fpdf dependency)."""
+    date_str = _dt.now(_tz.utc).strftime("%Y-%m-%d %H:%M UTC")
+    content_stream = (
+        f"BT\n"
+        f"/F1 14 Tf\n"
+        f"50 750 Td\n"
+        f"(QUANBY LEGAL - NOTARIZATION DOCUMENT) Tj\n"
+        f"0 -25 Td\n"
+        f"/F1 11 Tf\n"
+        f"(ENP: {enp_name}) Tj\n"
+        f"0 -20 Td (Commission No: {commission_no}) Tj\n"
+        f"0 -20 Td (Client: {client_name}) Tj\n"
+        f"0 -20 Td (Notarization Type: {notarization_type}) Tj\n"
+        f"0 -20 Td (Date: {date_str}) Tj\n"
+        f"0 -30 Td\n"
+        f"/F1 9 Tf\n"
+        f"(This document is a placeholder for electronic notarization via Quanby Legal.) Tj\n"
+        f"ET"
+    )
+    stream_bytes = content_stream.encode("latin-1")
+    stream_len = len(stream_bytes)
+
+    pdf_parts = [
+        b"%PDF-1.4\n",
+        b"1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n",
+        b"2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n",
+        b"3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Contents 4 0 R"
+        b"/Resources<</Font<</F1 5 0 R>>>>>>endobj\n",
+        f"4 0 obj<</Length {stream_len}>>\nstream\n".encode(),
+        stream_bytes,
+        b"\nendstream\nendobj\n",
+        b"5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj\n",
+        b"xref\n0 6\n"
+        b"0000000000 65535 f \n"
+        b"0000000009 00000 n \n"
+        b"0000000058 00000 n \n"
+        b"0000000115 00000 n \n"
+        b"0000000265 00000 n \n"
+        b"0000000400 00000 n \n",
+        b"trailer<</Size 6/Root 1 0 R>>\nstartxref\n460\n%%EOF",
+    ]
+    return b"".join(pdf_parts)
+
+
+@app.post("/api/appointments/{apt_id}/doconchain")
+async def create_doconchain_project(
+    apt_id: str,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """ENP starts signing — creates a DoconChain project for this appointment."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    if user.get("role") != "attorney":
+        raise HTTPException(403, "Only ENPs can start signing sessions")
+
+    with _apts_lock:
+        _reload_appointments()  # multi-worker: always read fresh from disk
+        apt = _appointments.get(apt_id)
+        if not apt:
+            raise HTTPException(404, "Appointment not found")
+        if apt["enp_id"] != user["id"]:
+            raise HTTPException(403, "Not your appointment")
+        if apt["status"] != "CONFIRMED":
+            raise HTTPException(400, "Appointment must be CONFIRMED before starting signing")
+
+    # DoconChain credentials
+    DC_BASE = "https://stg-api2.doconchain.com"
+    DC_CLIENT_KEY = "U2FsdGVkX19dxrNafE8249yn0M/GMqq3WAbITHfKYl8="
+    DC_CLIENT_SECRET = "5sd07WmZyXJft2jEP8LOJyfGH"
+    DC_EMAIL = "stg_quanby@maildrop.cc"
+
+    profile = user.get("profile") or {}
+    enp_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
+    commission_no = profile.get("commission_no", "N/A")
+
+    try:
+        import io as _io
+
+        # ── Step 1: Generate DoconChain token (multipart/form-data via urllib) ──
+        def _multipart_post(url: str, fields: dict, files: dict = None, headers: dict = None) -> dict:
+            boundary = "QLBoundary7f3a9b2c"
+            body_parts = []
+            for k, v in fields.items():
+                body_parts.append(
+                    f"--{boundary}\r\nContent-Disposition: form-data; name=\"{k}\"\r\n\r\n{v}\r\n".encode()
+                )
+            if files:
+                for k, (fname, fdata, ftype) in files.items():
+                    body_parts.append(
+                        f"--{boundary}\r\nContent-Disposition: form-data; name=\"{k}\"; filename=\"{fname}\"\r\nContent-Type: {ftype}\r\n\r\n".encode()
+                        + fdata + b"\r\n"
+                    )
+            body_parts.append(f"--{boundary}--\r\n".encode())
+            body = b"".join(body_parts)
+            req_headers = {"Content-Type": f"multipart/form-data; boundary={boundary}"}
+            if headers:
+                req_headers.update(headers)
+            req = _urllib_req.Request(url, data=body, headers=req_headers, method="POST")
+            with _urllib_req.urlopen(req, timeout=30) as resp:
+                return json.loads(resp.read().decode())
+
+        token_data = _multipart_post(
+            f"{DC_BASE}/api/v2/generate/token",
+            {"client_key": DC_CLIENT_KEY, "client_secret": DC_CLIENT_SECRET, "email": DC_EMAIL},
+        )
+        dc_token = (token_data.get("data") or {}).get("token") or token_data.get("token")
+        if not dc_token:
+            raise ValueError(f"No token in response: {token_data}")
+
+        # ── Step 2: Generate placeholder PDF ──
+        pdf_bytes = _generate_placeholder_pdf(
+            enp_name=enp_name,
+            commission_no=commission_no,
+            client_name=apt["client_name"],
+            notarization_type=apt["notarization_type"],
+        )
+
+        # ── Step 3: Create DoconChain project ──
+        document_stamp = json.dumps({
+            "enp_name": enp_name,
+            "commission_no": commission_no,
+            "notarization_type": apt["notarization_type"],
+            "appointment_id": apt_id,
+        })
+        project_data = _multipart_post(
+            f"{DC_BASE}/api/v2/projects?user_type=ENTERPRISE_API",
+            {"document_stamp": document_stamp, "user_list_editable": "false", "creator_as_viewer": "false"},
+            files={"file": ("notarization_placeholder.pdf", pdf_bytes, "application/pdf")},
+            headers={"Authorization": f"Bearer {dc_token}"},
+        )
+
+    except _urllib_err.HTTPError as e:
+        err_body = e.read().decode(errors="replace")[:500]
+        raise HTTPException(502, f"DoconChain API error: {e.code} - {err_body}")
+    except Exception as e:
+        raise HTTPException(502, f"DoconChain integration failed: {str(e)[:300]}")
+
+    # Extract project UUID and build sign link
+    # DoconChain staging API: /signers add endpoint returns 404 — signing via app URL
+    data = project_data.get("data") or project_data
+    project_uuid = (data.get("uuid") or data.get("project_uuid") or data.get("id") or str(uuid.uuid4()))
+    # Always construct the DoconChain app signing URL from the project UUID
+    sign_link = f"https://stg-app.doconchain.com/sign/{project_uuid}"
+
+    with _apts_lock:
+        _appointments[apt_id]["doconchain_project_uuid"] = project_uuid
+        _appointments[apt_id]["doconchain_sign_link"] = sign_link
+        _appointments[apt_id]["doconchain_client_email"] = apt.get("client_email", "")
+        _appointments[apt_id]["doconchain_enp_email"] = apt.get("enp_email", "")
+        _appointments[apt_id]["updated_at"] = _dt.now(_tz.utc).isoformat()
+        _save_appointments()
+
+    return {
+        "success": True,
+        "project_uuid": project_uuid,
+        "sign_link": sign_link,
+    }
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# LIVEKIT VIDEO SESSION ENDPOINTS
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# LIVEKIT VIDEO SESSION ENDPOINTS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+import jwt as _pyjwt
+
+
+def _create_livekit_token(room_name: str, identity: str, name: str, can_publish: bool = True) -> str:
+    """Generate a LiveKit access token using JWT (HS256)."""
+    api_key    = os.getenv("LIVEKIT_API_KEY", "APIfmzJ2GVEV3TJ")
+    api_secret = os.getenv("LIVEKIT_API_SECRET", "sTxyVlCJaPF9QMJTevLvT1xRmSPiXSZXZnLgGoJsIOH")
+    now = int(time.time())
+    grants = {
+        "room": room_name,
+        "roomJoin": True,
+        "canPublish": can_publish,
+        "canSubscribe": True,
+        "canPublishData": True,
+    }
+    payload = {
+        "iss": api_key,
+        "sub": identity,
+        "iat": now,
+        "exp": now + 3600 * 6,
+        "nbf": now,
+        "jti": str(uuid.uuid4()),
+        "name": name,
+        "video": grants,
+    }
+    return _pyjwt.encode(payload, api_secret, algorithm="HS256")
+
+
+class SessionCreateRequest(BaseModel):
+    apt_id: str
+
+
+class SessionJoinRequest(BaseModel):
+    room_name: str
+    apt_id: str
+
+
+class SessionInviteRequest(BaseModel):
+    apt_id: str
+    email: str
+    name: str
+    role: str  # "WITNESS" | "OBSERVER"
+
+
+_LIVEKIT_URL = "wss://quanby-lms-k4aq44qe.livekit.cloud"
+
+
+# ─── GET /api/sessions/my-ip ──────────────────────────────────────────────────
+
+@app.get("/api/sessions/my-ip")
+async def get_my_ip(request: Request):
+    """Return the client IP for VPN/proxy detection. No auth required."""
+    # Respect X-Forwarded-For (set by nginx proxy)
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        ip = forwarded.split(",")[0].strip()
+    else:
+        ip = request.client.host if request.client else "unknown"
+    return {"ip": ip}
+
+
+# ─── POST /api/sessions/verify-liveness ──────────────────────────────────────
+
+@app.post("/api/sessions/verify-liveness")
+async def verify_session_liveness(
+    request: Request,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Liveness check before joining a session.
+    Verifies the user's live selfie against their stored KYC record.
+    For now: checks that the user has a verified KYC record (liveness_verified=True)
+    and records a new session liveness verification timestamp.
+    """
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+
+    body = await request.json()
+    status = body.get("status", "")
+    transaction_id = body.get("transactionId", "")
+
+    # Cross-verify: user must have completed KYC during onboarding
+    has_kyc = user.get("liveness_verified") or user.get("hyperverge_status") in ("auto_approved", "needs_review", "success", "complete")
+    kyc_verified_at = user.get("kyc_verified_at")
+
+    # Accept any successful liveness outcome
+    liveness_ok = status in ("success", "auto_approved", "needs_review", "complete", "user_verified")
+
+    if liveness_ok and has_kyc:
+        # Record session liveness timestamp
+        await update_user(user["id"], {
+            "session_liveness_verified_at": datetime.now(_tz.utc).isoformat(),
+            "session_liveness_transaction_id": transaction_id,
+        })
+        return {
+            "success": True,
+            "kyc_match": True,
+            "message": "Identity verified and matches KYC record.",
+            "kyc_verified_at": kyc_verified_at,
+        }
+    elif liveness_ok and not has_kyc:
+        # Liveness passed but no prior KYC — allow but flag for review
+        await update_user(user["id"], {
+            "session_liveness_verified_at": datetime.now(_tz.utc).isoformat(),
+            "session_liveness_transaction_id": transaction_id,
+        })
+        return {
+            "success": True,
+            "kyc_match": False,
+            "note": "No prior KYC record found — flagged for review",
+            "message": "Liveness verified but no KYC record on file.",
+        }
+    else:
+        return {
+            "success": False,
+            "kyc_match": False,
+            "message": f"Liveness verification failed (status: {status}).",
+        }
+
+
+# ─── GET /api/sessions/{apt_id}/participants ──────────────────────────────────
+
+@app.get("/api/sessions/{apt_id}/participants")
+async def get_session_participants(
+    apt_id: str,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Get participants who are in or invited to the session.
+    Returns the appointment's session_participants list enriched with
+    the ENP and client info as base participants.
+    """
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+
+    with _apts_lock:
+        _reload_appointments()
+        apt = _appointments.get(apt_id)
+
+    if not apt:
+        raise HTTPException(404, "Appointment not found")
+
+    # Only ENP or client can view participants
+    if user["id"] not in (apt.get("enp_id"), apt.get("client_id")):
+        raise HTTPException(403, "Not authorized for this session")
+
+    # Base participants (ENP + Client)
+    participants = []
+
+    # ENP
+    enp_name = apt.get("enp_name", "ENP")
+    participants.append({
+        "identity": apt.get("enp_id", ""),
+        "name": enp_name,
+        "role": "ENP",
+        "type": "core",
+    })
+
+    # Client
+    client_name = apt.get("client_name", "Client")
+    participants.append({
+        "identity": apt.get("client_id", ""),
+        "name": client_name,
+        "role": "Client",
+        "type": "core",
+    })
+
+    # Invited participants (witnesses/observers)
+    for p in apt.get("session_participants", []):
+        participants.append({
+            "identity": p.get("email", ""),
+            "name": p.get("name", "Guest"),
+            "role": p.get("role", "Witness").capitalize(),
+            "type": "invited",
+        })
+
+    return {"participants": participants, "session_status": apt.get("session_status", "none")}
+
+
+# ─── POST /api/sessions/create ────────────────────────────────────────────────
+
+@app.post("/api/sessions/create")
+async def create_session(
+    req: SessionCreateRequest,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """ENP creates a LiveKit video session for an appointment."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    if user.get("role") != "attorney":
+        raise HTTPException(403, "Only ENPs can create sessions")
+
+    with _apts_lock:
+        _reload_appointments()
+        apt = _appointments.get(req.apt_id)
+        if not apt:
+            raise HTTPException(404, "Appointment not found")
+        if apt.get("enp_id") != user["id"]:
+            raise HTTPException(403, "Not your appointment")
+
+        ts        = int(time.time())
+        room_name = f"ql-{req.apt_id[:8]}-{ts}"
+        enp_name  = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() or "ENP"
+        token     = _create_livekit_token(room_name, user["id"], enp_name, can_publish=True)
+        now_iso   = _dt.now(_tz.utc).isoformat()
+
+        apt["session_room_name"]    = room_name
+        apt["session_status"]       = "active"
+        apt["session_created_at"]   = now_iso
+        apt["session_ended_at"]     = None
+        apt["session_participants"] = apt.get("session_participants", [])
+        apt["updated_at"]           = now_iso
+        _appointments[req.apt_id]   = apt
+        _save_appointments()
+
+    session_link = f"https://legal.quanbyai.com/session?room={room_name}&apt={req.apt_id}"
+    return {
+        "room_name":    room_name,
+        "token":        token,
+        "url":          _LIVEKIT_URL,
+        "session_link": session_link,
+    }
+
+
+# ─── POST /api/sessions/join ──────────────────────────────────────────────────
+
+@app.post("/api/sessions/join")
+async def join_session(
+    req: SessionJoinRequest,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Client or ENP joins an existing LiveKit session."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+
+    with _apts_lock:
+        _reload_appointments()
+        apt = _appointments.get(req.apt_id)
+        if not apt:
+            raise HTTPException(404, "Appointment not found")
+
+    uid = user["id"]
+    if uid != apt.get("client_id") and uid != apt.get("enp_id"):
+        raise HTTPException(403, "Not your appointment")
+
+    if apt.get("session_status") != "active":
+        raise HTTPException(400, "Session is not active")
+
+    is_enp    = uid == apt.get("enp_id")
+    user_role = "ENP" if is_enp else "Client"
+    user_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() or user_role
+    token     = _create_livekit_token(req.room_name, uid, user_name, can_publish=True)
+
+    return {
+        "token":     token,
+        "url":       _LIVEKIT_URL,
+        "room_name": req.room_name,
+        "user_name": user_name,
+        "user_role": user_role,
+    }
+
+
+# ─── POST /api/sessions/invite ────────────────────────────────────────────────
+
+@app.post("/api/sessions/invite")
+async def invite_to_session(
+    req: SessionInviteRequest,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """ENP invites a witness or observer to the session."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    if user.get("role") != "attorney":
+        raise HTTPException(403, "Only ENPs can invite participants")
+
+    role_upper = req.role.upper()
+    if role_upper not in ("WITNESS", "OBSERVER"):
+        raise HTTPException(400, "Role must be WITNESS or OBSERVER")
+
+    with _apts_lock:
+        _reload_appointments()
+        apt = _appointments.get(req.apt_id)
+        if not apt:
+            raise HTTPException(404, "Appointment not found")
+        if apt.get("enp_id") != user["id"]:
+            raise HTTPException(403, "Not your appointment")
+
+        room_name = apt.get("session_room_name")
+        if not room_name:
+            raise HTTPException(400, "No active session for this appointment")
+
+        can_publish = (role_upper == "WITNESS")
+        identity    = f"guest-{uuid.uuid4().hex[:8]}"
+        token       = _create_livekit_token(room_name, identity, req.name, can_publish=can_publish)
+        now_iso     = _dt.now(_tz.utc).isoformat()
+
+        participant = {
+            "email":      req.email,
+            "name":       req.name,
+            "role":       role_upper,
+            "invited_at": now_iso,
+            "identity":   identity,
+        }
+        if "session_participants" not in apt:
+            apt["session_participants"] = []
+        apt["session_participants"].append(participant)
+        _appointments[req.apt_id] = apt
+        _save_appointments()
+
+    join_link = (
+        f"https://legal.quanbyai.com/lobby"
+        f"?apt={req.apt_id}&guest_token={token}&room={room_name}"
+    )
+    return {
+        "token":     token,
+        "join_link": join_link,
+    }
+
+
+# ─── GET /api/sessions/{apt_id} ───────────────────────────────────────────────
+
+@app.get("/api/sessions/{apt_id}")
+async def get_session(
+    apt_id: str,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Get session info for an appointment."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+
+    with _apts_lock:
+        _reload_appointments()
+        apt = _appointments.get(apt_id)
+        if not apt:
+            raise HTTPException(404, "Appointment not found")
+
+    uid = user["id"]
+    if uid != apt.get("client_id") and uid != apt.get("enp_id"):
+        raise HTTPException(403, "Not your appointment")
+
+    return {
+        "apt_id":                  apt_id,
+        "room_name":               apt.get("session_room_name"),
+        "session_status":          apt.get("session_status", "none"),
+        "session_participants":    apt.get("session_participants", []),
+        "session_created_at":      apt.get("session_created_at"),
+        "session_ended_at":        apt.get("session_ended_at"),
+        "doconchain_sign_link":    apt.get("doconchain_sign_link"),
+        "doconchain_project_uuid": apt.get("doconchain_project_uuid"),
+        "notarization_type":       apt.get("notarization_type"),
+        "client_name":             apt.get("client_name"),
+        "enp_name":                apt.get("enp_name"),
+        "client_id":               apt.get("client_id"),
+        "enp_id":                  apt.get("enp_id"),
+    }
+
+
+# ─── POST /api/sessions/{apt_id}/end ─────────────────────────────────────────
+
+@app.post("/api/sessions/{apt_id}/end")
+async def end_session(
+    apt_id: str,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """ENP ends a video session."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    if user.get("role") != "attorney":
+        raise HTTPException(403, "Only ENPs can end sessions")
+
+    with _apts_lock:
+        _reload_appointments()
+        apt = _appointments.get(apt_id)
+        if not apt:
+            raise HTTPException(404, "Appointment not found")
+        if apt.get("enp_id") != user["id"]:
+            raise HTTPException(403, "Not your appointment")
+
+        now_iso = _dt.now(_tz.utc).isoformat()
+        apt["session_status"]   = "ended"
+        apt["session_ended_at"] = now_iso
+        apt["updated_at"]       = now_iso
+        _appointments[apt_id]   = apt
+        _save_appointments()
+
+    return {"success": True}

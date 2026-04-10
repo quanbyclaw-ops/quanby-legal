@@ -944,8 +944,8 @@
     <!-- STEP PROGRESS -->
     <div id="progress-wrap" style="display:none; width:100%; max-width:680px;">
         <div class="page-header">
-            <h1>⚖️ ENP Certification</h1>
-            <p>Electronic Notary Public Certification under A.M. No. 24-10-14-SC</p>
+            <h1 id="page-header-title">⚖️ ENP Certification</h1>
+            <p id="page-header-sub">Electronic Notary Public Certification under A.M. No. 24-10-14-SC</p>
         </div>
         <div class="ob-progress" id="ob-progress"></div>
     </div>
@@ -970,8 +970,8 @@
 
     <!-- STEP 2: PROFILE -->
     <div id="step-profile" class="ob-card" style="display:none;">
-        <h2>Complete Your Profile</h2>
-        <p class="sub">Required for ENP certification under A.M. No. 24-10-14-SC.</p>
+        <h2 id="profile-step-title">Complete Your Profile</h2>
+        <p class="sub" id="profile-step-sub">Required for ENP certification under A.M. No. 24-10-14-SC.</p>
         <div class="field-row">
             <div class="ob-field" style="flex:0 0 100px;">
                 <label>Prefix</label>
@@ -1194,17 +1194,8 @@
             </div>
 
         </div>
-        <!-- Client fields -->
-        <div id="client-fields" style="display:none;">
-            <div class="ob-field">
-                <label>Organization (if applicable)</label>
-                <input type="text" id="ob-org" placeholder="e.g. ABC Corporation">
-            </div>
-            <div class="ob-field">
-                <label>Position / Title</label>
-                <input type="text" id="ob-position" placeholder="e.g. General Manager">
-            </div>
-        </div>
+        <!-- Client fields (principals don't need org/position) -->
+        <div id="client-fields" style="display:none;"></div>
         <div id="err-profile" class="ob-error"></div>
         <div class="btn-row">
             <button class="btn-back" onclick="goToStep('role')">← Back</button>
@@ -1350,7 +1341,18 @@
             </button>
         </div>
     </div>
-</div>
+
+    <!-- STEP: CLIENT DONE -->
+    <div id="step-done" class="ob-card" style="display:none;text-align:center;margin:0 auto;">
+        <div style="font-size:3.5rem;margin-bottom:1rem;">🎉</div>
+        <h2 style="margin-bottom:0.5rem;">You're all set!</h2>
+        <p class="sub" style="margin-bottom:2rem;">Your profile is complete. You can now book a notarization session with an ENP.</p>
+        <button class="btn-primary" onclick="completeOnboarding()" style="max-width:280px;margin:0 auto;">
+            Go to Dashboard →
+        </button>
+    </div>
+
+</div><!-- end page-wrap -->
 
 <!-- RETAKE PAYMENT MODAL -->
 <div class="modal-overlay" id="retake-modal">
@@ -1409,8 +1411,13 @@ let _certificateId = null;
 let _currentPage = 0;
 const QUESTIONS_PER_PAGE = 10;
 
-const OB_STEPS = ['role','profile','course','exam','certificate','sc'];
-const OB_LABELS = ['Role','Profile','Course','Exam','Certificate','SC Submit'];
+// Steps are role-dependent: attorneys go through full flow, clients just role+profile+done
+const ENP_STEPS  = ['role','profile','course','exam','certificate','sc'];
+const ENP_LABELS = ['Role','Profile','Course','Exam','Certificate','SC Submit'];
+const CLIENT_STEPS  = ['role','profile','done'];
+const CLIENT_LABELS = ['Role','Profile','Done'];
+let OB_STEPS  = ENP_STEPS;
+let OB_LABELS = ENP_LABELS;
 
 // ═══════════════════════════════════════════════
 // INIT
@@ -1535,7 +1542,7 @@ function showProgress() {
 
 function showScreen(id) {
     document.getElementById('loading-screen').style.display = 'none';
-    const screens = ['auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc'];
+    const screens = ['auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc','step-done'];
     screens.forEach(s => {
         const el = document.getElementById(s);
         if (el) el.style.display = 'none';
@@ -1547,7 +1554,7 @@ function showScreen(id) {
 function goToStep(step) {
     _currentStep = step;
     updateProgress(step);
-    var _screens = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc'];
+    var _screens = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc','step-done'];
     _screens.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
 
     const stepMap = {
@@ -1557,7 +1564,8 @@ function goToStep(step) {
         'exam':        'step-exam',
         'result':      'step-result',
         'certificate': 'step-certificate',
-        'sc':          'step-sc'
+        'sc':          'step-sc',
+        'done':        'step-done'
     };
     const target = stepMap[step];
     if (target) {
@@ -1617,7 +1625,19 @@ function selectRole(role) {
     _role = role;
     document.getElementById('role-attorney').classList.toggle('selected', role === 'attorney');
     document.getElementById('role-client').classList.toggle('selected', role === 'client');
+    // Update page header immediately on role selection
+    updatePageHeader(role);
     submitRole();
+}
+
+function updatePageHeader(role) {
+    const isAttorney = role === 'attorney';
+    const hdrTitle = document.getElementById('page-header-title');
+    const hdrSub   = document.getElementById('page-header-sub');
+    if (hdrTitle) hdrTitle.textContent = isAttorney ? '⚖️ ENP Certification' : '👤 Complete Your Account';
+    if (hdrSub)   hdrSub.textContent   = isAttorney
+        ? 'Electronic Notary Public Certification under A.M. No. 24-10-14-SC'
+        : 'Set up your profile to start booking notarization sessions.';
 }
 
 async function submitRole() {
@@ -1660,6 +1680,20 @@ function toggleProfileFields() {
     const isAttorney = _role === 'attorney';
     document.getElementById('attorney-fields').style.display = isAttorney ? '' : 'none';
     document.getElementById('client-fields').style.display = isAttorney ? 'none' : '';
+    // Swap step definitions based on role
+    OB_STEPS  = isAttorney ? ENP_STEPS  : CLIENT_STEPS;
+    OB_LABELS = isAttorney ? ENP_LABELS : CLIENT_LABELS;
+    // Update page header via shared helper
+    updatePageHeader(_role);
+    // Update profile step card title/subtitle
+    const titleEl = document.getElementById('profile-step-title');
+    const subEl   = document.getElementById('profile-step-sub');
+    if (titleEl) titleEl.textContent = 'Complete Your Profile';
+    if (subEl) subEl.textContent = isAttorney
+        ? 'Required for ENP certification under A.M. No. 24-10-14-SC.'
+        : 'Tell us a little about yourself to get started.';
+    // Re-render progress bar for current step
+    updateProgress(_currentStep);
 }
 
 /* ── Custom Date Picker Engine ─────────────────────────── */
@@ -1940,7 +1974,8 @@ async function submitProfile() {
             }
             throw new Error(msg);
         }
-        goToStep('course');
+        // Attorneys go to course; clients go straight to done
+        goToStep(_role === 'attorney' ? 'course' : 'done');
     } catch(e) {
         document.getElementById('err-profile').textContent = e.message;
     } finally {
@@ -2163,7 +2198,7 @@ function renderResult(data) {
     try { localStorage.removeItem("ql_test_session_id"); } catch(e) {}
 
     // Show result directly
-    var allS = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc'];
+    var allS = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc','step-done'];
     allS.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
     var re = document.getElementById('step-result');
     if (re) re.style.display = '';
@@ -2207,7 +2242,7 @@ function goToDownloadCert(certId) {
     if (certId) _certificateId = certId;
     // Hide all other screens and show certificate step directly
     var allScreens = ['loading-screen','auth-gate','certified-screen','step-role','step-profile',
-        'step-course','step-exam','step-result','step-sc'];
+        'step-course','step-exam','step-result','step-sc','step-done'];
     allScreens.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
     var certEl = document.getElementById('step-certificate');
     if (certEl) certEl.style.display = 'block';
@@ -2320,7 +2355,7 @@ async function submitRetakePayment() {
 // ═══════════════════════════════════════════════
 async function completeOnboarding() {
     try { await fetch('/api/onboarding/complete', { method: 'POST', credentials: 'include' }); } catch(e) {}
-    window.location.href = '/';
+    window.location.href = '/dashboard';
 }
 
 // ═══════════════════════════════════════════════

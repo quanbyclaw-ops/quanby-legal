@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Quanby Legal — Notarization Session</title>
+<link rel="icon" href="/favicon.ico"/>
+<style>
+:root {
+  --navy:   #1B2A6B;
+  --gold:   #C9A84C;
+  --teal:   #0EA5E9;
+  --bg:     #0D0F1A;
+  --surface:#141726;
+  --text:   #E8EAF2;
+  --muted:  #8B90A8;
+  --red:    #EF4444;
+  --green:  #10B981;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+/* TOP BAR */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.2rem;height:56px;background:var(--surface);
+  border-bottom:1px solid rgba(201,168,76,.2);flex-shrink:0;z-index:20;
+}
+.topbar-logo{display:flex;align-items:center;gap:.6rem;font-weight:700;font-size:1rem;color:var(--gold)}
+.topbar-logo img{height:28px}
+.topbar-title{font-size:.95rem;color:var(--muted);font-weight:500}
+.topbar-right{display:flex;align-items:center;gap:.7rem}
+.recording-dot{width:8px;height:8px;background:var(--red);border-radius:50%;animation:blink 1.4s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.timer{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.btn-end{
+  background:var(--red);color:#fff;border:none;border-radius:6px;
+  padding:.38rem .9rem;font-size:.84rem;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:.4rem;transition:opacity .15s;
+}
+.btn-end:hover{opacity:.85}
+
+/* MAIN LAYOUT */
+.session-body{display:flex;flex:1;overflow:hidden}
+
+/* VIDEO AREA */
+.video-area{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.main-video{flex:1;background:#000;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.main-video video{width:100%;height:100%;object-fit:cover}
+.main-video-avatar{font-size:4rem;color:var(--muted)}
+.main-label{position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,.6);padding:.2rem .6rem;border-radius:4px;font-size:.78rem;display:flex;align-items:center;gap:.4rem}
+.role-badge{font-size:.65rem;padding:.1rem .35rem;border-radius:3px;font-weight:700}
+.role-ENP{background:var(--gold);color:#000}
+.role-Client{background:var(--teal);color:#fff}
+.role-WITNESS{background:var(--green);color:#fff}
+.role-OBSERVER{background:var(--muted);color:#fff}
+
+.thumbnails{
+  display:flex;gap:.5rem;padding:.5rem;background:rgba(0,0,0,.4);
+  overflow-x:auto;flex-shrink:0;min-height:100px;
+}
+.thumb{
+  width:140px;height:90px;flex-shrink:0;background:#111;border-radius:6px;
+  position:relative;overflow:hidden;border:2px solid transparent;cursor:pointer;
+  transition:border-color .2s;
+}
+.thumb.speaking{border-color:var(--gold)}
+.thumb video{width:100%;height:100%;object-fit:cover}
+.thumb-avatar{display:flex;align-items:center;justify-content:center;height:100%;font-size:1.6rem;color:var(--muted)}
+.thumb-label{
+  position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);
+  font-size:.66rem;padding:.15rem .4rem;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.thumb-self{border-color:rgba(201,168,76,.4)}
+
+/* CONTROLS */
+.controls{
+  display:flex;align-items:center;justify-content:center;gap:.75rem;
+  padding:.6rem 1rem;background:var(--surface);border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;
+}
+.ctrl-btn{
+  display:flex;flex-direction:column;align-items:center;gap:.2rem;
+  background:rgba(255,255,255,.07);border:none;border-radius:10px;
+  padding:.5rem .8rem;cursor:pointer;color:var(--text);font-size:.68rem;
+  transition:background .15s;min-width:58px;
+}
+.ctrl-btn:hover{background:rgba(255,255,255,.13)}
+.ctrl-btn .icon{font-size:1.3rem}
+.ctrl-btn.active{background:rgba(201,168,76,.18);color:var(--gold)}
+.ctrl-btn.muted{background:rgba(239,68,68,.2);color:var(--red)}
+.ctrl-btn-sign{background:rgba(14,165,233,.15);color:var(--teal)}
+.ctrl-btn-sign:hover{background:rgba(14,165,233,.28)}
+.ctrl-btn-upload{background:rgba(124,58,237,.15);color:#a78bfa}
+.ctrl-btn-upload:hover{background:rgba(124,58,237,.28)}
+
+/* SIDEBAR */
+.sidebar{
+  width:300px;flex-shrink:0;background:var(--surface);border-left:1px solid rgba(255,255,255,.06);
+  display:flex;flex-direction:column;transition:width .2s;
+}
+.sidebar.collapsed{width:0;overflow:hidden}
+.sidebar-tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.06)}
+.sidebar-tab{
+  flex:1;padding:.6rem .5rem;text-align:center;font-size:.78rem;cursor:pointer;
+  color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;
+}
+.sidebar-tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.sidebar-content{flex:1;overflow-y:auto;display:none;padding:.75rem}
+.sidebar-content.active{display:block}
+
+/* PARTICIPANTS PANEL */
+.participant-item{
+  display:flex;align-items:center;gap:.6rem;padding:.5rem .4rem;
+  border-radius:6px;margin-bottom:.35rem;
+}
+.participant-item:hover{background:rgba(255,255,255,.04)}
+.p-avatar{
+  width:34px;height:34px;border-radius:50%;background:var(--navy);
+  display:flex;align-items:center;justify-content:center;font-size:.85rem;
+  font-weight:700;flex-shrink:0;
+}
+.p-info{flex:1;min-width:0}
+.p-name{font-size:.82rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-role{font-size:.68rem;color:var(--muted)}
+.p-speaking{color:var(--gold);font-size:.7rem}
+/* Upload modal styles */
+.file-drop-zone{
+  border:2px dashed rgba(124,58,237,.4);border-radius:10px;padding:1.5rem;
+  text-align:center;cursor:pointer;transition:all .2s;background:rgba(124,58,237,.05);
+}
+.file-drop-zone:hover,.file-drop-zone.drag-over{border-color:#a78bfa;background:rgba(124,58,237,.12)}
+.file-drop-zone.has-file{border-color:var(--green);border-style:solid;background:rgba(16,185,129,.06)}
+.file-drop-icon{font-size:1.8rem;margin-bottom:.4rem}
+.file-drop-text{font-size:.85rem;font-weight:600;color:var(--text)}
+.file-drop-sub{font-size:.72rem;color:var(--muted);margin-top:.2rem}
+.form-group{margin-bottom:1rem}
+.form-label{display:block;font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.4rem}
+.form-input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:.55rem .75rem;color:var(--text);font-size:.85rem;font-family:inherit;outline:none;transition:border-color .15s}
+.form-input:focus{border-color:rgba(124,58,237,.5)}
+.form-select{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:.55rem .75rem;color:var(--text);font-size:.85rem;font-family:inherit;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238B90A8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center}
+.form-select:focus{border-color:rgba(124,58,237,.5)}
+.form-hint{font-size:.75rem;color:var(--teal);margin-top:.35rem;padding:.4rem .6rem;background:rgba(14,165,233,.07);border-radius:6px;border:1px solid rgba(14,165,233,.15)}
+.form-error{font-size:.73rem;color:var(--red);margin-top:.25rem}
+.fees-box{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.25);border-radius:10px;padding:.85rem 1rem;margin-bottom:1rem;text-align:center}
+.fees-title{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem}
+.fees-amount{font-size:1.4rem;font-weight:800;color:var(--gold)}
+.fees-note{font-size:.7rem;color:var(--muted);margin-top:.2rem}
+.upload-success{text-align:center;padding:1.5rem}
+
+.btn-invite{
+  width:100%;margin-top:.75rem;padding:.5rem;background:rgba(201,168,76,.1);
+  color:var(--gold);border:1px solid rgba(201,168,76,.3);border-radius:6px;
+  font-size:.8rem;font-weight:600;cursor:pointer;transition:background .15s;
+}
+.btn-invite:hover{background:rgba(201,168,76,.2)}
+
+/* CHAT PANEL */
+.chat-messages{
+  display:flex;flex-direction:column;gap:.4rem;height:calc(100% - 50px);
+  overflow-y:auto;margin-bottom:.5rem;
+}
+.chat-msg{padding:.35rem .5rem;border-radius:6px;font-size:.78rem;line-height:1.45}
+.chat-msg.self{background:rgba(14,165,233,.15);align-self:flex-end;text-align:right}
+.chat-msg.other{background:rgba(255,255,255,.05)}
+.chat-msg-name{font-size:.65rem;color:var(--muted);margin-bottom:.1rem}
+.chat-input-row{display:flex;gap:.4rem}
+.chat-input{
+  flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+  border-radius:6px;padding:.38rem .5rem;color:var(--text);font-size:.8rem;
+}
+.chat-input:focus{outline:none;border-color:var(--gold)}
+.chat-send{
+  background:var(--gold);color:#000;border:none;border-radius:6px;
+  padding:.38rem .6rem;cursor:pointer;font-weight:700;font-size:.8rem;
+}
+
+/* SIGN PANEL (slide-up) */
+.sign-panel{
+  position:fixed;bottom:0;left:0;right:300px;background:var(--surface);
+  border-top:2px solid var(--teal);padding:1.2rem 1.5rem;
+  transform:translateY(100%);transition:transform .25s ease;z-index:30;
+}
+.sign-panel.open{transform:translateY(0)}
+.sign-panel-title{font-size:1rem;font-weight:700;color:var(--teal);margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem}
+.sign-panel-meta{display:flex;gap:1.5rem;margin-bottom:1rem;flex-wrap:wrap}
+.sign-meta-item{font-size:.78rem;color:var(--muted)}
+.sign-meta-item strong{color:var(--text)}
+.btn-sign-portal{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:var(--teal);color:#fff;border:none;border-radius:8px;
+  padding:.6rem 1.2rem;font-size:.9rem;font-weight:700;cursor:pointer;
+  text-decoration:none;transition:opacity .15s;
+}
+.btn-sign-portal:hover{opacity:.85}
+.sign-panel-close{
+  position:absolute;top:.6rem;right:.8rem;background:none;border:none;
+  color:var(--muted);font-size:1.2rem;cursor:pointer;
+}
+
+/* INVITE MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(4px);
+  z-index:200;display:none;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--surface);border:1px solid rgba(201,168,76,.3);
+  border-radius:12px;padding:1.5rem;width:380px;max-width:95vw;
+}
+.modal-box{background:var(--surface);border:1px solid rgba(201,168,76,.25);border-radius:14px;padding:1.5rem;width:100%;position:relative;max-height:90vh;overflow-y:auto;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.modal-close-btn{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:.25rem .5rem;border-radius:4px}
+.modal-close-btn:hover{color:var(--text);background:rgba(255,255,255,.08)}
+.modal-body{overflow-y:auto}
+.modal-actions{display:flex;gap:.75rem;justify-content:flex-end;margin-top:1rem}
+.modal-title{font-size:1.1rem;font-weight:700;color:var(--gold);margin-bottom:1rem}
+.form-group{margin-bottom:.8rem}
+.form-label{font-size:.78rem;color:var(--muted);margin-bottom:.25rem;display:block}
+.form-input,.form-select{
+  width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  border-radius:6px;padding:.45rem .6rem;color:var(--text);font-size:.85rem;
+}
+.form-input:focus,.form-select:focus{outline:none;border-color:var(--gold)}
+.form-select option{background:var(--surface)}
+.modal-actions{display:flex;gap:.6rem;margin-top:1rem}
+.btn-modal-cancel{
+  flex:1;padding:.5rem;background:transparent;border:1px solid rgba(255,255,255,.15);
+  border-radius:6px;color:var(--muted);cursor:pointer;font-size:.85rem;
+}
+.btn-modal-send{
+  flex:1;padding:.5rem;background:var(--gold);border:none;
+  border-radius:6px;color:#000;font-weight:700;cursor:pointer;font-size:.85rem;
+}
+.invite-result{
+  margin-top:.8rem;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);
+  border-radius:6px;padding:.6rem;font-size:.75rem;word-break:break-all;display:none;
+}
+.invite-result.show{display:block}
+.copy-link-btn{
+  display:inline-block;margin-top:.4rem;background:rgba(255,255,255,.08);
+  border:none;border-radius:4px;padding:.2rem .5rem;color:var(--text);
+  font-size:.72rem;cursor:pointer;
+}
+
+/* PRE-JOIN SCREEN */
+.prejoin{
+  position:fixed;inset:0;background:var(--bg);z-index:40;
+  display:flex;align-items:center;justify-content:center;
+}
+.prejoin-card{
+  background:var(--surface);border:1px solid rgba(201,168,76,.25);
+  border-radius:16px;padding:2rem;max-width:480px;width:90%;text-align:center;
+}
+.prejoin-logo{font-size:2rem;margin-bottom:1rem}
+.prejoin-title{font-size:1.3rem;font-weight:700;color:var(--gold);margin-bottom:.4rem}
+.prejoin-sub{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.5}
+.preview-video{
+  width:100%;height:180px;background:#000;border-radius:8px;
+  margin-bottom:1.2rem;object-fit:cover;
+}
+.preview-placeholder{
+  width:100%;height:180px;background:#111;border-radius:8px;
+  margin-bottom:1.2rem;display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;color:var(--muted);
+}
+.btn-join-session{
+  width:100%;padding:.75rem;background:var(--gold);color:#000;
+  font-size:1rem;font-weight:700;border:none;border-radius:8px;cursor:pointer;
+  transition:opacity .15s;margin-bottom:.6rem;
+}
+.btn-join-session:hover{opacity:.85}
+.btn-join-session:disabled{opacity:.5;cursor:not-allowed}
+.prejoin-devices{display:flex;gap:.5rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
+.device-toggle{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:6px;padding:.35rem .7rem;font-size:.78rem;color:var(--text);
+  cursor:pointer;display:flex;align-items:center;gap:.3rem;
+}
+.device-toggle.off{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:var(--red)}
+
+/* Loading / Error */
+.loading-screen{
+  position:fixed;inset:0;background:var(--bg);z-index:60;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+}
+.spinner{
+  width:40px;height:40px;border:3px solid rgba(201,168,76,.2);
+  border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{color:var(--muted);font-size:.9rem}
+
+/* Responsive */
+@media(max-width:700px){
+  .sidebar{position:fixed;right:0;top:56px;bottom:0;z-index:15}
+  .sign-panel{right:0}
+  .thumbnails .thumb{width:100px;height:68px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-screen" id="loading-screen">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">Initializing session…</div>
+</div>
+
+<!-- PRE-JOIN -->
+<div class="prejoin" id="prejoin" style="display:none">
+  <div class="prejoin-card">
+    <div class="prejoin-logo">⚖️</div>
+    <div class="prejoin-title">Quanby Legal</div>
+    <div class="prejoin-sub" id="prejoin-sub">You are about to join a notarization session.</div>
+    <video class="preview-video" id="preview-video" autoplay muted playsinline style="display:none"></video>
+    <div class="preview-placeholder" id="preview-placeholder">📷</div>
+    <div class="prejoin-devices">
+      <button class="device-toggle" id="toggle-mic-pre">🎤 Mic On</button>
+      <button class="device-toggle" id="toggle-cam-pre">📷 Camera On</button>
+    </div>
+    <button class="btn-join-session" id="btn-join-session">Join Session</button>
+  </div>
+</div>
+
+<!-- INVITE MODAL -->
+<!-- Upload Document Modal -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal-box" style="max-width:500px;width:calc(100% - 2rem);">
+    <div class="modal-header">
+      <div class="modal-title">📄 Upload Document for Notarization</div>
+      <button class="modal-close-btn" onclick="closeUploadModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="upload-form" onsubmit="return false;">
+
+        <div class="form-group">
+          <label class="form-label">Document File *</label>
+          <div class="file-drop-zone" id="file-drop-zone" onclick="document.getElementById('doc-file-input').click()">
+            <div class="file-drop-icon">📎</div>
+            <div class="file-drop-text" id="file-drop-text">Click to select or drag &amp; drop a file</div>
+            <div class="file-drop-sub">PDF, DOC, DOCX — max 20MB</div>
+            <input type="file" id="doc-file-input" accept=".pdf,.doc,.docx" style="display:none" onchange="handleFileSelect(this)"/>
+          </div>
+          <div class="form-error" id="err-file"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Document Name *</label>
+          <input type="text" class="form-input" id="doc-name" placeholder="e.g. Deed of Sale, Affidavit of Loss…" />
+          <div class="form-error" id="err-doc-name"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Notarization Type *</label>
+          <select class="form-select" id="doc-notarization-type">
+            <option value="">— Select type —</option>
+            <option value="ACKNOWLEDGMENT">Acknowledgment</option>
+            <option value="JURAT">Jurat</option>
+            <option value="AFFIRMATION">Affirmation</option>
+            <option value="SIGNATURE_WITNESSING">Signature Witnessing</option>
+          </select>
+          <div class="form-hint" id="notarization-hint" style="display:none"></div>
+          <div class="form-error" id="err-notarization-type"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description / Purpose</label>
+          <textarea class="form-input" id="doc-description" rows="2" placeholder="Brief description of the document and its intended use…"></textarea>
+        </div>
+
+        <div class="fees-box" id="fees-box" style="display:none">
+          <div class="fees-title">💰 Estimated Notarization Fee</div>
+          <div class="fees-amount" id="fees-amount">₱—</div>
+          <div class="fees-note">Based on SC fee schedule. Actual fee may vary.</div>
+        </div>
+
+        <div class="modal-actions" style="display:flex;gap:.75rem;justify-content:flex-end;margin-top:1rem;">
+          <button type="button" class="btn-modal-cancel" onclick="closeUploadModal()">Cancel</button>
+          <button type="button" class="btn-modal-send" id="btn-upload-submit" onclick="submitDocument()">📤 Submit Document</button>
+        </div>
+
+      </form>
+      <div class="upload-success" id="upload-success" style="display:none;text-align:center;padding:1.5rem;">
+        <div style="font-size:2rem;margin-bottom:.5rem">✅</div>
+        <div style="font-weight:700;color:var(--green);margin-bottom:.25rem">Document submitted!</div>
+        <div style="font-size:.82rem;color:var(--muted)" id="upload-success-name"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="invite-modal">
+  <div class="modal">
+    <div class="modal-title">👥 Invite Participant</div>
+    <div class="form-group">
+      <label class="form-label">Full Name</label>
+      <input class="form-input" id="inv-name" placeholder="e.g. Juan dela Cruz"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input class="form-input" type="email" id="inv-email" placeholder="e.g. juan@email.com"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Role</label>
+      <select class="form-select" id="inv-role">
+        <option value="WITNESS">Witness (can speak & share video)</option>
+        <option value="OBSERVER">Observer (view only)</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeInviteModal()">Cancel</button>
+      <button class="btn-modal-send" id="btn-send-invite" onclick="sendInvite()">Send Invite</button>
+    </div>
+    <div class="invite-result" id="invite-result">
+      <div style="color:var(--green);font-weight:600;margin-bottom:.3rem">✅ Invite link created!</div>
+      <div id="invite-link-text" style="word-break:break-all"></div>
+      <button class="copy-link-btn" onclick="copyInviteLink()">📋 Copy Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIGN PANEL -->
+<div class="sign-panel" id="sign-panel">
+  <button class="sign-panel-close" onclick="closeSignPanel()">✕</button>
+  <div class="sign-panel-title">✍️ Document Signing</div>
+  <div class="sign-panel-meta" id="sign-panel-meta"></div>
+  <div id="sign-panel-actions"></div>
+</div>
+
+<!-- MAIN SESSION UI -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <img src="/qlegal-logo-sm.png" alt="Quanby Legal" onerror="this.style.display='none'"/>
+    Quanby Legal
+  </div>
+  <div class="topbar-title">Notarization Session</div>
+  <div class="topbar-right">
+    <div class="recording-dot"></div>
+    <div class="timer" id="session-timer">00:00</div>
+    <button class="btn-end" id="btn-end-call" style="display:none" onclick="endSession()">📵 End Session</button>
+    <button class="ctrl-btn" onclick="toggleSidebar()" title="Toggle sidebar" style="padding:.3rem .6rem;min-width:auto">
+      <span class="icon">👥</span>
+    </button>
+  </div>
+</div>
+
+<div class="session-body">
+  <div class="video-area">
+    <div class="main-video" id="main-video">
+      <div class="main-video-avatar" id="main-avatar">👤</div>
+      <video id="main-video-el" style="display:none" autoplay playsinline></video>
+      <div class="main-label" id="main-label" style="display:none">
+        <span id="main-name">–</span>
+        <span class="role-badge role-ENP" id="main-role-badge">ENP</span>
+      </div>
+    </div>
+    <div class="thumbnails" id="thumbnails"></div>
+    <div class="controls">
+      <button class="ctrl-btn" id="ctrl-mic" onclick="toggleMic()">
+        <span class="icon">🎤</span><span>Mute</span>
+      </button>
+      <button class="ctrl-btn" id="ctrl-cam" onclick="toggleCam()">
+        <span class="icon">📷</span><span>Camera</span>
+      </button>
+      <button class="ctrl-btn ctrl-btn-sign" onclick="openSignPanel()">
+        <span class="icon">✍️</span><span>Sign Doc</span>
+      </button>
+      <button class="ctrl-btn" id="ctrl-add" onclick="openInviteModal()">
+        <span class="icon">👥</span><span>Invite</span>
+      </button>
+      <button class="ctrl-btn ctrl-btn-upload" onclick="openUploadModal()">
+        <span class="icon">📄</span><span>Upload Doc</span>
+      </button>
+      <button class="ctrl-btn" onclick="toggleSidebar()">
+        <span class="icon">💬</span><span>Chat</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-tabs">
+      <div class="sidebar-tab active" onclick="switchSidebarTab('participants')">Participants</div>
+      <div class="sidebar-tab" onclick="switchSidebarTab('chat')">Chat</div>
+      <div class="sidebar-tab" onclick="switchSidebarTab('documents')" id="tab-docs-btn">📄 Docs</div>
+    </div>
+    <div class="sidebar-content active" id="tab-participants">
+      <div id="participants-list"></div>
+      <button class="btn-invite" id="sidebar-invite-btn" onclick="openInviteModal()">+ Invite Witness / Observer</button>
+    </div>
+    <div class="sidebar-content" id="tab-chat">
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chat-input" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendChat()"/>
+        <button class="chat-send" onclick="sendChat()">▶</button>
+      </div>
+    </div>
+    <div class="sidebar-content" id="tab-documents">
+      <div id="documents-list" style="display:flex;flex-direction:column;gap:.6rem;padding:.5rem 0;">
+        <div id="docs-empty" style="text-align:center;padding:1.5rem;font-size:.8rem;color:var(--muted);">
+          No documents uploaded yet.<br>Click <strong>📄 Upload Doc</strong> to add one.
+        </div>
+      </div>
+      <button class="btn-invite" onclick="openUploadModal()" style="margin-top:.5rem;">+ Upload Document</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.umd.min.js"></script>
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const params      = new URLSearchParams(location.search);
+const ROOM_NAME   = params.get('room') || '';
+const APT_ID      = params.get('apt') || '';
+const GUEST_TOKEN = params.get('guest_token') || '';
+
+let _room       = null;
+let _me         = null;
+let _sessionInfo= null;
+let _micEnabled = true;
+let _camEnabled = true;
+let _previewStream = null;
+let _startTime  = null;
+let _timerInt   = null;
+let _sidebarOpen= true;
+let _mainParticipant = null;
+let _participants = {}; // identity → {name, role, element}
+let _inviteLink = '';
+
+// ─── UPLOAD DOCUMENT ─────────────────────────────────────────────────────────
+
+const NOTARIZATION_FEES = {
+  'ACKNOWLEDGMENT': { fee: '₱100 – ₱300', desc: 'Confirms the identity of the signer and that they voluntarily signed the document.' },
+  'JURAT': { fee: '₱100 – ₱300', desc: 'The signer swears or affirms under oath that the contents of the document are true.' },
+  'AFFIRMATION': { fee: '₱100 – ₱300', desc: 'Similar to a jurat but without a religious oath — the signer affirms the truth of the contents.' },
+  'SIGNATURE_WITNESSING': { fee: '₱50 – ₱200', desc: 'The notary witnesses the signer physically signing the document.' },
+};
+
+let _selectedFile = null;
+
+function openUploadModal() {
+  document.getElementById('upload-modal').classList.add('open');
+  document.getElementById('upload-success').style.display = 'none';
+  document.getElementById('upload-form').style.display = '';
+  document.getElementById('btn-upload-submit').style.display = '';
+  // Reset
+  _selectedFile = null;
+  document.getElementById('doc-file-input').value = '';
+  document.getElementById('file-drop-text').textContent = 'Click to select or drag & drop a file';
+  document.getElementById('file-drop-zone').className = 'file-drop-zone';
+  document.getElementById('doc-name').value = '';
+  document.getElementById('doc-notarization-type').value = '';
+  document.getElementById('doc-description').value = '';
+  document.getElementById('fees-box').style.display = 'none';
+  document.getElementById('notarization-hint').style.display = 'none';
+  ['err-file','err-doc-name','err-notarization-type'].forEach(id => {
+    document.getElementById(id).textContent = '';
+  });
+}
+
+function closeUploadModal() {
+  document.getElementById('upload-modal').classList.remove('open');
+}
+
+function handleFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 20 * 1024 * 1024) {
+    document.getElementById('err-file').textContent = 'File too large — maximum 20MB.';
+    return;
+  }
+  _selectedFile = file;
+  const dropZone = document.getElementById('file-drop-zone');
+  dropZone.className = 'file-drop-zone has-file';
+  document.getElementById('file-drop-text').textContent = '✅ ' + file.name;
+  document.getElementById('err-file').textContent = '';
+  // Auto-fill document name from filename
+  const nameEl = document.getElementById('doc-name');
+  if (!nameEl.value) {
+    nameEl.value = file.name.replace(/\.[^.]+$/, '').replace(/[-_]/g, ' ');
+  }
+}
+
+function addDocumentToList(doc) {
+  const list = document.getElementById('documents-list');
+  const empty = document.getElementById('docs-empty');
+  if (empty) empty.style.display = 'none';
+
+  const fmtType = {
+    'ACKNOWLEDGMENT': 'Acknowledgment', 'JURAT': 'Jurat',
+    'AFFIRMATION': 'Affirmation', 'SIGNATURE_WITNESSING': 'Signature Witnessing'
+  }[doc.type] || doc.type;
+
+  const item = document.createElement('div');
+  item.style.cssText = 'background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.75rem;';
+  item.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:.6rem;">
+      <span style="font-size:1.4rem;flex-shrink:0">📄</span>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:.85rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(doc.name)}</div>
+        <div style="font-size:.73rem;color:var(--muted);margin-top:.15rem;">${escHtml(fmtType)}</div>
+        ${doc.desc ? `<div style="font-size:.72rem;color:var(--muted);margin-top:.1rem;font-style:italic;">${escHtml(doc.desc)}</div>` : ''}
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:.78rem;font-weight:700;color:var(--gold);">${escHtml(doc.fee)}</div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:.1rem;">est. fee</div>
+      </div>
+    </div>
+  `;
+  list.appendChild(item);
+
+  // Update tab badge
+  const tabBtn = document.getElementById('tab-docs-btn');
+  const count = list.querySelectorAll('div[style]').length;
+  if (tabBtn) tabBtn.textContent = `📄 Docs (${count})`;
+}
+
+// Drag and drop
+document.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('file-drop-zone');
+  if (!dz) return;
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      const inp = document.getElementById('doc-file-input');
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      inp.files = dt.files;
+      handleFileSelect(inp);
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const sel = document.getElementById('doc-notarization-type');
+  if (sel) sel.addEventListener('change', function() {
+    const val = this.value;
+    const hint = document.getElementById('notarization-hint');
+    const fees = document.getElementById('fees-box');
+    if (val && NOTARIZATION_FEES[val]) {
+      const info = NOTARIZATION_FEES[val];
+      hint.textContent = info.desc;
+      hint.style.display = '';
+      document.getElementById('fees-amount').textContent = info.fee;
+      fees.style.display = '';
+    } else {
+      hint.style.display = 'none';
+      fees.style.display = 'none';
+    }
+  });
+});
+
+function submitDocument() {
+  let hasError = false;
+  if (!_selectedFile) {
+    document.getElementById('err-file').textContent = 'Please select a file.';
+    hasError = true;
+  }
+  const name = document.getElementById('doc-name').value.trim();
+  if (!name) {
+    document.getElementById('err-doc-name').textContent = 'Document name is required.';
+    hasError = true;
+  }
+  const type = document.getElementById('doc-notarization-type').value;
+  if (!type) {
+    document.getElementById('err-notarization-type').textContent = 'Please select a notarization type.';
+    hasError = true;
+  }
+  if (hasError) return;
+
+  const btn = document.getElementById('btn-upload-submit');
+  btn.disabled = true;
+  btn.textContent = '⏳ Uploading…';
+
+  // Add to session documents list
+  const desc = document.getElementById('doc-description').value.trim();
+  const feeInfo = NOTARIZATION_FEES[type] || {};
+  addDocumentToList({ name, type, desc, fee: feeInfo.fee || '—', file: _selectedFile });
+
+  // Notify all participants via chat
+  const msg = `📄 Document uploaded: "${name}" (${type}) — Fee: ${feeInfo.fee || '—'}${desc ? ' | ' + desc : ''}`;
+  if (typeof sendDataMessage === 'function') sendDataMessage(msg);
+
+  // Show success
+  document.getElementById('upload-form').style.display = 'none';
+  btn.style.display = 'none';
+  const suc = document.getElementById('upload-success');
+  suc.style.display = '';
+  document.getElementById('upload-success-name').textContent = name + ' (' + type + ') — ' + (feeInfo.fee || '');
+  setTimeout(() => { closeUploadModal(); switchSidebarTab('documents'); }, 2000);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+async function init() {
+  setLoading('Checking authentication…');
+
+  // Guest flow (witness/observer via invite link)
+  if (GUEST_TOKEN) {
+    await startPrejoin(null, 'Guest', 'WITNESS');
+    return;
+  }
+
+  // Auth check
+  let me;
+  try {
+    const r = await fetch('/api/auth/me', { credentials: 'include' });
+    if (!r.ok) { location.href = '/'; return; }
+    me = await r.json();
+    _me = me;
+  } catch(e) { location.href = '/'; return; }
+
+  // Load session info
+  setLoading('Loading session info…');
+  try {
+    const r = await fetch(`/api/sessions/${APT_ID}`, { credentials: 'include' });
+    if (!r.ok) { showError('Session not found or you are not authorized.'); return; }
+    _sessionInfo = await r.json();
+  } catch(e) { showError('Could not load session info.'); return; }
+
+  if (_sessionInfo.session_status !== 'active') {
+    showError('This session is not active.');
+    return;
+  }
+
+  const isEnp = me.id === _sessionInfo.enp_id;
+  await startPrejoin(me, isEnp ? _sessionInfo.enp_name : _sessionInfo.client_name, isEnp ? 'ENP' : 'Client');
+}
+
+async function startPrejoin(me, userName, userRole) {
+  setLoading('Preparing camera preview…');
+  try {
+    _previewStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    document.getElementById('preview-video').srcObject = _previewStream;
+    document.getElementById('preview-video').style.display = '';
+    document.getElementById('preview-placeholder').style.display = 'none';
+  } catch(e) {
+    // No camera — that's ok
+  }
+  hideLoading();
+  document.getElementById('prejoin').style.display = 'flex';
+
+  // Fill prejoin info
+  const sub = document.getElementById('prejoin-sub');
+  if (_sessionInfo) {
+    const partner = (me && me.id === _sessionInfo.enp_id) ? _sessionInfo.client_name : _sessionInfo.enp_name;
+    sub.textContent = `You're about to join the notarization session for ${_sessionInfo.notarization_type || 'document'} with ${partner || 'your partner'}.`;
+  }
+
+  // Device toggles
+  document.getElementById('toggle-mic-pre').onclick = () => {
+    _micEnabled = !_micEnabled;
+    const btn = document.getElementById('toggle-mic-pre');
+    btn.textContent = _micEnabled ? '🎤 Mic On' : '🔇 Mic Off';
+    btn.className = 'device-toggle' + (_micEnabled ? '' : ' off');
+    if (_previewStream) _previewStream.getAudioTracks().forEach(t => t.enabled = _micEnabled);
+  };
+  document.getElementById('toggle-cam-pre').onclick = () => {
+    _camEnabled = !_camEnabled;
+    const btn = document.getElementById('toggle-cam-pre');
+    btn.textContent = _camEnabled ? '📷 Camera On' : '🚫 Camera Off';
+    btn.className = 'device-toggle' + (_camEnabled ? '' : ' off');
+    if (_previewStream) _previewStream.getVideoTracks().forEach(t => t.enabled = _camEnabled);
+  };
+
+  document.getElementById('btn-join-session').onclick = () => joinSession(me, userRole);
+}
+
+async function joinSession(me, userRole) {
+  const btn = document.getElementById('btn-join-session');
+  btn.disabled = true; btn.textContent = 'Connecting…';
+
+  // Stop preview stream
+  if (_previewStream) { _previewStream.getTracks().forEach(t => t.stop()); _previewStream = null; }
+
+  document.getElementById('prejoin').style.display = 'none';
+  setLoading('Connecting to session…');
+
+  let token, userName, role;
+  try {
+    if (GUEST_TOKEN) {
+      token    = GUEST_TOKEN;
+      userName = 'Guest';
+      role     = 'WITNESS';
+    } else {
+      const r = await fetch('/api/sessions/join', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room_name: ROOM_NAME, apt_id: APT_ID }),
+      });
+      if (!r.ok) { const e = await r.json(); showError(e.detail || 'Failed to join session.'); return; }
+      const data = await r.json();
+      token    = data.token;
+      userName = data.user_name;
+      role     = data.user_role;
+    }
+  } catch(e) { showError('Network error. Could not join session.'); return; }
+
+  setLoading('Joining LiveKit room…');
+  try {
+    _room = new LivekitClient.Room({
+      adaptiveStream: true,
+      dynacast: true,
+    });
+    setupRoomEvents(_room, userName, role);
+    await _room.connect('wss://quanby-lms-k4aq44qe.livekit.cloud', token, {
+      autoSubscribe: true,
+    });
+    await _room.localParticipant.enableCameraAndMicrophone();
+    if (!_camEnabled) await _room.localParticipant.setCameraEnabled(false);
+    if (!_micEnabled) await _room.localParticipant.setMicrophoneEnabled(false);
+  } catch(e) {
+    showError('Could not connect to LiveKit: ' + e.message);
+    return;
+  }
+
+  hideLoading();
+  postJoinSetup(userName, role, userRole);
+}
+
+function postJoinSetup(userName, role, userRole) {
+  // Show ENP-only controls
+  const isEnp = (role === 'ENP');
+  document.getElementById('btn-end-call').style.display = isEnp ? '' : 'none';
+  document.getElementById('ctrl-add').style.display = isEnp ? '' : 'none';
+  document.getElementById('sidebar-invite-btn').style.display = isEnp ? '' : 'none';
+
+  // Start timer
+  _startTime = Date.now();
+  _timerInt  = setInterval(updateTimer, 1000);
+
+  // Render self thumbnail
+  renderSelf(userName, role);
+
+  // Populate sign panel
+  populateSignPanel(isEnp);
+
+  // Render participants sidebar
+  renderParticipantsList();
+}
+
+// ─── LIVEKIT EVENTS ──────────────────────────────────────────────────────────
+function setupRoomEvents(room, localName, localRole) {
+  room.on(LivekitClient.RoomEvent.ParticipantConnected, (participant) => {
+    addParticipantTile(participant);
+    renderParticipantsList();
+  });
+  room.on(LivekitClient.RoomEvent.ParticipantDisconnected, (participant) => {
+    removeParticipantTile(participant.identity);
+    renderParticipantsList();
+  });
+  room.on(LivekitClient.RoomEvent.TrackSubscribed, (track, publication, participant) => {
+    attachTrack(track, participant);
+  });
+  room.on(LivekitClient.RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
+    detachTrack(track, participant);
+  });
+  room.on(LivekitClient.RoomEvent.ActiveSpeakersChanged, (speakers) => {
+    updateActiveSpeakers(speakers);
+  });
+  room.on(LivekitClient.RoomEvent.DataReceived, (data, participant) => {
+    const msg = new TextDecoder().decode(data);
+    try {
+      const obj = JSON.parse(msg);
+      if (obj.type === 'chat') appendChatMessage(obj.name, obj.text, false);
+    } catch(e) {}
+  });
+  room.on(LivekitClient.RoomEvent.Disconnected, () => {
+    clearInterval(_timerInt);
+  });
+}
+
+function addParticipantTile(participant) {
+  const identity = participant.identity;
+  const name     = participant.name || identity;
+  const role     = inferRole(identity, name);
+  _participants[identity] = { name, role, participant };
+  renderThumbnail(participant, name, role);
+  updateMainVideo();
+}
+
+function removeParticipantTile(identity) {
+  const el = document.getElementById('thumb-' + identity);
+  if (el) el.remove();
+  delete _participants[identity];
+  updateMainVideo();
+}
+
+function attachTrack(track, participant) {
+  if (track.kind === LivekitClient.Track.Kind.Video) {
+    const el = document.getElementById('thumb-vid-' + participant.identity);
+    if (el) { track.attach(el); el.style.display = ''; }
+    const av = document.getElementById('thumb-av-' + participant.identity);
+    if (av) av.style.display = 'none';
+    // If this is main, attach to main video too
+    if (_mainParticipant === participant.identity) {
+      const mv = document.getElementById('main-video-el');
+      track.attach(mv);
+      mv.style.display = '';
+      document.getElementById('main-avatar').style.display = 'none';
+    }
+  }
+  if (track.kind === LivekitClient.Track.Kind.Audio) {
+    track.attach();
+  }
+}
+
+function detachTrack(track, participant) {
+  track.detach();
+  if (track.kind === LivekitClient.Track.Kind.Video) {
+    const el = document.getElementById('thumb-vid-' + participant.identity);
+    if (el) el.style.display = 'none';
+    const av = document.getElementById('thumb-av-' + participant.identity);
+    if (av) av.style.display = '';
+  }
+}
+
+function updateActiveSpeakers(speakers) {
+  // Clear all speaking states
+  document.querySelectorAll('.thumb').forEach(t => t.classList.remove('speaking'));
+  speakers.forEach(s => {
+    const el = document.getElementById('thumb-' + s.identity);
+    if (el) el.classList.add('speaking');
+    // Put loudest speaker in main view
+    if (speakers[0] && speakers[0].identity !== _room.localParticipant.identity) {
+      setMainParticipant(speakers[0]);
+    }
+  });
+}
+
+// ─── VIDEO TILES ──────────────────────────────────────────────────────────────
+function renderSelf(name, role) {
+  const identity = _room.localParticipant.identity;
+  _participants[identity] = { name, role, participant: _room.localParticipant };
+
+  const thumb = document.createElement('div');
+  thumb.className = 'thumb thumb-self';
+  thumb.id        = 'thumb-' + identity;
+  thumb.onclick   = () => setMainParticipantById(identity);
+  thumb.innerHTML = `
+    <video class="thumb-vid" id="thumb-vid-${identity}" autoplay muted playsinline style="display:none"></video>
+    <div class="thumb-avatar" id="thumb-av-${identity}">${initials(name)}</div>
+    <div class="thumb-label">${escHtml(name)} (You)</div>
+  `;
+  document.getElementById('thumbnails').appendChild(thumb);
+
+  // Attach local video
+  const videoTrack = _room.localParticipant.getTrackPublication(LivekitClient.Track.Source.Camera);
+  if (videoTrack && videoTrack.track) {
+    const vid = thumb.querySelector('video');
+    videoTrack.track.attach(vid);
+    vid.style.display = '';
+    thumb.querySelector('.thumb-avatar').style.display = 'none';
+  }
+
+  // Set as main if alone
+  if (!_mainParticipant) setMainParticipantById(identity);
+}
+
+function renderThumbnail(participant, name, role) {
+  const identity = participant.identity;
+  const thumb = document.createElement('div');
+  thumb.className = 'thumb';
+  thumb.id        = 'thumb-' + identity;
+  thumb.onclick   = () => setMainParticipantById(identity);
+  thumb.innerHTML = `
+    <video class="thumb-vid" id="thumb-vid-${identity}" autoplay playsinline style="display:none"></video>
+    <div class="thumb-avatar" id="thumb-av-${identity}">${initials(name)}</div>
+    <div class="thumb-label">${escHtml(name)}</div>
+  `;
+  document.getElementById('thumbnails').appendChild(thumb);
+}
+
+function setMainParticipant(participant) {
+  setMainParticipantById(participant.identity);
+}
+
+function setMainParticipantById(identity) {
+  _mainParticipant = identity;
+  const info = _participants[identity];
+  if (!info) return;
+
+  const mv   = document.getElementById('main-video-el');
+  const mav  = document.getElementById('main-avatar');
+  const mlbl = document.getElementById('main-label');
+  const mnam = document.getElementById('main-name');
+  const mrole= document.getElementById('main-role-badge');
+
+  // Detach all from main
+  mv.srcObject = null;
+
+  const participant = info.participant;
+  if (participant) {
+    const src = participant === _room.localParticipant
+      ? LivekitClient.Track.Source.Camera
+      : LivekitClient.Track.Source.Camera;
+    const pub = participant.getTrackPublication(src);
+    if (pub && pub.track && !pub.isMuted) {
+      pub.track.attach(mv);
+      mv.style.display = '';
+      mav.style.display = 'none';
+    } else {
+      mv.style.display = 'none';
+      mav.style.display = '';
+      mav.textContent = initials(info.name);
+    }
+  }
+
+  mnam.textContent = info.name;
+  mrole.textContent= info.role;
+  mrole.className  = `role-badge role-${info.role}`;
+  mlbl.style.display = '';
+}
+
+function updateMainVideo() {
+  if (!_mainParticipant || !_participants[_mainParticipant]) {
+    // Default to first remote participant, then self
+    const keys = Object.keys(_participants);
+    if (keys.length > 0) setMainParticipantById(keys[0]);
+  }
+}
+
+// ─── PARTICIPANTS SIDEBAR ─────────────────────────────────────────────────────
+function renderParticipantsList() {
+  const list = document.getElementById('participants-list');
+  list.innerHTML = '';
+  Object.entries(_participants).forEach(([identity, info]) => {
+    const isSelf = identity === _room?.localParticipant?.identity;
+    const div = document.createElement('div');
+    div.className = 'participant-item';
+    div.innerHTML = `
+      <div class="p-avatar">${initials(info.name)}</div>
+      <div class="p-info">
+        <div class="p-name">${escHtml(info.name)}${isSelf ? ' (You)' : ''}</div>
+        <div class="p-role"><span class="role-badge role-${info.role}">${info.role}</span></div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+  if (!_room) return;
+  // Also add invited participants from session info who may not have joined yet
+  if (_sessionInfo && _sessionInfo.session_participants) {
+    _sessionInfo.session_participants.forEach(p => {
+      if (!Object.values(_participants).some(x => x.name === p.name)) {
+        const div = document.createElement('div');
+        div.className = 'participant-item';
+        div.style.opacity = '.5';
+        div.innerHTML = `
+          <div class="p-avatar">${initials(p.name)}</div>
+          <div class="p-info">
+            <div class="p-name">${escHtml(p.name)}</div>
+            <div class="p-role"><span class="role-badge role-${p.role}">${p.role}</span> <span style="font-size:.65rem;color:var(--muted)">⏳ invited</span></div>
+          </div>
+        `;
+        list.appendChild(div);
+      }
+    });
+  }
+}
+
+function inferRole(identity, name) {
+  if (_sessionInfo) {
+    if (identity === _sessionInfo.enp_id) return 'ENP';
+    if (identity === _sessionInfo.client_id) return 'Client';
+    if (identity.startsWith('guest-')) {
+      const p = (_sessionInfo.session_participants || []).find(x => x.identity === identity);
+      return p ? p.role : 'WITNESS';
+    }
+  }
+  return 'Participant';
+}
+
+// ─── CONTROLS ────────────────────────────────────────────────────────────────
+async function toggleMic() {
+  if (!_room) return;
+  _micEnabled = !_micEnabled;
+  await _room.localParticipant.setMicrophoneEnabled(_micEnabled);
+  const btn = document.getElementById('ctrl-mic');
+  btn.innerHTML = _micEnabled
+    ? '<span class="icon">🎤</span><span>Mute</span>'
+    : '<span class="icon">🔇</span><span>Unmuted</span>';
+  btn.className = 'ctrl-btn' + (_micEnabled ? '' : ' muted');
+}
+
+async function toggleCam() {
+  if (!_room) return;
+  _camEnabled = !_camEnabled;
+  await _room.localParticipant.setCameraEnabled(_camEnabled);
+  const btn = document.getElementById('ctrl-cam');
+  btn.innerHTML = _camEnabled
+    ? '<span class="icon">📷</span><span>Camera</span>'
+    : '<span class="icon">🚫</span><span>Camera</span>';
+  btn.className = 'ctrl-btn' + (_camEnabled ? '' : ' muted');
+
+  // Update self thumbnail
+  if (_room) {
+    const identity = _room.localParticipant.identity;
+    const av = document.getElementById('thumb-av-' + identity);
+    const vid= document.getElementById('thumb-vid-' + identity);
+    if (av && vid) { av.style.display = _camEnabled ? 'none' : ''; vid.style.display = _camEnabled ? '' : 'none'; }
+  }
+}
+
+function toggleSidebar() {
+  _sidebarOpen = !_sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('collapsed', !_sidebarOpen);
+}
+
+function switchSidebarTab(tab) {
+  document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+  const tabs = ['participants','chat','documents'];
+  tabs.forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) el.classList.toggle('active', t === tab);
+  });
+  // Update tab button active state
+  const tabBtns = document.querySelectorAll('.sidebar-tab');
+  const tabIdx = tabs.indexOf(tab);
+  tabBtns.forEach((t,i) => t.classList.toggle('active', i === tabIdx));
+  // Open sidebar if closed
+  const sb = document.getElementById('sidebar');
+  if (sb && !sb.classList.contains('open')) sb.classList.add('open');
+}
+
+// ─── SIGN PANEL ───────────────────────────────────────────────────────────────
+function populateSignPanel(isEnp) {
+  if (!_sessionInfo) return;
+  const meta = document.getElementById('sign-panel-meta');
+  meta.innerHTML = `
+    <div class="sign-meta-item">📄 <strong>${_sessionInfo.notarization_type || '–'}</strong></div>
+    <div class="sign-meta-item">👤 Client: <strong>${_sessionInfo.client_name || '–'}</strong></div>
+    <div class="sign-meta-item">⚖️ ENP: <strong>${_sessionInfo.enp_name || '–'}</strong></div>
+  `;
+  const acts = document.getElementById('sign-panel-actions');
+  const link = _sessionInfo.doconchain_sign_link;
+  if (link) {
+    acts.innerHTML = `
+      <a class="btn-sign-portal" href="${escHtml(link)}" target="_blank" rel="noopener">
+        ✍️ Open Signing Portal →
+      </a>
+      <div style="margin-top:.6rem;font-size:.72rem;color:var(--muted);word-break:break-all">${escHtml(link)}</div>
+    `;
+  } else {
+    acts.innerHTML = `<div style="color:var(--muted);font-size:.84rem">⏳ Signing session not yet initialized. ENP must start signing via DoconChain first.</div>`;
+  }
+}
+
+function openSignPanel() {
+  document.getElementById('sign-panel').classList.add('open');
+}
+function closeSignPanel() {
+  document.getElementById('sign-panel').classList.remove('open');
+}
+
+// ─── INVITE MODAL ─────────────────────────────────────────────────────────────
+function openInviteModal() {
+  document.getElementById('invite-modal').classList.add('open');
+  document.getElementById('invite-result').classList.remove('show');
+  document.getElementById('inv-name').value = '';
+  document.getElementById('inv-email').value = '';
+}
+function closeInviteModal() {
+  document.getElementById('invite-modal').classList.remove('open');
+}
+
+async function sendInvite() {
+  const name  = document.getElementById('inv-name').value.trim();
+  const email = document.getElementById('inv-email').value.trim();
+  const role  = document.getElementById('inv-role').value;
+  if (!name || !email) { alert('Please enter name and email.'); return; }
+
+  const btn = document.getElementById('btn-send-invite');
+  btn.disabled = true; btn.textContent = 'Sending…';
+
+  try {
+    const r = await fetch('/api/sessions/invite', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apt_id: APT_ID, name, email, role }),
+    });
+    const data = await r.json();
+    if (!r.ok) { alert(data.detail || 'Failed to create invite.'); return; }
+
+    _inviteLink = data.join_link;
+    document.getElementById('invite-link-text').textContent = _inviteLink;
+    document.getElementById('invite-result').classList.add('show');
+
+    // Add to session info participants
+    if (_sessionInfo) {
+      if (!_sessionInfo.session_participants) _sessionInfo.session_participants = [];
+      _sessionInfo.session_participants.push({ name, email, role, identity: '' });
+      renderParticipantsList();
+    }
+  } catch(e) {
+    alert('Network error. Please try again.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Send Invite';
+  }
+}
+
+function copyInviteLink() {
+  navigator.clipboard.writeText(_inviteLink).then(() => {
+    const btn = document.querySelector('.copy-link-btn');
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy Link', 2000);
+  });
+}
+
+// ─── CHAT ─────────────────────────────────────────────────────────────────────
+function appendChatMessage(name, text, isSelf) {
+  const div = document.createElement('div');
+  div.className = 'chat-msg ' + (isSelf ? 'self' : 'other');
+  div.innerHTML = `<div class="chat-msg-name">${escHtml(name)}</div>${escHtml(text)}`;
+  const msgs = document.getElementById('chat-messages');
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || !_room) return;
+  input.value = '';
+
+  const myName = _room.localParticipant.name || 'Me';
+  const payload = JSON.stringify({ type: 'chat', name: myName, text });
+  const encoder = new TextEncoder();
+  await _room.localParticipant.publishData(encoder.encode(payload), { reliable: true });
+  appendChatMessage(myName, text, true);
+}
+
+// ─── END SESSION ──────────────────────────────────────────────────────────────
+async function endSession() {
+  if (!confirm('End the notarization session for all participants?')) return;
+  try {
+    await fetch(`/api/sessions/${APT_ID}/end`, { method: 'POST', credentials: 'include' });
+  } catch(e) {}
+  if (_room) await _room.disconnect();
+  location.href = '/appointments';
+}
+
+// ─── TIMER ───────────────────────────────────────────────────────────────────
+function updateTimer() {
+  if (!_startTime) return;
+  const sec = Math.floor((Date.now() - _startTime) / 1000);
+  const m   = String(Math.floor(sec / 60)).padStart(2, '0');
+  const s   = String(sec % 60).padStart(2, '0');
+  document.getElementById('session-timer').textContent = `${m}:${s}`;
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function setLoading(msg) {
+  document.getElementById('loading-screen').style.display = 'flex';
+  document.getElementById('loading-text').textContent = msg;
+}
+function hideLoading() {
+  document.getElementById('loading-screen').style.display = 'none';
+}
+function showError(msg) {
+  document.getElementById('loading-screen').style.display = 'flex';
+  document.getElementById('loading-screen').innerHTML = `
+    <div style="text-align:center">
+      <div style="font-size:2rem;margin-bottom:1rem">⚠️</div>
+      <div style="color:var(--red);font-size:1rem;margin-bottom:1rem">${escHtml(msg)}</div>
+      <a href="/appointments" style="color:var(--teal);font-size:.85rem">← Back to Appointments</a>
+    </div>
+  `;
+}
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function initials(name) {
+  return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+}
+
+// ─── BOOTSTRAP ───────────────────────────────────────────────────────────────
+if (!ROOM_NAME || !APT_ID) {
+  showError('Missing room or appointment ID in URL.');
+} else {
+  init();
+}
+</script>
+</body>
+</html>

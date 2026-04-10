@@ -106,12 +106,8 @@
       <img src="/qlegal-logo-sm.png" alt="Quanby Legal" class="logo-img" onerror="this.style.display='none'">
       <span class="logo-text">Quanby Legal</span>
     </a>
-    <div class="nav-links">
-      <a href="/#features">Features</a>
-      <a href="/#contract-agent">Contract AI</a>
-      <a href="/#compliance">Compliance</a>
-      <a href="/#regulatory">Regulatory</a>
-      <a href="/#about">About</a>
+    <div class="nav-links" id="dash-nav-links">
+      <!-- role-aware links injected by JS -->
     </div>
     <div class="nav-user" id="nav-user-wrap" onclick="toggleDashMenu()">
       <img class="nav-user-avatar" id="dash-nav-avatar" src="" alt="" style="display:none;">
@@ -277,6 +273,30 @@
       </div>
     </div>
 
+    <!-- ROLE-AWARE QUICK ACTIONS -->
+    <div class="cert-box" id="booking-actions" style="display:none;">
+      <h3>📅 Notarization Services</h3>
+      <div class="grid" style="margin-bottom:0;">
+        <!-- Client cards -->
+        <div id="qa-client-browse" style="display:none;" class="card" style="cursor:pointer;" onclick="window.location.href='/browse'">
+          <h3>🔍 Find a Notary</h3>
+          <div class="card-value" style="font-size:1rem;">Browse Certified ENPs</div>
+          <div class="card-sub" style="margin-top:0.75rem;"><a href="/browse" style="color:var(--gold);font-weight:600;text-decoration:none;">Browse Directory →</a></div>
+        </div>
+        <div id="qa-client-appointments" style="display:none;" class="card" onclick="window.location.href='/appointments'" style="cursor:pointer;">
+          <h3>📋 My Appointments</h3>
+          <div class="card-value" style="font-size:1rem;">View booking status</div>
+          <div class="card-sub" style="margin-top:0.75rem;"><a href="/appointments" style="color:var(--gold);font-weight:600;text-decoration:none;">View Appointments →</a></div>
+        </div>
+        <!-- ENP card -->
+        <div id="qa-enp-appointments" style="display:none;" class="card" onclick="window.location.href='/appointments'" style="cursor:pointer;">
+          <h3>📋 Appointment Requests</h3>
+          <div class="card-value" id="qa-pending-count" style="font-size:1rem;">Loading…</div>
+          <div class="card-sub" style="margin-top:0.75rem;"><a href="/appointments" style="color:var(--gold);font-weight:600;text-decoration:none;">Manage Requests →</a></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -310,6 +330,44 @@ async function loadDashboard() {
     const roleLabel = { attorney: 'Attorney / ENP', client: 'Client / Principal', admin: 'Administrator' }[user.role] || user.role || 'User';
     document.getElementById('user-role').textContent = roleLabel;
     document.getElementById('stat-role').textContent = roleLabel;
+
+    // Role-aware nav links
+    const dashNavLinks = document.getElementById('dash-nav-links');
+    if (dashNavLinks) {
+      if (user.role === 'client') {
+        dashNavLinks.innerHTML = `
+          <a href="/dashboard">Dashboard</a>
+          <a href="/browse">Find a Notary</a>
+          <a href="/appointments">My Appointments</a>
+        `;
+      } else if (user.role === 'attorney') {
+        dashNavLinks.innerHTML = `
+          <a href="/dashboard">Dashboard</a>
+          <a href="/appointments">Appointments</a>
+        `;
+      }
+    }
+
+    // Role-aware booking actions
+    const bookingActions = document.getElementById('booking-actions');
+    if (bookingActions) {
+      bookingActions.style.display = '';
+      if (user.role === 'client') {
+        document.getElementById('qa-client-browse').style.display = '';
+        document.getElementById('qa-client-appointments').style.display = '';
+      } else if (user.role === 'attorney') {
+        const enpCard = document.getElementById('qa-enp-appointments');
+        if (enpCard) enpCard.style.display = '';
+        // Load pending count
+        fetch('/api/appointments', { credentials: 'include' })
+          .then(r => r.json())
+          .then(apts => {
+            const pending = apts.filter(a => a.status === 'PENDING').length;
+            const el = document.getElementById('qa-pending-count');
+            if (el) el.textContent = pending > 0 ? pending + ' pending request' + (pending > 1 ? 's' : '') : 'No pending requests';
+          }).catch(() => {});
+      }
+    }
 
     // Status chip
     const certStatus = user.certificate_status || 'none';

@@ -542,7 +542,7 @@
     "retake_count": 0,
     "retake_payment_confirmed": false,
     "created_at": "2026-04-08T04:44:28.607987+00:00",
-    "last_login": "2026-04-09T04:30:39.787246+00:00",
+    "last_login": "2026-04-10T02:01:51.200830+00:00",
     "kyc_id_uploaded": true,
     "hyperverge_transaction_id": "ql-297dd411-1775733185",
     "hyperverge_status": "auto_approved",
@@ -612,5 +612,256 @@
     "retake_payment_confirmed": false,
     "created_at": "2026-04-09T10:39:37.071014+00:00",
     "last_login": "2026-04-09T11:07:42.579132+00:00"
+  },
+  "73fe52ad-e29b-4e85-884b-48fe3bd8af83": {
+    "id": "73fe52ad-e29b-4e85-884b-48fe3bd8af83",
+    "email": "software@quanbyit.com",
+    "first_name": "Quanby",
+    "last_name": "Developer",
+    "picture": "https://lh3.googleusercontent.com/a/ACg8ocJF-_GWzLC4Bd51utsOgylVvv6SC8JvhDhiN1aclWbSUZkikw=s96-c",
+    "provider": "google",
+    "provider_id": "105802799376805006901",
+    "email_verified": true,
+    "role": "client",
+    "onboarding_step": "kyc_id",
+    "profile": {
+      "prefix": "",
+      "first_name": "Quanby",
+      "middle_initial": "",
+      "last_name": "Developer",
+      "suffix": "",
+      "phone": "+639295001017",
+      "organization": "",
+      "position": ""
+    },
+    "test_result": {
+      "total": 20,
+      "correct": 17,
+      "score_pct": 85.0,
+      "passed": true,
+      "passing_score": 70,
+      "results": [
+        {
+          "id": "cli_020",
+          "question": "A Loan Agreement that is notarized:",
+          "user_answer": "B",
+          "user_answer_text": "B. Becomes a public instrument with stronger evidentiary weight and easier to enforce",
+          "correct_answer_text": "B. Becomes a public instrument with stronger evidentiary weight and easier to enforce",
+          "is_correct": true,
+          "category": "Document Types"
+        },
+        {
+          "id": "cli_007",
+          "question": "A contract is legally binding in the Philippines when it has:",
+          "user_answer": "A",
+          "user_answer_text": "A. A notarial seal and three witnesses",
+          "correct_answer_text": "B. Consent, object, and cause \u2014 even without notarization in most cases",
+          "is_correct": false,
+          "category": "Civil Law Basics"
+        },
+        {
+          "id": "cli_004",
+          "question": "Your personal data shared on Quanby Legal is protected under which Philippine law?",
+          "user_answer": "B",
+          "user_answer_text": "B. Republic Act 10173 \u2014 Data Privacy Act of 2012",
+          "correct_answer_text": "B. Republic Act 10173 \u2014 Data Privacy Act of 2012",
+          "is_correct": true,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "cli_015",
+          "question": "When using Quanby Legal, your data is encrypted using:",
+          "user_answer": "B",
+          "user_answer_text": "B. AES-256 encryption at rest and TLS 1.3 in transit",
+          "correct_answer_text": "B. AES-256 encryption at rest and TLS 1.3 in transit",
+          "is_correct": true,
+          "category": "Security"
+        },
+        {
+          "id": "cli_001",
+          "question": "What does e-notarization mean?",
+          "user_answer": "B",
+          "user_answer_text": "B. The act of notarizing a document electronically using a certified Electronic Notary Public (ENP)",
+          "correct_answer_text": "B. The act of notarizing a document electronically using a certified Electronic Notary Public (ENP)",
+          "is_correct": true,
+          "category": "Basic Understanding"
+        },
+        {
+          "id": "cli_008",
+          "question": "If you need to authorize someone to act on your behalf for a specific legal transaction, you need a:",
+          "user_answer": "B",
+          "user_answer_text": "B. Special Power of Attorney (SPA)",
+          "correct_answer_text": "B. Special Power of Attorney (SPA)",
+          "is_correct": true,
+          "category": "Document Types"
+        },
+        {
+          "id": "cli_003",
+          "question": "An e-notarized document in the Philippines has the same legal effect as a:",
+          "user_answer": "B",
+          "user_answer_text": "B. Traditionally notarized paper document",
+          "correct_answer_text": "B. Traditionally notarized paper document",
+          "is_correct": true,
+          "category": "Legal Validity"
+        },
+        {
+          "id": "cli_019",
+          "question": "After successful e-notarization on Quanby Legal, your document is:",
+          "user_answer": "B",
+          "user_answer_text": "B. Cryptographically sealed, recorded on blockchain, and available for download as a certified PDF",
+          "correct_answer_text": "B. Cryptographically sealed, recorded on blockchain, and available for download as a certified PDF",
+          "is_correct": true,
+          "category": "Platform Knowledge"
+        },
+        {
+          "id": "cli_010",
+          "question": "Which of the following documents REQUIRES notarization to be legally effective in the Philippines?",
+          "user_answer": "B",
+          "user_answer_text": "B. A Deed of Absolute Sale for real property",
+          "correct_answer_text": "B. A Deed of Absolute Sale for real property",
+          "is_correct": true,
+          "category": "Document Types"
+        },
+        {
+          "id": "cli_017",
+          "question": "What type of ID is considered a competent evidence of identity for notarization in the Philippines?",
+          "user_answer": "B",
+          "user_answer_text": "B. A current government-issued ID with photo and signature (e.g., passport, PhilSys, driver's license)",
+          "correct_answer_text": "B. A current government-issued ID with photo and signature (e.g., passport, PhilSys, driver's license)",
+          "is_correct": true,
+          "category": "Process Knowledge"
+        },
+        {
+          "id": "cli_016",
+          "question": "If a contract is notarized, its evidentiary value in court compared to an unnotarized contract is:",
+          "user_answer": "B",
+          "user_answer_text": "B. Higher \u2014 a notarized document is a public instrument and presumed authentic",
+          "correct_answer_text": "B. Higher \u2014 a notarized document is a public instrument and presumed authentic",
+          "is_correct": true,
+          "category": "Legal Validity"
+        },
+        {
+          "id": "cli_002",
+          "question": "Which government body accredits e-notarization platforms in the Philippines?",
+          "user_answer": "B",
+          "user_answer_text": "B. Supreme Court of the Philippines",
+          "correct_answer_text": "B. Supreme Court of the Philippines",
+          "is_correct": true,
+          "category": "Basic Understanding"
+        },
+        {
+          "id": "cli_018",
+          "question": "Quanby Legal's e-notarization service is available to clients located:",
+          "user_answer": "B",
+          "user_answer_text": "B. Anywhere in the Philippines and eligible Filipinos abroad",
+          "correct_answer_text": "B. Anywhere in the Philippines and eligible Filipinos abroad",
+          "is_correct": true,
+          "category": "Platform Knowledge"
+        },
+        {
+          "id": "cli_009",
+          "question": "What does blockchain audit trail in Quanby Legal protect?",
+          "user_answer": "B",
+          "user_answer_text": "B. The integrity and authenticity of your notarized document \u2014 it cannot be tampered with",
+          "correct_answer_text": "B. The integrity and authenticity of your notarized document \u2014 it cannot be tampered with",
+          "is_correct": true,
+          "category": "Platform Knowledge"
+        },
+        {
+          "id": "cli_006",
+          "question": "What is the purpose of the liveness verification step during onboarding?",
+          "user_answer": "B",
+          "user_answer_text": "B. To verify you are a real, live person and match the identity document you provided",
+          "correct_answer_text": "B. To verify you are a real, live person and match the identity document you provided",
+          "is_correct": true,
+          "category": "Process Knowledge"
+        },
+        {
+          "id": "cli_011",
+          "question": "During a Remote Electronic Notarization (REN) session, you will be required to:",
+          "user_answer": "B",
+          "user_answer_text": "B. Appear via video call and present a valid government-issued ID",
+          "correct_answer_text": "B. Appear via video call and present a valid government-issued ID",
+          "is_correct": true,
+          "category": "Process Knowledge"
+        },
+        {
+          "id": "cli_013",
+          "question": "Under Philippine law, you have the right to request a copy of your personal data held by Quanby Legal. This is called the:",
+          "user_answer": "D",
+          "user_answer_text": "D. Right to Transparency",
+          "correct_answer_text": "B. Right to Access",
+          "is_correct": false,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "cli_014",
+          "question": "An acknowledgment in a notarized document means that YOU have confirmed the document is:",
+          "user_answer": "B",
+          "user_answer_text": "B. Your own free and voluntary act and deed, signed before the notary",
+          "correct_answer_text": "B. Your own free and voluntary act and deed, signed before the notary",
+          "is_correct": true,
+          "category": "Notarial Terms"
+        },
+        {
+          "id": "cli_012",
+          "question": "Quanby Legal is compliant with BSP Circular 944, which means documents notarized here are accepted by:",
+          "user_answer": "B",
+          "user_answer_text": "B. BSP-supervised financial institutions such as banks and e-money issuers",
+          "correct_answer_text": "B. BSP-supervised financial institutions such as banks and e-money issuers",
+          "is_correct": true,
+          "category": "Regulatory"
+        },
+        {
+          "id": "cli_005",
+          "question": "When you upload a document to Quanby Legal for notarization, you are communicating with a:",
+          "user_answer": "C",
+          "user_answer_text": "C. AI system that approves all documents automatically",
+          "correct_answer_text": "B. Supreme Court-accredited Electronic Notary Public (ENP)",
+          "is_correct": false,
+          "category": "Platform Knowledge"
+        }
+      ],
+      "retake_fee_php": 0
+    },
+    "liveness_verified": false,
+    "national_id_uploaded": false,
+    "certificate_status": "certified",
+    "certificate_id": "QL-CLT-20260410-3ECA3B8DFDC64383",
+    "retake_count": 0,
+    "retake_payment_confirmed": false,
+    "created_at": "2026-04-10T00:11:20.757136+00:00",
+    "last_login": "2026-04-10T02:42:34.428785+00:00"
+  },
+  "89f41df1-9ac9-4ce3-98e0-4f474aa119ef": {
+    "id": "89f41df1-9ac9-4ce3-98e0-4f474aa119ef",
+    "email": "subscriptions@quanbyit.com",
+    "first_name": "Quanby",
+    "last_name": "Subscriptions",
+    "picture": "https://lh3.googleusercontent.com/a/ACg8ocLggunETtfaVtCgOEhg792LcE6xuvSKNLT1zzlBdneJu284zQ=s96-c",
+    "provider": "google",
+    "provider_id": "105093202433576385809",
+    "email_verified": true,
+    "role": "client",
+    "onboarding_step": "test",
+    "profile": {
+      "prefix": "",
+      "first_name": "Quanby",
+      "middle_initial": "",
+      "last_name": "Subscriptions",
+      "suffix": "",
+      "phone": "+639295001017",
+      "organization": "",
+      "position": ""
+    },
+    "test_result": null,
+    "liveness_verified": false,
+    "national_id_uploaded": false,
+    "certificate_status": "none",
+    "certificate_id": null,
+    "retake_count": 0,
+    "retake_payment_confirmed": false,
+    "created_at": "2026-04-10T00:56:29.977472+00:00",
+    "last_login": "2026-04-10T02:09:58.709130+00:00"
   }
 }

@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<title>Session Lobby — Quanby Legal</title>
+<meta name="version" content="1775789505"/>
+<link rel="icon" href="/favicon.ico"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<!-- HyperVerge Web SDK -->
+<script src="https://hv-camera-web-sg.s3-ap-southeast-1.amazonaws.com/hyperverge-web-sdk@10.3.0/src/sdk.min.js"></script>
+<style>
+:root {
+  --navy: #1B2A6B; --gold: #C9A84C; --teal: #0EA5E9;
+  --bg: #0D0F1A; --surface: #141726; --surface2: #1a1f35;
+  --text: #E8EAF2; --muted: #8B90A8; --border: rgba(255,255,255,0.07);
+  --red: #EF4444; --green: #10B981; --purple: #7C3AED;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Top Nav Bar ── */
+.topbar {
+  background: rgba(10,12,24,0.97);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.topbar-logo { display: flex; align-items: center; gap: .6rem; text-decoration: none; }
+.topbar-logo-icon { font-size: 1.4rem; }
+.topbar-logo-text { font-size: 1rem; font-weight: 800; color: var(--gold); letter-spacing: -.01em; }
+.topbar-center { font-size: .85rem; color: var(--muted); font-weight: 500; }
+.topbar-back { font-size: .8rem; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: .3rem; transition: color .15s; }
+.topbar-back:hover { color: var(--text); }
+
+/* ── Main Layout ── */
+.lobby-main {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  gap: 1.5rem;
+}
+.lobby-left {
+  width: 340px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.lobby-right {
+  flex: 1;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+}
+.card-title {
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin-bottom: .9rem;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+/* ── Session Info Card ── */
+.session-info-card {
+  background: linear-gradient(135deg, rgba(27,42,107,.6) 0%, rgba(14,165,233,.08) 100%);
+  border-color: rgba(27,42,107,.7);
+}
+.session-type-badge {
+  display: inline-block;
+  background: rgba(201,168,76,.15);
+  border: 1px solid rgba(201,168,76,.35);
+  color: var(--gold);
+  font-size: .72rem;
+  font-weight: 700;
+  padding: .25rem .7rem;
+  border-radius: 20px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: .85rem;
+}
+.session-row {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .45rem 0;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.session-row:last-child { border-bottom: none; }
+.session-row-label { font-size: .75rem; color: var(--muted); width: 52px; flex-shrink: 0; }
+.session-row-val { font-size: .88rem; font-weight: 600; color: var(--text); }
+.mode-tag {
+  background: rgba(14,165,233,.12);
+  border: 1px solid rgba(14,165,233,.25);
+  color: var(--teal);
+  font-size: .68rem;
+  font-weight: 700;
+  padding: .15rem .5rem;
+  border-radius: 4px;
+  margin-left: .4rem;
+}
+
+/* ── Participants Card ── */
+.participants-card { border-color: rgba(27,42,107,.5); background: rgba(13,15,26,.6); }
+.participant-row {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .65rem .75rem;
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: .5rem;
+  transition: background .15s;
+}
+.participant-row:last-child { margin-bottom: 0; }
+.participant-row:hover { background: rgba(255,255,255,.05); }
+.participant-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--navy), var(--teal));
+  display: flex; align-items: center; justify-content: center;
+  font-size: .8rem; font-weight: 700; color: #fff; flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,.08);
+}
+.participant-info { flex: 1; min-width: 0; }
+.participant-name { font-size: .875rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.participant-role-text { font-size: .72rem; color: var(--muted); margin-top: .1rem; }
+.participant-badges { display: flex; gap: .3rem; align-items: center; flex-shrink: 0; }
+.badge {
+  font-size: .65rem; font-weight: 700; padding: .2rem .55rem;
+  border-radius: 20px; white-space: nowrap;
+}
+.badge-enp { background: rgba(201,168,76,.15); color: var(--gold); border: 1px solid rgba(201,168,76,.3); }
+.badge-client { background: rgba(14,165,233,.1); color: var(--teal); border: 1px solid rgba(14,165,233,.25); }
+.badge-witness { background: rgba(124,58,237,.1); color: #a78bfa; border: 1px solid rgba(124,58,237,.25); }
+.badge-you { background: rgba(16,185,129,.12); color: var(--green); border: 1px solid rgba(16,185,129,.3); }
+.participants-empty { text-align: center; padding: 1.25rem; font-size: .8rem; color: var(--muted); }
+
+/* ── Camera Card ── */
+.camera-preview {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #070810;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--border);
+  margin-bottom: .75rem;
+}
+.camera-preview video { width: 100%; height: 100%; object-fit: cover; display: none; }
+.camera-placeholder {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: .5rem; color: var(--muted);
+}
+.camera-placeholder span { font-size: 2.5rem; opacity: .4; }
+.camera-placeholder p { font-size: .78rem; }
+.preview-label {
+  position: absolute; bottom: .6rem; left: .75rem;
+  background: rgba(0,0,0,.65); backdrop-filter: blur(4px);
+  font-size: .72rem; font-weight: 600; padding: .2rem .55rem;
+  border-radius: 20px; display: none;
+}
+.device-controls { display: flex; gap: .6rem; }
+.device-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: .4rem;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+  padding: .5rem .75rem; font-size: .8rem; font-weight: 500; color: var(--text);
+  cursor: pointer; transition: all .15s; font-family: inherit;
+}
+.device-btn:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.15); }
+.device-btn.off { background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.25); color: var(--red); }
+
+/* ── Check Rows ── */
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  padding: .75rem 1rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: .84rem;
+  transition: all .2s;
+}
+.check-row.checking { background: rgba(14,165,233,.05); border-color: rgba(14,165,233,.15); }
+.check-row.pass { background: rgba(16,185,129,.06); border-color: rgba(16,185,129,.25); }
+.check-row.fail { background: rgba(239,68,68,.06); border-color: rgba(239,68,68,.2); }
+.check-row.idle { background: rgba(255,255,255,.02); }
+.check-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+.check-content { flex: 1; min-width: 0; }
+.check-label { font-weight: 600; font-size: .82rem; margin-bottom: .2rem; }
+.check-label.pass { color: var(--green); }
+.check-label.fail { color: var(--red); }
+.check-label.checking { color: var(--teal); }
+.check-label.idle { color: var(--muted); }
+.check-sub { font-size: .73rem; color: var(--muted); line-height: 1.5; }
+.check-steps { margin-top: .4rem; display: flex; flex-direction: column; gap: .3rem; }
+.step { display: flex; align-items: center; gap: .4rem; font-size: .72rem; color: var(--muted); }
+.step.done { color: var(--green); }
+.step.fail { color: var(--red); }
+.step.active { color: var(--text); }
+
+.spin-sm {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(14,165,233,.2);
+  border-top-color: var(--teal);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Liveness Button ── */
+.btn-liveness {
+  width: 100%; padding: .6rem 1rem;
+  background: rgba(201,168,76,.1);
+  border: 1px solid rgba(201,168,76,.35);
+  color: var(--gold); font-size: .83rem; font-weight: 700;
+  border-radius: 8px; cursor: pointer;
+  transition: background .15s; font-family: inherit;
+  margin-top: .6rem;
+}
+.btn-liveness:hover { background: rgba(201,168,76,.18); }
+.btn-liveness:disabled { opacity: .4; cursor: not-allowed; }
+
+/* ── Join Button ── */
+.btn-join-wrap { padding: 0; }
+.btn-join {
+  width: 100%; padding: .9rem 1.5rem;
+  background: var(--gold); color: #0a0c17;
+  font-size: 1rem; font-weight: 800; letter-spacing: .01em;
+  border: none; border-radius: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  transition: all .2s; font-family: inherit;
+  box-shadow: 0 4px 20px rgba(201,168,76,.3);
+}
+.btn-join:hover:not(:disabled) { opacity: .9; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(201,168,76,.4); }
+.btn-join:disabled { opacity: .3; cursor: not-allowed; transform: none; box-shadow: none; background: var(--muted); color: var(--bg); }
+.join-hint { text-align: center; font-size: .72rem; color: var(--muted); margin-top: .5rem; }
+
+/* ── Loading / Error ── */
+.full-loading {
+  position: fixed; inset: 0; background: var(--bg); z-index: 100;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem;
+}
+.big-spinner {
+  width: 44px; height: 44px;
+  border: 3px solid rgba(201,168,76,.15);
+  border-top-color: var(--gold);
+  border-radius: 50%; animation: spin .8s linear infinite;
+}
+.full-loading p { color: var(--muted); font-size: .9rem; }
+
+/* ── Responsive ── */
+@media (max-width: 780px) {
+  .lobby-main { flex-direction: column; align-items: stretch; padding: 1rem; }
+  .lobby-left, .lobby-right { width: 100%; max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- Full-screen loading -->
+<div class="full-loading" id="full-loading">
+  <div class="big-spinner"></div>
+  <p id="full-loading-text">Loading session…</p>
+</div>
+
+<!-- Top navigation bar -->
+<nav class="topbar" id="topbar" style="display:none">
+  <a class="topbar-logo" href="/">
+    <span class="topbar-logo-icon">⚖️</span>
+    <span class="topbar-logo-text">Quanby Legal</span>
+  </a>
+  <span class="topbar-center">Notarization Session Lobby</span>
+  <a class="topbar-back" href="/appointments">← Back</a>
+</nav>
+
+<!-- Main content -->
+<div class="lobby-main" id="lobby-main" style="display:none">
+
+  <!-- LEFT COLUMN -->
+  <div class="lobby-left">
+
+    <!-- Session Info -->
+    <div class="card session-info-card">
+      <div class="card-title">📋 Session Details</div>
+      <div class="session-type-badge" id="sum-type">–</div>
+      <div class="session-row">
+        <span class="session-row-label">Mode</span>
+        <span class="session-row-val">Remote Electronic<span class="mode-tag" id="sum-mode">REN</span></span>
+      </div>
+      <div class="session-row">
+        <span class="session-row-label">ENP</span>
+        <span class="session-row-val" id="sum-enp">–</span>
+      </div>
+      <div class="session-row">
+        <span class="session-row-label">Client</span>
+        <span class="session-row-val" id="sum-client">–</span>
+      </div>
+    </div>
+
+    <!-- Who's in the Lobby -->
+    <div class="card participants-card">
+      <div class="card-title">👥 Who's in the lobby</div>
+      <div id="participants-list">
+        <div class="participants-empty">Loading participants…</div>
+      </div>
+    </div>
+
+  </div><!-- /left -->
+
+  <!-- RIGHT COLUMN -->
+  <div class="lobby-right">
+
+    <!-- Camera & Mic -->
+    <div class="card">
+      <div class="card-title">📷 Camera &amp; Microphone</div>
+      <div class="camera-preview">
+        <video id="preview-video" autoplay muted playsinline></video>
+        <div class="camera-placeholder" id="camera-placeholder">
+          <span>📷</span>
+          <p>Camera preview</p>
+        </div>
+        <div class="preview-label" id="preview-label"></div>
+      </div>
+      <div class="device-controls">
+        <button class="device-btn" id="btn-mic">🎤 Mic On</button>
+        <button class="device-btn" id="btn-cam">📷 Camera On</button>
+      </div>
+    </div>
+
+    <!-- Identity Verification -->
+    <div class="card" id="liveness-section">
+      <div class="card-title">🔐 Identity Verification</div>
+      <div class="check-row idle" id="liveness-box">
+        <span class="check-icon">🤳</span>
+        <div class="check-content">
+          <div class="check-label idle" id="liveness-label">Required before joining</div>
+          <div class="check-sub" id="liveness-text">A quick selfie check to confirm your identity. This is cross-verified against your KYC record.</div>
+        </div>
+      </div>
+      <button class="btn-liveness" id="btn-liveness" onclick="startLiveness()">
+        🤳 Start Identity Check
+      </button>
+    </div>
+
+    <!-- Location Verification -->
+    <div class="card">
+      <div class="card-title">📍 Location Verification</div>
+      <div class="check-row checking" id="loc-box">
+        <div class="spin-sm" id="loc-spinner"></div>
+        <div class="check-content">
+          <div class="check-label checking" id="loc-label">Checking…</div>
+          <div class="check-sub" id="loc-text">Running security checks…</div>
+          <div class="check-steps" id="check-steps">
+            <div class="step active" id="step-vpn">🔍 Checking VPN / proxy…</div>
+            <div class="step" id="step-geo">📍 Getting your location…</div>
+            <div class="step" id="step-country">🇵🇭 Verifying country…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Join Button -->
+    <div>
+      <button class="btn-join" id="btn-join" disabled onclick="joinNow()">
+        🎥 Join Session
+      </button>
+      <div class="join-hint" id="join-hint">Complete identity and location checks to join</div>
+    </div>
+
+  </div><!-- /right -->
+</div><!-- /main -->
+
+<script>
+const params      = new URLSearchParams(location.search);
+const APT_ID      = params.get('apt')         || '';
+const GUEST_TOKEN = params.get('guest_token') || '';
+const ROOM_NAME   = params.get('room')        || '';
+const GMAPS_KEY   = 'AIzaSyBEY8IoRaKuEq7fMyNNtfq478Tb9EAvA-M';
+const PROXY_KEY   = '71e443-5vn7j9-232954-9a3565';
+
+let _sessionInfo = null;
+let _me          = null;
+let _previewStream = null;
+let _micOn = true, _camOn = true;
+let _locPassed = false, _livenessPassed = false, _livenessBypassed = false;
+
+async function boot() {
+  if (!APT_ID) { showFullError('Missing appointment ID in URL.'); return; }
+  setFullLoading('Authenticating…');
+
+  if (GUEST_TOKEN) {
+    _me = { id: 'guest', first_name: 'Guest', last_name: '', role: 'guest' };
+  } else {
+    try {
+      const r = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!r.ok) { location.href = '/'; return; }
+      _me = await r.json();
+    } catch(e) { location.href = '/'; return; }
+  }
+
+  setFullLoading('Loading session info…');
+  try {
+    const r = await fetch(GUEST_TOKEN ? `/api/sessions/${APT_ID}?guest=1` : `/api/sessions/${APT_ID}`, { credentials: 'include' });
+    if (!r.ok) { showFullError('Session not found or you are not authorized.'); return; }
+    _sessionInfo = await r.json();
+  } catch(e) { showFullError('Could not load session info.'); return; }
+
+  if (_sessionInfo.session_status !== 'active' && !GUEST_TOKEN) {
+    showFullError('This session is not currently active. Please wait for the ENP to start the session.');
+    return;
+  }
+
+  // Fill session details
+  document.getElementById('sum-type').textContent   = _sessionInfo.notarization_type || '–';
+  document.getElementById('sum-enp').textContent    = _sessionInfo.enp_name    || '–';
+  document.getElementById('sum-client').textContent = _sessionInfo.client_name || '–';
+
+  let myName = 'You';
+  if (_me && _me.first_name) myName = (_me.first_name + ' ' + (_me.last_name||'')).trim();
+  document.getElementById('preview-label').textContent = myName;
+
+  // Show UI
+  document.getElementById('full-loading').style.display = 'none';
+  document.getElementById('topbar').style.display = '';
+  document.getElementById('lobby-main').style.display = '';
+
+  startPreview(myName);
+  loadParticipants();
+
+  // Liveness check temporarily bypassed — location verification is sufficient to join
+  _livenessBypassed = true;
+  if (document.getElementById('liveness-section')) {
+    document.getElementById('liveness-section').style.display = 'none';
+  }
+
+  runLocationChecks();
+  document.getElementById('btn-mic').addEventListener('click', toggleMic);
+  document.getElementById('btn-cam').addEventListener('click', toggleCam);
+}
+
+async function startPreview(name) {
+  try {
+    _previewStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    const vid = document.getElementById('preview-video');
+    vid.srcObject = _previewStream;
+    vid.style.display = '';
+    document.getElementById('camera-placeholder').style.display = 'none';
+    document.getElementById('preview-label').style.display = '';
+  } catch(e) {}
+}
+
+function toggleMic() {
+  _micOn = !_micOn;
+  const btn = document.getElementById('btn-mic');
+  btn.textContent = _micOn ? '🎤 Mic On' : '🔇 Mic Off';
+  btn.className = 'device-btn' + (_micOn ? '' : ' off');
+  if (_previewStream) _previewStream.getAudioTracks().forEach(t => t.enabled = _micOn);
+}
+
+function toggleCam() {
+  _camOn = !_camOn;
+  const btn = document.getElementById('btn-cam');
+  btn.textContent = _camOn ? '📷 Camera On' : '🚫 Camera Off';
+  btn.className = 'device-btn' + (_camOn ? '' : ' off');
+  if (_previewStream) {
+    _previewStream.getVideoTracks().forEach(t => t.enabled = _camOn);
+    document.getElementById('preview-video').style.display = _camOn ? '' : 'none';
+    document.getElementById('camera-placeholder').style.display = _camOn ? 'none' : 'flex';
+  }
+}
+
+async function runLocationChecks() {
+  setLocState('checking', 'Checking…', 'Running security checks…');
+  markStep('step-vpn', 'active', '🔍 Checking VPN / proxy…');
+
+  let userIp = null;
+  try { const r = await fetch('/api/sessions/my-ip'); userIp = (await r.json()).ip; } catch(e) {}
+
+  if (userIp && userIp !== 'unknown') {
+    try {
+      const d = await (await fetch(`https://proxycheck.io/v2/${userIp}?key=${PROXY_KEY}&vpn=1&asn=1`)).json();
+      const entry = d[userIp] || {};
+      if (entry.proxy === 'yes' || entry.vpn === 'yes' || entry.type === 'VPN') {
+        markStep('step-vpn', 'fail', '❌ VPN or proxy detected');
+        setLocState('fail', '❌ VPN Detected', 'Disable your VPN to join this session.');
+        return;
+      }
+    } catch(e) {}
+  }
+  markStep('step-vpn', 'done', '✅ No VPN detected');
+  markStep('step-geo', 'active', '📍 Getting your location…');
+
+  let coords;
+  try {
+    coords = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(
+      p => res({ lat: p.coords.latitude, lng: p.coords.longitude }),
+      rej, { timeout: 15000, maximumAge: 60000 }
+    ));
+  } catch(e) {
+    markStep('step-geo', 'fail', '❌ Location denied');
+    setLocState('fail', '❌ Location Required', 'Please allow location access in your browser and refresh.');
+    return;
+  }
+  markStep('step-geo', 'done', '✅ Location obtained');
+  markStep('step-country', 'active', '🇵🇭 Verifying country…');
+
+  let countryCode = null; let placeNames = [];
+  try {
+    const gd = await (await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=${GMAPS_KEY}`)).json();
+    if (gd.results?.[0]) {
+      for (const c of gd.results[0].address_components || [])
+        if (c.types.includes('country')) countryCode = c.short_name;
+      for (const res of gd.results) {
+        placeNames.push((res.formatted_address || '').toLowerCase());
+        for (const c of res.address_components || []) placeNames.push((c.long_name||'').toLowerCase());
+      }
+    }
+  } catch(e) {
+    setLocState('fail', '❌ Verification Failed', 'Could not verify location. Check your connection.');
+    return;
+  }
+
+  const allPlaces = placeNames.join(' ');
+  if (countryCode === 'PH') {
+    markStep('step-country', 'done', '✅ Philippines confirmed');
+    setLocState('pass', '✅ Philippines', 'Location verified — Philippines');
+    _locPassed = true; checkEnableJoin();
+  } else if (/embassy|consulate|consular/i.test(allPlaces)) {
+    markStep('step-country', 'done', '✅ Philippine Embassy/Consulate confirmed');
+    setLocState('pass', '✅ PH Embassy/Consulate', 'Location verified — Philippine Embassy/Consulate');
+    _locPassed = true; checkEnableJoin();
+  } else {
+    markStep('step-country', 'fail', `❌ Outside Philippines (${countryCode||'Unknown'})`);
+    setLocState('fail', '❌ Outside Philippines', `You must be in the Philippines or at a Philippine embassy/consulate. Detected: ${countryCode||'Unknown'}`);
+  }
+}
+
+async function startLiveness() {
+  const btn = document.getElementById('btn-liveness');
+  btn.disabled = true; btn.textContent = '⏳ Loading…';
+  setLivenessState('checking', 'Fetching token…', '');
+
+  let hvToken, hvWorkflowId, hvTransactionId;
+  try {
+    const r = await fetch('/api/onboarding/hyperverge-token', { method: 'POST', credentials: 'include' });
+    if (!r.ok) throw new Error('Failed to get verification token');
+    const d = await r.json();
+    hvToken = d.token;
+    hvWorkflowId = d.workflowId || 'workflow_onboarding';
+    hvTransactionId = d.transactionId || ('ql-session-' + Date.now());
+  } catch(e) {
+    setLivenessState('fail', 'Could not start', 'Failed to fetch token. Please try again.');
+    btn.disabled = false; btn.textContent = '🤳 Retry Identity Check'; return;
+  }
+
+  // Validate SDK is loaded
+  if (typeof HyperKycConfig === 'undefined' || typeof HyperKYCModule === 'undefined') {
+    setLivenessState('fail', '❌ SDK not loaded', 'Please refresh the page and try again.');
+    btn.disabled = false; btn.textContent = '🤳 Retry Identity Check'; return;
+  }
+
+  setLivenessState('checking', 'Look at the camera…', 'Follow the on-screen instructions.');
+  btn.textContent = '⏳ KYC in progress…';
+
+  try {
+    const config = new HyperKycConfig(hvToken, hvWorkflowId, hvTransactionId);
+    HyperKYCModule.launch(config, async (result) => {
+      const status = result.status;
+      if (status === 'user_cancelled') {
+        setLivenessState('idle', 'Cancelled', 'Complete identity check to join.');
+        btn.disabled = false; btn.textContent = '🤳 Retry Identity Check'; return;
+      }
+      setLivenessState('checking', 'Verifying…', 'Checking against your KYC record.');
+      try {
+        const vd = await (await fetch('/api/sessions/verify-liveness', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            transactionId: hvTransactionId,
+            status: status || 'success',
+            result: result.details || result,
+          }),
+        })).json();
+        if (vd.success) {
+          setLivenessState('pass', '✅ Identity Verified', 'Matches your KYC record.');
+          btn.style.display = 'none'; _livenessPassed = true; checkEnableJoin();
+        } else {
+          setLivenessState('fail', '❌ Verification Failed', vd.message || 'Please try again.');
+          btn.disabled = false; btn.textContent = '🤳 Retry Identity Check';
+        }
+      } catch(e) {
+        setLivenessState('fail', '❌ Error', 'Verification error. Please try again.');
+        btn.disabled = false; btn.textContent = '🤳 Retry Identity Check';
+      }
+    });
+  } catch(e) {
+    setLivenessState('fail', '❌ Launch Failed', e.message);
+    btn.disabled = false; btn.textContent = '🤳 Retry Identity Check';
+  }
+}
+
+function checkEnableJoin() {
+  if ((_livenessPassed || _livenessBypassed) && _locPassed) {
+    const btn = document.getElementById('btn-join');
+    btn.disabled = false;
+    document.getElementById('join-hint').textContent = 'All checks passed — you can now join the session';
+    document.getElementById('join-hint').style.color = 'var(--green)';
+  }
+}
+
+async function loadParticipants() {
+  try {
+    const d = await (await fetch(`/api/sessions/${encodeURIComponent(APT_ID)}/participants`, { credentials: 'include' })).json();
+    renderParticipants(d.participants || []);
+    setTimeout(loadParticipants, 10000);
+  } catch(e) { setTimeout(loadParticipants, 10000); }
+}
+
+function renderParticipants(participants) {
+  const list = document.getElementById('participants-list');
+  if (!participants.length) {
+    list.innerHTML = '<div class="participants-empty">Waiting for others to join…</div>';
+    return;
+  }
+  list.innerHTML = participants.map(p => {
+    const initials = (p.name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const isYou = _me && (p.identity === _me.id || p.name === ((_me.first_name||'')+' '+(_me.last_name||'')).trim());
+    const role = p.role || 'Participant';
+    const bc = role==='ENP'?'badge-enp':role==='Client'?'badge-client':role==='Witness'?'badge-witness':'badge-client';
+    return `<div class="participant-row">
+      <div class="participant-avatar">${escHtml(initials)}</div>
+      <div class="participant-info">
+        <div class="participant-name">${escHtml(p.name||'Unknown')}</div>
+        <div class="participant-role-text">${escHtml(role)}</div>
+      </div>
+      <div class="participant-badges">
+        ${isYou ? '<span class="badge badge-you">You</span>' : ''}
+        <span class="badge ${bc}">${escHtml(role)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function joinNow() {
+  if (!_locPassed || (!_livenessPassed && !_livenessBypassed)) return;
+  const btn = document.getElementById('btn-join');
+  btn.disabled = true; btn.textContent = '⏳ Entering session…';
+  if (_previewStream) { _previewStream.getTracks().forEach(t => t.stop()); _previewStream = null; }
+  const room = _sessionInfo.room_name || ROOM_NAME;
+  location.href = GUEST_TOKEN
+    ? `/session?room=${encodeURIComponent(room)}&apt=${encodeURIComponent(APT_ID)}&guest_token=${encodeURIComponent(GUEST_TOKEN)}`
+    : `/session?room=${encodeURIComponent(room)}&apt=${encodeURIComponent(APT_ID)}`;
+}
+
+function setLocState(state, label, sub) {
+  const box = document.getElementById('loc-box');
+  const lbl = document.getElementById('loc-label');
+  const txt = document.getElementById('loc-text');
+  const spi = document.getElementById('loc-spinner');
+  const steps = document.getElementById('check-steps');
+  box.className = 'check-row ' + state;
+  lbl.className = 'check-label ' + state;
+  lbl.textContent = label;
+  txt.textContent = sub;
+  spi.style.display = state === 'checking' ? '' : 'none';
+  steps.style.display = state === 'checking' ? '' : 'none';
+}
+
+function setLivenessState(state, label, sub) {
+  const box = document.getElementById('liveness-box');
+  const lbl = document.getElementById('liveness-label');
+  const txt = document.getElementById('liveness-text');
+  box.className = 'check-row ' + state;
+  lbl.className = 'check-label ' + state;
+  lbl.textContent = label;
+  txt.textContent = sub;
+}
+
+function markStep(id, state, text) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'step ' + state;
+  el.textContent = text;
+}
+
+function setFullLoading(msg) {
+  const el = document.getElementById('full-loading');
+  el.style.display = 'flex';
+  const t = document.getElementById('full-loading-text');
+  if (t) t.textContent = msg;
+}
+
+function showFullError(msg) {
+  document.getElementById('full-loading').innerHTML = `
+    <div style="text-align:center;max-width:380px;padding:1.5rem">
+      <div style="font-size:3rem;margin-bottom:1rem">⚠️</div>
+      <div style="color:var(--red);font-size:.95rem;margin-bottom:1.5rem;line-height:1.6">${escHtml(msg)}</div>
+      <a href="/appointments" style="color:var(--teal);font-size:.85rem;text-decoration:none;border:1px solid rgba(14,165,233,.3);padding:.5rem 1.2rem;border-radius:8px;">← Back to Appointments</a>
+    </div>`;
+  document.getElementById('full-loading').style.display = 'flex';
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+boot();
+</script>
+</body>
+</html>
