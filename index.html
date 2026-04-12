@@ -1,14 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    /* Quanby Legal: silently block Cloudflare beacon to prevent CORS/SRI errors */
+    (function() {
+      function isCFBeacon(el) {
+        return el && el.tagName === 'SCRIPT' && typeof el.src === 'string' &&
+               el.src.indexOf('cloudflareinsights') !== -1;
+      }
+      /* Intercept DOM insertions before they reach the browser */
+      var _ac = Element.prototype.appendChild;
+      Element.prototype.appendChild = function(c) {
+        if (isCFBeacon(c)) return c;
+        return _ac.call(this, c);
+      };
+      var _ib = Element.prototype.insertBefore;
+      Element.prototype.insertBefore = function(c, r) {
+        if (isCFBeacon(c)) return c;
+        return _ib.call(this, c, r);
+      };
+      /* Remove any already-injected beacon tags */
+      function stripNow() {
+        document.querySelectorAll('script[src*="cloudflareinsights"]').forEach(function(s) {
+          if (s.parentNode) s.parentNode.removeChild(s);
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', stripNow);
+      } else {
+        stripNow();
+      }
+      /* Suppress any resulting errors silently */
+      var _oe = window.onerror;
+      window.onerror = function(m, src, l, c, e) {
+        if (src && src.indexOf('cloudflareinsights') !== -1) return true;
+        if (_oe) return _oe.apply(this, arguments);
+      };
+    })();
+  </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quanby Legal - Electronic Notarization Platform</title>
-    <meta name="description" content="Philippines first Supreme Court-accredited electronic notarization platform. AI-powered contract analysis compliant with A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and SEC MC 28-2020.">
+    <meta name="description" content="Philippines' premier Supreme Court-compliant electronic notarization platform. AI-powered contract analysis compliant with A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and SEC MC 28-2020.">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://legal.quanbyai.com/">
+    <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css"/>
+  <link rel="canonical" href="https://legal.quanbyai.com/">
     <meta property="og:title" content="Quanby Legal - Electronic Notarization Platform">
-    <meta property="og:description" content="Philippines first Supreme Court-accredited ENF. AI-powered e-notarization compliant with Philippine law.">
+    <meta property="og:description" content="Philippines' premier Supreme Court-compliant ENF. AI-powered e-notarization compliant with Philippine law.">
     <meta property="og:url" content="https://legal.quanbyai.com/">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
@@ -23,6 +62,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <meta property="og:image" content="https://legal.quanbyai.com/favicon-512.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.5/purify.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         :root {
             --bg-color: #05060f;
@@ -56,25 +96,88 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
         .nav-content { display: flex; justify-content: space-between; align-items: center; gap: 2rem; }
         .logo { display: flex; align-items: center; flex-shrink: 0; }
-        .logo-circle {
-            width: 40px; height: 40px;
-            background: var(--purple);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 1.25rem;
-            margin-right: 0.5rem;
+        .logo-img {
+            width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; margin-right: 0.4rem; image-rendering: -webkit-optimize-contrast; background: transparent;
         }
         .logo-text { font-weight: bold; font-size: 1.25rem; white-space: nowrap; }
         .nav-links { display: flex; gap: 1.5rem; align-items: center; flex: 1; justify-content: center; }
         .nav-links a { white-space: nowrap; }
         .nav-links a:hover { color: var(--purple-light); }
         .nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
-        .nav-user { display: none; align-items: center; gap: 0.625rem; }
+        .nav-user { display: none; align-items: center; gap: 0.625rem; position: relative; }
         .nav-user.visible { display: flex; }
         .nav-user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); }
         .nav-user-name { font-size: 0.85rem; color: var(--muted); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .nav-signout-btn { background: transparent; border: 1px solid rgba(239,68,68,0.35); color: #f87171; font-size: 0.78rem; padding: 0.3rem 0.75rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-        .nav-signout-btn:hover { background: rgba(239,68,68,0.12); border-color: #f87171; }
+        .nav-signin-btn { background: var(--purple); border: none; color: #fff; font-size: 0.82rem; font-weight: 600; padding: 0.4rem 1rem; border-radius: 999px; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: "Inter", sans-serif; }
+        .nav-signin-btn:hover { background: var(--purple-light, #9d5ff3); transform: translateY(-1px); }
+        .nav-signout-btn { display: none; } /* replaced by menu */
+        /* Profile trigger */
+        .nav-profile-wrap {
+            display: flex; align-items: center; gap: 0.5rem;
+            cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: background 0.15s, border-color 0.15s;
+            position: relative; user-select: none;
+        }
+        .nav-profile-wrap:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.2); }
+        .nav-user-initials {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .nav-profile-chevron { transition: transform 0.2s; flex-shrink: 0; }
+        .nav-profile-wrap.open .nav-profile-chevron { transform: rotate(180deg); }
+        /* Dropdown */
+        .nav-user-menu {
+            position: absolute; top: calc(100% + 8px); right: 0;
+            background: #111827; border: 1px solid rgba(124,58,237,0.3);
+            border-radius: 0.75rem; min-width: 220px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6); z-index: 200;
+            overflow: hidden;
+        }
+        .num-header {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.875rem 1rem;
+            background: rgba(124,58,237,0.08);
+        }
+        .num-avatar, .nav-user-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); flex-shrink: 0; }
+        .num-initials {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .num-info { display: flex; flex-direction: column; min-width: 0; }
+        .num-name { font-size: 0.85rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .num-email { font-size: 0.72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .num-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 0.25rem 0; }
+        .num-item {
+            display: flex; align-items: center; gap: 0.625rem;
+            width: 100%; padding: 0.6rem 1rem; font-size: 0.85rem;
+            color: var(--text); background: none; border: none;
+            cursor: pointer; transition: background 0.12s; text-align: left;
+            font-family: "Inter", sans-serif;
+        }
+        .num-item:hover { background: rgba(255,255,255,0.06); }
+        .num-item svg { opacity: 0.6; flex-shrink: 0; }
+        .num-badge { margin-left: auto; font-size: 0.65rem; background: rgba(124,58,237,0.2); color: #a78bfa; padding: 0.1rem 0.4rem; border-radius: 999px; border: 1px solid rgba(124,58,237,0.3); }
+        .num-signout { color: #f87171; }
+        .num-signout svg { opacity: 0.8; }
+        .num-signout:hover { background: rgba(239,68,68,0.08); }
+        .nav-cert-badge {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            font-size: 0.78rem; font-weight: 600; padding: 0.35rem 1rem;
+            border-radius: 999px; white-space: nowrap; cursor: pointer;
+            transition: all 0.2s; border: none;
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            color: #fff; letter-spacing: 0.01em;
+        }
+        .nav-cert-badge:hover { opacity: 0.9; transform: translateY(-1px); }
+        .nav-cert-badge.step-certified {
+            background: linear-gradient(135deg, #10b981, #059669);
+            cursor: default; transform: none;
+        }
         .btn {
             padding: 0.5rem 1.25rem;
             border-radius: 0.375rem;
@@ -83,7 +186,12 @@
             border: none;
             font-size: 0.95rem;
             transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
         }
+        .btn i[data-lucide], .btn .qi { display: inline-flex; align-items: center; }
+        .btn i[data-lucide] svg, .btn .qi svg { width: 1em; height: 1em; flex-shrink: 0; }
         .btn-outline { border: 1px solid var(--purple); color: var(--purple); background: transparent; }
         .btn-outline:hover { background: rgba(124,58,237,0.1); }
         .btn-filled { background: var(--purple); color: white; }
@@ -252,12 +360,24 @@
         }
         .card:hover { border-color: rgba(124,58,237,0.4); }
         .card-icon { font-size: 2rem; margin-bottom: 1rem; }
+        .card-icon svg { width: 2rem; height: 2rem; stroke: var(--purple-light, #9d5ff3); stroke-width: 1.5; }
+        .qi { display: inline-flex; align-items: center; justify-content: center; }
+        .qi svg, span svg, div > svg { vertical-align: middle; flex-shrink: 0; }
+        .qi svg { width: 1em; height: 1em; stroke: currentColor; stroke-width: 1.75; fill: none; vertical-align: -0.15em; flex-shrink: 0; }
         .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; }
         .card-desc { color: var(--muted); font-size: 0.9rem; }
 
         /* PARTNERS */
-        #partners { padding: 2rem 0; background: var(--card-bg); }
-        .partners-row { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; color: var(--muted); }
+        #partners { padding: 2.5rem 0; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); overflow: hidden; }
+        .partners-track-wrapper { position: relative; overflow: hidden; mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%); }
+        .partners-track { display: flex; align-items: center; gap: 3.5rem; width: max-content; animation: partnerScroll 22s linear infinite; }
+        .partners-track:hover, .partners-track-wrapper:hover .partners-track { animation-play-state: paused; }
+        @keyframes partnerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+        .partner-logo-wrap { display: flex; align-items: center; justify-content: center; opacity: 0.65; transition: opacity 0.2s; flex-shrink: 0; }
+        .partner-logo-wrap:hover { opacity: 1; }
+        .partner-logo { height: 48px; width: auto; max-width: 150px; object-fit: contain; }
+        .partner-logo-sq { height: 52px; max-width: 52px; }
+        .partner-logo-wide { height: 28px; max-width: 180px; }
 
         /* FEATURES */
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
@@ -286,8 +406,9 @@
         .use-cases-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; }
 
         /* PRICING */
-        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 1.5rem; }
         .pricing-card { position: relative; }
+        .pricing-card.popular { padding-top: 2rem; }
         .popular-badge {
             position: absolute; top: -1rem; left: 50%; transform: translateX(-50%);
             background: var(--pink); padding: 0.25rem 0.75rem;
@@ -512,6 +633,11 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 1rem;
         }
+        .contact-typing { display: flex; gap: 5px; align-items: center; padding: 0.75rem 1rem !important; }
+        .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(148,163,184,0.6); animation: typingPulse 1.2s infinite ease-in-out; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingPulse { 0%,80%,100% { transform: scale(0.7); opacity:0.4; } 40% { transform: scale(1); opacity:1; } }
         .online-dot { width: 8px; height: 8px; background: var(--teal); border-radius: 50%; display: inline-block; }
         .contract-chat-messages {
             flex: 1; overflow-y: auto; padding: 1.25rem;
@@ -773,13 +899,183 @@
             /* Upload area: less padding on mobile */
             .upload-area { padding: 1.75rem 1rem; }
         }
+
+        /* ── ONBOARDING MODAL ── */
+        .onboard-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+        .onboard-overlay.open { display: flex; }
+        .onboard-modal {
+            background: #0f1020;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 640px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .onboard-close {
+            position: absolute;
+            top: 1rem; right: 1rem;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            transition: color 0.2s;
+        }
+        .onboard-close:hover { color: #fff; }
+        .onboard-progress {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            padding-bottom: 0.25rem;
+        }
+        .ob-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.35rem;
+            flex-shrink: 0;
+            min-width: 56px;
+        }
+        .ob-step-num {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            border: 2px solid rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted, #94a3b8);
+            transition: all 0.2s;
+        }
+        .ob-step-num.done {
+            background: var(--teal, #10b981);
+            border-color: var(--teal, #10b981);
+            color: #fff;
+        }
+        .ob-step-num.active {
+            background: var(--purple, #7c3aed);
+            border-color: var(--purple, #7c3aed);
+            color: #fff;
+        }
+        .ob-step span {
+            font-size: 0.65rem;
+            color: var(--muted, #94a3b8);
+            white-space: nowrap;
+            text-align: center;
+        }
+        .ob-line {
+            flex: 1;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            min-width: 12px;
+            margin-bottom: 1.1rem;
+        }
+        .onboard-modal h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+        .onboard-modal .sub {
+            color: var(--muted, #94a3b8);
+            font-size: 0.9rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.6;
+        }
+        .onboard-btn {
+            display: block;
+            width: 100%;
+            padding: 0.875rem 1.5rem;
+            background: var(--purple, #7c3aed);
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.25rem;
+            transition: background 0.2s;
+        }
+        .onboard-btn:hover { background: var(--purple-light, #9d5ff3); }
+        .onboard-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .onboard-field { margin-bottom: 1rem; }
+        .onboard-field label { display: block; font-size: 0.85rem; color: var(--muted,#94a3b8); margin-bottom: 0.35rem; }
+        .onboard-field input, .onboard-field select {
+            width: 100%;
+            padding: 0.6rem 0.875rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.4rem;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+        .onboard-field input:focus { outline: none; border-color: var(--purple,#7c3aed); }
+        .onboard-role-cards { display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+        .onboard-role-card {
+            flex: 1; min-width: 140px;
+            padding: 1rem;
+            background: rgba(255,255,255,0.03);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .onboard-role-card:hover, .onboard-role-card.selected {
+            border-color: var(--purple,#7c3aed);
+            background: rgba(124,58,237,0.1);
+        }
+        .ob-question { margin-bottom: 1.25rem; }
+        .ob-question p { font-weight: 500; margin-bottom: 0.75rem; line-height: 1.5; }
+        .ob-choice {
+            padding: 0.6rem 0.875rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.4rem;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.15s;
+        }
+        .ob-choice:hover { background: rgba(124,58,237,0.15); border-color: rgba(124,58,237,0.4); }
+        .ob-choice.selected { background: rgba(124,58,237,0.2); border-color: var(--purple,#7c3aed); color: #fff; }
+        .ob-result-banner { padding: 1rem 1.25rem; border-radius: 0.5rem; font-weight: 600; font-size: 1rem; margin-bottom: 1rem; text-align: center; }
+        .ob-result-banner.pass { background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); color: #34d399; }
+        .ob-result-banner.fail { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.25); color: #f87171; }
+        .ob-error { color: #f87171; font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2em; }
+        .ob-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: ob-spin 0.7s linear infinite; margin-right: 0.5rem; vertical-align: middle; }
+        @keyframes ob-spin { to { transform: rotate(360deg); } }
+        .ob-cam-container { text-align: center; margin: 1rem 0; }
+        .ob-cam-container video, .ob-cam-container canvas { border-radius: 0.5rem; max-width: 100%; border: 1px solid rgba(255,255,255,0.1); }
     </style>
+    <script src="https://hv-camera-web-sg.s3-ap-southeast-1.amazonaws.com/hyperverge-web-sdk@10.3.0/src/sdk.min.js"></script>
 </head>
 <body>
     <nav>
         <div class="container nav-content">
             <div class="logo">
-                <div class="logo-circle">Q</div>
+                <img src="/qlegal-logo-sm.png" alt="Quanby Legal" class="logo-img">
                 <span class="logo-text">Quanby Legal</span>
             </div>
             <div class="nav-links">
@@ -790,45 +1086,83 @@
                 <a href="#pricing">Pricing</a>
                 <a href="#about">About</a>
             </div>
+            <button class="nav-signin-btn" id="nav-signin-btn" onclick="openSSO()" style="display:none;">Sign In</button>
+            <button id="admin-nav-btn" onclick="openAdminModal()" title="Admin Login" style="
+              background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.35);
+              color:rgba(200,190,255,0.7);font-size:0.75rem;font-weight:600;
+              padding:0.35rem 0.8rem;border-radius:999px;cursor:pointer;
+              font-family:'Inter',sans-serif;transition:all 0.2s;white-space:nowrap;
+              display:flex;align-items:center;gap:0.3rem;
+            " onmouseover="this.style.background='rgba(124,58,237,0.25)';this.style.color='#c4b5fd'"
+               onmouseout="this.style.background='rgba(124,58,237,0.12)';this.style.color='rgba(200,190,255,0.7)'">
+              🔐 Admin
+            </button>
             <div class="nav-user" id="nav-user">
-                <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" onerror="this.style.display='none'">
-                <span class="nav-user-name" id="nav-user-name"></span>
-                <button class="nav-signout-btn" onclick="signOut()">Sign Out</button>
+                <button id="nav-cert-badge" class="nav-cert-badge" style="display:none;" onclick="_navBadgeClick()"></button>
+                <!-- User avatar trigger -->
+                <div class="nav-profile-wrap" id="nav-profile-wrap" onclick="toggleUserMenu()">
+                    <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" style="display:none;" onload="this.style.display='block';document.getElementById('nav-user-initials').style.display='none';" onerror="this.style.display='none';document.getElementById('nav-user-initials').style.display='flex';">
+                    <div class="nav-user-initials" id="nav-user-initials" style="display:none;"></div>
+                    <span class="nav-user-name" id="nav-user-name"></span>
+                    <svg class="nav-profile-chevron" id="nav-profile-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <!-- Dropdown menu -->
+                <div class="nav-user-menu" id="nav-user-menu" style="display:none;">
+                    <div class="num-header">
+                        <img class="num-avatar" id="num-avatar" src="" alt="" style="display:none;" onload="this.style.display='block';document.getElementById('num-initials').style.display='none';" onerror="this.style.display='none';document.getElementById('num-initials').style.display='flex';">
+                        <div class="num-initials" id="num-initials" style="display:none;"></div>
+                        <div class="num-info">
+                            <span class="num-name" id="num-name"></span>
+                            <span class="num-email" id="num-email"></span>
+                        </div>
+                    </div>
+                    <div class="num-divider"></div>
+                    <button class="num-item" onclick="_navBadgeClick(); toggleUserMenu()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm0 1c-3.31 0-6 1.79-6 4v1h12v-1c0-2.21-2.69-4-6-4z" fill="currentColor"/></svg>
+                        My Profile
+                    </button>
+                    <button class="num-item" onclick="toggleUserMenu()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm0 2a5 5 0 110 10A5 5 0 018 3zm0 2a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm-2.5 6a2.5 2.5 0 015 0H5.5z" fill="currentColor"/></svg>
+                        Account Settings
+                        <span class="num-badge">Soon</span>
+                    </button>
+                    <button class="num-item" onclick="toggleTheme(); toggleUserMenu()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+                        <span id="num-theme-label">Light Mode</span>
+                    </button>
+                    <div class="num-divider"></div>
+                    <button class="num-item num-signout" onclick="signOut()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Sign Out
+                    </button>
+                </div>
             </div>
             <button class="hamburger" id="hamburger-btn" aria-label="Open navigation menu" aria-expanded="false" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
         </div>
     </nav>
-    <!-- ══ ONBOARDING CTA STRIP ══ -->
-    <div class="onboard-strip" id="onboard-strip">
-        <div class="container">
-            <span class="onboard-label">⚖️ Supreme Court-accredited — Get certified today:</span>
-            <button class="btn-signup" onclick="openSSO('attorney')" aria-label="Sign Up — Get certified today">
-                ✍️ Sign Up
-            </button>
-        </div>
-    </div>
+</div>
 
     <!-- ══ SSO MODAL ══ -->
     <div class="sso-modal-overlay" id="sso-modal" role="dialog" aria-modal="true" aria-label="Sign in to Quanby Legal">
         <div class="sso-modal">
             <button class="sso-modal-close" onclick="closeSSO()" aria-label="Close">&times;</button>
 
-            <div id="sso-role-badge" class="sso-role-badge attorney">⚖️ Law Firm / Attorney</div>
+            <div id="sso-role-badge" class="sso-role-badge" style="display:none;"></div>
 
-            <h3 id="sso-title">Start Your ENP Certification</h3>
-            <p id="sso-desc">Sign in to begin your Electronic Notary Public certification — required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.</p>
+            <h3 id="sso-title">Sign in to Quanby Legal</h3>
+            <p id="sso-desc">Access e-notarization services, contract AI analysis, and connect with certified Electronic Notary Publics (ENPs).</p>
 
-            <!-- Progress steps -->
-            <div class="sso-steps">
+            <!-- Progress steps — shown only for role-specific flows -->
+            <div class="sso-steps" id="sso-steps-row" style="display:none;">
                 <div class="sso-step"><div class="sso-step-num" style="background:rgba(124,58,237,0.4);border-color:#7c3aed;color:white;">1</div><span>Sign In</span></div>
                 <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
                 <div class="sso-step"><div class="sso-step-num">2</div><span>Profile</span></div>
                 <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
-                <div class="sso-step"><div class="sso-step-num">3</div><span>15-Q Test</span></div>
+                <div class="sso-step" id="sso-step-exam"><div class="sso-step-num">3</div><span>15-Q Test</span></div>
+                <div class="sso-step-line" id="sso-step-exam-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
+                <div class="sso-step"><div class="sso-step-num" id="sso-step-4-num">4</div><span id="sso-step-4-label">Liveness</span></div>
                 <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
-                <div class="sso-step"><div class="sso-step-num">4</div><span>Liveness</span></div>
-                <div class="sso-step-line" style="flex:none;width:20px;height:1px;background:rgba(255,255,255,0.1);margin-top:11px;"></div>
-                <div class="sso-step"><div class="sso-step-num">5</div><span>Certificate</span></div>
+                <div class="sso-step"><div class="sso-step-num" id="sso-step-5-num">5</div><span id="sso-step-5-label">Certificate</span></div>
             </div>
 
             <!-- SSO Buttons -->
@@ -839,6 +1173,9 @@
                 Continue with Google
             </button>
 
+            <div id="sso-role-hint" class="sso-note" style="display:none;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);border-radius:0.5rem;padding:0.6rem 0.875rem;margin-bottom:0.75rem;color:var(--text-secondary,#a0aec0);font-size:0.8rem;">
+                You'll choose your role (Attorney/ENP or Client) after signing in.
+            </div>
             <div class="sso-note">
                 By continuing, you agree to Quanby Legal's Terms of Service and Privacy Policy.<br>
                 Your data is protected under RA 10173 (Data Privacy Act).
@@ -865,40 +1202,77 @@
         </div>
         <div class="container hero-content">
             <div class="hero-text">
-                <div class="badge">⚖️ Supreme Court-accredited — A.M. No. 24-10-14-SC | RA 8792 | RA 10173 | BSP Circular 944 | SEC MC 28-2020</div>
+                <div class="badge"><i class="hgi-stroke hgi-justice-scale-01" style="font-size:.8rem;vertical-align:middle;margin-right:.3rem;"></i>Supreme Court-compliant — A.M. No. 24-10-14-SC | RA 8792 | RA 10173 | BSP Circular 944 | SEC MC 28-2020</div>
                 <h1><span class="gradient-text">AI-Powered Legal</span><br>Platform for the Philippines</h1>
                 <p class="hero-subtitle">Analyze contracts, generate legally compliant documents, and get instant notarization — powered by AI and fully compliant with Philippine law — A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and SEC MC 28-2020.</p>
                 <div style="display:flex; flex-wrap:wrap; gap:0.6rem; margin-bottom:1.25rem;">
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">⚖️ A.M. No. 24-10-14-SC</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg> A.M. No. 24-10-14-SC</span>
                     <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">📜 RA 8792 E-Commerce</span>
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">🔒 RA 10173 Data Privacy</span>
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">🏦 BSP Circular 944</span>
-                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;">📋 SEC MC 28-2020</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> RA 10173 Data Privacy</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10V21M19 10V21M12 3L3 10h18L12 3z"/></svg> BSP Circular 944</span>
+                    <span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.35);color:#a78bfa;padding:0.2rem 0.65rem;border-radius:9999px;font-size:0.75rem;font-weight:600;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> SEC MC 28-2020</span>
                 </div>
                 <div class="hero-buttons">
-                    <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})">🤖 Try Contract AI Agent →</button>
+                    <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'})"><i data-lucide="bot" class="qi"></i> Try Contract AI Agent →</button>
                     <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">View Compliance →</button>
                 </div>
             </div>
             <div class="orbital">
-                <div class="orbital-center">⚖️</div>
+                <div class="orbital-center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg></div>
                 <div class="ring ring1"></div>
                 <div class="ring ring2"></div>
-                <div class="orbital-icon icon1">📄</div>
-                <div class="orbital-icon icon2">🛡️</div>
-                <div class="orbital-icon icon3">✍️</div>
-                <div class="orbital-icon icon4">⛓️</div>
+                <div class="orbital-icon icon1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+                <div class="orbital-icon icon2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="orbital-icon icon3"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+                <div class="orbital-icon icon4"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
             </div>
         </div>
     </section>
 
     <!-- PARTNERS -->
     <section id="partners">
-        <div class="container partners-row">
-            <span>DOCONCHAIN Group</span>
-            <span>Hyperledger Fabric</span>
-            <span>Supreme Court of the Philippines</span>
-            <span>DICT National PKI</span>
+        <div class="container">
+            <p style="text-align:center;font-size:0.78rem;color:rgba(148,163,184,0.5);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:1.5rem;">Powered by &amp; Aligned with</p>
+            <div class="partners-track-wrapper">
+              <div class="partners-track">
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/sc-logo.png" alt="Supreme Court of the Philippines" class="partner-logo partner-logo-sq">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/doc-logo-white.png" alt="DOCONCHAIN" class="partner-logo">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/hyperledger-logo.png" alt="Hyperledger Fabric" class="partner-logo">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/dict-logo.png" alt="DICT National PKI" class="partner-logo">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/pnpki-logo.jpg" alt="PNPKI" class="partner-logo partner-logo-sq">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/linux-foundation-logo.png" alt="Linux Foundation" class="partner-logo partner-logo-wide">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/sc-logo.png" alt="Supreme Court of the Philippines" class="partner-logo partner-logo-sq">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/doc-logo-white.png" alt="DOCONCHAIN" class="partner-logo">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/hyperledger-logo.png" alt="Hyperledger Fabric" class="partner-logo">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/dict-logo.png" alt="DICT National PKI" class="partner-logo">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/pnpki-logo.jpg" alt="PNPKI" class="partner-logo partner-logo-sq">
+                </div>
+                <div class="partner-logo-wrap">
+                    <img src="/assets/partners/linux-foundation-logo.png" alt="Linux Foundation" class="partner-logo partner-logo-wide">
+                </div>
+              </div>
+            </div>
         </div>
     </section>
 
@@ -909,32 +1283,32 @@
             <p class="section-subtitle">Comprehensive ENF platform compliant with A.M. No. 24-10-14-SC</p>
             <div class="features-grid">
                 <div class="card">
-                    <div class="card-icon">🤖</div>
+                    <div class="card-icon"><i data-lucide="bot"></i></div>
                     <div class="card-title">Contract AI Agent</div>
                     <p class="card-desc">Upload any contract and get instant AI analysis — parties, risks, obligations, Philippine law compliance flags</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">📹</div>
+                    <div class="card-icon"><i data-lucide="video"></i></div>
                     <div class="card-title">IEN & REN Services</div>
                     <p class="card-desc">In-Person and Remote Electronic Notarization with HD videoconferencing</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">🛡️</div>
+                    <div class="card-icon"><i data-lucide="shield-check"></i></div>
                     <div class="card-title">DICT National PKI Authentication</div>
                     <p class="card-desc">Official digital certificates for identity verification</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">✍️</div>
+                    <div class="card-icon"><i data-lucide="pen-line"></i></div>
                     <div class="card-title">Electronic Signatures & Seal</div>
                     <p class="card-desc">Legally binding electronic notarial seal compliant with Philippine law</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">⛓️</div>
+                    <div class="card-icon"><i data-lucide="link"></i></div>
                     <div class="card-title">Immutable Blockchain Audit</div>
                     <p class="card-desc">Hyperledger Fabric blockchain audit trails — tamper-proof notarization records</p>
                 </div>
                 <div class="card">
-                    <div class="card-icon">🌐</div>
+                    <div class="card-icon"><i data-lucide="globe"></i></div>
                     <div class="card-title">Global-Grade Security</div>
                     <p class="card-desc">Singapore-based blockchain security by DOCONCHAIN Group</p>
                 </div>
@@ -955,7 +1329,7 @@
 
             <!-- TABS -->
             <div class="agent-tabs">
-                <button class="agent-tab active" onclick="switchTab('analyze')">📋 Analyze Contract</button>
+                <button class="agent-tab active" onclick="switchTab('analyze')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Analyze Contract</button>
                 <button class="agent-tab" onclick="switchTab('chat')">💬 Ask AI</button>
                 <button class="agent-tab" onclick="switchTab('generate')">✨ Generate Contract</button>
             </div>
@@ -965,7 +1339,7 @@
                 <!-- Upload Area -->
                 <div class="upload-area" id="upload-area">
                     <input type="file" id="file-input" accept=".pdf,.docx,.txt" onchange="handleFileSelect(this)">
-                    <div class="upload-icon">📄</div>
+                    <div class="upload-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg></div>
                     <div class="upload-title">Drop your contract here</div>
                     <p class="upload-desc">Upload a PDF or DOCX contract for instant AI-powered legal analysis under Philippine law</p>
                     <div class="upload-types">
@@ -1025,19 +1399,19 @@
 
                         <!-- Compliance -->
                         <div class="analysis-card">
-                            <div class="analysis-card-title">✅ Compliance Check</div>
+                            <div class="analysis-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Compliance Check</div>
                             <div id="compliance-list"></div>
                         </div>
 
                         <!-- Missing Clauses -->
                         <div class="analysis-card" style="grid-column: 1 / -1">
-                            <div class="analysis-card-title">⚠️ Missing Clauses</div>
+                            <div class="analysis-card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Missing Clauses</div>
                             <div id="missing-clauses-list"></div>
                         </div>
                     </div>
 
                     <div style="margin-top:1.5rem;padding:1.25rem;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);border-radius:0.75rem">
-                        <div style="font-weight:600;margin-bottom:0.5rem">🤖 AI Recommendation</div>
+                        <div style="font-weight:600;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.4rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V7M8 7h8a2 2 0 000-4H8a2 2 0 000 4zM8 15h2M14 15h2"/></svg> AI Recommendation</div>
                         <div id="ai-recommendation" style="color:var(--muted);font-size:0.9rem;line-height:1.6"></div>
                         <div style="margin-top:1rem;font-size:0.75rem;color:var(--muted);font-style:italic">⚖️ This AI analysis is for informational purposes only and does not constitute legal advice. Consult a licensed Philippine attorney for final decisions. Quanby Legal's certified ENPs are available for e-notarization.</div>
                     </div>
@@ -1120,7 +1494,7 @@
                             <div class="generated-contract-header">
                                 <div style="font-weight:600" id="generated-title">Generated Contract</div>
                                 <div style="display:flex;gap:0.5rem">
-                                    <button class="btn btn-outline btn-sm" onclick="copyContract()">📋 Copy</button>
+                                    <button class="btn btn-outline btn-sm" onclick="copyContract()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button>
                                     <button class="btn btn-teal btn-sm" onclick="downloadContract()">⬇ Download</button>
                                 </div>
                             </div>
@@ -1145,7 +1519,7 @@
             <!-- Compliance trust bar -->
             <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:0.75rem; margin-bottom:2.5rem;">
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">⚖️</div>
+                    <div style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg></div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">A.M. No. 24-10-14-SC</div>
                     <div style="font-size:0.65rem;color:#64748b;">Supreme Court</div>
                 </div>
@@ -1155,22 +1529,22 @@
                     <div style="font-size:0.65rem;color:#64748b;">E-Commerce Act</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">🔒</div>
+                    <div style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">RA 10173</div>
                     <div style="font-size:0.65rem;color:#64748b;">Data Privacy Act</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">🏦</div>
+                    <div style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M3 10h18M5 10V21M19 10V21M12 3L3 10h18L12 3z"/></svg></div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">BSP Circular 944</div>
                     <div style="font-size:0.65rem;color:#64748b;">eKYC Standards</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">📋</div>
+                    <div style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">SEC MC 28-2020</div>
                     <div style="font-size:0.65rem;color:#64748b;">Remote Notarization</div>
                 </div>
                 <div style="background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.3);border-radius:0.5rem;padding:0.6rem 1.1rem;text-align:center;min-width:140px;">
-                    <div style="font-size:1.3rem;">🛡️</div>
+                    <div style="display:flex;align-items:center;justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
                     <div style="font-size:0.72rem;font-weight:700;color:#a78bfa;margin-top:0.25rem;">DICT PNPKI</div>
                     <div style="font-size:0.65rem;color:#64748b;">Gov. Identity Verified</div>
                 </div>
@@ -1178,37 +1552,37 @@
 
             <div class="compliance-grid">
                 <div class="compliance-card card">
-                    <div class="icon-circle">⚖️</div>
-                    <div class="card-title">Supreme Court-Accredited ENF</div>
-                    <p class="card-desc">First and only accredited Electronic Notarization Facility (ENF) in the Philippines under A.M. No. 24-10-14-SC. Supports both In-Person (IEN) and Remote (REN) notarization nationwide.</p>
+                    <div class="icon-circle"><i class="hgi-stroke hgi-justice-scale-01" style="font-size:1.3rem;"></i></div>
+                    <div class="card-title">Supreme Court-Compliant ENF</div>
+                    <p class="card-desc">Supreme Court-compliant Electronic Notarization Facility (ENF) built under A.M. No. 24-10-14-SC. Supports both In-Person (IEN) and Remote (REN) notarization nationwide.</p>
                     <a href="https://sc.judiciary.gov.ph/enotary-services/enotarization-rules/" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">sc.judiciary.gov.ph →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">🏛️</div>
+                    <div class="icon-circle"><i class="hgi-stroke hgi-certificate-01" style="font-size:1.3rem;"></i></div>
                     <div class="card-title">DICT National PKI Verified</div>
                     <p class="card-desc">All ENPs are verified through the Philippine National PKI (RA 8792). Digital signatures carry full legal weight under the E-Commerce Act of 2000 and its IRR.</p>
                     <a href="https://dict.gov.ph/pnpki" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">DICT PNPKI →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">🔒</div>
+                    <div class="icon-circle"><i class="hgi-stroke hgi-lock-01" style="font-size:1.3rem;"></i></div>
                     <div class="card-title">NPC-Registered Data Controller</div>
                     <p class="card-desc">Registered Personal Information Controller (PIC) with the National Privacy Commission under RA 10173. AES-256 encryption, TLS 1.3, and a dedicated Data Protection Officer (DPO).</p>
                     <a href="https://privacy.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">privacy.gov.ph →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">🏦</div>
+                    <div class="icon-circle"><i class="hgi-stroke hgi-bank" style="font-size:1.3rem;"></i></div>
                     <div class="card-title">BSP-Aligned eKYC</div>
                     <p class="card-desc">Identity verification aligns with BSP Circular 944 (eKYC) and Circular 1108 (digital onboarding), making Quanby Legal documents accepted by BSP-supervised banks and EMIs.</p>
                     <a href="https://bsp.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">bsp.gov.ph →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">📋</div>
+                    <div class="icon-circle"><i class="hgi-stroke hgi-file-01" style="font-size:1.3rem;"></i></div>
                     <div class="card-title">SEC &amp; Corporate Filing Ready</div>
                     <p class="card-desc">E-notarized documents are accepted for SEC submissions under MC 28-2020 and MC 6-2021, covering GIS, AFS, and mandatory corporate filings under RA 11232.</p>
                     <a href="https://sec.gov.ph" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">sec.gov.ph →</a>
                 </div>
                 <div class="compliance-card card">
-                    <div class="icon-circle">⛓️</div>
+                    <div class="icon-circle"><i class="hgi-stroke hgi-link-circle-02" style="font-size:1.3rem;"></i></div>
                     <div class="card-title">DOCONCHAIN &amp; Hyperledger</div>
                     <p class="card-desc">Enterprise blockchain-backed immutable document trail via DOCONCHAIN / Hyperledger. Every notarized document is cryptographically anchored for tamper-proof verification.</p>
                     <a href="https://doconchain.com" target="_blank" rel="noopener" style="color:var(--purple-light);font-size:0.875rem">doconchain.com →</a>
@@ -1216,7 +1590,7 @@
             </div>
 
             <div style="text-align:center; margin-top:2rem;">
-                <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">📖 View Full Regulatory Disclosure →</button>
+                <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})"><i class="hgi-stroke hgi-book-open-01" style="font-size:.9rem;vertical-align:middle;margin-right:.35rem;"></i>View Full Regulatory Disclosure →</button>
             </div>
         </div>
     </section>
@@ -1231,11 +1605,11 @@
 
             <!-- Supreme Court & Judiciary -->
             <div style="margin-bottom: 3rem;">
-                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">⚖️ Supreme Court of the Philippines</h3>
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg> Supreme Court of the Philippines</h3>
                 <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
                     <div class="card" style="padding: 1.5rem;">
                         <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">A.M. No. 24-10-14-SC</div>
-                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Rules on Electronic Notarization in the Philippines. Quanby Legal is the first and only platform accredited under this Supreme Court issuance, authorizing both In-Person (IEN) and Remote (REN) electronic notarization nationwide.</p>
+                        <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6;">Rules on Electronic Notarization in the Philippines. Quanby Legal is built in full compliance with this Supreme Court issuance, supporting both In-Person (IEN) and Remote (REN) electronic notarization nationwide.</p>
                         <a href="https://sc.judiciary.gov.ph/enotary-services/enotarization-rules/" target="_blank" rel="noopener" style="color: #a78bfa; font-size: 0.825rem; display: inline-block; margin-top: 0.75rem;">sc.judiciary.gov.ph ↗</a>
                     </div>
                     <div class="card" style="padding: 1.5rem;">
@@ -1271,7 +1645,7 @@
 
             <!-- Data Privacy -->
             <div style="margin-bottom: 3rem;">
-                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;">🔒 Data Privacy (NPC / RA 10173)</h3>
+                <h3 style="font-size: 1.1rem; color: #a78bfa; border-left: 3px solid #7c3aed; padding-left: 0.75rem; margin-bottom: 1.5rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Data Privacy (NPC / RA 10173)</h3>
                 <div class="compliance-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
                     <div class="card" style="padding: 1.5rem;">
                         <div style="font-weight: 700; margin-bottom: 0.5rem; color: #f1f5f9;">RA 10173 — Data Privacy Act of 2012</div>
@@ -1329,7 +1703,7 @@
 
             <!-- Disclaimer -->
             <div class="card" style="padding: 1.75rem 2rem; border-left: 3px solid rgba(124,58,237,0.5); background: rgba(124,58,237,0.06);">
-                <div style="font-weight: 700; margin-bottom: 0.75rem; color: #f1f5f9; font-size: 0.95rem;">⚠️ Regulatory Disclaimer</div>
+                <div style="font-weight: 700; margin-bottom: 0.75rem; color: #f1f5f9; font-size: 0.95rem; display:flex; align-items:center; gap:0.4rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Regulatory Disclaimer</div>
                 <p style="color: #94a3b8; font-size: 0.875rem; line-height: 1.8;">This page is provided for informational purposes and does not constitute legal advice. Regulatory frameworks are subject to change. Quanby Legal makes no warranty that all information is current at the time of reading. For the most up-to-date regulatory guidance, consult the Supreme Court of the Philippines, the National Privacy Commission (NPC), Bangko Sentral ng Pilipinas (BSP), or the Securities and Exchange Commission (SEC). Businesses and individuals should seek independent legal counsel for compliance advice specific to their situation.</p>
                 <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.825rem;">
                     <a href="https://sc.judiciary.gov.ph" target="_blank" rel="noopener" style="color: #a78bfa;">Supreme Court ↗</a>
@@ -1357,14 +1731,14 @@
                 <div class="connecting-line"></div>
                 <div class="step">
                     <div class="step-number">2</div>
-                    <div class="step-icon">🪪</div>
+                    <div class="step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/><circle cx="8" cy="14" r="2"/><path d="M12 14h4M12 17h4"/></svg></div>
                     <div class="step-title">Verify Identity</div>
                     <p style="color:var(--muted);font-size:0.9rem">eKYC with DICT PKI — legally binding identity</p>
                 </div>
                 <div class="connecting-line"></div>
                 <div class="step">
                     <div class="step-number">3</div>
-                    <div class="step-icon">✅</div>
+                    <div class="step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
                     <div class="step-title">Certified & Notarized</div>
                     <p style="color:var(--muted);font-size:0.9rem">Instant blockchain-anchored notarized document</p>
                 </div>
@@ -1377,10 +1751,10 @@
         <div class="container">
             <h2>Built for every industry that needs legal certainty</h2>
             <div class="use-cases-grid">
-                <div class="card"><div class="card-icon">🏘️</div><div class="card-title">Real Estate</div><p class="card-desc">Deeds of Sale, Lease Agreements, MOAs — fully analyzed and notarized</p></div>
-                <div class="card"><div class="card-icon">⚖️</div><div class="card-title">Legal & Law Firms</div><p class="card-desc">Faster document review and notarization for your clients</p></div>
-                <div class="card"><div class="card-icon">🏦</div><div class="card-title">Banking & Finance</div><p class="card-desc">Loan agreements, SPAs, and financial contracts with AI compliance checks</p></div>
-                <div class="card"><div class="card-icon">🏛️</div><div class="card-title">Government</div><p class="card-desc">Procurement, MOAs, and government contracts with full audit trail</p></div>
+                <div class="card"><div class="card-icon"><i data-lucide="building-2"></i></div><div class="card-title">Real Estate</div><p class="card-desc">Deeds of Sale, Lease Agreements, MOAs — fully analyzed and notarized</p></div>
+                <div class="card"><div class="card-icon"><i data-lucide="scale"></i></div><div class="card-title">Legal & Law Firms</div><p class="card-desc">Faster document review and notarization for your clients</p></div>
+                <div class="card"><div class="card-icon"><i data-lucide="landmark"></i></div><div class="card-title">Banking & Finance</div><p class="card-desc">Loan agreements, SPAs, and financial contracts with AI compliance checks</p></div>
+                <div class="card"><div class="card-icon"><i data-lucide="university"></i></div><div class="card-title">Government</div><p class="card-desc">Procurement, MOAs, and government contracts with full audit trail</p></div>
             </div>
         </div>
     </section>
@@ -1402,7 +1776,7 @@
                     </ul>
                     <button class="btn btn-outline" style="width:100%;margin-top:1.5rem">Get started</button>
                 </div>
-                <div class="pricing-card card" style="border-color:var(--purple);position:relative">
+                <div class="pricing-card popular card" style="border-color:var(--purple);position:relative">
                     <div class="popular-badge">MOST POPULAR</div>
                     <div class="tier-name">Professional</div>
                     <div class="tier-price">₱2,999<span style="font-size:1rem;color:var(--muted)">/mo</span></div>
@@ -1439,17 +1813,17 @@
             <div class="contact-section">
                 <div class="topics">
                     <div class="topic-card" data-topic="enp">
-                        <div class="topic-icon">📄</div>
+                        <div class="topic-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
                         <div class="topic-title">I Need an ENP</div>
                         <p class="topic-desc">ENP is an Electronic Notary Public</p>
                     </div>
                     <div class="topic-card" data-topic="lawyer">
-                        <div class="topic-icon">⚖️</div>
+                        <div class="topic-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg></div>
                         <div class="topic-title">I'm a Lawyer</div>
                         <p class="topic-desc">Apply to become a certified ENP on the platform</p>
                     </div>
                     <div class="topic-card" data-topic="investor">
-                        <div class="topic-icon">💼</div>
+                        <div class="topic-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2M12 12v4M8 12h8"/></svg></div>
                         <div class="topic-title">Investment Inquiry</div>
                         <p class="topic-desc">Quanby Legal is seeking strategic investors</p>
                     </div>
@@ -1460,10 +1834,10 @@
                     </div>
                 </div>
                 <div class="chat-panel">
-                    <div class="chat-header">🤖 Quanby Assistant <span class="online-dot"></span></div>
+                    <div class="chat-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V7M8 7h8a2 2 0 000-4H8a2 2 0 000 4zM8 15h2M14 15h2"/></svg> Quanby Assistant <span class="online-dot"></span></div>
                     <div class="chat-messages" id="chat-messages">
                         <div class="empty-state">
-                            <div style="font-size:2.5rem;margin-bottom:0.5rem">🤖</div>
+                            <div style="margin-bottom:0.5rem;display:flex;justify-content:center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V7M8 7h8a2 2 0 000-4H8a2 2 0 000 4zM8 15h2M14 15h2"/></svg></div>
                             <div style="font-weight:500">Quanby Legal Assistant</div>
                             <p style="font-size:0.875rem;margin-top:0.25rem">Select a topic to start</p>
                         </div>
@@ -1482,11 +1856,11 @@
         <div class="container footer-grid">
             <div>
                 <div class="footer-logo">
-                    <div class="logo-circle">Q</div>
+                    <img src="/qlegal-logo-sm.png" alt="Quanby Legal" class="logo-img" style="width:32px;height:32px;">
                     <span class="logo-text" style="margin-left:0.5rem">Quanby Legal</span>
                 </div>
-                <p class="footer-tagline">The Philippines' first Supreme Court-accredited AI-powered electronic notarization platform</p>
-                <div class="accreditations">Accredited: Supreme Court PH | DICT PKI | PropTech Consortium | DOCONCHAIN | Hyperledger</div>
+                <p class="footer-tagline">The Philippines' premier Supreme Court-compliant AI-powered electronic notarization platform</p>
+                <div class="accreditations">Compliant with: Supreme Court PH | DICT PKI | PropTech Consortium | DOCONCHAIN | Hyperledger</div>
             </div>
             <div>
                 <h3 style="margin-bottom:1rem">Product</h3>
@@ -1575,14 +1949,16 @@
         formData.append('session_id', SESSION_ID);
 
         const abortAnalyze = new AbortController();
-        setTimeout(() => abortAnalyze.abort(), 30000);
-        const ctrl1 = new AbortController(); setTimeout(() => ctrl1.abort(), 30000);
+        // 90s timeout — AI analysis of complex contracts can take up to 45s server-side
+        const _abortTimer = setTimeout(() => abortAnalyze.abort(), 90000);
+        const ctrl1 = new AbortController(); setTimeout(() => ctrl1.abort(), 90000);
         try {
             const res = await fetch(`${API_BASE}/analyze`, {
                 method: 'POST',
                 signal: abortAnalyze.signal,
                 body: formData
             });
+            clearTimeout(_abortTimer);
             const data = await res.json();
 
             document.getElementById('analysis-loading').style.display = 'none';
@@ -1598,8 +1974,13 @@
                 uploadArea.style.display = 'block';
             }
         } catch (err) {
+            clearTimeout(_abortTimer);
             document.getElementById('analysis-loading').style.display = 'none';
-            showError('Network error. Please check your connection and try again.');
+            if (err && err.name === 'AbortError') {
+                showError('Analysis timed out. The document may be too large or complex. Please try a smaller file.');
+            } else {
+                showError('Network error. Please check your connection and try again.');
+            }
             uploadArea.style.display = 'block';
         }
     }
@@ -1756,7 +2137,7 @@
             const impColor = m.importance === 'high' ? '#f87171' : m.importance === 'medium' ? '#fbbf24' : 'var(--muted)';
             missEl.innerHTML += `
                 <div class="flag-item flag-${m.importance || 'medium'}">
-                    <div class="flag-icon">⚠️</div>
+                    <div class="flag-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
                     <div>
                         <div class="flag-title">${escHtml(m.clause || 'Missing clause')}</div>
                         <div class="flag-desc">${escHtml(m.why_needed || '')}</div>
@@ -2032,7 +2413,7 @@
         navigator.clipboard.writeText(generatedContractText).then(() => {
             const btn = event.currentTarget;
             btn.textContent = '✓ Copied!';
-            setTimeout(() => btn.textContent = '📋 Copy', 2000);
+            setTimeout(() => btn.textContent = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy', 2000);
         });
     }
 
@@ -2048,13 +2429,68 @@
         URL.revokeObjectURL(url);
     }
 
-    // ─── CONTACT CHAT ───────────────────────────────────────────────────────────
-    const botResponses = {
-        enp: "To find a certified Electronic Notary Public (ENP), you can browse our verified ENP directory. We have accredited notaries available for both In-Person (IEN) and Remote (REN) notarization. Would you like help finding one near you?",
-        lawyer: "To apply as a certified ENP on Quanby Legal, you'll need your IBP ID and must complete our identity verification via DICT National PKI. The process takes about 3-5 business days. Shall I walk you through the requirements?",
-        investor: "Thank you for your interest in Quanby Legal! We are the Philippines' first and only Supreme Court-accredited electronic notarization platform. We're currently exploring strategic investment opportunities. Please contact us at invest@quanby.legal or book a call with our CTO.",
-        question: "Happy to help! You can ask about our pricing, how e-notarization works, compliance requirements, the Contract AI Agent, or anything else about Quanby Legal."
+    // ─── CONTACT CHAT (AI-powered via /api/chatbot) ─────────────────────────────
+    const topicGreetings = {
+        enp:      "I need to find a certified Electronic Notary Public (ENP).",
+        lawyer:   "I am a lawyer and I want to apply to become a certified ENP on Quanby Legal.",
+        investor: "I have an investment inquiry about Quanby Legal.",
+        question: "I have a general question about Quanby Legal."
     };
+
+    let _contactSessionId = null;
+    let _contactWaiting = false;
+
+    function _contactAddMessage(text, role) {
+        const msgs = document.getElementById('chat-messages');
+        const div = document.createElement('div');
+        div.className = 'message ' + (role === 'user' ? 'user-message' : 'bot-message');
+        div.textContent = text;
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+        return div;
+    }
+
+    function _contactShowTyping() {
+        const msgs = document.getElementById('chat-messages');
+        const div = document.createElement('div');
+        div.className = 'message bot-message contact-typing';
+        div.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function _contactRemoveTyping() {
+        const t = document.querySelector('.contact-typing');
+        if (t) t.remove();
+    }
+
+    async function _contactCallAPI(message) {
+        _contactWaiting = true;
+        const input = document.getElementById('contact-chat-input');
+        const btn = document.getElementById('send-btn');
+        if (input) input.disabled = true;
+        if (btn) btn.disabled = true;
+        _contactShowTyping();
+        try {
+            const res = await fetch('/api/chatbot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: message, session_id: _contactSessionId || '' })
+            });
+            _contactRemoveTyping();
+            if (!res.ok) throw new Error('Server error');
+            const data = await res.json();
+            if (data.session_id) _contactSessionId = data.session_id;
+            _contactAddMessage(data.reply || 'Sorry, I could not process that. Please try again.', 'bot');
+        } catch(e) {
+            _contactRemoveTyping();
+            _contactAddMessage('Sorry, I ran into an issue. Please try again or email legal@quanby.legal.', 'bot');
+        } finally {
+            _contactWaiting = false;
+            if (input) { input.disabled = false; input.focus(); }
+            if (btn) btn.disabled = false;
+        }
+    }
 
     document.querySelectorAll('.topic-card').forEach(card => {
         card.addEventListener('click', () => {
@@ -2062,13 +2498,9 @@
             card.classList.add('active');
             const msgs = document.getElementById('chat-messages');
             msgs.innerHTML = '';
-            const msg = document.createElement('div');
-            msg.className = 'message bot-message';
-            msg.textContent = botResponses[card.dataset.topic] || botResponses.question;
-            msgs.appendChild(msg);
-            const input = document.getElementById('contact-chat-input');
-            input.disabled = false;
-            input.focus();
+            _contactSessionId = null;
+            const greeting = topicGreetings[card.dataset.topic] || topicGreetings.question;
+            _contactCallAPI(greeting);
         });
     });
 
@@ -2080,20 +2512,10 @@
     function sendContactChat() {
         const input = document.getElementById('contact-chat-input');
         const text = input.value.trim();
-        if (!text) return;
-        const msgs = document.getElementById('chat-messages');
-        const userMsg = document.createElement('div');
-        userMsg.className = 'message user-message';
-        userMsg.textContent = text;
-        msgs.appendChild(userMsg);
+        if (!text || _contactWaiting) return;
         input.value = '';
-        setTimeout(() => {
-            const botMsg = document.createElement('div');
-            botMsg.className = 'message bot-message';
-            botMsg.textContent = "Thank you for reaching out! Our team will get back to you within 1 business day. For urgent matters, email us at legal@quanby.legal.";
-            msgs.appendChild(botMsg);
-            msgs.scrollTop = msgs.scrollHeight;
-        }, 600);
+        _contactAddMessage(text, 'user');
+        _contactCallAPI(text);
     }
 
     // ─── UTILITIES ──────────────────────────────────────────────────────────────
@@ -2124,22 +2546,52 @@
     }
 
     function openSSO(role) {
-        _ssoRole = role;
+        _ssoRole = role || null;
         const modal = document.getElementById('sso-modal');
         const badge = document.getElementById('sso-role-badge');
         const title = document.getElementById('sso-title');
         const desc  = document.getElementById('sso-desc');
+        const stepsRow = document.getElementById('sso-steps-row');
+
+        const hint = document.getElementById('sso-role-hint');
+        if (hint) hint.style.display = 'none';
 
         if (role === 'attorney') {
             badge.className = 'sso-role-badge attorney';
             badge.textContent = '⚖️ Law Firm / Attorney';
+            badge.style.display = '';
             title.textContent = 'Start Your ENP Certification';
             desc.textContent = 'Sign in to begin your Electronic Notary Public (ENP) certification — required by the Supreme Court of the Philippines under A.M. No. 24-10-14-SC.';
-        } else {
+            // Show all 5 steps for ENP
+            stepsRow.style.display = '';
+            document.getElementById('sso-step-exam').style.display = '';
+            document.getElementById('sso-step-exam-line').style.display = '';
+            document.getElementById('sso-step-4-num').textContent = '4';
+            document.getElementById('sso-step-4-label').textContent = 'Liveness';
+            document.getElementById('sso-step-5-num').textContent = '5';
+            document.getElementById('sso-step-5-label').textContent = 'Certificate';
+        } else if (role === 'client') {
             badge.className = 'sso-role-badge client';
             badge.textContent = '👤 Public Client';
+            badge.style.display = '';
             title.textContent = 'Create Your Client Account';
             desc.textContent = 'Sign in to access e-notarization services, upload contracts for AI analysis, and connect with certified Electronic Notary Publics (ENPs).';
+            // Show 3 steps for Client (no exam)
+            stepsRow.style.display = '';
+            document.getElementById('sso-step-exam').style.display = 'none';
+            document.getElementById('sso-step-exam-line').style.display = 'none';
+            document.getElementById('sso-step-4-num').textContent = '3';
+            document.getElementById('sso-step-4-label').textContent = 'Verify';
+            document.getElementById('sso-step-5-num').textContent = '4';
+            document.getElementById('sso-step-5-label').textContent = 'Done';
+        } else {
+            // Generic sign-in — no role context
+            badge.style.display = 'none';
+            title.textContent = 'Sign in to Quanby Legal';
+            desc.textContent = 'Access e-notarization services, contract AI analysis, and connect with certified Electronic Notary Publics (ENPs).';
+            stepsRow.style.display = 'none';
+            const hint = document.getElementById('sso-role-hint');
+            if (hint) hint.style.display = '';
         }
 
         modal.classList.add('open');
@@ -2277,6 +2729,12 @@
     // Handle return from OAuth (backend sets HttpOnly cookie, redirects with ?step=)
     (function handleAuthReturn() {
         const params = new URLSearchParams(window.location.search);
+        // Handle ?sso=1 — open SSO modal directly
+        if (params.get('sso') === '1') {
+            window.history.replaceState({}, '', '/');
+            setTimeout(function(){ var m = document.getElementById('sso-modal'); if(m) m.classList.add('open'); }, 200);
+            return;
+        }
         const step = params.get('step');
         if (!step) return;
         const role = sessionStorage.getItem('ql_pending_role') || 'attorney';
@@ -2294,32 +2752,155 @@
             })
             .catch(() => { /* toast is nice-to-have, never block routing */ })
             .finally(() => {
+                // Check if user wanted to go to /onboard after login
+                const redirect = sessionStorage.getItem('post_login_redirect');
+                if (redirect) {
+                    sessionStorage.removeItem('post_login_redirect');
+                    window.location.href = redirect;
+                    return;
+                }
                 routeToStep(step, role);
             });
     })();
 
+    function toggleUserMenu() {
+        const menu = document.getElementById('nav-user-menu');
+        const wrap = document.getElementById('nav-profile-wrap');
+        const isOpen = menu.style.display !== 'none';
+        menu.style.display = isOpen ? 'none' : 'block';
+        wrap.classList.toggle('open', !isOpen);
+    }
+    // Close menu on outside click
+    document.addEventListener('click', function(e) {
+        const wrap = document.getElementById('nav-profile-wrap');
+        const menu = document.getElementById('nav-user-menu');
+        if (menu && wrap && !wrap.contains(e.target) && !menu.contains(e.target)) {
+            menu.style.display = 'none';
+            wrap.classList.remove('open');
+        }
+    });
+    let _isDark = true;
+    function toggleTheme() {
+        _isDark = !_isDark;
+        document.getElementById('num-theme-label').textContent = _isDark ? 'Light Mode' : 'Dark Mode';
+        // Theme toggle placeholder — full implementation TBD
+    }
     async function signOut() {
         try {
             await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
         } catch(e) {}
         document.getElementById('nav-user').classList.remove('visible');
+        const sb = document.getElementById('nav-signin-btn');
+        if (sb) sb.style.display = 'inline-block';
         window.location.reload();
     }
 
+    async function _authFetch(url, opts) {
+        // Try request; if 401 attempt token refresh then retry once
+        let res = await fetch(url, opts);
+        if (res.status === 401) {
+            try {
+                const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+                if (ref.ok) res = await fetch(url, opts);
+            } catch(e) {}
+        }
+        return res;
+    }
+
     async function initNavUser() {
+        const signinBtn = document.getElementById('nav-signin-btn');
+        // Proactively try a silent token refresh before checking /me
+        // This prevents the Sign In flash when access token just expired but refresh is still valid
+        try {
+            await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+        } catch(e) { /* silent ? if refresh fails, /me will handle it */ }
         try {
             const res = await fetch('/api/auth/me', { credentials: 'include' });
-            if (!res.ok) return;
+            if (!res.ok) {
+                if (signinBtn) signinBtn.style.display = 'inline-block';
+                return;
+            }
             const user = await res.json();
             const nameEl = document.getElementById('nav-user-name');
             const avatarEl = document.getElementById('nav-user-avatar');
             const navUser = document.getElementById('nav-user');
+            const displayName = (user.first_name || '') + (user.last_name ? ' ' + user.last_name : '') || user.email || 'Account';
+            const initials = ((user.first_name || '?')[0] + (user.last_name || '')[0]).toUpperCase();
             if (nameEl) nameEl.textContent = user.first_name || user.email || 'Account';
-            if (avatarEl && user.picture) avatarEl.src = user.picture;
+            // Show initials immediately as fallback; photo onload will hide them
+            const initialsEl = document.getElementById('nav-user-initials');
+            if (initialsEl) { initialsEl.textContent = initials; initialsEl.style.display = 'flex'; }
+            if (avatarEl) {
+                if (user.picture) { avatarEl.src = user.picture; }
+                else { avatarEl.style.display = 'none'; initialsEl && (initialsEl.style.display = 'flex'); }
+            }
+            // Populate dropdown header
+            const numAvatar = document.getElementById('num-avatar');
+            const numInitials = document.getElementById('num-initials');
+            const numName = document.getElementById('num-name');
+            const numEmail = document.getElementById('num-email');
+            if (numInitials) { numInitials.textContent = initials; numInitials.style.display = 'flex'; }
+            if (numAvatar && user.picture) { numAvatar.src = user.picture; }
+            else if (numInitials) { numInitials.style.display = 'flex'; }
+            if (numName) numName.textContent = displayName;
+            if (numEmail) numEmail.textContent = user.email || '';
             if (navUser) navUser.classList.add('visible');
-        } catch(e) {}
+            if (signinBtn) signinBtn.style.display = 'none';
+            window._currentUser = user;
+        _updateCertBadge(user);
+        } catch(e) {
+            if (signinBtn) signinBtn.style.display = 'inline-block';
+        }
     }
+
+    function _updateCertBadge(user) {
+        var badge = document.getElementById('nav-cert-badge');
+        if (!badge) return;
+        var step = user.onboarding_step || 'role_select';
+        var role = user.role || 'attorney';
+        var config = {
+            'role_select': { cls: 'step-profile',     icon: '📋', label: 'Complete Profile' },
+            'profile':     { cls: 'step-profile',     icon: '📋', label: 'Complete Profile' },
+            'test':        { cls: 'step-exam',         icon: '📝', label: 'Take Exam' },
+            'kyc':         { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'kyc_id':      { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'liveness':    { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'survey':      { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'certificate': { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'sc_redirect': { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'certified':   { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+        };
+        var cfg = config[step] || config['test'];
+        badge.className = 'nav-cert-badge ' + cfg.cls;
+        badge.textContent = cfg.icon + ' ' + cfg.label;
+        badge.style.display = 'inline-flex';
+        badge._step = step;
+        badge._role = role;
+    }
+
+    function _navBadgeClick() {
+        var badge = document.getElementById('nav-cert-badge');
+        if (!badge) return;
+        var step = badge._step || '';
+        // Post-exam steps all go to dashboard
+        var dashSteps = ['kyc','kyc_id','liveness','survey','certificate','sc_redirect','certified'];
+        if (dashSteps.indexOf(step) >= 0) {
+            window.location.href = '/dashboard';
+            return;
+        }
+        // All other steps: go to /onboard
+        window.location.href = '/onboard';
+    }
+
+        function _updateOnboardStrip(user) { /* removed */ }
     initNavUser();
+
+    // Handle ?exam=1 email link — fires on direct page load (not OAuth redirect)
+    (function handleExamLink() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('exam') !== '1') return;
+        window.location.href = '/onboard';
+    })();
 
         function routeToStep(step, role) {
         switch(step) {
@@ -2340,6 +2921,9 @@
     let _obRole      = 'attorney';
     let _obAnswers   = {};
     let _obQuestions = [];
+    let _obTestSessionId = null;
+    let _obTimerInterval = null;
+    let _obCertificateId = null;
 
     function openOnboard(step, role) {
         _obRole = role || 'attorney';
@@ -2349,6 +2933,46 @@
         document.body.style.overflow = 'hidden';
         _renderObStep(step);
     }
+
+    function _renderCertificateStep() {
+        var ob = document.getElementById('ob-content');
+        var certId = _obCertificateId || '';
+        ob.innerHTML =
+            '<h3>&#127891; Download Your Certificate</h3>' +
+            '<p class="sub">Your ENP Course Completion Certificate is ready. Download it and submit it to the Supreme Court of the Philippines.</p>' +
+            '<div style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.3);border-radius:0.75rem;padding:2rem;text-align:center;margin:1.5rem 0;">' +
+                '<div style="font-size:3rem;margin-bottom:1rem;">&#128220;</div>' +
+                '<p style="font-weight:600;color:#c9a84c;margin-bottom:0.5rem;">Certificate ID: <span style="letter-spacing:0.05em;">' + certId + '</span></p>' +
+                '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1.5rem;">Keep this ID &#8212; you will need it for Supreme Court submission.</p>' +
+                '<a href="/api/certificate/' + certId + '" target="_blank" style="display:inline-block;background:#c9a84c;color:#000;font-weight:700;padding:0.875rem 2rem;border-radius:0.5rem;text-decoration:none;font-size:1rem;">&#11015;&#65039; Download Certificate (PDF)</a>' +
+            '</div>' +
+            '<button class="onboard-btn" onclick="_renderSCRedirectStep()" style="margin-top:0.5rem;">Continue to Supreme Court Submission &#8594;</button>';
+        _renderObProgress('certified');
+    }
+
+    function _renderSCRedirectStep() {
+        var ob = document.getElementById('ob-content');
+        ob.innerHTML =
+            '<h3>&#128203; Submit to the Supreme Court</h3>' +
+            '<p class="sub">You are required to submit your certificate to the Supreme Court of the Philippines Electronic Notarization Portal.</p>' +
+            '<div style="background:rgba(27,42,107,0.3);border:1px solid rgba(201,168,76,0.35);border-radius:0.75rem;padding:2rem;text-align:center;margin:1.5rem 0;">' +
+                '<div style="font-size:3rem;margin-bottom:1rem;">&#9878;&#65039;</div>' +
+                '<p style="font-weight:600;color:#c9a84c;font-size:1.1rem;margin-bottom:0.5rem;">Supreme Court of the Philippines</p>' +
+                '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1.5rem;">Electronic Notarization Portal</p>' +
+                '<a href="https://efiling.sc.judiciary.gov.ph" target="_blank" style="display:inline-block;background:#1B2A6B;color:#fff;font-weight:700;padding:0.875rem 2rem;border-radius:0.5rem;text-decoration:none;font-size:1rem;border:2px solid #c9a84c;">Go to Supreme Court Portal &#8594;</a>' +
+            '</div>' +
+            '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:0.5rem;padding:1rem;margin:1rem 0;font-size:0.875rem;color:var(--muted);line-height:1.6;">' +
+                'After submitting your certificate on the Supreme Court portal, your ENP certification will be processed. You will receive confirmation from the Supreme Court directly.' +
+            '</div>' +
+            '<button class="onboard-btn" onclick="_completeOnboarding()" style="margin-top:0.5rem;">&#9989; Done &#8212; Return to Dashboard</button>';
+    }
+
+    async function _completeOnboarding() {
+        try { await fetch('/api/onboarding/complete', { method: 'POST', credentials: 'include' }); } catch(e) {}
+        closeOnboard();
+        window.location.href = '/dashboard';
+    }
+
     function closeOnboard() {
         var overlay = document.getElementById('onboard-overlay');
         if (overlay) overlay.classList.remove('open');
@@ -2370,6 +2994,16 @@
     async function _renderObStep(step) {
         _renderObProgress(step);
         const el = document.getElementById('ob-content');
+        // Certificate / download step
+        if (step === 'certificate' || step === 'kyc_id' || step === 'liveness' || step === 'survey') {
+            _renderCertificateStep();
+            return;
+        }
+        // SC redirect step
+        if (step === 'sc_redirect') {
+            _renderSCRedirectStep();
+            return;
+        }
         if (step === 'role') {
             el.innerHTML = `
                 <h3>Choose Your Role</h3>
@@ -2378,7 +3012,7 @@
                     <div class="role-card ${_obRole==='attorney'?'selected':''}" onclick="_selectRole('attorney',this)">
                         <div class="role-icon">&#9878;&#65039;</div>
                         <div class="role-title">Attorney / Law Firm</div>
-                        <div class="role-desc">IBP-accredited, practicing notary public</div>
+                        <div class="role-desc">IBP-registered, practicing notary public</div>
                     </div>
                     <div class="role-card ${_obRole==='client'?'selected':''}" onclick="_selectRole('client',this)">
                         <div class="role-icon">&#128100;</div>
@@ -2389,16 +3023,30 @@
                 <button class="onboard-btn" onclick="_submitRole()">Continue &#8594;</button>
                 <div id="ob-err" class="ob-error"></div>`;
         } else if (step === 'profile') {
+            const isAttorney = _obRole === 'attorney';
             el.innerHTML = `
                 <h3>Complete Your Profile</h3>
                 <p class="sub">Required for ENP certification under A.M. No. 24-10-14-SC.</p>
-                <div class="onboard-field"><label>Full Name *</label><input type="text" id="ob-name" placeholder="Juan dela Cruz"></div>
-                <div class="onboard-field"><label>IBP Roll No. ${_obRole==='attorney'?'*':'(if applicable)'}</label><input type="text" id="ob-ibp" placeholder="e.g. 12345"></div>
-                <div class="onboard-field"><label>PTR No. (if applicable)</label><input type="text" id="ob-ptr" placeholder="e.g. 98765"></div>
-                <div class="onboard-field"><label>Province / City *</label><input type="text" id="ob-province" placeholder="e.g. Legazpi City, Albay"></div>
-                <div class="onboard-field"><label>Notarial Jurisdiction</label><input type="text" id="ob-jurisdiction" placeholder="e.g. Albay"></div>
-                <button class="onboard-btn" onclick="_submitProfile()">Continue &#8594;</button>
-                <div id="ob-err" class="ob-error"></div>`;
+                <div style="display:flex;gap:0.75rem;">
+                    <div class="onboard-field" style="flex:1"><label>First Name *</label><input type="text" id="ob-first-name" placeholder="Juan"></div>
+                    <div class="onboard-field" style="flex:1"><label>Last Name *</label><input type="text" id="ob-last-name" placeholder="dela Cruz"></div>
+                </div>
+                <div class="onboard-field"><label>Phone Number *</label><input type="tel" id="ob-phone" placeholder="+63 9XX XXX XXXX"></div>
+                ${isAttorney ? `
+                <div class="onboard-field"><label>Law Firm / Office Name</label><input type="text" id="ob-firm" placeholder="e.g. Dela Cruz Law Offices"></div>
+                <div class="onboard-field"><label>IBP Roll No. *</label><input type="text" id="ob-ibp" placeholder="e.g. 12345"></div>
+                <div class="onboard-field"><label>PTC No. (if applicable)</label><input type="text" id="ob-ptc" placeholder="e.g. 98765"></div>
+                <div class="onboard-field"><label>Legal Address</label><input type="text" id="ob-address" placeholder="e.g. Legazpi City, Albay"></div>
+                ` : `
+                <div class="onboard-field"><label>Organization (if applicable)</label><input type="text" id="ob-org" placeholder="e.g. ABC Corporation"></div>
+                <div class="onboard-field"><label>Position / Title</label><input type="text" id="ob-position" placeholder="e.g. General Manager"></div>
+                `}
+                <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+                    <button onclick="_renderObStep('role')" style="flex:0 0 auto;padding:0.75rem 1.25rem;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);border-radius:0.5rem;cursor:pointer;font-size:0.9rem;">&#8592; Back</button>
+                    <button class="onboard-btn" onclick="_submitProfile()" style="margin-top:0;flex:1;">Continue &#8594;</button>
+                </div>
+                <div id="ob-err" class="ob-error"></div>
+                <p style="text-align:center;margin-top:0.75rem;"><a href="#" onclick="event.preventDefault();_renderObStep('test')" style="color:var(--muted);font-size:0.8rem;text-decoration:underline;">Skip to Exam (test mode)</a></p>`;
         } else if (step === 'test') {
             el.innerHTML = `
                 <h3>&#128218; Course Module</h3>
@@ -2420,13 +3068,16 @@
                         <span>I have read and understood the course module and am ready to take the 50-question ENP Certification Exam.</span>
                     </label>
                 </div>
-                <button class="onboard-btn" id="start-exam-btn" disabled
-                        onclick="_startExam()"
-                        style="opacity:0.5;transition:opacity 0.2s;"
-                        onmouseenter="if(!this.disabled)this.style.opacity='1'"
-                        onmouseleave="if(!this.disabled)this.style.opacity='1'">
-                    &#127891; Start 50-Question Exam
-                </button>
+                <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
+                    <button onclick="_renderObStep('profile')" style="flex:0 0 auto;padding:0.75rem 1.25rem;background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--muted);border-radius:0.5rem;cursor:pointer;font-size:0.9rem;">&#8592; Back</button>
+                    <button class="onboard-btn" id="start-exam-btn" disabled
+                            onclick="_startExam()"
+                            style="opacity:0.5;transition:opacity 0.2s;margin-top:0;flex:1;"
+                            onmouseenter="if(!this.disabled)this.style.opacity='1'"
+                            onmouseleave="if(!this.disabled)this.style.opacity='1'">
+                        &#127891; Start 50-Question Exam
+                    </button>
+                </div>
                 <div id="ob-err" class="ob-error"></div>`;
             // Enable button visual when checkbox is ticked
             document.getElementById('start-exam-btn').addEventListener('click', function(){});
@@ -2435,29 +3086,15 @@
                 btn.style.opacity = this.checked ? '1' : '0.5';
             });
         } else if (step === 'kyc') {
-            el.innerHTML = `
-                <h3>&#128203; KYC &mdash; Identity Document Upload</h3>
-                <p class="sub">Upload a valid Philippine government-issued ID. This will be used during the liveness verification step when meeting with your notary.</p>
-                <div class="kyc-upload-box" id="kyc-upload-box">
-                    <div style="font-size:2.5rem;margin-bottom:0.75rem;">&#129371;</div>
-                    <p style="color:var(--muted);font-size:0.88rem;margin:0 0 1rem;">Accepted IDs: PhilSys (National ID), Passport, Driver&#39;s License, SSS/GSIS, PRC ID, Voter&#39;s ID</p>
-                    <div style="background:rgba(255,255,255,0.05);border:2px dashed rgba(201,168,76,0.4);border-radius:0.75rem;padding:2rem;text-align:center;cursor:pointer;margin-bottom:1rem;" onclick="document.getElementById('kyc-file-input').click()">
-                        <div id="kyc-preview" style="display:none;margin-bottom:0.75rem;">
-                            <img id="kyc-img-preview" style="max-width:100%;max-height:200px;border-radius:0.5rem;" />
-                        </div>
-                        <div id="kyc-placeholder">
-                            <div style="font-size:1.5rem;margin-bottom:0.5rem;">&#128228;</div>
-                            <p style="color:var(--muted);margin:0;font-size:0.875rem;">Click to upload your ID photo</p>
-                            <p style="color:var(--muted);margin:0.25rem 0 0;font-size:0.75rem;">JPG, PNG, or PDF &middot; Max 5MB</p>
-                        </div>
-                    </div>
-                    <input type="file" id="kyc-file-input" accept="image/jpeg,image/png,application/pdf" style="display:none;" onchange="_kycFileSelected(this)">
-                    <button class="onboard-btn" id="kyc-upload-btn" disabled style="opacity:0.5;" onclick="_submitKycId()">
-                        Upload ID &amp; Continue &rarr;
-                    </button>
-                </div>
-                <div id="ob-err" class="ob-error"></div>`;
+            // KYC + Liveness handled together by HyperVerge — launch directly
+            _launchHyperVerge();
+            return;
         } else if (step === 'liveness') {
+            // Also launch HyperVerge for liveness step
+            _launchHyperVerge();
+            return;
+        } else if (step === '__legacy_liveness_placeholder__') {
+
             el.innerHTML = `
                 <h3>&#128248; Liveness Verification</h3>
                 <p class="sub">BSP Circular 944 (eKYC) requires a live selfie verification. Please have your Philippine National ID ready.</p>
@@ -2514,26 +3151,42 @@
     }
 
     async function _submitProfile() {
-        const name = document.getElementById('ob-name').value.trim();
-        const province = document.getElementById('ob-province').value.trim();
-        if (!name || !province) {
-            document.getElementById('ob-err').textContent = 'Full name and province are required.'; return;
+        const firstName = (document.getElementById('ob-first-name') || {}).value?.trim() || '';
+        const lastName = (document.getElementById('ob-last-name') || {}).value?.trim() || '';
+        const phone = (document.getElementById('ob-phone') || {}).value?.trim() || '';
+        if (!firstName || !lastName || !phone) {
+            document.getElementById('ob-err').textContent = 'First name, last name, and phone are required.'; return;
         }
         const btn = document.querySelector('#ob-content .onboard-btn');
         btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Saving&#8230;';
+        const isAttorney = _obRole === 'attorney';
+        const payload = {
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone,
+            role: _obRole,
+            firm_name: (document.getElementById('ob-firm') || {}).value?.trim() || '',
+            ibp_number: (document.getElementById('ob-ibp') || {}).value?.trim() || '',
+            ptc_number: (document.getElementById('ob-ptc') || {}).value?.trim() || '',
+            legal_address: (document.getElementById('ob-address') || {}).value?.trim() || '',
+            organization: (document.getElementById('ob-org') || {}).value?.trim() || '',
+            position: (document.getElementById('ob-position') || {}).value?.trim() || '',
+        };
         try {
             const res = await fetch('/api/onboarding/profile', {
                 method: 'POST', credentials: 'include',
                 headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({
-                    full_name: name,
-                    ibp_number: document.getElementById('ob-ibp').value.trim(),
-                    ptr_number: document.getElementById('ob-ptr').value.trim(),
-                    province: province,
-                    notarial_jurisdiction: document.getElementById('ob-jurisdiction').value.trim()
-                })
+                body: JSON.stringify(payload)
             });
-            if (!res.ok) throw new Error((await res.json()).detail || 'Failed');
+            if (!res.ok) {
+                const errData = await res.json();
+                const detail = errData.detail;
+                let msg = 'Failed to save profile.';
+                if (typeof detail === 'string') msg = detail;
+                else if (Array.isArray(detail)) msg = detail.map(e => e.msg || e.message || JSON.stringify(e)).join('; ');
+                else if (detail) msg = JSON.stringify(detail);
+                throw new Error(msg);
+            }
             _renderObStep('test');
         } catch(e) {
             btn.disabled = false; btn.textContent = 'Continue →';
@@ -2543,17 +3196,18 @@
 
     function _startExam() {
         var el = document.getElementById('ob-content');
-        el.innerHTML = '<h3>ENP Certification Test</h3><p class="sub">Loading your 50-question exam&#8230;</p>';
+        el.innerHTML = '<h3>ENP Certification Test</h3><p class="sub">Loading your 15-question exam&#8230;</p>';
         _loadTest();
     }
 
     async function _loadTest() {
         try {
-            const res = await fetch('/api/onboarding/test/start', { method: 'POST', credentials: 'include' });
+            const res = await fetch('/api/certification/start', { method: 'GET', credentials: 'include' });
             if (!res.ok) throw new Error((await res.json()).detail || 'Failed to start test');
             const data = await res.json();
-            _obQuestions = data.questions; _obAnswers = {};
+            _obQuestions = data.questions; _obAnswers = {}; _obTestSessionId = data.test_session_id;
             _renderTestUI();
+            _startTimer(data.time_limit_minutes || 60);
         } catch(e) {
             document.getElementById('ob-content').innerHTML =
                 '<h3>Test</h3><div class="ob-error">' + e.message + '</div>';
@@ -2571,10 +3225,33 @@
         ).join('');
         document.getElementById('ob-content').innerHTML =
             '<h3>ENP Certification Test</h3>' +
+            '<div id="ob-timer" style="text-align:center;font-size:1.1rem;font-weight:600;color:var(--accent,#c8a45c);margin-bottom:0.75rem;">&#9203; Time Remaining: --:--</div>' +
             '<p class="sub">Answer all 50 questions. You need 70% (35/50) to pass.</p>' +
             qs +
             '<button class="onboard-btn" id="ob-submit-btn" onclick="_submitTest()">Submit Test</button>' +
             '<div id="ob-err" class="ob-error"></div>';
+    }
+
+
+    function _startTimer(minutes) {
+        if (_obTimerInterval) clearInterval(_obTimerInterval);
+        let remaining = minutes * 60;
+        function _updateDisplay() {
+            const el = document.getElementById('ob-timer');
+            if (!el) { clearInterval(_obTimerInterval); return; }
+            const m = Math.floor(remaining / 60);
+            const s = remaining % 60;
+            el.textContent = '\u23f1 Time Remaining: ' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+            if (remaining <= 0) {
+                clearInterval(_obTimerInterval);
+                _obTimerInterval = null;
+                el.textContent = '\u23f1 Time Remaining: 00:00';
+                _submitTest();
+            }
+            remaining--;
+        }
+        _updateDisplay();
+        _obTimerInterval = setInterval(_updateDisplay, 1000);
     }
 
     function _pickAnswer(qid, el) {
@@ -2593,11 +3270,12 @@
         }
         const btn = document.getElementById('ob-submit-btn');
         btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Grading&#8230;';
+        if (_obTimerInterval) { clearInterval(_obTimerInterval); _obTimerInterval = null; }
         try {
-            const res = await fetch('/api/onboarding/test/submit', {
+            const res = await fetch('/api/certification/submit', {
                 method: 'POST', credentials: 'include',
                 headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ answers: _obAnswers })
+                body: JSON.stringify({ answers: _obAnswers, test_session_id: _obTestSessionId })
             });
             _renderTestResult(await res.json());
         } catch(e) {
@@ -2607,6 +3285,7 @@
     }
 
     function _renderTestResult(data) {
+        if (data.certificate_id) { _obCertificateId = data.certificate_id; }
         const passed = data.passed;
         const score = data.score !== undefined ? data.score : data.correct;
         const total = data.total;
@@ -2765,24 +3444,95 @@
     }
 
     async function _startLiveness(evt) {
-        const btn = evt.target;
-        btn.disabled = true; btn.innerHTML = '<span class="ob-spinner"></span>Starting camera&#8230;';
+        // Legacy call — redirect to HyperVerge
+        _launchHyperVerge();
+    }
+
+    async function _launchHyperVerge() {
+        const ob = document.getElementById('ob-content');
+        if (!ob) return;
+        ob.innerHTML = `
+            <h3>&#128249; Identity Verification</h3>
+            <p class="sub">We use HyperVerge to securely verify your identity. This includes ID upload and a quick liveness check.</p>
+            <div style="text-align:center;padding:1.5rem;">
+                <div style="font-size:3rem;margin-bottom:1rem;">&#128249;</div>
+                <p style="color:var(--muted);margin-bottom:1.5rem;font-size:0.875rem;">Starting secure KYC verification&hellip;</p>
+                <div class="ob-spinner" style="display:inline-block;width:2rem;height:2rem;border-width:3px;"></div>
+            </div>
+            <div id="ob-err" class="ob-error"></div>`;
+
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            stream.getTracks().forEach(t => t.stop());
-            const res = await fetch('/api/onboarding/liveness', {
-                method: 'POST', credentials: 'include',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ verified: true, method: 'camera_check' })
+            // Get HyperVerge access token from backend
+            const tokenRes = await fetch('/api/onboarding/hyperverge-token', {
+                method: 'POST', credentials: 'include'
             });
-            if (!res.ok) throw new Error((await res.json()).detail || 'Liveness check failed');
-            _renderObStep('certified');
+            if (!tokenRes.ok) {
+                const err = await tokenRes.json();
+                throw new Error(err.detail || 'Failed to initialize KYC');
+            }
+            const { token, appId, workflowId, sdkVersion, transactionId } = await tokenRes.json();
+
+            // Launch HyperVerge Web SDK
+            if (typeof HyperKycConfig === 'undefined' && typeof window.HVOnboardingModule === 'undefined') {
+                throw new Error('HyperVerge SDK not loaded. Please refresh and try again.');
+            }
+
+            // HyperVerge Web SDK v10 API
+            const hyperKycConfig = new HyperKycConfig(
+                token,
+                workflowId,
+                transactionId
+            );
+
+            HyperKYCModule.launch(hyperKycConfig, async (HyperKycResult) => {
+                const status = HyperKycResult.status; // user_cancelled | auto_approved | needs_review | error
+                if (status === 'user_cancelled') {
+                    ob.innerHTML = `
+                        <h3>&#128249; Identity Verification</h3>
+                        <p class="sub" style="text-align:center;color:var(--muted);">KYC was cancelled. You can try again when ready.</p>
+                        <div id="ob-err" class="ob-error"></div>
+                        <button class="onboard-btn" onclick="_launchHyperVerge()" style="margin-top:1rem;">Try Again</button>`;
+                    return;
+                }
+
+                // Notify backend
+                ob.innerHTML = `
+                    <h3>&#128249; Identity Verification</h3>
+                    <p class="sub" style="text-align:center;">Finalizing verification&hellip;</p>
+                    <div style="text-align:center;padding:1rem;"><div class="ob-spinner" style="display:inline-block;width:2rem;height:2rem;border-width:3px;"></div></div>
+                    <div id="ob-err" class="ob-error"></div>`;
+
+                try {
+                    const completeRes = await fetch('/api/onboarding/hyperverge-complete', {
+                        method: 'POST', credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            status: status,
+                            transactionId: transactionId,
+                            result: HyperKycResult.details || {}
+                        })
+                    });
+                    const data = await completeRes.json();
+                    if (data.success) {
+                        _renderObStep('certificate');
+                    } else {
+                        throw new Error(data.message || 'Verification not approved.');
+                    }
+                } catch(e) {
+                    ob.innerHTML = `
+                        <h3>&#128249; Identity Verification</h3>
+                        <p style="color:#F87171;text-align:center;">${e.message}</p>
+                        <button class="onboard-btn" onclick="_launchHyperVerge()" style="margin-top:1rem;">Try Again</button>`;
+                }
+            });
+
         } catch(e) {
-            btn.disabled = false; btn.textContent = 'Start Liveness Check';
-            document.getElementById('ob-err').textContent =
-                e.name === 'NotAllowedError'
-                    ? 'Camera access denied. Please allow camera access and try again.'
-                    : e.message;
+            const errEl = document.getElementById('ob-err');
+            if (errEl) errEl.textContent = e.message;
+            else ob.innerHTML = `
+                <h3>&#128249; Identity Verification</h3>
+                <p style="color:#F87171;text-align:center;">${e.message}</p>
+                <button class="onboard-btn" onclick="_launchHyperVerge()" style="margin-top:1rem;">Try Again</button>`;
         }
     }
 
@@ -3445,6 +4195,144 @@
             <div id="ob-content"></div>
         </div>
     </div>
+    <script>
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    </script>
+
+<!-- ═══ ADMIN LOGIN MODAL ═══ -->
+<div id="ql-admin-overlay" onclick="closeAdminModal()" style="
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;
+">
+  <div onclick="event.stopPropagation()" style="
+    background:#0d0f1a;border:1px solid rgba(124,58,237,0.3);
+    border-radius:16px;padding:2rem 2rem 1.75rem;width:340px;
+    max-width:calc(100vw - 2rem);box-shadow:0 24px 80px rgba(0,0,0,0.7);
+    position:relative;animation:qlAdminIn 0.18s ease;
+  ">
+    <button onclick="closeAdminModal()" style="
+      position:absolute;top:12px;right:14px;background:none;border:none;
+      font-size:18px;cursor:pointer;color:#6b7280;line-height:1;padding:4px;
+    ">✕</button>
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;">
+      <img src="/qlegal-logo-sm.png" style="width:36px;height:36px;object-fit:contain;border-radius:8px;" onerror="this.style.display='none'">
+      <div>
+        <div style="font-size:1rem;font-weight:800;color:#e8eaf2;font-family:Inter,sans-serif;">Admin Portal</div>
+        <div style="font-size:0.72rem;color:#8b90a8;margin-top:1px;">Quanby Legal — Internal Access</div>
+      </div>
+    </div>
+
+    <!-- Alert -->
+    <div id="ql-admin-alert" style="display:none;margin-bottom:1rem;padding:0.6rem 0.9rem;border-radius:8px;font-size:0.8rem;"></div>
+
+    <!-- Username -->
+    <div style="margin-bottom:0.85rem;">
+      <label style="font-size:0.72rem;font-weight:600;color:#8b90a8;display:block;margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:0.5px;">Username</label>
+      <input id="ql-admin-user" type="text" placeholder="admin" autocomplete="username"
+        style="width:100%;padding:0.65rem 0.85rem;background:rgba(255,255,255,0.05);
+               border:1px solid rgba(255,255,255,0.1);border-radius:8px;
+               color:#e8eaf2;font-size:0.9rem;font-family:Inter,sans-serif;outline:none;
+               transition:border-color 0.15s;"
+        onfocus="this.style.borderColor='rgba(124,58,237,0.7)'"
+        onblur="this.style.borderColor='rgba(255,255,255,0.1)'"
+        onkeydown="if(event.key==='Enter')document.getElementById('ql-admin-pass').focus()">
+    </div>
+
+    <!-- Password -->
+    <div style="margin-bottom:1.25rem;">
+      <label style="font-size:0.72rem;font-weight:600;color:#8b90a8;display:block;margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:0.5px;">Password</label>
+      <div style="position:relative;">
+        <input id="ql-admin-pass" type="password" placeholder="••••••••" autocomplete="current-password"
+          style="width:100%;padding:0.65rem 2.5rem 0.65rem 0.85rem;background:rgba(255,255,255,0.05);
+                 border:1px solid rgba(255,255,255,0.1);border-radius:8px;
+                 color:#e8eaf2;font-size:0.9rem;font-family:Inter,sans-serif;outline:none;
+                 transition:border-color 0.15s;"
+          onfocus="this.style.borderColor='rgba(124,58,237,0.7)'"
+          onblur="this.style.borderColor='rgba(255,255,255,0.1)'"
+          onkeydown="if(event.key==='Enter')submitAdminLogin()">
+        <button type="button" onclick="var i=document.getElementById('ql-admin-pass');i.type=i.type==='password'?'text':'password'" style="
+          position:absolute;right:10px;top:50%;transform:translateY(-50%);
+          background:none;border:none;cursor:pointer;color:#6b7280;font-size:15px;line-height:1;
+        " title="Show/hide">👁</button>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <button id="ql-admin-submit" onclick="submitAdminLogin()" style="
+      width:100%;padding:0.7rem;
+      background:linear-gradient(135deg,#7c3aed,#9d5ff3);
+      border:none;border-radius:8px;color:#fff;
+      font-size:0.9rem;font-weight:700;font-family:Inter,sans-serif;
+      cursor:pointer;transition:opacity 0.15s;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+    " onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+      Sign In to Admin
+    </button>
+  </div>
+</div>
+
+<style>
+@keyframes qlAdminIn {
+  from { transform: translateY(14px) scale(0.97); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+</style>
+
+<script>
+function openAdminModal() {
+  var o = document.getElementById('ql-admin-overlay');
+  o.style.display = 'flex';
+  setTimeout(function(){ document.getElementById('ql-admin-user').focus(); }, 80);
+}
+function closeAdminModal() {
+  document.getElementById('ql-admin-overlay').style.display = 'none';
+  document.getElementById('ql-admin-alert').style.display = 'none';
+  document.getElementById('ql-admin-pass').value = '';
+}
+function _showAdminAlert(msg, ok) {
+  var el = document.getElementById('ql-admin-alert');
+  el.style.display = 'block';
+  el.style.background = ok ? 'rgba(16,185,129,0.12)' : 'rgba(248,113,113,0.12)';
+  el.style.color = ok ? '#6ee7b7' : '#fca5a5';
+  el.style.border = ok ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(248,113,113,0.3)';
+  el.textContent = msg;
+}
+async function submitAdminLogin() {
+  var btn = document.getElementById('ql-admin-submit');
+  var username = document.getElementById('ql-admin-user').value.trim();
+  var password = document.getElementById('ql-admin-pass').value;
+  if (!username || !password) { _showAdminAlert('Please enter username and password.', false); return; }
+  btn.disabled = true;
+  btn.innerHTML = '<div style="width:15px;height:15px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:qlAdminSpin 0.7s linear infinite"></div> Signing in…';
+  try {
+    var r = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({username: username, password: password})
+    });
+    if (r.ok) {
+      _showAdminAlert('✅ Access granted! Redirecting…', true);
+      setTimeout(function(){ window.location.href = '/admin'; }, 600);
+    } else {
+      var d = await r.json().catch(function(){ return {}; });
+      _showAdminAlert('❌ ' + (d.detail || d.error || 'Invalid credentials.'), false);
+      btn.disabled = false;
+      btn.innerHTML = 'Sign In to Admin';
+      document.getElementById('ql-admin-pass').value = '';
+    }
+  } catch(e) {
+    _showAdminAlert('❌ Network error. Try again.', false);
+    btn.disabled = false;
+    btn.innerHTML = 'Sign In to Admin';
+  }
+}
+</script>
+<style>@keyframes qlAdminSpin { to { transform: rotate(360deg); } }</style>
+
 </body>
 </html>
 

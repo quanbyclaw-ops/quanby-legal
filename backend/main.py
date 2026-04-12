@@ -1656,6 +1656,226 @@ async def chatbot_endpoint(request: LegalChatRequest):
     return {"reply": reply, "session_id": session_id}
 
 
+
+# ═══════════════════════════════════════════════════════════════
+#  ADMIN AUTH
+# ═══════════════════════════════════════════════════════════════
+_ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+_ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "Alyssa7719!!")
+
+def _get_admin_user(req) -> Optional[dict]:
+    """Verify ql_admin JWT cookie. Returns {role:'admin'} or None."""
+    from fastapi import Request as _FReq
+    cookie = req.cookies.get("ql_admin", "") if hasattr(req, "cookies") else ""
+    if not cookie:
+        return None
+    payload = verify_jwt(cookie)
+    if payload and payload.get("role") == "admin":
+        return {"role": "admin", "sub": payload.get("sub", "admin")}
+    return None
+
+class _AdminLoginRequest(BaseModel):
+    username: str = ""
+    password: str = ""
+
+@app.post("/api/admin/login")
+async def admin_login(body: _AdminLoginRequest):
+    """Validate admin username/password, issue ql_admin JWT cookie."""
+    username = (body.username or "").strip()
+    password = (body.password or "").strip()
+    if username == _ADMIN_USERNAME and password == _ADMIN_PASSWORD:
+        # Issue JWT
+        secret = os.getenv("SECRET_KEY", "change-me-in-production")
+        import time as _t
+        try:
+            import jwt as _jwt
+            tok = _jwt.encode(
+                {"role": "admin", "sub": "admin",
+                 "iat": int(_t.time()), "exp": int(_t.time()) + 8*3600},
+                secret, algorithm="HS256"
+            )
+        except Exception:
+            tok = "admin-token-no-jwt"
+        resp = JSONResponse({"ok": True})
+        resp.set_cookie("ql_admin", tok, max_age=8*3600, httponly=True,
+                        samesite="lax", secure=False)
+        return resp
+    raise HTTPException(401, "Invalid credentials")
+
+@app.post("/api/admin/logout")
+async def admin_logout():
+    resp = JSONResponse({"ok": True})
+    resp.delete_cookie("ql_admin")
+    return resp
+
+@app.get("/api/admin/me")
+async def admin_me(request: Request):
+    u = _get_admin_user(request)
+    if not u:
+        raise HTTPException(401, "Unauthorized")
+    return {"ok": True, "role": "admin"}
+
+@app.get("/api/admin/stats")
+async def admin_stats(request: Request):
+    u = _get_admin_user(request)
+    if not u:
+        raise HTTPException(401, "Unauthorized")
+    from datetime import datetime as _dtt, timezone as _ttz
+    _reload_users()
+    _reload_appointments()
+    today = _dtt.now(_ttz.utc).strftime("%Y-%m-%d")
+    users_list = list(_users.values())
+    apts_list  = list(_appointments.values())
+    by_role = {"attorney": 0, "client": 0, "admin": 0, "other": 0}
+    for u2 in users_list:
+        r = u2.get("role", "other")
+        by_role[r] = by_role.get(r, 0) + 1
+    reg = _load_registry()
+    acts = reg.get("acts", [])
+    new_users_today = sum(1 for u3 in users_list if (u3.get("created_at") or "").startswith(today))
+    new_apts_today  = sum(1 for a in apts_list  if (a.get("created_at") or "").startswith(today))
+    pending_enp = sum(1 for u4 in users_list
+                      if u4.get("role") == "attorney"
+                      and u4.get("sc_commission_status", "pending") == "pending")
+    return {
+        "total_users": len(users_list),
+        "users_by_role": by_role,
+        "total_appointments": len(apts_list),
+        "ended_appointments": sum(1 for a in apts_list if a.get("session_status") == "ended"),
+        "total_acts": len(acts),
+        "pending_enp_commission": pending_enp,
+        "new_users_today": new_users_today,
+        "new_appointments_today": new_apts_today,
+    }
+
+@app.get("/api/admin/users")
+async def admin_users(
+    request: Request,
+    search: str = "", role: str = "", page: int = 1, per_page: int = 20
+):
+    u = _get_admin_user(request)
+    if not u:
+        raise HTTPException(401, "Unauthorized")
+    _reload_users()
+    items = list(_users.values())
+    if role:
+        items = [x for x in items if x.get("role") == role]
+    if search:
+        s = search.lower()
+        items = [x for x in items if s in (x.get("email","")).lower()
+                 or s in (x.get("first_name","")).lower()
+                 or s in (x.get("last_name","")).lower()]
+    total = len(items)
+    start = (page - 1) * per_page
+    page_items = items[start:start + per_page]
+    return {
+        "total": total, "page": page, "per_page": per_page,
+        "items": [{
+            "id": x["id"], "email": x.get("email",""),
+            "first_name": x.get("first_name",""), "last_name": x.get("last_name",""),
+            "role": x.get("role",""), "created_at": x.get("created_at",""),
+            "onboarding_step": x.get("onboarding_step",""),
+            "certificate_status": x.get("certificate_status",""),
+            "sc_commission_status": x.get("sc_commission_status","pending"),
+            "kyc_verified_at": x.get("kyc_verified_at"),
+        } for x in page_items]
+    }
+
+@app.get("/api/admin/appointments")
+async def admin_appointments(
+    request: Request,
+    search: str = "", status: str = "", page: int = 1, per_page: int = 20
+):
+    u = _get_admin_user(request)
+    if not u:
+        raise HTTPException(401, "Unauthorized")
+    _reload_appointments()
+    _reload_users()
+    items = list(_appointments.values())
+    if status:
+        items = [x for x in items if x.get("session_status") == status or x.get("status") == status]
+    if search:
+        s = search.lower()
+        items = [x for x in items if s in (x.get("client_email","")).lower()
+                 or s in str(x.get("enp_id","")).lower()
+                 or s in str(x.get("id","")).lower()]
+    total = len(items)
+    items.sort(key=lambda x: x.get("created_at",""), reverse=True)
+    start = (page - 1) * per_page
+    page_items = items[start:start + per_page]
+    def _enp_name(enp_id):
+        u2 = _users.get(enp_id)
+        if not u2: return enp_id[:8] if enp_id else "—"
+        return f"{u2.get('first_name','')} {u2.get('last_name','')}".strip() or u2.get("email","")
+    return {
+        "total": total, "page": page, "per_page": per_page,
+        "items": [{
+            "id": x.get("id",""), "enp_id": x.get("enp_id",""),
+            "enp_name": _enp_name(x.get("enp_id","")),
+            "client_email": x.get("client_email",""),
+            "status": x.get("status",""), "session_status": x.get("session_status",""),
+            "session_ended_at": x.get("session_ended_at"),
+            "doc_count": len(x.get("session_documents",[])),
+            "created_at": x.get("created_at",""),
+        } for x in page_items]
+    }
+
+@app.get("/api/admin/registry")
+async def admin_registry(
+    request: Request,
+    search: str = "", act_type: str = "", page: int = 1, per_page: int = 20
+):
+    u = _get_admin_user(request)
+    if not u:
+        raise HTTPException(401, "Unauthorized")
+    reg = _load_registry()
+    items = reg.get("acts", [])
+    if act_type:
+        items = [x for x in items if x.get("act_type","").upper() == act_type.upper()]
+    if search:
+        s = search.lower()
+        items = [x for x in items if s in (x.get("doc_name","")).lower()
+                 or s in (x.get("principal_name","")).lower()
+                 or s in (x.get("enp_name","")).lower()
+                 or s in (x.get("dc_reference_number","")).lower()]
+    total = len(items)
+    items.sort(key=lambda x: x.get("executed_at",""), reverse=True)
+    start = (page - 1) * per_page
+    return {
+        "total": total, "page": page, "per_page": per_page,
+        "items": items[start:start + per_page]
+    }
+
+class _AdminSetRoleRequest(BaseModel):
+    role: str = ""
+
+@app.post("/api/admin/users/{user_id}/set-role")
+async def admin_set_role(user_id: str, body: _AdminSetRoleRequest, request: Request):
+    u = _get_admin_user(request)
+    if not u:
+        raise HTTPException(401, "Unauthorized")
+    new_role = (body.role or "").strip()
+    if new_role not in ("attorney","client","admin"):
+        raise HTTPException(400, "Invalid role")
+    with _users_lock:
+        _reload_users()
+        if user_id not in _users:
+            raise HTTPException(404, "User not found")
+        _users[user_id]["role"] = new_role
+        _save_users()
+    return {"ok": True, "user_id": user_id, "role": new_role}
+
+@app.get("/admin")
+async def admin_page():
+    from fastapi.responses import FileResponse as _FR
+    import os as _os
+    p = _os.path.join(_os.path.dirname(__file__), "..", "admin.html")
+    if _os.path.exists(p):
+        return _FR(p)
+    return JSONResponse({"error": "Admin panel not yet deployed. Building..."}, status_code=503)
+
+# ═══ end admin endpoints ═══════════════════════════════════════════════════════
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("APP_PORT", 8080))
@@ -4983,4 +5203,358 @@ async def registry_get_document(
         "sc_files": files,
         "doconchain_link": doconchain_link,
         "sc_raw_response": sc_resp,
+    }
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ADMIN PANEL — Auth + API Endpoints
+# ══════════════════════════════════════════════════════════════════════════════
+
+import jwt as _pyjwt_admin
+from fastapi.responses import FileResponse as _FileResponse
+from datetime import datetime as _admin_dt, timezone as _admin_tz, timedelta as _admin_td
+
+_ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+_ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "Alyssa7719!!")
+_ADMIN_SECRET   = os.getenv("SECRET_KEY", "change-me-in-production")
+_ADMIN_COOKIE   = "ql_admin"
+_ADMIN_HTML     = os.path.join(os.path.dirname(os.path.dirname(__file__)), "admin.html")
+
+
+def _issue_admin_jwt() -> str:
+    now = _admin_dt.now(_admin_tz.utc)
+    payload = {
+        "sub":  "admin",
+        "role": "admin",
+        "iat":  int(now.timestamp()),
+        "exp":  int((now + _admin_td(hours=8)).timestamp()),
+    }
+    return _pyjwt_admin.encode(payload, _ADMIN_SECRET, algorithm="HS256")
+
+
+def _get_admin_user(request: Request):
+    token = request.cookies.get(_ADMIN_COOKIE)
+    if not token:
+        return None
+    try:
+        payload = _pyjwt_admin.decode(token, _ADMIN_SECRET, algorithms=["HS256"])
+        if payload.get("role") == "admin":
+            return {"role": "admin", "sub": payload.get("sub", "admin")}
+    except Exception:
+        pass
+    return None
+
+
+# ── Static: GET /admin → admin.html ──────────────────────────────────────────
+
+@app.get("/admin")
+async def admin_panel():
+    return _FileResponse(_ADMIN_HTML)
+
+
+# ── POST /api/admin/login ────────────────────────────────────────────────────
+
+class _AdminLoginReq(BaseModel):
+    username: str
+    password: str
+
+
+@app.post("/api/admin/login")
+async def admin_login(req: _AdminLoginReq, response: Response):
+    if req.username != _ADMIN_USERNAME or req.password != _ADMIN_PASSWORD:
+        raise HTTPException(401, "Invalid credentials")
+    token = _issue_admin_jwt()
+    response.set_cookie(
+        key=_ADMIN_COOKIE,
+        value=token,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=8 * 3600,
+        path="/",
+    )
+    return {"ok": True}
+
+
+# ── POST /api/admin/logout ───────────────────────────────────────────────────
+
+@app.post("/api/admin/logout")
+async def admin_logout(response: Response):
+    response.delete_cookie(_ADMIN_COOKIE, path="/")
+    return {"ok": True}
+
+
+# ── GET /api/admin/me ────────────────────────────────────────────────────────
+
+@app.get("/api/admin/me")
+async def admin_me(request: Request):
+    admin = _get_admin_user(request)
+    if not admin:
+        raise HTTPException(401, "Unauthorized")
+    return {"ok": True, "role": "admin"}
+
+
+# ── GET /api/admin/stats ─────────────────────────────────────────────────────
+
+@app.get("/api/admin/stats")
+async def admin_stats(request: Request):
+    admin = _get_admin_user(request)
+    if not admin:
+        raise HTTPException(401, "Unauthorized")
+
+    _users_path = os.path.join(os.path.dirname(__file__), "data", "users.json")
+    try:
+        with open(_users_path, "r", encoding="utf-8") as f:
+            all_users: dict = json.load(f)
+    except Exception:
+        all_users = {}
+
+    with _apts_lock:
+        _reload_appointments()
+        all_apts = dict(_appointments)
+
+    with _registry_lock:
+        reg = _load_registry()
+
+    today = _admin_dt.now(_admin_tz.utc).date().isoformat()
+
+    total_users = len(all_users)
+    by_role = {"attorney": 0, "client": 0, "admin": 0}
+    new_users_today = 0
+    pending_enp_commission = 0
+
+    for u in all_users.values():
+        r = u.get("role", "")
+        if r in by_role:
+            by_role[r] += 1
+        created = (u.get("created_at") or "")[:10]
+        if created == today:
+            new_users_today += 1
+        if u.get("role") == "attorney" and u.get("sc_commission_status", "pending") == "pending":
+            pending_enp_commission += 1
+
+    total_apts = len(all_apts)
+    ended_apts = sum(1 for a in all_apts.values() if a.get("session_status") == "ended")
+    new_apts_today = sum(1 for a in all_apts.values() if (a.get("created_at") or "")[:10] == today)
+    total_acts = len(reg.get("acts", []))
+
+    return {
+        "total_users": total_users,
+        "users_by_role": by_role,
+        "total_appointments": total_apts,
+        "ended_appointments": ended_apts,
+        "total_acts": total_acts,
+        "pending_enp_commission": pending_enp_commission,
+        "new_users_today": new_users_today,
+        "new_appointments_today": new_apts_today,
+    }
+
+
+# ── GET /api/admin/users ─────────────────────────────────────────────────────
+
+@app.get("/api/admin/users")
+async def admin_list_users(
+    request: Request,
+    search: Optional[str] = None,
+    role: Optional[str] = None,
+    page: int = 1,
+    per_page: int = 20,
+):
+    admin = _get_admin_user(request)
+    if not admin:
+        raise HTTPException(401, "Unauthorized")
+
+    _users_path = os.path.join(os.path.dirname(__file__), "data", "users.json")
+    try:
+        with open(_users_path, "r", encoding="utf-8") as f:
+            all_users: dict = json.load(f)
+    except Exception:
+        all_users = {}
+
+    users = list(all_users.values())
+
+    if role:
+        users = [u for u in users if u.get("role") == role]
+    if search:
+        q = search.lower()
+        users = [
+            u for u in users
+            if q in (u.get("email") or "").lower()
+            or q in (u.get("first_name") or "").lower()
+            or q in (u.get("last_name") or "").lower()
+        ]
+
+    users.sort(key=lambda u: u.get("created_at") or "", reverse=True)
+
+    total = len(users)
+    start = (page - 1) * per_page
+    result = []
+    for u in users[start:start + per_page]:
+        result.append({
+            "id":                 u.get("id"),
+            "email":              u.get("email"),
+            "first_name":         u.get("first_name"),
+            "last_name":          u.get("last_name"),
+            "role":               u.get("role"),
+            "created_at":         u.get("created_at"),
+            "onboarding_step":    u.get("onboarding_step"),
+            "certificate_status": u.get("certificate_status"),
+            "sc_commission_status": u.get("sc_commission_status"),
+            "kyc_verified_at":    u.get("kyc_verified_at"),
+        })
+
+    return {
+        "users": result,
+        "total": total,
+        "page":  page,
+        "per_page": per_page,
+        "pages": max(1, (total + per_page - 1) // per_page),
+    }
+
+
+# ── POST /api/admin/users/{user_id}/set-role ─────────────────────────────────
+
+class _SetRoleReq(BaseModel):
+    role: str
+
+
+@app.post("/api/admin/users/{user_id}/set-role")
+async def admin_set_role(user_id: str, req: _SetRoleReq, request: Request):
+    admin = _get_admin_user(request)
+    if not admin:
+        raise HTTPException(401, "Unauthorized")
+    if req.role not in ("attorney", "client", "admin"):
+        raise HTTPException(400, "role must be attorney, client, or admin")
+
+    _users_path = os.path.join(os.path.dirname(__file__), "data", "users.json")
+    try:
+        with open(_users_path, "r", encoding="utf-8") as f:
+            all_users: dict = json.load(f)
+    except Exception:
+        all_users = {}
+
+    if user_id not in all_users:
+        raise HTTPException(404, "User not found")
+
+    all_users[user_id]["role"] = req.role
+    with open(_users_path, "w", encoding="utf-8") as f:
+        json.dump(all_users, f, indent=2, ensure_ascii=False)
+
+    return {"ok": True, "user_id": user_id, "role": req.role}
+
+
+# ── GET /api/admin/appointments ──────────────────────────────────────────────
+
+@app.get("/api/admin/appointments")
+async def admin_list_appointments(
+    request: Request,
+    status: Optional[str] = None,
+    search: Optional[str] = None,
+    page: int = 1,
+    per_page: int = 20,
+):
+    admin = _get_admin_user(request)
+    if not admin:
+        raise HTTPException(401, "Unauthorized")
+
+    _users_path = os.path.join(os.path.dirname(__file__), "data", "users.json")
+    try:
+        with open(_users_path, "r", encoding="utf-8") as f:
+            all_users: dict = json.load(f)
+    except Exception:
+        all_users = {}
+
+    with _apts_lock:
+        _reload_appointments()
+        all_apts = list(_appointments.values())
+
+    def _enp_name(enp_id: str) -> str:
+        u = all_users.get(enp_id)
+        if u:
+            return f"{u.get('first_name','')} {u.get('last_name','')}".strip()
+        return enp_id[:8] if enp_id else ""
+
+    apts = all_apts
+    if status:
+        status_upper = status.upper()
+        apts = [a for a in apts if a.get("status", "").upper() == status_upper
+                or a.get("session_status", "").upper() == status_upper]
+    if search:
+        q = search.lower()
+        apts = [
+            a for a in apts
+            if q in (a.get("client_email") or "").lower()
+            or q in (a.get("enp_name") or "").lower()
+            or q in (a.get("apt_id") or "").lower()
+        ]
+
+    apts.sort(key=lambda a: a.get("created_at") or "", reverse=True)
+
+    total = len(apts)
+    start = (page - 1) * per_page
+    result = []
+    for a in apts[start:start + per_page]:
+        result.append({
+            "id":              a.get("apt_id"),
+            "enp_id":          a.get("enp_id"),
+            "enp_name":        a.get("enp_name") or _enp_name(a.get("enp_id", "")),
+            "client_email":    a.get("client_email"),
+            "status":          a.get("status"),
+            "session_status":  a.get("session_status"),
+            "session_ended_at": a.get("session_ended_at"),
+            "doc_count":       len(a.get("session_documents", [])),
+            "created_at":      a.get("created_at"),
+        })
+
+    return {
+        "appointments": result,
+        "total": total,
+        "page":  page,
+        "per_page": per_page,
+        "pages": max(1, (total + per_page - 1) // per_page),
+    }
+
+
+# ── GET /api/admin/registry ──────────────────────────────────────────────────
+
+@app.get("/api/admin/registry")
+async def admin_list_registry(
+    request: Request,
+    search: Optional[str] = None,
+    act_type: Optional[str] = None,
+    page: int = 1,
+    per_page: int = 20,
+):
+    admin = _get_admin_user(request)
+    if not admin:
+        raise HTTPException(401, "Unauthorized")
+
+    with _registry_lock:
+        reg = _load_registry()
+
+    acts = list(reg.get("acts", []))
+
+    if act_type:
+        acts = [a for a in acts if a.get("act_type", "").upper() == act_type.upper()]
+    if search:
+        q = search.lower()
+        acts = [
+            a for a in acts
+            if q in (a.get("doc_name") or "").lower()
+            or q in (a.get("enp_name") or "").lower()
+            or q in (a.get("principal_name") or "").lower()
+            or q in (a.get("dc_reference_number") or "").lower()
+        ]
+
+    acts.sort(key=lambda a: a.get("executed_at") or a.get("created_at") or "", reverse=True)
+
+    total = len(acts)
+    start = (page - 1) * per_page
+    result = acts[start:start + per_page]
+
+    return {
+        "acts": result,
+        "total": total,
+        "page":  page,
+        "per_page": per_page,
+        "pages": max(1, (total + per_page - 1) // per_page),
     }
