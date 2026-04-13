@@ -144,6 +144,7 @@
   .empty-state a:hover{text-decoration:underline;}
 
   .loading-overlay{text-align:center;padding:4rem;color:var(--muted);}
+    @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -458,6 +459,9 @@ function buildEnpCard(apt) {
           <a class="btn-session-join" href="/lobby?apt=${escHtml(apt.apt_id)}" style="text-decoration:none;">
             <i class="hgi-stroke hgi-video-01" style="font-size:.85rem;vertical-align:middle;margin-right:.3rem;"></i>Rejoin Session →
           </a>
+          <button onclick="endSessionFromApts('${escHtml(apt.apt_id)}',this)" style="background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.4);color:#f87171;padding:0.5rem 1rem;border-radius:0.4rem;font-size:0.82rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:0.35rem;transition:all .15s;" onmouseover="this.style.background='rgba(248,113,113,.25)'" onmouseout="this.style.background='rgba(248,113,113,.15)'">
+            <i class="hgi-stroke hgi-telephone-off-01" style="font-size:.85rem;"></i> End Session
+          </button>
         </div>`;
     } else {
       signingHtml = `
@@ -658,6 +662,34 @@ async function downloadAptRecording(aptId) {
     }
   } catch(e) {
     alert('Error: ' + e.message);
+  }
+}
+
+async function endSessionFromApts(aptId, btn) {
+  if (!confirm('End this session? This will close the session for all participants.')) return;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="hgi-stroke hgi-loading-03" style="font-size:.85rem;animation:spin .7s linear infinite;"></i> Ending…';
+  try {
+    const r = await fetch(`/api/sessions/${aptId}/end`, { method: 'POST', credentials: 'include' });
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      throw new Error(d.detail || 'Failed to end session');
+    }
+    const idx = _appointments.findIndex(a => a.apt_id === aptId);
+    if (idx >= 0) {
+      _appointments[idx].session_status = 'ended';
+      const card = document.getElementById('apt-' + aptId);
+      if (card) {
+        const updated = buildEnpCard(_appointments[idx]);
+        const tmp = document.createElement('div');
+        tmp.innerHTML = updated;
+        card.replaceWith(tmp.firstElementChild);
+      }
+    }
+  } catch(e) {
+    alert('Error: ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="hgi-stroke hgi-telephone-off-01" style="font-size:.85rem;"></i> End Session';
   }
 }
 </script>
