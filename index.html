@@ -2726,7 +2726,7 @@
             document.getElementById('sso-step-5-label').textContent = 'Certificate';
         } else if (role === 'client') {
             badge.className = 'sso-role-badge client';
-            badge.textContent = '👤 Public Client';
+            badge.innerHTML = '<i class="hgi-stroke hgi-user-01" style="font-size:.8rem;margin-right:.3rem;vertical-align:middle;"></i> Public Client';
             badge.style.display = '';
             title.textContent = 'Create Your Client Account';
             desc.textContent = 'Sign in to access e-notarization services, upload contracts for AI analysis, and connect with certified Electronic Notary Publics (ENPs).';
@@ -2961,6 +2961,16 @@
         return res;
     }
 
+    // Proactive token refresh every 20 minutes to prevent session expiry
+    function _startTokenRefreshTimer() {
+        setInterval(async function() {
+            try {
+                await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+            } catch(e) {}
+        }, 20 * 60 * 1000); // 20 minutes
+    }
+    _startTokenRefreshTimer();
+
     async function initNavUser() {
         const signinBtn = document.getElementById('nav-signin-btn');
         // Proactively try a silent token refresh before checking /me
@@ -3007,6 +3017,18 @@
             if (_adminBtn) _adminBtn.style.display = 'none';
             window._currentUser = user;
         _updateCertBadge(user);
+            // Update badge click behavior
+            var _certBadgeEl = document.getElementById('nav-cert-badge');
+            if (_certBadgeEl) {
+                var _badgeStep = user.onboarding_step || 'role_select';
+                if (_badgeStep === 'certified') {
+                    _certBadgeEl.onclick = function() { window.location.href = '/dashboard'; };
+                    _certBadgeEl.title = 'Go to Dashboard';
+                } else {
+                    _certBadgeEl.onclick = function() { window.location.href = '/onboard'; };
+                    _certBadgeEl.title = 'Complete your profile';
+                }
+            }
         } catch(e) {
             if (signinBtn) signinBtn.style.display = 'inline-block';
             var _adminBtnCatch = document.getElementById('admin-nav-btn');
@@ -3022,18 +3044,22 @@
         var config = {
             'role_select': { cls: 'step-profile',     icon: 'hgi-file-02', label: 'Complete Profile' },
             'profile':     { cls: 'step-profile',     icon: 'hgi-file-02', label: 'Complete Profile' },
-            'test':        { cls: 'step-exam',         icon: '📝', label: 'Take Exam' },
-            'kyc':         { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
-            'kyc_id':      { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
-            'liveness':    { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
-            'survey':      { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
-            'certificate': { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
-            'sc_redirect': { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
-            'certified':   { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
+            'test':        { cls: 'step-exam',         icon: 'hgi-book-02', label: 'Take Exam' },
+            'kyc':         { cls: 'step-certified',    icon: 'hgi-layout-01', label: 'Dashboard' },
+            'kyc_id':      { cls: 'step-certified',    icon: 'hgi-layout-01', label: 'Dashboard' },
+            'liveness':    { cls: 'step-certified',    icon: 'hgi-layout-01', label: 'Dashboard' },
+            'survey':      { cls: 'step-certified',    icon: 'hgi-layout-01', label: 'Dashboard' },
+            'certificate': { cls: 'step-certified',    icon: 'hgi-layout-01', label: 'Dashboard' },
+            'sc_redirect': { cls: 'step-certified',    icon: 'hgi-layout-01', label: 'Dashboard' },
+            'certified':   { cls: 'step-certified',    icon: 'hgi-layout-01', label: 'Dashboard' },
         };
         var cfg = config[step] || config['test'];
         badge.className = 'nav-cert-badge ' + cfg.cls;
-        badge.textContent = cfg.icon + ' ' + cfg.label;
+        // Use innerHTML to support HugeIcon <i> elements
+        var iconHtml = cfg.icon && cfg.icon.startsWith('hgi-')
+            ? '<i class="hgi-stroke ' + cfg.icon + '" style="font-size:.8rem;margin-right:.3rem;vertical-align:middle;"></i>'
+            : (cfg.icon + ' ');
+        badge.innerHTML = iconHtml + cfg.label;
         badge.style.display = 'inline-flex';
         badge._step = step;
         badge._role = role;
@@ -3064,15 +3090,19 @@
     })();
 
         function routeToStep(step, role) {
-        switch(step) {
-            case 'role_select': openOnboard('role', role); break;
-            case 'profile':     openOnboard('profile', role); break;
-            case 'test':        openOnboard('test', role); break;
-            case 'liveness':    openOnboard('liveness', role); break;
-            case 'survey':      openOnboard('survey', role); break;
-            case 'certified':   openOnboard('certified', role); break;
-            default:            openOnboard('role', role); break;
+        // Certified users go directly to dashboard, never show modal on homepage
+        if (step === 'certified' || (role === 'attorney' && step === 'certified')) {
+            window.location.href = '/dashboard';
+            return;
         }
+        // Clients who completed onboarding go to dashboard
+        if (role === 'client' && step === 'certified') {
+            window.location.href = '/dashboard';
+            return;
+        }
+        // All incomplete onboarding → go to /onboard page (not modal)
+        // This includes: role_select (fresh), profile, test, kyc, liveness, survey
+        window.location.href = '/onboard';
     }
 
     // ══ ONBOARDING MODAL ENGINE ════════════════════════════════════════════════
