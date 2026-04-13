@@ -3273,23 +3273,13 @@ async def get_plot_link(
                         _save_appointments()
                         break
 
-        # Strip token/api_token params from the link (DC embeds credentials in URL).
-        # Previous repo called this "cleanPlotUrl" — same approach.
-        # The link works without these params; stripping prevents credential exposure.
+          # NOTE: Do NOT strip token/api_token — DC needs them for auto-login in popup.
         try:
-            from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
-            _parsed = urlparse(link)
-            _params = parse_qs(_parsed.query, keep_blank_values=True)
-            # Remove credential params, keep everything else (page, user_type, email, signer_role, api)
-            for _rm in ('token', 'api_token', 'access_token'):
-                _params.pop(_rm, None)
-            # Rebuild — use doseq=True to keep single-value params clean
-            _clean_query = urlencode({k: v[0] if len(v)==1 else v for k, v in _params.items()}, doseq=True)
-            link = urlunparse(_parsed._replace(query=_clean_query))
-        except Exception as _clean_err:
-            print(f"[PlotLink] URL clean failed (non-fatal): {_clean_err}", flush=True)
-
-        print(f"[PlotLink] link (clean): {link[:180]}", flush=True)
+            from urllib.parse import urlparse
+            _base = urlparse(link).netloc + urlparse(link).path
+        except Exception:
+            _base = link[:60]
+        print(f"[PlotLink] link ready: {_base}", flush=True)
         return {"link": link, "project_uuid": project_uuid}
 
     except HTTPException:
