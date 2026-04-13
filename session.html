@@ -1006,6 +1006,7 @@ function renderSignerChip(projectUuid, signer) {
   chip.dataset.signingOrder = order;
   chip.dataset.projectUuid = projectUuid;
   chip.dataset.email = signer.email || '';
+  chip.dataset.fullname = signerFullName;
   chip.dataset.signed = 'false';
   chip.style.cssText = 'display:grid;grid-template-columns:1.4rem 1fr auto;align-items:center;gap:.4rem;margin-top:.35rem;padding:.4rem .6rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:8px;font-size:.7rem;transition:border-color .3s;';
   // Color by role
@@ -1139,7 +1140,7 @@ function _refreshSignerBadges(projectUuid) {
     const _blockedName = blockedBy !== null
       ? (function() {
           const bc = chips.find(function(c){ return parseInt(c.dataset.signingOrder) === blockedBy; });
-          return bc ? (bc.querySelector('div > div')?.textContent || 'Signer #' + blockedBy) : 'Signer #' + blockedBy;
+          return bc ? (bc.dataset.fullname || 'Signer #' + blockedBy) : 'Signer #' + blockedBy;
         })()
       : 'previous signer';
     signBtn.innerHTML = '<i class="hgi-stroke hgi-time-01" style="font-size:1rem;"></i> Waiting for ' + _blockedName;
