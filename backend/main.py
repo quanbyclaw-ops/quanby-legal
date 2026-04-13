@@ -1949,6 +1949,8 @@ class AppointmentCreateRequest(BaseModel):
     notarization_type: str  # ACKNOWLEDGMENT | JURAT | AFFIRMATION | SIGNATURE_WITNESSING
     mode: str               # REN | IEN
     notes: str = ""
+    title: str = ""
+    preferred_time: str = ""
 
 
 class AppointmentActionRequest(BaseModel):
@@ -2025,6 +2027,8 @@ async def create_appointment(
         "notarization_type": req.notarization_type,
         "mode": req.mode,
         "notes": req.notes[:1000],
+        "title": req.title[:200] if req.title else "",
+        "preferred_time": req.preferred_time[:200] if req.preferred_time else "",
         "status": "PENDING",
         "created_at": now_iso,
         "updated_at": now_iso,

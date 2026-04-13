@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    /* Quanby Legal: silently block Cloudflare beacon to prevent CORS/SRI errors */
+    (function() {
+      function isCFBeacon(el) {
+        return el && el.tagName === 'SCRIPT' && typeof el.src === 'string' &&
+               el.src.indexOf('cloudflareinsights') !== -1;
+      }
+      /* Intercept DOM insertions before they reach the browser */
+      var _ac = Element.prototype.appendChild;
+      Element.prototype.appendChild = function(c) {
+        if (isCFBeacon(c)) return c;
+        return _ac.call(this, c);
+      };
+      var _ib = Element.prototype.insertBefore;
+      Element.prototype.insertBefore = function(c, r) {
+        if (isCFBeacon(c)) return c;
+        return _ib.call(this, c, r);
+      };
+      /* Remove any already-injected beacon tags */
+      function stripNow() {
+        document.querySelectorAll('script[src*="cloudflareinsights"]').forEach(function(s) {
+          if (s.parentNode) s.parentNode.removeChild(s);
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', stripNow);
+      } else {
+        stripNow();
+      }
+      /* Suppress any resulting errors silently */
+      var _oe = window.onerror;
+      window.onerror = function(m, src, l, c, e) {
+        if (src && src.indexOf('cloudflareinsights') !== -1) return true;
+        if (_oe) return _oe.apply(this, arguments);
+      };
+    })();
+  </script>
+
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Find a Notary — Quanby Legal</title>
+<link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css"/>
+  <link rel="icon" href="/favicon.ico"/>
+<style>
+  :root {
+    --navy:#1B2A6B; --gold:#C9A84C; --teal:#0EA5E9; --bg:#0D0F1A;
+    --surface:#141726; --border:rgba(255,255,255,0.08);
+    --text:#E8EAF2; --muted:#8B90A8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  nav{background:rgba(10,12,24,0.97);border-bottom:1px solid rgba(255,255,255,0.06);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+  .nav-content{max-width:1280px;margin:0 auto;padding:0 2rem;height:64px;display:flex;align-items:center;gap:2rem;}
+  .logo{display:flex;align-items:center;gap:0.625rem;text-decoration:none;flex-shrink:0;}
+  .logo-img{height:32px;width:auto;}
+  .logo-text{font-size:1.1rem;font-weight:700;color:#e8eaf2;letter-spacing:-0.02em;}
+  .nav-links{display:flex;gap:1.5rem;align-items:center;flex:1;justify-content:center;}
+  .nav-links a{color:#8b90a8;text-decoration:none;font-size:0.875rem;font-weight:500;transition:color 0.15s,background 0.15s;white-space:nowrap;padding:0.4rem 0.75rem;border-radius:6px;}
+  .nav-links a:hover{color:#e8eaf2;background:rgba(255,255,255,0.06);}
+  .nav-links a.active{color:#e8eaf2;background:rgba(255,255,255,0.08);}
+  .nav-user{display:flex;align-items:center;gap:0.625rem;position:relative;cursor:pointer;}
+  .nav-user-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,0.4);}
+  .nav-user-name{font-size:0.85rem;color:#8b90a8;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .nav-user-initials{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;color:#fff;border:2px solid rgba(201,168,76,0.4);flex-shrink:0;}
+  .nav-user-menu{position:absolute;right:0;top:calc(100% + 8px);background:#141726;border:1px solid rgba(255,255,255,0.08);border-radius:0.75rem;min-width:220px;box-shadow:0 8px 32px rgba(0,0,0,0.4);overflow:hidden;z-index:200;}
+  .num-header{padding:1rem;display:flex;align-items:center;gap:0.75rem;}
+  .num-avatar,.num-initials{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,0.4);flex-shrink:0;}
+  .num-initials{background:linear-gradient(135deg,var(--navy),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;color:#fff;}
+  .num-info{display:flex;flex-direction:column;min-width:0;}
+  .num-name{font-size:0.875rem;font-weight:600;color:#e8eaf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .num-email{font-size:0.75rem;color:#8b90a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .num-divider{height:1px;background:rgba(255,255,255,0.07);margin:0;}
+  .num-item{display:flex;align-items:center;gap:0.625rem;width:100%;padding:0.625rem 1rem;background:none;border:none;color:#8b90a8;font-size:0.8rem;cursor:pointer;text-align:left;transition:background 0.15s,color 0.15s;}
+  .num-item:hover{background:rgba(255,255,255,0.05);color:#e8eaf2;}
+  .num-signout{color:#f87171;}
+  .num-signout:hover{background:rgba(239,68,68,0.08);color:#f87171;}
+  @media(max-width:768px){.nav-links{display:none;}}
+
+  .container{max-width:1100px;margin:0 auto;padding:2rem 1.5rem;}
+  .page-header{margin-bottom:2rem;}
+  .page-header h1{font-size:1.75rem;font-weight:700;margin-bottom:0.4rem;}
+  .page-header p{color:var(--muted);font-size:0.95rem;}
+
+  /* ENP Cards grid */
+  .enp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;}
+  .enp-card{background:var(--surface);border:1px solid var(--border);border-radius:1rem;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;transition:border-color 0.2s;}
+  .enp-card:hover{border-color:rgba(201,168,76,0.35);}
+  .enp-card-top{display:flex;align-items:center;gap:1rem;}
+  .enp-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;color:#fff;border:2px solid rgba(201,168,76,0.35);flex-shrink:0;overflow:hidden;}
+  .enp-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .enp-name-block h3{font-size:1rem;font-weight:700;margin-bottom:0.25rem;}
+  .badge-certified{display:inline-block;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);color:var(--gold);font-size:0.7rem;font-weight:700;padding:0.15rem 0.55rem;border-radius:99px;letter-spacing:0.05em;text-transform:uppercase;}
+  .enp-meta{font-size:0.8rem;color:var(--muted);line-height:1.7;}
+  .enp-meta span{display:block;}
+  .btn-gold{background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0D0F1A;font-weight:700;padding:0.65rem 1.25rem;border-radius:0.5rem;border:none;cursor:pointer;font-size:0.9rem;width:100%;transition:opacity 0.15s;}
+  .btn-gold:hover{opacity:0.88;}
+
+  /* Empty state */
+  .empty-state{text-align:center;padding:4rem 2rem;color:var(--muted);}
+  .empty-state .icon{font-size:3rem;margin-bottom:1rem;}
+  .empty-state h3{font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;color:var(--text);}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:500;display:flex;align-items:center;justify-content:center;padding:1rem;}
+  .modal-overlay.hidden{display:none;}
+  .modal-card{background:var(--surface);border:1px solid rgba(201,168,76,0.25);border-radius:1rem;width:100%;max-width:480px;padding:2rem;position:relative;}
+  .modal-card h2{font-size:1.15rem;font-weight:700;margin-bottom:0.25rem;}
+  .modal-card .enp-subtitle{color:var(--muted);font-size:0.875rem;margin-bottom:1.5rem;}
+  .modal-close{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.25rem;line-height:1;}
+  .modal-close:hover{color:var(--text);}
+  .form-group{margin-bottom:1rem;}
+  .form-group label{display:block;font-size:0.8rem;font-weight:600;color:var(--muted);margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.05em;}
+  .form-group select,.form-group textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:0.5rem;color:var(--text);padding:0.65rem 0.85rem;font-size:0.9rem;font-family:inherit;transition:border-color 0.15s;outline:none;}
+  .form-group select:focus,.form-group textarea:focus{border-color:var(--gold);}
+  .form-group textarea{resize:vertical;min-height:90px;}
+  .form-group select option{background:#141726;color:var(--text);}
+  .success-msg{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:0.5rem;padding:1rem;text-align:center;color:#10B981;font-weight:600;margin-top:1rem;display:none;}
+  .loading-overlay{text-align:center;padding:4rem;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-content">
+    <a class="logo" href="/">
+      <img src="/qlegal-logo-sm.png" alt="Quanby Legal" class="logo-img" onerror="this.style.display='none'">
+      <span class="logo-text">Quanby Legal</span>
+    </a>
+    <div class="nav-links" id="nav-links">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/browse" class="active">Find a Notary</a>
+      <a href="/appointments">My Appointments</a>
+      <a href="/profile"><i class="hgi-stroke hgi-user-circle" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Profile</a>
+    </div>
+    <div class="nav-user" id="nav-user-wrap" onclick="toggleMenu()">
+      <img class="nav-user-avatar" id="nav-avatar" src="" alt="" style="display:none;">
+      <div class="nav-user-initials" id="nav-initials" style="display:none;"></div>
+      <span class="nav-user-name" id="nav-name"></span>
+      <svg width="12" height="12" viewBox="0 0 12 12" style="margin-left:2px;flex-shrink:0;"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="nav-user-menu" id="user-menu" style="display:none;" onclick="event.stopPropagation()">
+        <div class="num-header">
+          <img class="num-avatar" id="menu-avatar" src="" alt="" style="display:none;">
+          <div class="num-initials" id="menu-initials" style="display:none;"></div>
+          <div class="num-info">
+            <span class="num-name" id="menu-name"></span>
+            <span class="num-email" id="menu-email"></span>
+          </div>
+        </div>
+        <div class="num-divider"></div>
+        <button class="num-item" onclick="window.location.href='/dashboard'">
+          <svg width="14" height="14" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>
+          Dashboard
+        </button>
+        <button class="num-item" onclick="window.location.href='/appointments'">
+          <svg width="14" height="14" viewBox="0 0 16 16"><path d="M2 3h12v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3zm4-2h4M6 7h4M6 10h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          My Appointments
+        </button>
+        <div class="num-divider"></div>
+        <button class="num-item num-signout" onclick="signOut()">
+          <svg width="14" height="14" viewBox="0 0 16 16"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div id="loading-state" class="loading-overlay">Loading certified notaries…</div>
+  <div id="main-content" style="display:none;">
+    <div class="page-header">
+      <h1><i class="hgi-stroke hgi-search-01" style="font-size:1.1rem;vertical-align:middle;margin-right:.4rem;"></i>Find a Notary</h1>
+      <p>Browse certified Electronic Notary Publics available for your notarization needs</p>
+    </div>
+    <div id="enp-grid" class="enp-grid"></div>
+    <div id="empty-state" class="empty-state" style="display:none;">
+      <div class="icon"><i class="hgi-stroke hgi-building-01" style="font-size:2.5rem;color:#8b949e;"></i></div>
+      <h3>No certified ENPs available yet</h3>
+      <p>Check back soon as more Electronic Notary Publics complete certification.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal-overlay hidden" id="modal" onclick="closeModalOnBg(event)">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal()"><i class="hgi-stroke hgi-cancel-01" style="font-size:1rem;vertical-align:middle;"></i></button>
+    <h2>Book Appointment</h2>
+    <div class="enp-subtitle" id="modal-enp-name">ENP Name</div>
+    <div class="form-group">
+      <label>Document Title <span style="color:#f87171;font-size:.8rem;">*</span></label>
+      <input id="modal-title" type="text" placeholder="e.g. Deed of Sale, Affidavit of Loss, SPA…" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:.65rem .85rem;color:#e8eaf2;font-size:.875rem;outline:none;font-family:Inter,sans-serif;transition:border-color .15s;color-scheme:dark;" onfocus="this.style.borderColor='rgba(201,168,76,.6)'" onblur="this.style.borderColor='rgba(255,255,255,.15)'" maxlength="200">
+    </div>
+    <div class="form-group">
+      <label>Notarization Type</label>
+      <select id="modal-type">
+        <option value="ACKNOWLEDGMENT">Acknowledgment</option>
+        <option value="JURAT">Jurat</option>
+        <option value="AFFIRMATION">Affirmation</option>
+        <option value="SIGNATURE_WITNESSING">Signature Witnessing</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Mode</label>
+      <select id="modal-mode">
+        <option value="REN">REN — Remote Electronic Notarization</option>
+        <option value="IEN">IEN — In-Person Electronic Notarization</option>
+      </select>
+    </div>
+    <div class="form-group">
+    <div class="form-group">
+      <label>Preferred Date &amp; Time <span style="color:#9ba3c4;font-size:.78rem;">(optional)</span></label>
+      <input id="modal-time" type="datetime-local" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:.65rem .85rem;color:#e8eaf2;font-size:.875rem;outline:none;font-family:Inter,sans-serif;transition:border-color .15s;color-scheme:dark;" onfocus="this.style.borderColor='rgba(201,168,76,.6)'" onblur="this.style.borderColor='rgba(255,255,255,.15)'">
+    </div>
+    <div class="form-group">
+      <label>Notes <span style="color:#9ba3c4;font-size:.78rem;">(optional)</span></label>
+      <textarea id="modal-notes" placeholder="Describe the document or any special instructions…"></textarea>
+    </div>
+    <button class="btn-gold" id="modal-submit" onclick="submitBooking()">Send Appointment Request</button>
+    <div class="success-msg" id="modal-success"><i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.85rem;vertical-align:middle;margin-right:.3rem;color:#10B981;"></i>Request sent! The ENP will confirm shortly.</div>
+  </div>
+</div>
+
+<script>
+let _currentEnpId = null;
+let _currentUser = null;
+
+async function init() {
+  // Auth check
+  try {
+    try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
+    let r = await fetch('/api/auth/me', { credentials: 'include' });
+    if (r.status === 401) { try { const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); if (ref.ok) r = await fetch('/api/auth/me', { credentials: 'include' }); } catch(e) {} }
+    if (!r.ok) { window.location.href = '/'; return; }
+    _currentUser = await r.json();
+    if (_currentUser.role !== 'client') {
+      // ENPs shouldn't browse — redirect to dashboard
+      window.location.href = '/dashboard';
+      return;
+    }
+  } catch(e) {
+    window.location.href = '/';
+    return;
+  }
+
+  // Populate nav
+  const name = ((_currentUser.first_name || '') + ' ' + (_currentUser.last_name || '')).trim() || _currentUser.email || '?';
+  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('nav-name').textContent = name.split(' ')[0];
+  document.getElementById('menu-name').textContent = name;
+  document.getElementById('menu-email').textContent = _currentUser.email || '';
+  if (_currentUser.picture) {
+    const a = document.getElementById('nav-avatar');
+    const b = document.getElementById('menu-avatar');
+    a.src = b.src = _currentUser.picture;
+    a.style.display = b.style.display = '';
+  } else {
+    const a = document.getElementById('nav-initials');
+    const b = document.getElementById('menu-initials');
+    a.textContent = b.textContent = initials;
+    a.style.display = b.style.display = 'flex';
+  }
+
+  // Load ENPs
+  await loadEnps();
+}
+
+async function loadEnps() {
+  try {
+    const r = await fetch('/api/enps', { credentials: 'include' });
+    const enps = await r.json();
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('main-content').style.display = '';
+
+    if (!enps.length) {
+      document.getElementById('empty-state').style.display = '';
+      return;
+    }
+
+    const grid = document.getElementById('enp-grid');
+    grid.innerHTML = '';
+    enps.forEach(enp => {
+      const initials = enp.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2) || 'EN';
+      const card = document.createElement('div');
+      card.className = 'enp-card';
+      card.innerHTML = `
+        <div class="enp-card-top">
+          <div class="enp-avatar">
+            ${enp.picture ? `<img src="${enp.picture}" alt="${enp.name}" onerror="this.parentElement.textContent='${initials}'">` : initials}
+          </div>
+          <div class="enp-name-block">
+            <h3>${escHtml(enp.name)}</h3>
+            <span class="badge-certified">✓ Certified ENP</span>
+          </div>
+        </div>
+        <div class="enp-meta">
+          ${enp.notary_address ? `<span><i class="hgi-stroke hgi-location-01" style="font-size:.82rem;vertical-align:middle;margin-right:.3rem;color:#a78bfa;"></i>${escHtml(enp.notary_address)}</span>` : ''}
+          ${enp.commission_no ? `<span><i class="hgi-stroke hgi-justice-scale-01" style="font-size:.82rem;vertical-align:middle;margin-right:.3rem;"></i>Commission No: ${escHtml(enp.commission_no)}</span>` : ''}
+          ${enp.ibp_no ? `<span><i class="hgi-stroke hgi-justice-scale-01" style="font-size:.82rem;vertical-align:middle;margin-right:.3rem;"></i>IBP No: ${escHtml(enp.ibp_no)}</span>` : ''}
+        </div>
+        <button class="btn-gold" onclick="openModal('${enp.id}', '${escHtml(enp.name)}')">Book Appointment</button>
+      `;
+      grid.appendChild(card);
+    });
+  } catch(e) {
+    document.getElementById('loading-state').textContent = 'Failed to load notaries. Please refresh.';
+  }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function openModal(enpId, enpName) {
+  _currentEnpId = enpId;
+  document.getElementById('modal-enp-name').textContent = 'with ' + enpName;
+  document.getElementById('modal-success').style.display = 'none';
+  document.getElementById('modal-submit').style.display = '';
+  document.getElementById('modal-notes').value = '';
+  document.getElementById('modal-title').value = '';
+  document.getElementById('modal-time').value = '';
+  setTimeout(function() { document.getElementById('modal-title').focus(); }, 80);
+  document.getElementById('modal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+  _currentEnpId = null;
+}
+
+function closeModalOnBg(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+
+async function submitBooking() {
+  if (!_currentEnpId) return;
+  const _titleVal = document.getElementById('modal-title').value.trim();
+  if (!_titleVal) {
+    document.getElementById('modal-title').focus();
+    document.getElementById('modal-title').style.borderColor = '#f87171';
+    setTimeout(function() { document.getElementById('modal-title').style.borderColor = 'rgba(255,255,255,.15)'; }, 2000);
+    return;
+  }
+  const btn = document.getElementById('modal-submit');
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+
+  try {
+    const r = await fetch('/api/appointments', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        enp_id: _currentEnpId,
+        notarization_type: document.getElementById('modal-type').value,
+        mode: document.getElementById('modal-mode').value,
+        notes: document.getElementById('modal-notes').value.trim(),
+        title: document.getElementById('modal-title').value.trim(),
+        preferred_time: document.getElementById('modal-time').value,
+      }),
+    });
+    if (!r.ok) {
+      const err = await r.json();
+      alert('Error: ' + (err.detail || 'Failed to book appointment'));
+      btn.textContent = 'Send Appointment Request';
+      btn.disabled = false;
+      return;
+    }
+    document.getElementById('modal-success').style.display = '';
+    btn.style.display = 'none';
+    setTimeout(() => closeModal(), 2200);
+  } catch(e) {
+    alert('Network error. Please try again.');
+    btn.textContent = 'Send Appointment Request';
+    btn.disabled = false;
+  }
+}
+
+function toggleMenu() {
+  const m = document.getElementById('user-menu');
+  m.style.display = m.style.display === 'none' ? '' : 'none';
+}
+
+async function signOut() {
+  await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+  window.location.href = '/';
+}
+
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('nav-user-wrap');
+  const menu = document.getElementById('user-menu');
+  if (wrap && !wrap.contains(e.target)) menu.style.display = 'none';
+});
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
