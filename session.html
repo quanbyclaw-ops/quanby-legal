@@ -683,6 +683,20 @@ function addDocumentToList(doc) {
   const empty = document.getElementById('docs-empty');
   if (empty) empty.style.display = 'none';
 
+  // Dedup: skip if this document is already in the list
+  const _existingUuid = doc.project_uuid || '';
+  if (_existingUuid) {
+    // Check by project_uuid data attribute
+    const _existing = list ? list.querySelector('[data-project-uuid="' + _existingUuid + '"]') : null;
+    if (_existing) return; // already rendered
+  } else {
+    // No UUID yet — check by doc name to avoid exact duplicates
+    const _existingName = list ? Array.from(list.querySelectorAll('.doc-list-item')).find(function(el) {
+      return el.querySelector('.doc-title') && el.querySelector('.doc-title').textContent === (doc.name || '');
+    }) : null;
+    if (_existingName) return;
+  }
+
   const fmtType = {
     'ACKNOWLEDGMENT': 'Acknowledgment', 'JURAT': 'Jurat',
     'AFFIRMATION': 'Affirmation', 'SIGNATURE_WITNESSING': 'Signature Witnessing'
@@ -993,6 +1007,12 @@ function renderSignerChip(projectUuid, signer) {
   const order = signer.signing_order || 1;
   const signerFullName = [signer.first_name || '', signer.last_name || ''].filter(Boolean).join(' ') || '(unknown)';
   const chipId = 'signer-chip-' + projectUuid + '-' + order;
+
+  // Dedup: skip if chip with same email already exists in this doc's container
+  const _signerEmail = (signer.email || '').toLowerCase();
+  if (_signerEmail && container.querySelector('[data-email="' + _signerEmail + '"]')) return;
+  // Also skip if chip with same id already exists
+  if (document.getElementById(chipId)) return;
 
   const chip = document.createElement('div');
   chip.id = chipId;
@@ -1693,7 +1713,10 @@ function setupRoomEvents(room, localName, localRole) {
         }
       } else if (obj.type === 'doc_uploaded') {
         // ENP uploaded a document — add it to client's sidebar in real time
-        const existingEl = obj.project_uuid ? document.getElementById('doc-' + obj.project_uuid) : null;
+        const _docListEl = document.getElementById('documents-list');
+        const existingEl = (obj.project_uuid && _docListEl)
+          ? _docListEl.querySelector('[data-project-uuid="' + obj.project_uuid + '"]')
+          : null;
         if (!existingEl) {
           addDocumentToList({
             name: obj.name,
@@ -2892,8 +2915,10 @@ async function _syncSessionState() {
       const uuid = doc.project_uuid || doc.doconchain_project_uuid;
       if (!uuid) return;
 
-      // Add doc to UI if not already there
-      if (!document.getElementById('doc-' + uuid)) {
+      // Add doc to UI if not already there (check by data-project-uuid attribute)
+      const _docList = document.getElementById('documents-list');
+      const _alreadyRendered = _docList && _docList.querySelector('[data-project-uuid="' + uuid + '"]');
+      if (!_alreadyRendered) {
         addDocumentToList({
           name: doc.doc_name || doc.name || 'Document',
           type: doc.notarization_type || doc.type || '',
