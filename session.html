@@ -978,6 +978,7 @@ async function submitAddSigner() {
     const _ab2 = document.getElementById('add-signer-btn-' + _signerTargetUuid);
     if (_ab2) _ab2.style.display = 'none';
     closeSignerModal();
+    setTimeout(_syncSessionState, 1500);
   } catch(e) {
     err.textContent = e.message;
   } finally {
@@ -1455,6 +1456,9 @@ function postJoinSetup(userName, role, userRole) {
   // Start timer
   _startTime = Date.now();
   _timerInt  = setInterval(updateTimer, 1000);
+
+  // Background session state sync — keeps doc/signer state fresh without refresh
+  _startSessionSync();
 
   // Render self thumbnail
   renderSelf(userName, role);
@@ -2551,6 +2555,7 @@ async function openPlotSignature(projectUuid) {
                 try { _room.localParticipant.publishData(new TextEncoder().encode(_msg), { reliable: true }); } catch(e) {}
               }
               refreshSignerStatus(projectUuid, _plotAptId, true);
+              setTimeout(_syncSessionState, 2000);
             } else {
               // No — restore button to original purple enabled state
               if (_pb) {
@@ -2802,6 +2807,99 @@ async function refreshSignerStatus(projectUuid, aptId, silent) {
 
 // Auto-poll signer status every 5s while session is active
 var _signerPollIntervals = {};
+// ── Background session state sync ─────────────────────────────────────────
+let _sessionSyncInterval = null;
+
+function _startSessionSync() {
+  if (_sessionSyncInterval) return; // already running
+  // Immediate sync after 3s, then every 30s
+  setTimeout(_syncSessionState, 3000);
+  _sessionSyncInterval = setInterval(_syncSessionState, 30000);
+}
+
+async function _syncSessionState() {
+  if (!APT_ID) return;
+  try {
+    const r = await fetch(`/api/sessions/${APT_ID}`, { credentials: 'include' });
+    if (!r.ok) return;
+    const fresh = await r.json();
+    if (!fresh || !Array.isArray(fresh.session_documents)) return;
+
+    const existingDocs = (_sessionInfo && _sessionInfo.session_documents) || [];
+
+    // Update _sessionInfo with fresh data
+    if (_sessionInfo) {
+      _sessionInfo.session_documents = fresh.session_documents;
+    }
+
+    // For each doc in fresh data, check if UI needs updating
+    fresh.session_documents.forEach(function(doc) {
+      const uuid = doc.project_uuid || doc.doconchain_project_uuid;
+      if (!uuid) return;
+
+      // Add doc to UI if not already there
+      if (!document.getElementById('doc-' + uuid)) {
+        addDocumentToList({
+          name: doc.doc_name || doc.name || 'Document',
+          type: doc.notarization_type || doc.type || '',
+          desc: doc.description || doc.desc || '',
+          fee: doc.fee || '—',
+          sign_link: doc.sign_link || '',
+          project_uuid: uuid,
+        });
+        // Restore signers
+        if (Array.isArray(doc.signers) && doc.signers.length > 0) {
+          doc.signers.forEach(function(s) { renderSignerChip(uuid, s); });
+          var _ab = document.getElementById('add-signer-btn-' + uuid);
+          if (_ab) _ab.style.display = 'none';
+        }
+      }
+
+      // If plotting_started on backend but button still shows idle/Plotting → lock green
+      if (doc.plotting_done && !window._plottingDone[uuid]) {
+        if (!window._plottingDone) window._plottingDone = {};
+        window._plottingDone[uuid] = true;
+        _lockPlotButtonDone(uuid);
+      }
+
+      // Refresh sign button eligibility
+      if (doc.plotting_started || doc.plotting_done) {
+        var _sb = document.getElementById('sign-doc-btn-' + uuid);
+        if (_sb) _sb.dataset.signLink = '1';
+        var _rsb = document.getElementById('refresh-status-btn-' + uuid);
+        if (_rsb) _rsb.style.display = 'flex';
+      }
+
+      // Refresh signer chips from latest signers list
+      if (Array.isArray(doc.signers) && doc.signers.length > 0) {
+        var container = document.getElementById('signers-' + uuid);
+        if (container) {
+          doc.signers.forEach(function(s) {
+            var chipEmail = (s.email || '').toLowerCase();
+            var existing = container.querySelector('[data-email="' + chipEmail + '"]');
+            if (!existing) {
+              renderSignerChip(uuid, s);
+            }
+          });
+        }
+      }
+
+      // Refresh signer badge statuses
+      _refreshSignerBadges(uuid);
+    });
+
+    // Switch to docs tab if docs exist and tab not yet shown
+    if (fresh.session_documents.length > 0) {
+      var docTab = document.getElementById('tab-documents');
+      if (docTab && docTab.children.length <= 1) {
+        switchSidebarTab('documents');
+      }
+    }
+  } catch(e) {
+    // Sync is best-effort — silent fail
+  }
+}
+
 function _startSignerStatusPolling(projectUuid, aptId) {
   if (_signerPollIntervals[projectUuid]) return; // already polling
   // Fire once immediately, then every 5s
