@@ -5718,7 +5718,58 @@ async def add_sub_org_member(sub_org_id: str, req: _SubOrgMemberReq, request: Re
         org.setdefault("members", []).append(member)
         org["updated_at"] = _dt.now(_tz.utc).isoformat()
         _save_sub_orgs(orgs)
-    return {"success": True, "member": member}
+        # Capture org details for DC call (outside lock scope for network call)
+        _dc_suborg_uuid = org.get("dc_sub_org_uuid") or ""
+        _dc_suborg_id   = org.get("dc_sub_org_id") or ""
+        _org_type       = org.get("type", "Department")
+
+    # Provision member in DoconChain (non-blocking)
+    _dc_member_error = None
+    _dc_member_result = None
+    if _dc_suborg_uuid and target:
+        try:
+            import urllib.request as _ur_m, urllib.error as _ue_m, json as _json_m
+            _dc_token_m = _get_dc_token()
+            _bd_m = "QLMember" + member["user_id"].replace("-","")[:12]
+            _CRLF = b"\r\n"
+            _fn = target.get("first_name") or member["email"].split("@")[0]
+            _ln = target.get("last_name") or "."
+            _em = member["email"]
+            # organization JSON string as required by DC
+            import json as _json_org
+            _org_json = _json_org.dumps({"id": int(_dc_suborg_id) if _dc_suborg_id.isdigit() else 0, "sub_organization_type_name": _org_type})
+            def _mf(name, value):
+                return (b"--" + _bd_m.encode() + _CRLF +
+                        b"Content-Disposition: form-data; name=\"" + name.encode() + b"\"" + _CRLF +
+                        _CRLF + str(value).encode("utf-8") + _CRLF)
+            _body_m = (
+                _mf("data[0][email]",           _em) +
+                _mf("data[0][first_name]",      _fn) +
+                _mf("data[0][last_name]",       _ln) +
+                _mf("data[0][role]",            "Member") +
+                _mf("data[0][organization]",    _org_json) +
+                _mf("data[0][organization_id]", _dc_suborg_uuid) +
+                b"--" + _bd_m.encode() + b"--" + _CRLF
+            )
+            _url_m = f"{_DC_BASE}/api/v2/sub-organizations/{_dc_suborg_uuid}/members?user_type=ENTERPRISE_API"
+            _req_m = _ur_m.Request(_url_m, data=_body_m, headers={
+                "Authorization": f"Bearer {_dc_token_m}",
+                "Content-Type": f"multipart/form-data; boundary={_bd_m}",
+                "Accept": "application/json",
+            }, method="POST")
+            with _ur_m.urlopen(_req_m, timeout=20) as _r_m:
+                _dc_member_result = _json_m.loads(_r_m.read().decode())
+            print(f"[SubOrg Member] DC added {_em} to {_dc_suborg_uuid}: {str(_dc_member_result)[:120]}", flush=True)
+        except Exception as _dc_m_err:
+            _dc_member_error = str(_dc_m_err)
+            print(f"[SubOrg Member] DC add failed (non-fatal): {_dc_m_err}", flush=True)
+
+    result = {"success": True, "member": member}
+    if _dc_member_error:
+        result["dc_warning"] = f"Member added locally. DoconChain: {_dc_member_error[:150]}"
+    elif _dc_member_result:
+        result["dc_provisioned"] = True
+    return result
 
 
 # ── DELETE /api/sub-orgs/{sub_org_id}/members/{user_id} ──────────────────────
