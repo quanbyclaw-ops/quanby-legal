@@ -317,35 +317,57 @@
         }
         .hero-subtitle { color: var(--muted); font-size: 1.25rem; margin-bottom: 2rem; }
         .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
-        .orbital { position: relative; width: 300px; height: 300px; display: none; }
-        @media (min-width: 768px) { .orbital { display: block; } }
-        .orbital-center {
+        /* -- Orbiting Circles -- */
+        .orbiting-circles { display: none; position: relative; width: 500px; height: 500px; flex-shrink: 0; }
+        @media (min-width: 768px) { .orbiting-circles { display: block; } }
+        .oc-center {
             position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 80px; height: 80px;
-            background: var(--purple);
+            width: 160px; height: 160px;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 2rem;
+            box-shadow: 0 0 40px rgba(124,58,237,0.5), 0 0 80px rgba(236,72,153,0.2);
+            z-index: 2;
         }
-        .ring {
+        .oc-rings { position: absolute; inset: 0; pointer-events: none; }
+        @keyframes orbit-cw {
+            from { transform: translate(-50%,-50%) rotate(0deg)   translateX(var(--r)) rotate(0deg); }
+            to   { transform: translate(-50%,-50%) rotate(360deg) translateX(var(--r)) rotate(-360deg); }
+        }
+        @keyframes orbit-ccw {
+            from { transform: translate(-50%,-50%) rotate(0deg)    translateX(var(--r)) rotate(0deg); }
+            to   { transform: translate(-50%,-50%) rotate(-360deg) translateX(var(--r)) rotate(360deg); }
+        }
+        .oc-icon {
             position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            border: 2px dashed var(--muted);
-            border-radius: 50%;
-            animation: rotate 20s linear infinite;
+            border: none; cursor: pointer; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: box-shadow 0.2s;
+            z-index: 3;
         }
-        .ring1 { width: 200px; height: 200px; }
-        .ring2 { width: 280px; height: 280px; animation-duration: 25s; animation-direction: reverse; }
-        @keyframes rotate {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
+        .oc-icon.inner { width: 56px; height: 56px; animation: orbit-cw var(--dur,20s) linear infinite; --r: 125px; }
+        .oc-icon.outer { width: 70px; height: 70px; animation: orbit-ccw var(--dur,25s) linear infinite; --r: 225px; }
+        #orbit-info-panel {
+            display: none; position: absolute;
+            bottom: -10px; left: 50%; transform: translateX(-50%);
+            width: 300px;
+            background: #0f1117; border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px; padding: 1.25rem;
+            z-index: 100; color: #e2e8f0;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         }
-        .orbital-icon { position: absolute; font-size: 1.5rem; }
-        .icon1 { top: 10%; left: 50%; transform: translate(-50%, -50%); }
-        .icon2 { top: 50%; right: 10%; transform: translate(50%, -50%); }
-        .icon3 { bottom: 10%; left: 50%; transform: translate(-50%, 50%); }
-        .icon4 { top: 50%; left: 10%; transform: translate(-50%, -50%); }
+        #orbit-info-panel.visible { display: block; }
+        #orbit-info-panel h3 { font-size: 0.95rem; margin: 0 0 0.5rem; color: #fff; }
+        #orbit-info-panel p  { font-size: 0.8rem; margin: 0; color: rgba(148,163,184,0.9); line-height: 1.5; }
+        #orbit-info-close {
+            position: absolute; top: 0.6rem; right: 0.75rem;
+            background: none; border: none; color: rgba(148,163,184,0.7);
+            cursor: pointer; font-size: 1rem; line-height: 1;
+        }
+        #orbit-info-close:hover { color: #fff; }
+        .oc-panel-header { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
+        .oc-panel-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
 
         /* SECTIONS */
         section { padding: 4rem 0; }
@@ -1217,14 +1239,78 @@
                     <button class="btn btn-outline" onclick="document.getElementById('regulatory').scrollIntoView({behavior:'smooth'})">View Compliance →</button>
                 </div>
             </div>
-            <div class="orbital">
-                <div class="orbital-center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg></div>
-                <div class="ring ring1"></div>
-                <div class="ring ring2"></div>
-                <div class="orbital-icon icon1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-                <div class="orbital-icon icon2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-                <div class="orbital-icon icon3"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
-                <div class="orbital-icon icon4"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
+            <div class="orbiting-circles">
+                <!-- SVG orbit rings -->
+                <svg class="oc-rings" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="250" cy="250" r="125" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                    <circle cx="250" cy="250" r="225" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+                </svg>
+
+                <!-- Center logo -->
+                <div class="oc-center">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/>
+                    </svg>
+                </div>
+
+                <!-- Inner orbit CW 20s icon 1: Scale/Justice purple -->
+                <button class="oc-icon inner"
+                    style="--dur:20s; animation-delay:0s; background:rgba(91,26,128,0.2); border:1.5px solid rgba(91,26,128,0.3);"
+                    onclick="showOrbitInfo('Supreme Court-Compliant','Designed to be fully compliant with A.M. No. 24-10-14-SC, the Supreme Court Rules on Electronic Notarization, ensuring every digital notarial act meets the highest legal standards.','rgb(167,139,250)')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgb(167,139,250)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/>
+                    </svg>
+                </button>
+
+                <!-- Inner orbit CW 20s icon 2: Signature pink (-10s) -->
+                <button class="oc-icon inner"
+                    style="--dur:20s; animation-delay:-10s; background:rgba(233,30,140,0.2); border:1.5px solid rgba(233,30,140,0.3);"
+                    onclick="showOrbitInfo('Electronic Signatures &amp; Seal','Create and affix electronic signatures and official notarial seals that are legally recognized under Republic Act 8792 and the E-Commerce Act of the Philippines.','rgb(249,168,212)')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgb(249,168,212)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                    </svg>
+                </button>
+
+                <!-- Outer orbit CCW 25s icon 1: Shield green -->
+                <button class="oc-icon outer"
+                    style="--dur:25s; animation-delay:0s; background:rgba(16,185,129,0.2); border:1.5px solid rgba(16,185,129,0.3);"
+                    onclick="showOrbitInfo('Secured by DOCONCHAIN','Secured by DOCONCHAIN Group Pte. Ltd. (Singapore) — enterprise-grade blockchain infrastructure providing tamper-proof document custody and cryptographic audit trails.','rgb(52,211,153)')">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgb(52,211,153)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                </button>
+
+                <!-- Outer orbit CCW 25s icon 2: CheckCircle blue (-8.33s) -->
+                <button class="oc-icon outer"
+                    style="--dur:25s; animation-delay:-8.33s; background:rgba(59,130,246,0.2); border:1.5px solid rgba(59,130,246,0.3);"
+                    onclick="showOrbitInfo('DICT National PKI Verified','Verified by the Department of Information and Communications Technology National Public Key Infrastructure — ensuring every certificate and signature chain meets government-grade cryptographic standards.','rgb(147,197,253)')">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgb(147,197,253)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                </button>
+
+                <!-- Outer orbit CCW 25s icon 3: Blockchain purple (-16.67s) -->
+                <button class="oc-icon outer"
+                    style="--dur:25s; animation-delay:-16.67s; background:rgba(139,92,246,0.2); border:1.5px solid rgba(139,92,246,0.3);"
+                    onclick="showOrbitInfo('Hyperledger Fabric Audit','All notarial acts are recorded on an immutable Hyperledger Fabric blockchain ledger — providing a Supreme Court-ready chain of custody and cryptographic proof of authenticity.','rgb(196,181,253)')">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgb(196,181,253)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                </button>
+
+                <!-- Info panel -->
+                <div id="orbit-info-panel">
+                    <button id="orbit-info-close" onclick="document.getElementById('orbit-info-panel').classList.remove('visible')">&times;</button>
+                    <div class="oc-panel-header">
+                        <span class="oc-panel-dot" id="orbit-info-dot"></span>
+                        <h3 id="orbit-info-title"></h3>
+                    </div>
+                    <p id="orbit-info-body"></p>
+                </div>
             </div>
         </div>
     </section>
