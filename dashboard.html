@@ -43,7 +43,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>My Dashboard — Quanby Legal</title>
 <link rel="icon" href="/favicon.ico"/>
-  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css"/>
+<link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css"/>
 <style>
   :root {
     --navy: #1B2A6B; --gold: #C9A84C; --teal: #0EA5E9; --bg: #080B18;
@@ -53,7 +53,8 @@
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-  :root { --purple: #7c3aed; --purple-light: #9d5ff3; --text-color: #e8eaf2; --muted-color: #8b90a8; }
+
+  /* ── NAV ── */
   nav { background: rgba(10,12,24,0.97); border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
   .nav-content { max-width: 1280px; margin: 0 auto; padding: 0 2rem; height: 64px; display: flex; align-items: center; gap: 2rem; }
   .logo { display: flex; align-items: center; gap: 0.625rem; text-decoration: none; flex-shrink: 0; }
@@ -64,7 +65,6 @@
   .nav-links a:hover { background: rgba(255,255,255,0.06); color: var(--text); }
   .nav-links a.active { background: rgba(255,255,255,0.08); color: var(--text); }
   .nav-user { display: flex; align-items: center; gap: 0.625rem; position: relative; cursor: pointer; }
-  
   .nav-user-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); }
   .nav-user-name { font-size: 0.85rem; color: #8b90a8; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .nav-user-initials { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #1B2A6B, #0EA5E9); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: #fff; border: 2px solid rgba(201,168,76,0.4); flex-shrink: 0; }
@@ -81,65 +81,253 @@
   .num-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
   .num-signout { color: #f87171; }
   .num-signout:hover { background: rgba(239,68,68,0.07); color: #f87171; }
-  .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
-  .hero-card { background: linear-gradient(135deg, rgba(27,42,107,0.5) 0%, rgba(14,165,233,0.08) 100%); border: 1px solid rgba(201,168,76,0.25); border-radius: 14px; padding: 1.75rem 2rem; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 1.5rem; position: relative; overflow: hidden; }
-  .hero-card::before { content: ''; position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(14,165,233,0.12), transparent 70%); pointer-events: none; }
-  .hero-avatar { width: 68px; height: 68px; border-radius: 50%; background: linear-gradient(135deg, var(--navy), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: 700; color: #fff; flex-shrink: 0; border: 2px solid rgba(201,168,76,0.5); box-shadow: 0 0 0 4px rgba(201,168,76,0.1); }
-  .hero-info { flex: 1; min-width: 0; }
-  .hero-info h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 0.25rem; }
-  .hero-info .role-badge { display: inline-block; background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.35); color: var(--gold); font-size: 0.7rem; font-weight: 700; padding: 0.18rem 0.55rem; border-radius: 99px; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.25rem; }
-  .hero-info .email { color: var(--muted); font-size: 0.82rem; margin-bottom: 0.5rem; }
-  .status-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.28rem 0.7rem; border-radius: 99px; font-size: 0.75rem; font-weight: 600; }
+
+  /* ── MAIN LAYOUT ── */
+  .dash-main { max-width: 960px; margin: 0 auto; padding: 2.25rem 1.5rem 4rem; }
+
+  /* Loading / Error */
+  .dash-loading { text-align: center; padding: 5rem 2rem; color: var(--muted); font-size: 0.9rem; }
+  .error-box { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 14px; padding: 2rem; text-align: center; color: var(--red); max-width: 420px; margin: 4rem auto; }
+
+  /* ── HERO STRIP ── */
+  .hero-strip {
+    background: linear-gradient(135deg, rgba(27,42,107,0.4) 0%, rgba(14,165,233,0.1) 100%);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 16px;
+    padding: 2rem 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-strip::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(14,165,233,0.1), transparent 70%);
+    pointer-events: none;
+  }
+  .hero-left { display: flex; align-items: center; gap: 1.25rem; position: relative; z-index: 1; }
+  .hero-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--navy), var(--teal));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+    border: 2px solid rgba(201,168,76,0.45);
+    box-shadow: 0 0 0 4px rgba(201,168,76,0.1);
+  }
+  .hero-meta {}
+  .hero-name { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.015em; margin-bottom: 0.2rem; line-height: 1.2; }
+  .hero-email { font-size: 0.81rem; color: var(--muted); margin-bottom: 0.5rem; }
+  .role-badge {
+    display: inline-block;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.35);
+    color: var(--gold);
+    font-size: 0.67rem; font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    letter-spacing: 0.07em; text-transform: uppercase;
+  }
+  .hero-right { flex-shrink: 0; position: relative; z-index: 1; }
+
+  /* Status chips */
+  .status-chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.38rem 0.85rem; border-radius: 99px; font-size: 0.78rem; font-weight: 600; }
   .status-chip.certified { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.35); color: #34d399; }
   .status-chip.pending { background: rgba(139,144,168,0.1); border: 1px solid rgba(139,144,168,0.25); color: var(--muted); }
   .status-chip.probationary { background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); color: var(--amber); }
-  .section-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
-  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.875rem; margin-bottom: 1.25rem; }
-  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem 1.375rem; transition: border-color 0.15s; }
-  .stat-card:hover { border-color: var(--border2); }
-  .stat-card .label, .stat-card h3 { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 0.6rem; }
-  .stat-card .value { font-size: 1.3rem; font-weight: 700; color: var(--text); line-height: 1.2; }
-  .stat-card .sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; }
-  .stat-card.warn .value { color: var(--amber); }
-  .stat-card.danger .value { color: var(--red); }
-  .stat-card.success .value { color: #34d399; }
-  .cert-box { background: var(--surface); border: 1px solid rgba(201,168,76,0.2); border-radius: 10px; padding: 1.375rem; margin-bottom: 1.25rem; }
-  .cert-box h3 { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 0.875rem; }
-  .cert-id-block { font-family: 'Courier New', monospace; font-size: 0.82rem; background: rgba(0,0,0,0.35); border: 1px solid rgba(201,168,76,0.2); border-radius: 6px; padding: 0.65rem 0.875rem; color: var(--gold); margin-bottom: 0.875rem; word-break: break-all; letter-spacing: 0.03em; }
-  .btn-gold { display: inline-flex; align-items: center; gap: 0.4rem; background: linear-gradient(135deg,#C9A84C,#ddb96e); color: #0D0F1A; font-weight: 700; padding: 0.65rem 1.25rem; border-radius: 7px; border: none; cursor: pointer; font-size: 0.875rem; text-decoration: none; transition: opacity 0.15s; }
+
+  /* ── STATS ROW ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem 1.25rem 1rem;
+    transition: border-color 0.15s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    border-radius: 12px 12px 0 0;
+  }
+  .stat-onboarding::before { background: var(--teal); }
+  .stat-role-card::before  { background: var(--gold); }
+  .stat-cert-card::before  { background: var(--green); }
+  .stat-kyc-card::before   { background: var(--purple); }
+  .stat-sc-card::before    { background: var(--amber); }
+  .stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .stat-label { font-size: 0.67rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--muted); margin-bottom: 0.55rem; }
+  .stat-value { font-size: 1.05rem; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .stat-sub { font-size: 0.71rem; color: var(--muted); margin-top: 0.3rem; }
+  /* SC stat full-width bar below grid */
+  .stat-card-wide {
+    grid-column: 1 / -1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex; align-items: center; gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── SECTION WRAPPER ── */
+  .dash-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.625rem 1.875rem;
+    margin-bottom: 1.25rem;
+  }
+  .dash-section.cert-section {
+    background: var(--surface);
+    border-color: rgba(201,168,76,0.2);
+  }
+
+  /* Section headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.67rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 1.375rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-header i { font-size: 0.9rem; }
+
+  /* ── CERTIFICATE SECTION ── */
+  .cert-id-block {
+    font-family: 'Courier New', 'Lucida Console', monospace;
+    font-size: 0.875rem;
+    background: #0a0d1a;
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 8px;
+    padding: 0.9rem 1.125rem;
+    color: var(--gold);
+    margin-bottom: 1.125rem;
+    word-break: break-all;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+  }
+  .cert-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+  /* ── KYC SECTION ── */
+  .kyc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.125rem;
+  }
+  .kyc-item-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 0.4rem; }
+  .kyc-item-value { font-weight: 600; font-size: 0.88rem; }
+
+  /* ── SC SECTION ── */
+  .sc-status-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 1rem 1.125rem;
+    border-radius: 8px;
+    background: rgba(245,158,11,0.06);
+    margin-bottom: 0.875rem;
+  }
+  .sc-steps {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.125rem;
+  }
+
+  /* ── ACTION CARDS (services grid) ── */
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  .action-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s, box-shadow 0.18s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .action-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border2);
+    box-shadow: 0 10px 36px rgba(0,0,0,0.35);
+  }
+  .action-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .action-title { font-size: 0.95rem; font-weight: 700; line-height: 1.2; }
+  .action-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.6; flex: 1; }
+  .action-cta { align-self: flex-start; pointer-events: none; }
+
+  /* ── BUTTONS ── */
+  .btn-gold { display: inline-flex; align-items: center; gap: 0.4rem; background: linear-gradient(135deg,#C9A84C,#ddb96e); color: #0D0F1A; font-weight: 700; padding: 0.6rem 1.25rem; border-radius: 7px; border: none; cursor: pointer; font-size: 0.85rem; text-decoration: none; transition: opacity 0.15s; white-space: nowrap; }
   .btn-gold:hover { opacity: 0.88; }
-  .btn-outline { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border2); color: var(--text); font-weight: 600; padding: 0.6rem 1.125rem; border-radius: 7px; text-decoration: none; font-size: 0.85rem; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+  .btn-outline { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.04); border: 1px solid var(--border2); color: var(--text); font-weight: 600; padding: 0.55rem 1.125rem; border-radius: 7px; text-decoration: none; font-size: 0.85rem; cursor: pointer; transition: background 0.15s, border-color 0.15s; white-space: nowrap; }
   .btn-outline:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
-  .btn-teal { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(14,165,233,0.15); border: 1px solid rgba(14,165,233,0.35); color: #38bdf8; font-weight: 600; padding: 0.6rem 1.125rem; border-radius: 7px; font-size: 0.85rem; cursor: pointer; text-decoration: none; transition: background 0.15s; }
+  .btn-teal { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(14,165,233,0.15); border: 1px solid rgba(14,165,233,0.35); color: #38bdf8; font-weight: 600; padding: 0.55rem 1.125rem; border-radius: 7px; font-size: 0.85rem; cursor: pointer; text-decoration: none; transition: background 0.15s; white-space: nowrap; }
   .btn-teal:hover { background: rgba(14,165,233,0.25); }
-  .btn-danger { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; font-weight: 600; padding: 0.6rem 1.125rem; border-radius: 7px; font-size: 0.85rem; cursor: pointer; }
-  .actions { display: flex; flex-wrap: wrap; gap: 0.625rem; margin-bottom: 1.25rem; }
-  .quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.875rem; margin-bottom: 1.25rem; }
-  .quick-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; cursor: pointer; text-decoration: none; color: var(--text); transition: background 0.15s, border-color 0.15s; display: flex; flex-direction: column; gap: 0.6rem; }
-  .quick-card:hover { background: var(--surface2); border-color: var(--border2); }
-  .quick-card .qc-icon { width: 36px; height: 36px; background: rgba(14,165,233,0.12); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #38bdf8; font-size: 1rem; }
-  .quick-card .qc-title { font-size: 0.9rem; font-weight: 600; }
-  .quick-card .qc-desc { font-size: 0.75rem; color: var(--muted); }
-  .notice { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 0.875rem 1rem; font-size: 0.82rem; color: var(--amber); margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 0.625rem; }
+  .btn-danger { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; font-weight: 600; padding: 0.55rem 1.125rem; border-radius: 7px; font-size: 0.85rem; cursor: pointer; }
+
+  /* ── NOTICES ── */
+  .notice { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 0.875rem 1rem; font-size: 0.82rem; color: var(--amber); display: flex; align-items: flex-start; gap: 0.625rem; line-height: 1.5; }
   .notice.danger { background: rgba(239,68,68,0.07); border-color: rgba(239,68,68,0.25); color: var(--red); }
-  .notice.success { background: rgba(16,185,129,0.07); border-color: rgba(16,185,129,0.25); color: #34d399; }
-  .loading { text-align: center; padding: 5rem 2rem; color: var(--muted); font-size: 0.9rem; }
-  .error-box { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); border-radius: 10px; padding: 2rem; text-align: center; color: var(--red); }
-  .divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
-  .kyc-done-msg { color: #34d399; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; gap: 0.35rem; }
-  .sc-status-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-  .sc-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.375rem; margin-bottom: 1.25rem; }
-  .sc-card h3 { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-  @media (max-width: 600px) {
-    .hero-card { flex-direction: column; text-align: center; }
-    .stats-grid { grid-template-columns: 1fr 1fr; }
-    .quick-grid { grid-template-columns: 1fr 1fr; }
-    .actions { flex-direction: column; }
-    .container { padding: 1.25rem 1rem 2rem; }
+
+  /* KYC done msg */
+  .kyc-done-msg { color: #34d399; font-size: 0.82rem; font-weight: 600; display: flex; align-items: center; gap: 0.4rem; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .hero-strip { flex-direction: column; align-items: flex-start; padding: 1.5rem; }
+    .hero-right { align-self: flex-start; }
+    .kyc-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 480px) {
+    .dash-main { padding: 1.25rem 1rem 3rem; }
+    .dash-section { padding: 1.25rem 1.125rem; }
+    .hero-strip { padding: 1.25rem; }
+    .hero-left { flex-direction: column; align-items: flex-start; }
+    .kyc-grid { grid-template-columns: 1fr; }
+    .cert-actions { flex-direction: column; }
+    .services-grid { grid-template-columns: 1fr; }
   }
 </style>
-    <script src="https://hv-camera-web-sg.s3-ap-southeast-1.amazonaws.com/hyperverge-web-sdk@10.3.0/src/sdk.min.js"></script>
+<script src="https://hv-camera-web-sg.s3-ap-southeast-1.amazonaws.com/hyperverge-web-sdk@10.3.0/src/sdk.min.js"></script>
 </head>
 <body>
 
@@ -162,7 +350,7 @@
    onmouseout="this.style.background='rgba(124,58,237,0.1)';this.style.color='rgba(196,181,253,0.65)'">
   🔐 Admin
 </button>
-<div class="nav-user" id="nav-user-wrap" onclick="toggleDashMenu()">
+    <div class="nav-user" id="nav-user-wrap" onclick="toggleDashMenu()">
       <img class="nav-user-avatar" id="dash-nav-avatar" src="" alt="" style="display:none;">
       <div class="nav-user-initials" id="dash-nav-initials" style="display:none;"></div>
       <span class="nav-user-name" id="dash-nav-name"></span>
@@ -196,105 +384,152 @@
   </div>
 </nav>
 
-<div class="container">
-  <div id="loading" class="loading">Loading your dashboard…</div>
+<main class="dash-main">
+
+  <!-- Loading / Error states -->
+  <div id="loading" class="dash-loading">
+    <div style="margin-bottom:0.75rem;opacity:0.5;font-size:1.5rem;">⋯</div>
+    Loading your dashboard…
+  </div>
   <div id="error" style="display:none;" class="error-box">
+    <i class="hgi-stroke hgi-alert-circle" style="font-size:1.75rem;margin-bottom:0.75rem;display:block;opacity:0.7;"></i>
     <p id="error-msg">Unable to load your profile. Please <a href="/" style="color:var(--gold);">sign in</a> first.</p>
   </div>
+
+  <!-- Dashboard (shown after auth) -->
   <div id="dashboard" style="display:none;">
 
-    <!-- HERO -->
-    <div class="hero-card">
-      <div class="hero-avatar" id="avatar-initials">?</div>
-      <div class="hero-info">
-        <h1 id="user-name">…</h1>
-        <span class="role-badge" id="user-role">…</span>
-        <div class="email" id="user-email">…</div>
-        <span class="status-chip" id="status-chip">…</span>
+    <!-- ① WELCOME HERO STRIP -->
+    <div class="hero-strip">
+      <div class="hero-left">
+        <div class="hero-avatar" id="avatar-initials">?</div>
+        <div class="hero-meta">
+          <h1 class="hero-name" id="user-name">…</h1>
+          <div class="hero-email" id="user-email">…</div>
+          <span class="role-badge" id="user-role">…</span>
+        </div>
+      </div>
+      <div class="hero-right">
+        <span class="status-chip pending" id="status-chip">
+          <i class="hgi-stroke hgi-clock-01" style="font-size:.85rem;"></i>…
+        </span>
       </div>
     </div>
 
-    <!-- CERT BOX -->
-    <div class="cert-box" id="cert-section" style="display:none;">
-      <h3><i class="hgi-stroke hgi-award-01" style="font-size:1rem;vertical-align:middle;margin-right:.4rem;"></i>Your Certificate</h3>
+    <!-- ② STATUS CARDS ROW -->
+    <div class="stats-row">
+      <div class="stat-card stat-onboarding" id="stat-onboarding">
+        <div class="stat-label">Onboarding</div>
+        <div class="stat-value" id="stat-step">…</div>
+        <div class="stat-sub" id="stat-step-sub">…</div>
+      </div>
+      <div class="stat-card stat-role-card">
+        <div class="stat-label">Account Role</div>
+        <div class="stat-value" id="stat-role">…</div>
+        <div class="stat-sub">Platform access level</div>
+      </div>
+      <div class="stat-card stat-cert-card">
+        <div class="stat-label">Certification</div>
+        <div class="stat-value" id="stat-cert">…</div>
+        <div class="stat-sub" id="stat-cert-sub">…</div>
+      </div>
+      <div class="stat-card stat-kyc-card" id="kyc-card">
+        <div class="stat-label">KYC Status</div>
+        <div class="stat-value" id="stat-kyc">…</div>
+        <div class="stat-sub" id="stat-kyc-sub">…</div>
+      </div>
+    </div>
+
+    <!-- SC Commission stat — full width, only for certified attorneys -->
+    <div class="stat-card stat-sc-card" id="sc-card" style="display:none;margin-bottom:1.5rem;">
+      <div class="stat-label"><i class="hgi-stroke hgi-justice-scale-01" style="font-size:.82rem;vertical-align:middle;margin-right:.3rem;"></i>SC Commission</div>
+      <div class="stat-value" id="stat-sc">…</div>
+      <div class="stat-sub" id="stat-sc-sub">…</div>
+    </div>
+
+    <!-- ③ CERTIFICATE SECTION (shown when certified) -->
+    <div class="dash-section cert-section" id="cert-section" style="display:none;">
+      <div class="section-header">
+        <i class="hgi-stroke hgi-award-01"></i>
+        <span>Your Certificate</span>
+      </div>
       <div class="cert-id-block" id="cert-id-display">…</div>
-      <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
-        <a id="cert-download-btn" href="#" target="_blank" class="btn-gold"><i class="hgi-stroke hgi-download-01" style="font-size:.85rem;vertical-align:middle;margin-right:.3rem;"></i>Download Certificate</a>
-        <button class="btn-outline" onclick="copyCertId()"><i class="hgi-stroke hgi-copy-01" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Copy Certificate ID</button>
+      <div class="cert-actions">
+        <a id="cert-download-btn" href="#" target="_blank" class="btn-gold">
+          <i class="hgi-stroke hgi-download-01" style="font-size:.85rem;"></i>Download Certificate
+        </a>
+        <button class="btn-outline" onclick="copyCertId()">
+          <i class="hgi-stroke hgi-copy-01" style="font-size:.85rem;"></i>Copy Certificate ID
+        </button>
+        <button class="btn-outline" id="btn-regenerate" onclick="regenerateCert()" style="display:none;">
+          <i class="hgi-stroke hgi-refresh" style="font-size:.85rem;"></i>Regenerate Certificate
+        </button>
       </div>
     </div>
 
-    <!-- STATS GRID -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h3>Onboarding Status</h3>
-        <div class="value" id="stat-step">…</div>
-        <div class="sub" id="stat-step-sub">…</div>
+    <!-- ④ IDENTITY / KYC SECTION -->
+    <div class="dash-section" id="kyc-section">
+      <div class="section-header">
+        <i class="hgi-stroke hgi-user-id-verification"></i>
+        <span>Identity Verification</span>
       </div>
-      <div class="stat-card">
-        <h3>Account Role</h3>
-        <div class="value" id="stat-role">…</div>
-        <div class="sub">Platform access level</div>
+
+      <div class="kyc-grid">
+        <div>
+          <div class="kyc-item-label">Liveness Check</div>
+          <div id="kyc-liveness-status" class="kyc-item-value">…</div>
+        </div>
+        <div>
+          <div class="kyc-item-label">ID Upload</div>
+          <div id="kyc-id-status" class="kyc-item-value">…</div>
+        </div>
+        <div>
+          <div class="kyc-item-label">KYC Expiry</div>
+          <div id="kyc-expiry" class="kyc-item-value">…</div>
+        </div>
       </div>
-      <div class="stat-card">
-        <h3>Certification</h3>
-        <div class="value" id="stat-cert">…</div>
-        <div class="sub" id="stat-cert-sub">…</div>
+
+      <div id="kyc-warning" style="display:none;margin-bottom:0.875rem;" class="notice">
+        <i class="hgi-stroke hgi-alert-02" style="font-size:.9rem;flex-shrink:0;margin-top:1px;"></i>
+        <span>Your KYC verification expires in <strong id="kyc-days-left"></strong> days. Redo KYC before it expires to maintain your certification status.</span>
       </div>
-      <div class="stat-card" id="kyc-card">
-        <h3>KYC / Identity</h3>
-        <div class="value" id="stat-kyc">…</div>
-        <div class="sub" id="stat-kyc-sub">…</div>
+      <div id="kyc-expired-warning" style="display:none;margin-bottom:0.875rem;" class="notice danger">
+        <i class="hgi-stroke hgi-cancel-circle" style="font-size:.9rem;flex-shrink:0;margin-top:1px;"></i>
+        <span>Your KYC has expired. Please redo your identity verification.</span>
       </div>
-      <div class="stat-card" id="sc-card" style="display:none;">
-        <h3><i class="hgi-stroke hgi-justice-scale-01" style="font-size:1rem;vertical-align:middle;margin-right:.4rem;"></i>SC Commission</h3>
-        <div class="value" id="stat-sc">…</div>
-        <div class="sub" id="stat-sc-sub">…</div>
+
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-top:0.25rem;">
+        <button class="btn-teal" onclick="redoKyc()" id="btn-redo-kyc" style="display:none;">
+          <i class="hgi-stroke hgi-refresh" style="font-size:.85rem;"></i>Redo KYC Verification
+        </button>
+        <div id="kyc-done-msg" class="kyc-done-msg" style="display:none;">
+          <i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.9rem;"></i>
+          KYC Verified — <span id="kyc-done-date"></span>
+        </div>
+        <div id="kyc-msg" style="font-size:0.8rem;color:var(--muted);display:none;"></div>
       </div>
     </div>
 
-    <!-- KYC SECTION -->
-    <div class="cert-box" id="kyc-section">
-      <h3><i class="hgi-stroke hgi-user-id-verification" style="font-size:1rem;vertical-align:middle;margin-right:.4rem;"></i>Identity Verification (KYC)</h3>
-      <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-start;margin-bottom:1rem;">
-        <div style="flex:1;min-width:200px;">
-          <div style="font-size:0.875rem;color:var(--muted);margin-bottom:0.5rem;">Liveness Check</div>
-          <div id="kyc-liveness-status" style="font-weight:600;"></div>
-        </div>
-        <div style="flex:1;min-width:200px;">
-          <div style="font-size:0.875rem;color:var(--muted);margin-bottom:0.5rem;">ID Upload</div>
-          <div id="kyc-id-status" style="font-weight:600;"></div>
-        </div>
-        <div style="flex:1;min-width:200px;">
-          <div style="font-size:0.875rem;color:var(--muted);margin-bottom:0.5rem;">KYC Expiry</div>
-          <div id="kyc-expiry" style="font-weight:600;"></div>
-        </div>
+    <!-- ⑤ SC COMMISSION SECTION (attorneys with cert only) -->
+    <div class="dash-section" id="sc-section" style="display:none;">
+      <div class="section-header">
+        <i class="hgi-stroke hgi-justice-scale-01"></i>
+        <span>SC Commission Status</span>
       </div>
-      <div id="kyc-warning" style="display:none;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.4);border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.85rem;color:#F59E0B;margin-bottom:1rem;">
-        <i class="hgi-stroke hgi-alert-02" style="color:#F59E0B;font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Your KYC verification expires in <span id="kyc-days-left"></span> days. Redo KYC before it expires to maintain your certification status.
-      </div>
-      <div id="kyc-expired-warning" style="display:none;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.85rem;color:#F87171;margin-bottom:1rem;">
-        <i class="hgi-stroke hgi-cancel-circle" style="color:#F87171;font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Your KYC has expired. Please redo your identity verification.
-      </div>
-      <button class="btn-teal" onclick="redoKyc()" id="btn-redo-kyc" style="max-width:260px;display:none;"><i class="hgi-stroke hgi-refresh" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Redo KYC Verification</button>
-      <div id="kyc-done-msg" class="kyc-done-msg" style="display:none;color:#10B981;font-size:0.875rem;font-weight:600;"><i class="hgi-stroke hgi-checkmark-circle-01" style="color:#10B981;font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>KYC Verified — <span id="kyc-done-date"></span></div>
-      <div id="kyc-msg" style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem;display:none;"></div>
-    </div>
 
-    <!-- SC COMMISSION STATUS -->
-    <div class="cert-box" id="sc-section" style="display:none;">
-      <h3><i class="hgi-stroke hgi-justice-scale-01" style="font-size:1rem;vertical-align:middle;margin-right:.4rem;"></i>Supreme Court ENP Commission Status</h3>
-      <div id="sc-status-block" style="margin-bottom:1rem;">
-        <div style="display:flex;align-items:center;gap:0.75rem;padding:1rem;border-radius:0.5rem;margin-bottom:0.75rem;" id="sc-status-banner">
-          <div style="font-size:1.75rem;" id="sc-status-icon"><i class="hgi-stroke hgi-clock-01" style="color:#F59E0B;"></i></div>
+      <div id="sc-status-block" style="margin-bottom:1.25rem;">
+        <div class="sc-status-banner" id="sc-status-banner">
+          <div id="sc-status-icon" style="font-size:1.75rem;flex-shrink:0;margin-top:2px;">
+            <i class="hgi-stroke hgi-clock-01" style="color:var(--amber);"></i>
+          </div>
           <div>
-            <div style="font-weight:700;font-size:1rem;" id="sc-status-label">Pending SC Activation</div>
-            <div style="font-size:0.8rem;color:var(--muted);margin-top:0.2rem;" id="sc-status-desc">Your ENP commission must be activated by the Supreme Court before you can legally practice as an Electronic Notary Public.</div>
+            <div style="font-weight:700;font-size:0.95rem;margin-bottom:0.25rem;" id="sc-status-label">Pending SC Activation</div>
+            <div style="font-size:0.8rem;color:var(--muted);line-height:1.6;" id="sc-status-desc">Your ENP commission must be activated by the Supreme Court before you can legally practice as an Electronic Notary Public.</div>
           </div>
         </div>
-        <div style="background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:0.5rem;padding:1rem;font-size:0.8rem;color:var(--muted);line-height:1.7;">
-          <strong style="color:var(--text);display:block;margin-bottom:0.4rem;">Required steps after certification:</strong>
-          <ol style="padding-left:1.25rem;margin:0;">
+        <div class="sc-steps">
+          <strong style="color:var(--text);display:block;margin-bottom:0.5rem;font-size:0.8rem;">Required steps after certification:</strong>
+          <ol style="padding-left:1.25rem;margin:0;font-size:0.79rem;color:var(--muted);line-height:1.9;">
             <li>Print your ENP certificate and submit it to the <strong style="color:var(--text);">Supreme Court of the Philippines</strong></li>
             <li>Complete the SC e-filing at <a href="https://efiling.sc.judiciary.gov.ph" target="_blank" style="color:var(--teal);">efiling.sc.judiciary.gov.ph</a></li>
             <li>Wait for SC to add you to the national ENP registry</li>
@@ -302,56 +537,62 @@
           </ol>
         </div>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:0.75rem;">
-        <a href="https://efiling.sc.judiciary.gov.ph" target="_blank" class="btn-teal" style="font-size:0.875rem;padding:0.6rem 1.25rem;"><i class="hgi-stroke hgi-justice-scale-01" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Go to SC e-Filing Portal</a>
-        <a id="sc-cert-link" href="#" target="_blank" class="btn-outline" style="font-size:0.875rem;padding:0.6rem 1.25rem;display:none;"><i class="hgi-stroke hgi-download-01" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Download Certificate for SC Submission</a>
+
+      <div class="cert-actions">
+        <a href="https://efiling.sc.judiciary.gov.ph" target="_blank" class="btn-teal">
+          <i class="hgi-stroke hgi-justice-scale-01" style="font-size:.85rem;"></i>Go to SC e-Filing Portal
+        </a>
+        <a id="sc-cert-link" href="#" target="_blank" class="btn-outline" style="display:none;">
+          <i class="hgi-stroke hgi-download-01" style="font-size:.85rem;"></i>Download Certificate for SC Submission
+        </a>
       </div>
     </div>
 
-    <!-- SIGNING PORTAL -->
-    <div class="cert-box" style="border-color:rgba(14,165,233,0.35);background:linear-gradient(135deg,rgba(14,165,233,0.06),rgba(13,15,26,0.8));">
-      <h3 style="color:var(--teal);"><i class="hgi-stroke hgi-pencil-edit-01" style="font-size:1rem;vertical-align:middle;margin-right:.4rem;"></i>Document Signing Portal</h3>
-      <p style="font-size:0.875rem;color:var(--muted);margin-bottom:1rem;line-height:1.6;">Access the Quanby Legal signing platform to create, send, and e-notarize documents with certified ENPs.</p>
-      <a href="https://qlegal.quanbyit.com" target="_blank" rel="noopener" class="btn-teal" style="display:inline-block;text-decoration:none;"><i class="hgi-stroke hgi-pencil-edit-01" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Open Signing Portal →</a>
-    </div>
+    <!-- ⑥ NOTARIZATION SERVICES (role-based) -->
+    <div class="dash-section" id="booking-actions" style="display:none;">
+      <div class="section-header">
+        <i class="hgi-stroke hgi-calendar-03"></i>
+        <span>Notarization Services</span>
+      </div>
 
-    <!-- ACTIONS -->
-    <div class="cert-box">
-      <h3><i class="hgi-stroke hgi-flash" style="font-size:1rem;vertical-align:middle;margin-right:.4rem;"></i>Quick Actions</h3>
-      <div class="actions" style="margin-bottom:0;">
-        <a href="/" class="btn-outline"><i class="hgi-stroke hgi-home-01" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Return to Home</a>
-        <a href="https://qlegal.quanbyit.com" target="_blank" rel="noopener" class="btn-teal" style="font-size:0.875rem;padding:0.6rem 1.25rem;"><i class="hgi-stroke hgi-pencil-edit-01" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Sign Documents</a>
-        <a href="https://efiling.sc.judiciary.gov.ph" target="_blank" class="btn-outline"><i class="hgi-stroke hgi-justice-scale-01" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Supreme Court Portal</a>
-        <button class="btn-outline" id="btn-regenerate" onclick="regenerateCert()" style="display:none;"><i class="hgi-stroke hgi-refresh" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Regenerate Certificate</button>
+      <div class="services-grid">
+
+        <!-- CLIENT: Find a Notary -->
+        <div id="qa-client-browse" style="display:none;" class="action-card" onclick="window.location.href='/browse'">
+          <div class="action-icon" style="background:rgba(201,168,76,0.12);color:var(--gold);">
+            <i class="hgi-stroke hgi-search-01"></i>
+          </div>
+          <div class="action-title">Find a Notary</div>
+          <div class="action-desc">Browse our directory of certified Electronic Notary Publics and book an appointment.</div>
+          <span class="btn-gold action-cta" style="font-size:0.8rem;padding:0.5rem 1rem;">Browse Directory</span>
+        </div>
+
+        <!-- CLIENT: My Appointments -->
+        <div id="qa-client-appointments" style="display:none;" class="action-card" onclick="window.location.href='/appointments'">
+          <div class="action-icon" style="background:rgba(14,165,233,0.12);color:var(--teal);">
+            <i class="hgi-stroke hgi-calendar-check-in-02"></i>
+          </div>
+          <div class="action-title">My Appointments</div>
+          <div class="action-desc">View and manage your scheduled notarization appointments and booking history.</div>
+          <span class="btn-teal action-cta" style="font-size:0.8rem;padding:0.5rem 1rem;">View Appointments</span>
+        </div>
+
+        <!-- ENP: Manage Appointments -->
+        <div id="qa-enp-appointments" style="display:none;" class="action-card" onclick="window.location.href='/appointments'">
+          <div class="action-icon" style="background:rgba(16,185,129,0.12);color:var(--green);">
+            <i class="hgi-stroke hgi-calendar-check-in-02"></i>
+          </div>
+          <div class="action-title">Manage Appointments</div>
+          <div class="action-desc" id="qa-pending-count">Loading pending requests…</div>
+          <span class="btn-gold action-cta" style="font-size:0.8rem;padding:0.5rem 1rem;">Manage Requests</span>
+        </div>
+
       </div>
     </div>
 
-    <!-- ROLE-AWARE QUICK ACTIONS -->
-    <div class="cert-box" id="booking-actions" style="display:none;">
-      <h3><i class="hgi-stroke hgi-calendar-03" style="font-size:1rem;vertical-align:middle;margin-right:.4rem;"></i>Notarization Services</h3>
-      <div class="stats-grid" style="margin-bottom:0;">
-        <!-- Client cards -->
-        <div id="qa-client-browse" style="display:none;" class="stat-card" style="cursor:pointer;" onclick="window.location.href='/browse'">
-          <h3><i class="hgi-stroke hgi-search-01" style="font-size:1rem;vertical-align:middle;margin-right:.4rem;"></i>Find a Notary</h3>
-          <div class="value" style="font-size:1rem;">Browse Certified ENPs</div>
-          <div class="sub" style="margin-top:0.75rem;"><a href="/browse" style="color:var(--gold);font-weight:600;text-decoration:none;">Browse Directory →</a></div>
-        </div>
-        <div id="qa-client-appointments" style="display:none;" class="stat-card" onclick="window.location.href='/appointments'" style="cursor:pointer;">
-          <h3><i class="hgi-stroke hgi-calendar-check-in-02" style="font-size:1rem;vertical-align:middle;margin-right:.4rem;"></i>My Appointments</h3>
-          <div class="value" style="font-size:1rem;">View booking status</div>
-          <div class="sub" style="margin-top:0.75rem;"><a href="/appointments" style="color:var(--gold);font-weight:600;text-decoration:none;">View Appointments →</a></div>
-        </div>
-        <!-- ENP card -->
-        <div id="qa-enp-appointments" style="display:none;" class="stat-card" onclick="window.location.href='/appointments'" style="cursor:pointer;">
-          <h3><i class="hgi-stroke hgi-calendar-check-in-02" style="font-size:1rem;vertical-align:middle;margin-right:.4rem;"></i>Appointment Requests</h3>
-          <div class="value" id="qa-pending-count" style="font-size:1rem;">Loading…</div>
-          <div class="sub" style="margin-top:0.75rem;"><a href="/appointments" style="color:var(--gold);font-weight:600;text-decoration:none;">Manage Requests →</a></div>
-        </div>
-      </div>
-    </div>
+  </div><!-- /#dashboard -->
 
-  </div>
-</div>
+</main>
 
 <script>
 async function loadDashboard() {
@@ -463,7 +704,7 @@ async function loadDashboard() {
       document.getElementById('cert-section').style.display = '';
       document.getElementById('cert-id-display').textContent = user.certificate_id;
       document.getElementById('cert-download-btn').href = `/api/certificate/${user.certificate_id}`;
-      document.getElementById('btn-regenerate').style.display = 'inline-block';
+      document.getElementById('btn-regenerate').style.display = 'inline-flex';
     }
 
     // KYC status
@@ -495,24 +736,24 @@ async function loadDashboard() {
         ? `<span style="color:${daysLeft <= 3 ? '#F87171' : daysLeft <= 7 ? '#F59E0B' : '#10B981'};">${daysLeft}d left (${expiryStr})</span>`
         : '<span style="color:#F87171;">Expired</span>';
       if (daysLeft <= 0) {
-        document.getElementById('kyc-expired-warning').style.display = '';
+        document.getElementById('kyc-expired-warning').style.display = 'flex';
         statKyc.innerHTML = '<span style="color:#F87171;">Expired</span>';
         statKycSub.textContent = 'Redo KYC required';
-        if (redoBtn) redoBtn.style.display = '';
+        if (redoBtn) redoBtn.style.display = 'inline-flex';
         if (doneMsgEl) doneMsgEl.style.display = 'none';
       } else if (daysLeft <= 5) {
-        document.getElementById('kyc-warning').style.display = '';
+        document.getElementById('kyc-warning').style.display = 'flex';
         document.getElementById('kyc-days-left').textContent = daysLeft;
         statKyc.innerHTML = `<span style="color:#F59E0B;">Expiring soon</span>`;
         statKycSub.textContent = `${daysLeft} days left`;
-        if (redoBtn) redoBtn.style.display = '';
-        if (doneMsgEl) { doneMsgEl.style.display = ''; if (doneDateEl) doneDateEl.textContent = `expires ${expiryStr}`; }
+        if (redoBtn) redoBtn.style.display = 'inline-flex';
+        if (doneMsgEl) { doneMsgEl.style.display = 'flex'; if (doneDateEl) doneDateEl.textContent = `expires ${expiryStr}`; }
       } else {
-        statKyc.innerHTML = '<span style="color:#10B981;"><i class=\"hgi-stroke hgi-shield-check\" style=\"font-size:.8rem;vertical-align:middle;margin-right:.2rem;\"></i>Valid</span>';
+        statKyc.innerHTML = '<span style="color:#10B981;"><i class="hgi-stroke hgi-shield-check" style="font-size:.8rem;vertical-align:middle;margin-right:.2rem;"></i>Valid</span>';
         statKycSub.textContent = `Expires in ${daysLeft} days`;
         // Hide redo button, show done message
         if (redoBtn) redoBtn.style.display = 'none';
-        if (doneMsgEl) { doneMsgEl.style.display = ''; if (doneDateEl) doneDateEl.textContent = `expires ${expiryStr}`; }
+        if (doneMsgEl) { doneMsgEl.style.display = 'flex'; if (doneDateEl) doneDateEl.textContent = `expires ${expiryStr}`; }
       }
     } else if (kycVerified) {
       // Verified but no timestamp stored
@@ -520,12 +761,12 @@ async function loadDashboard() {
       statKyc.innerHTML = '<span style="color:#10B981;"><i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.8rem;vertical-align:middle;margin-right:.2rem;"></i>Verified</span>';
       statKycSub.textContent = 'KYC complete';
       if (redoBtn) redoBtn.style.display = 'none';
-      if (doneMsgEl) { doneMsgEl.style.display = ''; if (doneDateEl) doneDateEl.textContent = 'verified'; }
+      if (doneMsgEl) { doneMsgEl.style.display = 'flex'; if (doneDateEl) doneDateEl.textContent = 'verified'; }
     } else {
       document.getElementById('kyc-expiry').innerHTML = '<span style="color:#8B90A8;">N/A</span>';
       statKyc.innerHTML = '<span style="color:#F59E0B;">Not done</span>';
       statKycSub.textContent = 'Complete KYC verification';
-      if (redoBtn) redoBtn.style.display = '';
+      if (redoBtn) redoBtn.style.display = 'inline-flex';
       if (doneMsgEl) doneMsgEl.style.display = 'none';
     }
 
@@ -565,21 +806,21 @@ async function loadDashboard() {
       if (scSection) scSection.style.display = '';
       if (scCertLink && user.certificate_id) {
         scCertLink.href = `/api/certificate/${user.certificate_id}`;
-        scCertLink.style.display = '';
+        scCertLink.style.display = 'inline-flex';
       }
 
       if (scStatus === 'active') {
-        if (statSc) statSc.innerHTML = '<span style="color:#10B981;"><i class=\"hgi-stroke hgi-checkmark-circle-01\" style=\"font-size:.8rem;vertical-align:middle;margin-right:.2rem;\"></i>Active</span>';
+        if (statSc) statSc.innerHTML = '<span style="color:#10B981;"><i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.8rem;vertical-align:middle;margin-right:.2rem;"></i>Active</span>';
         if (statScSub) statScSub.textContent = 'Commission active — you may practice';
         if (scBanner) scBanner.style.background = 'rgba(16,185,129,0.08)';
-        if (scIcon) scIcon.innerHTML = '<i class=\"hgi-stroke hgi-checkmark-circle-01\" style=\"font-size:1.5rem;color:#10B981;\"></i>';
+        if (scIcon) scIcon.innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:1.75rem;color:#10B981;"></i>';
         if (scLabel) scLabel.textContent = 'Commission Active';
         if (scDesc) scDesc.textContent = 'Your ENP commission has been activated by the Supreme Court. You are authorized to perform electronic notarizations.';
       } else if (scStatus === 'rejected') {
-        if (statSc) statSc.innerHTML = '<span style="color:#F87171;"><i class=\"hgi-stroke hgi-cancel-circle\" style=\"font-size:.8rem;vertical-align:middle;margin-right:.2rem;\"></i>Rejected</span>';
+        if (statSc) statSc.innerHTML = '<span style="color:#F87171;"><i class="hgi-stroke hgi-cancel-circle" style="font-size:.8rem;vertical-align:middle;margin-right:.2rem;"></i>Rejected</span>';
         if (statScSub) statScSub.textContent = 'Contact the SC for details';
         if (scBanner) scBanner.style.background = 'rgba(239,68,68,0.08)';
-        if (scIcon) scIcon.innerHTML = '<i class=\"hgi-stroke hgi-cancel-circle\" style=\"font-size:1.5rem;color:#F87171;\"></i>';
+        if (scIcon) scIcon.innerHTML = '<i class="hgi-stroke hgi-cancel-circle" style="font-size:1.75rem;color:#F87171;"></i>';
         if (scLabel) scLabel.textContent = 'Commission Rejected';
         if (scDesc) scDesc.textContent = 'Your application was rejected by the Supreme Court. Please contact the SC directly for further guidance.';
       } else {
@@ -606,8 +847,8 @@ async function loadDashboard() {
 function copyCertId() {
   const id = document.getElementById('cert-id-display').textContent;
   navigator.clipboard.writeText(id).then(() => {
-    const btn = event.target; btn.innerHTML = '<i class=\"hgi-stroke hgi-checkmark-circle-01\" style=\"font-size:.85rem;vertical-align:middle;margin-right:.25rem;\"></i>Copied!';
-    setTimeout(() => { btn.textContent = '<i class="hgi-stroke hgi-copy-01" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Copy Certificate ID'; }, 1800);
+    const btn = event.target; btn.innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.85rem;vertical-align:middle;margin-right:.25rem;"></i>Copied!';
+    setTimeout(() => { btn.innerHTML = '<i class="hgi-stroke hgi-copy-01" style="font-size:.85rem;"></i>Copy Certificate ID'; }, 1800);
   });
 }
 
@@ -621,10 +862,10 @@ async function regenerateCert() {
     const data = await res.json();
     document.getElementById('cert-id-display').textContent = data.certificate_id;
     document.getElementById('cert-download-btn').href = `/api/certificate/${data.certificate_id}`;
-    btn.innerHTML = '<i class=\"hgi-stroke hgi-checkmark-circle-01\" style=\"font-size:.85rem;vertical-align:middle;margin-right:.25rem;\"></i>Done — reload to confirm';
+    btn.innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.85rem;vertical-align:middle;margin-right:.25rem;"></i>Done — reload to confirm';
     setTimeout(() => location.reload(), 1500);
   } catch(e) {
-    btn.disabled = false; btn.textContent = '<i class="hgi-stroke hgi-refresh" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Regenerate Certificate';
+    btn.disabled = false; btn.innerHTML = '<i class="hgi-stroke hgi-refresh" style="font-size:.85rem;"></i>Regenerate Certificate';
     alert('Regeneration failed. Try again.');
   }
 }
@@ -650,14 +891,14 @@ async function redoKyc() {
       throw new Error('HyperVerge SDK not loaded. Please refresh and try again.');
     }
 
-    btn.innerHTML = '<i class=\"hgi-stroke hgi-clock-01\" style=\"font-size:.85rem;vertical-align:middle;margin-right:.25rem;\"></i>KYC in progress…';
+    btn.innerHTML = '<i class="hgi-stroke hgi-clock-01" style="font-size:.85rem;vertical-align:middle;margin-right:.25rem;"></i>KYC in progress…';
 
     const hyperKycConfig = new HyperKycConfig(token, workflowId, transactionId);
     HyperKYCModule.launch(hyperKycConfig, async (result) => {
       const status = result.status;
       if (status === 'user_cancelled') {
         btn.disabled = false;
-        btn.textContent = '<i class="hgi-stroke hgi-refresh" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Redo KYC Verification';
+        btn.innerHTML = '<i class="hgi-stroke hgi-refresh" style="font-size:.85rem;"></i>Redo KYC Verification';
         msg.textContent = 'KYC cancelled. You can try again anytime.';
         msg.style.display = '';
         return;
@@ -671,7 +912,7 @@ async function redoKyc() {
         });
         const data = await completeRes.json();
         if (data.success) {
-          msg.innerHTML = '<span style="color:#10B981;"><i class=\"hgi-stroke hgi-checkmark-circle-01\" style=\"font-size:.85rem;vertical-align:middle;margin-right:.25rem;\"></i>KYC renewed successfully! Refreshing…</span>';
+          msg.innerHTML = '<span style="color:#10B981;"><i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.85rem;vertical-align:middle;margin-right:.25rem;"></i>KYC renewed successfully! Refreshing…</span>';
           msg.style.display = '';
           setTimeout(() => location.reload(), 1500);
         } else {
@@ -679,14 +920,14 @@ async function redoKyc() {
         }
       } catch(e) {
         btn.disabled = false;
-        btn.textContent = '<i class="hgi-stroke hgi-refresh" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Redo KYC Verification';
+        btn.innerHTML = '<i class="hgi-stroke hgi-refresh" style="font-size:.85rem;"></i>Redo KYC Verification';
         msg.innerHTML = '<span style="color:#F87171;">' + e.message + '</span>';
         msg.style.display = '';
       }
     });
   } catch(e) {
     btn.disabled = false;
-    btn.textContent = '<i class="hgi-stroke hgi-refresh" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Redo KYC Verification';
+    btn.innerHTML = '<i class="hgi-stroke hgi-refresh" style="font-size:.85rem;"></i>Redo KYC Verification';
     msg.innerHTML = '<span style="color:#F87171;">' + e.message + '</span>';
     msg.style.display = '';
   }
