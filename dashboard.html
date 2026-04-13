@@ -356,18 +356,16 @@
 <script>
 async function loadDashboard() {
   try {
-    // Silently refresh access token first to prevent false "not signed in" errors
-    try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-
-    let res = await fetch('/api/auth/me', { credentials: 'include' });
-    // If still 401, try one more explicit refresh then retry
-    if (res.status === 401) {
-      try {
-        const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
-        if (ref.ok) res = await fetch('/api/auth/me', { credentials: 'include' });
-      } catch(e) {}
+    // Silently refresh access token — retry up to 3 times with delay (handles post-OAuth cookie propagation)
+    let _authRes = null;
+    for (let _attempt = 0; _attempt < 3; _attempt++) {
+      if (_attempt > 0) await new Promise(r => setTimeout(r, 800 * _attempt)); // 0.8s, 1.6s delay
+      try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
+      _authRes = await fetch('/api/auth/me', { credentials: 'include' });
+      if (_authRes.ok) break;
     }
-    if (!res.ok) throw new Error('Not authenticated');
+    let res = _authRes;
+    if (!res || !res.ok) throw new Error('Not authenticated');
     const user = await res.json();
 
     // Avatar — use SSO picture if available, else initials
@@ -598,9 +596,10 @@ async function loadDashboard() {
   } catch(e) {
     document.getElementById('loading').style.display = 'none';
     // Only show "not signed in" if truly unauthenticated after refresh attempt
-    document.getElementById('error-msg').textContent = 'Session expired. Redirecting to sign in?';
+    // Only show error after all retries failed — not on transient OAuth cookie delay
+    document.getElementById('error-msg').textContent = 'Please sign in to continue.';
     document.getElementById('error').style.display = '';
-    setTimeout(() => { window.location.href = '/'; }, 2000);
+    setTimeout(() => { window.location.href = '/?sso=1'; }, 1500);
   }
 }
 
