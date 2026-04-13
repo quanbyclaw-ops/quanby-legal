@@ -1658,6 +1658,46 @@ async def chatbot_endpoint(request: LegalChatRequest):
 
 
 
+# ── GET /api/sub-orgs/{sub_org_id}/dc-info ────────────────────────────────────
+@app.get("/api/sub-orgs/{sub_org_id}/dc-info")
+async def get_sub_org_dc_info(sub_org_id: str, request: Request):
+    """Fetch live sub-org details from DoconChain using the stored dc_sub_org_uuid."""
+    user = _require_attorney_or_admin(request)
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+    org = next((o for o in orgs if o["id"] == sub_org_id), None)
+    if not org:
+        raise HTTPException(404, "Sub-org not found")
+    dc_uuid = org.get("dc_sub_org_uuid")
+    if not dc_uuid:
+        raise HTTPException(404, "This sub-org has not been provisioned in DoconChain yet")
+    try:
+        import urllib.request as _ur_gi, urllib.error as _ue_gi, json as _json_gi
+        _tok_gi = _get_dc_token()
+        _req_gi = _ur_gi.Request(
+            f"{_DC_BASE}/api/v2/organizations/sub/{dc_uuid}?user_type=ENTERPRISE_API",
+            headers={"Authorization": f"Bearer {_tok_gi}", "Accept": "application/json"},
+            method="GET",
+        )
+        with _ur_gi.urlopen(_req_gi, timeout=20) as _r_gi:
+            _dc_gi = _json_gi.loads(_r_gi.read().decode())
+        # Update photo_url in local record if available
+        _photo = (_dc_gi.get("branding_photo_url") or _dc_gi.get("photo_url") or
+                  (_dc_gi.get("data") or {}).get("photo") or "")
+        if _photo and _photo != org.get("dc_photo_url"):
+            with _sub_orgs_lock:
+                orgs2 = _load_sub_orgs()
+                org2 = next((o for o in orgs2 if o["id"] == sub_org_id), None)
+                if org2:
+                    org2["dc_photo_url"] = _photo
+                    _save_sub_orgs(orgs2)
+        return {"dc_data": _dc_gi, "dc_sub_org_uuid": dc_uuid, "dc_photo_url": _photo}
+    except _ue_gi.HTTPError as he:
+        raise HTTPException(he.code, f"DoconChain error {he.code}: {he.read().decode()[:200]}")
+    except Exception as e:
+        raise HTTPException(502, f"Could not fetch from DoconChain: {str(e)[:200]}")
+
+
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("APP_PORT", 8080))
