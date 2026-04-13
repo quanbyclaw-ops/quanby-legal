@@ -857,9 +857,12 @@ async function loadSubOrgs() {
       card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;';
       card.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div>
-            <span style="font-size:16px;font-weight:700;color:var(--text);">${escHtml(org.name)}</span>
-            <span style="margin-left:10px;background:rgba(124,58,237,.2);color:var(--purple);padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">${escHtml(org.type||'Department')}</span>
+          <div style="display:flex;align-items:center;gap:12px;">
+            ${org.dc_photo_url ? `<img src="${escHtml(org.dc_photo_url)}" alt="${escHtml(org.name)}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,.1);">` : `<div style="width:44px;height:44px;border-radius:8px;background:rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="hgi-stroke hgi-building-03" style="font-size:1.2rem;color:var(--purple);"></i></div>`}
+            <div>
+              <span style="font-size:16px;font-weight:700;color:var(--text);">${escHtml(org.name)}</span>
+              <span style="margin-left:10px;background:rgba(124,58,237,.2);color:var(--purple);padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">${escHtml(org.type||'Department')}</span>
+            </div>
           </div>
           <span style="color:var(--muted);font-size:12px;">Created ${fmtDate(org.created_at)}</span>
         </div>

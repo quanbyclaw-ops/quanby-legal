@@ -5595,7 +5595,7 @@ async def create_sub_org(
             _field("name", org["name"]) +
             _field("address", org["address"] or org["name"]) +
             _field("sub_organization_type_name", org["type"]) +
-            _field("organization_uuid", _DC_ORG_ID)
+            _field("organization_uuid", _DC_ORG_UUID)
         )
         # Attach photo if provided
         if _photo_bytes and _photo_name:
@@ -5624,9 +5624,17 @@ async def create_sub_org(
             _dc_resp = _json_so.loads(_r_so.read().decode())
         _dc_data = _dc_resp.get("data") or _dc_resp.get("message") or _dc_resp
         if isinstance(_dc_data, dict):
-            org["dc_sub_org_id"]   = str(_dc_data.get("id") or "")
-            org["dc_sub_org_uuid"] = str(_dc_data.get("uuid") or _dc_data.get("organization_uuid") or "")
-            print(f"[SubOrg] DC provisioned: id={org['dc_sub_org_id']} uuid={org['dc_sub_org_uuid']}", flush=True)
+            # DC returns nested sub_org_data for the sub-org details
+            _sub_data = _dc_data.get("sub_org_data") or _dc_data
+            org["dc_sub_org_id"]     = str(_sub_data.get("id") or "")
+            org["dc_sub_org_uuid"]   = str(_sub_data.get("uuid") or "")
+            org["dc_photo_url"]      = str(_sub_data.get("photo") or _sub_data.get("photo_url") or _sub_data.get("avatar") or "")
+            # Store DC-generated credentials for this sub-org
+            if _dc_data.get("client_key"):
+                org["dc_client_key"]    = str(_dc_data["client_key"])
+            if _dc_data.get("client_secret"):
+                org["dc_client_secret"] = str(_dc_data["client_secret"])
+            print(f"[SubOrg] DC provisioned: id={org['dc_sub_org_id']} uuid={org['dc_sub_org_uuid']} photo={bool(org['dc_photo_url'])}", flush=True)
     except Exception as _dc_so_err:
         _dc_provision_error = str(_dc_so_err)
         print(f"[SubOrg] DC provisioning failed (non-fatal): {_dc_so_err}", flush=True)
