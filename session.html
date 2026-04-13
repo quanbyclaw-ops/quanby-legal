@@ -2556,15 +2556,18 @@ async function openPlotSignature(projectUuid) {
                 }
                 refreshSignerStatus(projectUuid, _plotAptId, true);
               } else {
+                // No — fully restore to original purple enabled state
                 if (_pb) {
-                  _pb.disabled = false; _pb.style.opacity = '1'; _pb.style.cursor = 'pointer';
-                  _pb.style.background = 'rgba(245,158,11,.12)';
-                  _pb.style.borderColor = 'rgba(245,158,11,.45)';
-                  _pb.style.color = '#f59e0b';
-                  _pb.innerHTML = '<i class="hgi-stroke hgi-alert-02" style="font-size:.82rem;"></i> ✕ Closed — Try Again';
-                  _pb.title = 'Closed without plotting — click to reopen';
-                  _pb.onmouseover = function() { this.style.background='rgba(245,158,11,.22)'; };
-                  _pb.onmouseout  = function() { this.style.background='rgba(245,158,11,.12)'; };
+                  _pb.disabled = false;
+                  _pb.style.opacity = '1';
+                  _pb.style.cursor = 'pointer';
+                  _pb.style.background = 'rgba(167,139,250,.1)';
+                  _pb.style.borderColor = 'rgba(167,139,250,.3)';
+                  _pb.style.color = '#a78bfa';
+                  _pb.innerHTML = '<i class="hgi-stroke hgi-pen-tool-01" style="font-size:.82rem;"></i> Plot Signature Fields';
+                  _pb.title = 'Plot signature fields in DoconChain';
+                  _pb.onmouseover = function() { this.style.background='rgba(167,139,250,.22)'; };
+                  _pb.onmouseout  = function() { this.style.background='rgba(167,139,250,.1)'; };
                   _pb.onclick = function() { openPlotSignature(projectUuid); };
                 }
                 if (_sessionInfo && Array.isArray(_sessionInfo.session_documents)) {
