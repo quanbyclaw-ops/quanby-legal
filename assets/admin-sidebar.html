@@ -166,7 +166,11 @@
 <div id="sidebar-inner">
   <!-- Logo -->
   <div id="sb-logo">
-    <img src="/qlegal-logo-sm.png" alt="Quanby Legal" onerror="this.style.display='none'">
+    <div id="sb-logo-img-wrap" style="width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+      <img src="/qlegal-logo-sm.png" alt="Quanby Legal"
+        style="width:40px;height:40px;object-fit:contain;"
+        onerror="this.parentElement.innerHTML='<div style=\"width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#ec4899);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;font-family:Inter,sans-serif;\">QL</div>';this.style.display='none'">
+    </div>
     <div id="sb-logo-text">
       <span id="sb-logo-name">Quanby Legal</span>
       <span id="sb-logo-sub">Admin Portal</span>
