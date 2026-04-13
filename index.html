@@ -418,9 +418,24 @@
 
         /* HOW IT WORKS */
         .steps { display: flex; justify-content: center; gap: 2rem; position: relative; flex-wrap: wrap; }
-        .step { text-align: center; max-width: 250px; }
-        .step-number { font-size: 3rem; font-weight: bold; color: var(--purple); margin-bottom: 0.5rem; }
-        .step-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .step { text-align: center; max-width: 240px; display:flex; flex-direction:column; align-items:center; }
+        .step-number {
+          font-size: 0.72rem; font-weight: 800; color: var(--purple);
+          text-transform: uppercase; letter-spacing: .12em;
+          margin-bottom: 1rem; opacity: .7;
+        }
+        .step-icon {
+          width: 64px; height: 64px; border-radius: 16px; margin: 0 auto 1rem;
+          display: flex; align-items: center; justify-content: center;
+          background: rgba(124,58,237,.15); border: 1.5px solid rgba(124,58,237,.3);
+          box-shadow: 0 0 20px rgba(124,58,237,.12);
+          font-size: 1.6rem; /* fallback for text */
+          transition: background .2s, box-shadow .2s;
+        }
+        .step:hover .step-icon {
+          background: rgba(124,58,237,.25); box-shadow: 0 0 28px rgba(124,58,237,.22);
+        }
+        .step-icon i { font-size: 1.6rem; color: #c4b5fd; }
         .step-title { font-weight: 600; margin-bottom: 0.5rem; }
         .connecting-line { position: absolute; top: 40%; left: 25%; width: 50%; height: 2px; background: var(--muted); z-index: -1; }
 
@@ -1814,24 +1829,30 @@
             <h2>Three steps to a legally valid notarized document</h2>
             <div class="steps">
                 <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-icon">📤</div>
-                    <div class="step-title">Upload & Analyze</div>
-                    <p style="color:var(--muted);font-size:0.9rem">Upload your contract — AI analyzes it instantly</p>
+                    <div class="step-number">Step 1</div>
+                    <div class="step-icon">
+                      <i class="hgi-stroke hgi-upload-04" style="font-size:1.6rem;color:#c4b5fd;"></i>
+                    </div>
+                    <div class="step-title">Upload &amp; Analyze</div>
+                    <p style="color:var(--muted);font-size:0.875rem;line-height:1.6;">Upload your contract — AI analyzes risk, compliance, and key clauses instantly</p>
                 </div>
                 <div class="connecting-line"></div>
                 <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/><circle cx="8" cy="14" r="2"/><path d="M12 14h4M12 17h4"/></svg></div>
+                    <div class="step-number">Step 2</div>
+                    <div class="step-icon">
+                      <i class="hgi-stroke hgi-user-check-01" style="font-size:1.6rem;color:#c4b5fd;"></i>
+                    </div>
                     <div class="step-title">Verify Identity</div>
-                    <p style="color:var(--muted);font-size:0.9rem">eKYC with DICT PKI — legally binding identity</p>
+                    <p style="color:var(--muted);font-size:0.875rem;line-height:1.6;">eKYC with DICT PKI and liveness detection — legally binding identity verification</p>
                 </div>
                 <div class="connecting-line"></div>
                 <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-                    <div class="step-title">Certified & Notarized</div>
-                    <p style="color:var(--muted);font-size:0.9rem">Instant blockchain-anchored notarized document</p>
+                    <div class="step-number">Step 3</div>
+                    <div class="step-icon">
+                      <i class="hgi-stroke hgi-certificate-01" style="font-size:1.6rem;color:#c4b5fd;"></i>
+                    </div>
+                    <div class="step-title">Certified &amp; Notarized</div>
+                    <p style="color:var(--muted);font-size:0.875rem;line-height:1.6;">Blockchain-anchored notarial act with electronic seal, Supreme Court-compliant</p>
                 </div>
             </div>
         </div>
