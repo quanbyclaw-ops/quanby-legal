@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    (function() {
+      function isCFBeacon(el) {
+        return el && el.tagName === 'SCRIPT' && typeof el.src === 'string' &&
+               el.src.indexOf('cloudflareinsights') !== -1;
+      }
+      var _ac = Element.prototype.appendChild;
+      Element.prototype.appendChild = function(c) {
+        if (isCFBeacon(c)) return c;
+        return _ac.call(this, c);
+      };
+      var _ib = Element.prototype.insertBefore;
+      Element.prototype.insertBefore = function(c, r) {
+        if (isCFBeacon(c)) return c;
+        return _ib.call(this, c, r);
+      };
+      function stripNow() {
+        document.querySelectorAll('script[src*="cloudflareinsights"]').forEach(function(s) {
+          if (s.parentNode) s.parentNode.removeChild(s);
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', stripNow);
+      } else {
+        stripNow();
+      }
+      var _oe = window.onerror;
+      window.onerror = function(m, src, l, c, e) {
+        if (src && src.indexOf('cloudflareinsights') !== -1) return true;
+        if (_oe) return _oe.apply(this, arguments);
+      };
+    })();
+  </script>
+
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>My Profile — Quanby Legal</title>
+<link rel="icon" href="/favicon.ico"/>
+<link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css"/>
+<style>
+  :root {
+    --navy:#1B2A6B; --gold:#C9A84C; --teal:#0EA5E9; --bg:#0D0F1A;
+    --surface:#141726; --surface2:#1c1f30; --border:rgba(255,255,255,0.08);
+    --text:#E8EAF2; --muted:#8B90A8; --accent:#7c3aed; --red:#ef4444;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+  /* NAV */
+  :root{--purple:#7c3aed;--purple-light:#9d5ff3;}
+  nav{background:rgba(10,12,24,0.97);border-bottom:1px solid rgba(255,255,255,0.06);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+  .nav-content{max-width:1280px;margin:0 auto;padding:0 2rem;height:64px;display:flex;align-items:center;gap:2rem;}
+  .logo{display:flex;align-items:center;gap:0.625rem;text-decoration:none;flex-shrink:0;}
+  .logo-img{height:32px;width:auto;}
+  .logo-text{font-size:1.1rem;font-weight:700;color:#e8eaf2;letter-spacing:-0.02em;}
+  .nav-links{display:flex;gap:1.5rem;align-items:center;flex:1;justify-content:center;}
+  .nav-links a{color:#8b90a8;text-decoration:none;font-size:0.875rem;font-weight:500;transition:color 0.15s,background 0.15s;white-space:nowrap;padding:0.4rem 0.75rem;border-radius:6px;}
+  .nav-links a:hover{color:#e8eaf2;background:rgba(255,255,255,0.06);}
+  .nav-links a.active{color:#e8eaf2;background:rgba(255,255,255,0.08);}
+  .nav-user{display:flex;align-items:center;gap:0.625rem;position:relative;cursor:pointer;}
+  .nav-user-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,0.4);}
+  .nav-user-name{font-size:0.85rem;color:#8b90a8;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .nav-user-initials{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;color:#fff;border:2px solid rgba(201,168,76,0.4);flex-shrink:0;}
+  .nav-user-menu{position:absolute;right:0;top:calc(100% + 8px);background:#141726;border:1px solid rgba(255,255,255,0.08);border-radius:0.75rem;min-width:220px;box-shadow:0 8px 32px rgba(0,0,0,0.4);overflow:hidden;z-index:200;}
+  .num-header{padding:1rem;display:flex;align-items:center;gap:0.75rem;}
+  .num-avatar,.num-initials{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid rgba(201,168,76,0.4);flex-shrink:0;}
+  .num-initials{background:linear-gradient(135deg,var(--navy),var(--teal));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;color:#fff;}
+  .num-info{display:flex;flex-direction:column;min-width:0;}
+  .num-name{font-size:0.875rem;font-weight:600;color:#e8eaf2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .num-email{font-size:0.75rem;color:#8b90a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .num-divider{height:1px;background:rgba(255,255,255,0.07);margin:0;}
+  .num-item{display:flex;align-items:center;gap:0.625rem;width:100%;padding:0.625rem 1rem;background:none;border:none;color:#8b90a8;font-size:0.8rem;cursor:pointer;text-align:left;transition:background 0.15s,color 0.15s;}
+  .num-item:hover{background:rgba(255,255,255,0.05);color:#e8eaf2;}
+  .num-signout{color:#f87171;}
+  .num-signout:hover{background:rgba(239,68,68,0.08);color:#f87171;}
+  @media(max-width:768px){.nav-links{display:none;}}
+
+  /* LAYOUT */
+  .container{max-width:960px;margin:0 auto;padding:2rem 1.5rem;}
+  .page-header{display:flex;align-items:center;gap:0.75rem;margin-bottom:2rem;}
+  .page-header i{font-size:1.6rem;color:var(--gold);}
+  .page-header h1{font-size:1.5rem;font-weight:700;}
+
+  .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+  @media(max-width:720px){.profile-grid{grid-template-columns:1fr;}}
+
+  /* SECTION CARDS */
+  .section-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;}
+  .section-card.full-width{grid-column:1/-1;}
+  .section-title{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem;}
+  .section-title i{font-size:0.95rem;}
+
+  /* AVATAR */
+  .profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--teal));display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:700;color:#fff;border:2px solid rgba(201,168,76,0.4);margin-bottom:1rem;flex-shrink:0;}
+  .profile-top{display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;}
+  .profile-top-info{display:flex;flex-direction:column;gap:0.35rem;}
+  .role-badge{display:inline-block;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);color:var(--gold);font-size:0.7rem;font-weight:600;padding:0.15rem 0.6rem;border-radius:99px;letter-spacing:0.06em;text-transform:uppercase;}
+  .role-badge.client{background:rgba(14,165,233,0.12);border-color:rgba(14,165,233,0.35);color:var(--teal);}
+
+  /* SUBSECTION */
+  .subsection{margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border);}
+  .subsection:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+  .subsection-label{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-bottom:0.75rem;}
+
+  /* FORM */
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;}
+  .form-row.single{grid-template-columns:1fr;}
+  .form-row.triple{grid-template-columns:1fr 1fr 1fr;}
+  @media(max-width:520px){.form-row,.form-row.triple{grid-template-columns:1fr;}}
+  .form-group{display:flex;flex-direction:column;gap:0.35rem;}
+  .form-group label{font-size:0.75rem;font-weight:600;color:var(--muted);}
+  .form-group input,.form-group textarea,.form-group select{
+    background:var(--surface2);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:.55rem .75rem;
+    color:var(--text);
+    font-size:0.875rem;
+    font-family:inherit;
+    transition:border-color 0.15s;
+    outline:none;
+  }
+  .form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:rgba(201,168,76,0.5);}
+  .form-group input[readonly]{color:var(--muted);cursor:default;}
+  .form-group textarea{resize:vertical;min-height:80px;}
+
+  /* SAVE BUTTON */
+  .save-bar{grid-column:1/-1;display:flex;justify-content:flex-end;gap:1rem;padding-top:0.5rem;}
+  .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.5rem;border-radius:8px;font-size:0.875rem;font-weight:600;cursor:pointer;border:none;transition:opacity 0.15s,transform 0.1s;}
+  .btn:hover{opacity:0.88;}
+  .btn:active{transform:scale(0.98);}
+  .btn-primary{background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0D0F1A;}
+  .btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+
+  /* TOAST */
+  .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.875rem 1.25rem;font-size:0.875rem;display:flex;align-items:center;gap:0.625rem;box-shadow:0 8px 32px rgba(0,0,0,0.4);z-index:9999;transform:translateY(120%);opacity:0;transition:transform 0.3s ease,opacity 0.3s ease;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast.success{border-color:rgba(16,185,129,0.4);color:#6ee7b7;}
+  .toast.error{border-color:rgba(239,68,68,0.4);color:#f87171;}
+  .toast i{font-size:1rem;}
+
+  /* LOADING */
+  .loading{text-align:center;color:var(--muted);padding:4rem 2rem;font-size:0.95rem;}
+  .error-box{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:1.5rem;color:#f87171;text-align:center;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-content">
+    <a class="logo" href="/">
+      <img src="/qlegal-logo-sm.png" alt="Quanby Legal" class="logo-img" onerror="this.style.display='none'">
+      <span class="logo-text">Quanby Legal</span>
+    </a>
+    <div class="nav-links" id="prof-nav-links">
+      <!-- injected by JS -->
+    </div>
+    <div class="nav-user" id="nav-user-wrap" onclick="toggleMenu()">
+      <img class="nav-user-avatar" id="nav-avatar" src="" alt="" style="display:none;">
+      <div class="nav-user-initials" id="nav-initials" style="display:none;"></div>
+      <span class="nav-user-name" id="nav-name"></span>
+      <svg width="12" height="12" viewBox="0 0 12 12" style="margin-left:2px;flex-shrink:0;"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="nav-user-menu" id="nav-menu" style="display:none;" onclick="event.stopPropagation()">
+        <div class="num-header">
+          <img class="num-avatar" id="menu-avatar" src="" alt="" style="display:none;">
+          <div class="num-initials" id="menu-initials" style="display:none;"></div>
+          <div class="num-info">
+            <span class="num-name" id="menu-name"></span>
+            <span class="num-email" id="menu-email"></span>
+          </div>
+        </div>
+        <div class="num-divider"></div>
+        <button class="num-item" onclick="window.location.href='/dashboard'">
+          <svg width="14" height="14" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg>
+          My Dashboard
+        </button>
+        <button class="num-item" onclick="window.location.href='/'">
+          <svg width="14" height="14" viewBox="0 0 16 16"><path d="M8 1L1 7h2v7h4v-4h2v4h4V7h2L8 1z" fill="currentColor"/></svg>
+          Home
+        </button>
+        <div class="num-divider"></div>
+        <button class="num-item num-signout" onclick="signOut()">
+          <svg width="14" height="14" viewBox="0 0 16 16"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="hgi-stroke hgi-checkmark-circle-01" id="toast-icon"></i>
+  <span id="toast-msg"></span>
+</div>
+
+<div class="container">
+  <div id="loading" class="loading">Loading profile…</div>
+  <div id="error" style="display:none;" class="error-box">
+    <p id="error-msg">Unable to load profile. Please <a href="/" style="color:var(--gold);">sign in</a> first.</p>
+  </div>
+
+  <div id="profile-page" style="display:none;">
+    <div class="page-header">
+      <i class="hgi-stroke hgi-user-circle"></i>
+      <h1>My Profile</h1>
+    </div>
+
+    <form id="profile-form" onsubmit="saveProfile(event)">
+      <div class="profile-grid">
+
+        <!-- SECTION 1: ACCOUNT -->
+        <div class="section-card full-width">
+          <div class="section-title">
+            <i class="hgi-stroke hgi-user-account"></i>
+            Account
+          </div>
+          <div class="profile-top">
+            <div class="profile-avatar" id="avatar-circle"></div>
+            <div class="profile-top-info">
+              <span id="display-email" style="font-size:0.85rem;color:var(--muted);"></span>
+              <span class="role-badge" id="display-role"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="field-email" readonly tabindex="-1"/>
+            </div>
+            <div class="form-group">
+              <label>Prefix</label>
+              <input type="text" id="field-prefix" name="prefix" placeholder="Atty. / Dr. / etc."/>
+            </div>
+          </div>
+          <div class="form-row triple">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" id="field-first-name" name="first_name" required/>
+            </div>
+            <div class="form-group">
+              <label>Middle Initial</label>
+              <input type="text" id="field-middle-initial" name="middle_initial" maxlength="5"/>
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" id="field-last-name" name="last_name" required/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Suffix</label>
+              <input type="text" id="field-suffix" name="suffix" placeholder="Jr. / Sr. / III"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: CONTACT -->
+        <div class="section-card full-width">
+          <div class="section-title">
+            <i class="hgi-stroke hgi-call"></i>
+            Contact
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" id="field-phone" name="phone" placeholder="+63 9XX XXX XXXX"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: NOTARIAL CREDENTIALS (ENP only) -->
+        <div class="section-card full-width" id="section-enp" style="display:none;">
+          <div class="section-title">
+            <i class="hgi-stroke hgi-license"></i>
+            Notarial Credentials
+          </div>
+
+          <!-- PRC / Roll -->
+          <div class="subsection">
+            <div class="subsection-label">PRC / Roll</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Roll Number</label>
+                <input type="text" id="field-roll-no" name="roll_no"/>
+              </div>
+              <div class="form-group">
+                <label>Roll Date</label>
+                <input type="date" id="field-roll-date" name="roll_date"/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Commission No.</label>
+                <input type="text" id="field-commission-no" name="commission_no"/>
+              </div>
+              <div class="form-group">
+                <label>Commission Valid Until</label>
+                <input type="date" id="field-commission-valid-until" name="commission_no_valid_until"/>
+              </div>
+            </div>
+            <div class="form-row single">
+              <div class="form-group">
+                <label>NPN (for SC Registry)</label>
+                <input type="text" id="field-npn" name="npn" placeholder="Notary PRC Number"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- PTR -->
+          <div class="subsection">
+            <div class="subsection-label">PTR</div>
+            <div class="form-row triple">
+              <div class="form-group">
+                <label>PTR No.</label>
+                <input type="text" id="field-ptr-no" name="ptr_no"/>
+              </div>
+              <div class="form-group">
+                <label>PTR Location</label>
+                <input type="text" id="field-ptr-location" name="ptr_no_location"/>
+              </div>
+              <div class="form-group">
+                <label>PTR Date</label>
+                <input type="date" id="field-ptr-date" name="ptr_no_date"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- IBP -->
+          <div class="subsection">
+            <div class="subsection-label">IBP</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>IBP No.</label>
+                <input type="text" id="field-ibp-no" name="ibp_no"/>
+              </div>
+              <div class="form-group">
+                <label>IBP Date</label>
+                <input type="date" id="field-ibp-date" name="ibp_no_date"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notary Address -->
+          <div class="subsection">
+            <div class="subsection-label">Notary Address</div>
+            <div class="form-row single">
+              <div class="form-group">
+                <label>Office / Notary Address</label>
+                <textarea id="field-notary-address" name="notary_address" rows="2"></textarea>
+              </div>
+            </div>
+            <div class="form-row triple">
+              <div class="form-group">
+                <label>Home / Office Street</label>
+                <input type="text" id="field-home-street" name="home_street" placeholder="e.g. 123 Rizal St."/>
+              </div>
+              <div class="form-group">
+                <label>Barangay</label>
+                <input type="text" id="field-barangay" name="barangay" placeholder="e.g. Barangay 1"/>
+              </div>
+              <div class="form-group">
+                <label>City / Province</label>
+                <input type="text" id="field-city-province" name="city_province" placeholder="e.g. Legazpi City"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- MCLE -->
+          <div class="subsection">
+            <div class="subsection-label">MCLE</div>
+            <div class="form-row triple">
+              <div class="form-group">
+                <label>MCLE Period</label>
+                <input type="text" id="field-mcle-period" name="mcle_no_period" placeholder="e.g. VII"/>
+              </div>
+              <div class="form-group">
+                <label>MCLE No.</label>
+                <input type="text" id="field-mcle-no" name="mcle_no"/>
+              </div>
+              <div class="form-group">
+                <label>MCLE Date</label>
+                <input type="date" id="field-mcle-date" name="mcle_no_date"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 4: CLIENT INFO (client only) -->
+        <div class="section-card full-width" id="section-client" style="display:none;">
+          <div class="section-title">
+            <i class="hgi-stroke hgi-office"></i>
+            Client Information
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Organization / Company</label>
+              <input type="text" id="field-organization" name="organization"/>
+            </div>
+            <div class="form-group">
+              <label>Position / Title</label>
+              <input type="text" id="field-position" name="position"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- SAVE BAR -->
+        <div class="save-bar">
+          <button type="submit" class="btn btn-primary" id="save-btn">
+            <i class="hgi-stroke hgi-floppy-disk"></i>
+            Save Changes
+          </button>
+        </div>
+
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  let currentUser = null;
+
+  function getInitials(u) {
+    const f = (u.first_name || '').trim();
+    const l = (u.last_name || '').trim();
+    if (f && l) return (f[0] + l[0]).toUpperCase();
+    if (f) return f.slice(0,2).toUpperCase();
+    if (u.email) return u.email[0].toUpperCase();
+    return '?';
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    const icon = document.getElementById('toast-icon');
+    document.getElementById('toast-msg').textContent = msg;
+    t.className = 'toast ' + type;
+    icon.className = type === 'success'
+      ? 'hgi-stroke hgi-checkmark-circle-01'
+      : 'hgi-stroke hgi-alert-circle';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  function toggleMenu() {
+    const m = document.getElementById('nav-menu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+  }
+  document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('nav-user-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      const m = document.getElementById('nav-menu');
+      if (m) m.style.display = 'none';
+    }
+  });
+
+  async function signOut() {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    window.location.href = '/';
+  }
+
+  function populateNav(user) {
+    const links = document.getElementById('prof-nav-links');
+    const profileLink = '<a href="/profile" class="active"><i class="hgi-stroke hgi-user-circle" style="font-size:.9rem;vertical-align:middle;margin-right:.25rem;"></i>Profile</a>';
+    if (user.role === 'client') {
+      links.innerHTML = `
+        <a href="/dashboard">Dashboard</a>
+        <a href="/browse">Find a Notary</a>
+        <a href="/appointments">My Appointments</a>
+        ${profileLink}
+      `;
+    } else if (user.role === 'attorney') {
+      links.innerHTML = `
+        <a href="/dashboard">Dashboard</a>
+        <a href="/appointments">Appointments</a>
+        <a href="/registry"><i class="hgi-stroke hgi-book-open-01" style="font-size:.9rem;vertical-align:middle;margin-right:.25rem;"></i>Registry</a>
+        ${profileLink}
+      `;
+    } else {
+      links.innerHTML = `<a href="/dashboard">Dashboard</a>${profileLink}`;
+    }
+  }
+
+  function populateForm(user) {
+    const profile = user.profile || {};
+
+    // Nav + menu
+    const initials = getInitials(user);
+    document.getElementById('nav-name').textContent = (user.first_name || user.email || '');
+    document.getElementById('menu-initials').textContent = initials;
+    if (user.picture) {
+      const na = document.getElementById('nav-avatar');
+      const ma = document.getElementById('menu-avatar');
+      if (na) { na.src = user.picture; na.style.display = ''; }
+      if (ma) { ma.src = user.picture; ma.style.display = ''; }
+      const ni = document.getElementById('nav-initials');
+      if (ni) ni.style.display = 'none';
+    } else {
+      document.getElementById('nav-initials').textContent = initials;
+      const na = document.getElementById('nav-avatar');
+      if (na) na.style.display = 'none';
+    }
+    document.getElementById('menu-name').textContent = [user.first_name, user.last_name].filter(Boolean).join(' ');
+    document.getElementById('menu-email').textContent = user.email || '';
+
+    // Avatar + role badge
+    document.getElementById('avatar-circle').textContent = initials;
+    document.getElementById('display-email').textContent = user.email || '';
+    const roleEl = document.getElementById('display-role');
+    if (user.role === 'attorney') {
+      roleEl.textContent = 'ENP / Attorney';
+      roleEl.className = 'role-badge';
+    } else {
+      roleEl.textContent = 'Client / Principal';
+      roleEl.className = 'role-badge client';
+    }
+
+    // Account fields
+    document.getElementById('field-email').value = user.email || '';
+    document.getElementById('field-prefix').value = profile.prefix || '';
+    document.getElementById('field-first-name').value = user.first_name || profile.first_name || '';
+    document.getElementById('field-middle-initial').value = profile.middle_initial || '';
+    document.getElementById('field-last-name').value = user.last_name || profile.last_name || '';
+    document.getElementById('field-suffix').value = profile.suffix || '';
+
+    // Contact
+    document.getElementById('field-phone').value = profile.phone || '';
+
+    // Role-specific sections
+    if (user.role === 'attorney') {
+      document.getElementById('section-enp').style.display = '';
+      document.getElementById('field-roll-no').value = profile.roll_no || '';
+      document.getElementById('field-roll-date').value = profile.roll_date || '';
+      document.getElementById('field-commission-no').value = profile.commission_no || '';
+      document.getElementById('field-commission-valid-until').value = profile.commission_no_valid_until || '';
+      document.getElementById('field-npn').value = profile.npn || '';
+      document.getElementById('field-ptr-no').value = profile.ptr_no || '';
+      document.getElementById('field-ptr-location').value = profile.ptr_no_location || '';
+      document.getElementById('field-ptr-date').value = profile.ptr_no_date || '';
+      document.getElementById('field-ibp-no').value = profile.ibp_no || '';
+      document.getElementById('field-ibp-date').value = profile.ibp_no_date || '';
+      document.getElementById('field-notary-address').value = profile.notary_address || '';
+      document.getElementById('field-home-street').value = profile.home_street || '';
+      document.getElementById('field-barangay').value = profile.barangay || '';
+      document.getElementById('field-city-province').value = profile.city_province || '';
+      document.getElementById('field-mcle-period').value = profile.mcle_no_period || '';
+      document.getElementById('field-mcle-no').value = profile.mcle_no || '';
+      document.getElementById('field-mcle-date').value = profile.mcle_no_date || '';
+    } else if (user.role === 'client') {
+      document.getElementById('section-client').style.display = '';
+      document.getElementById('field-organization').value = profile.organization || '';
+      document.getElementById('field-position').value = profile.position || '';
+    }
+  }
+
+  async function saveProfile(e) {
+    e.preventDefault();
+    const btn = document.getElementById('save-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="hgi-stroke hgi-loading-02" style="animation:spin 1s linear infinite;"></i> Saving…';
+
+    const user = currentUser;
+    const profile = user.profile || {};
+    const role = user.role;
+
+    const payload = {
+      first_name: document.getElementById('field-first-name').value.trim(),
+      last_name: document.getElementById('field-last-name').value.trim(),
+      prefix: document.getElementById('field-prefix').value.trim(),
+      middle_initial: document.getElementById('field-middle-initial').value.trim(),
+      suffix: document.getElementById('field-suffix').value.trim(),
+      phone: document.getElementById('field-phone').value.trim(),
+    };
+
+    if (role === 'attorney') {
+      Object.assign(payload, {
+        roll_no: document.getElementById('field-roll-no').value.trim(),
+        roll_date: document.getElementById('field-roll-date').value,
+        commission_no: document.getElementById('field-commission-no').value.trim(),
+        commission_no_valid_until: document.getElementById('field-commission-valid-until').value,
+        npn: document.getElementById('field-npn').value.trim(),
+        ptr_no: document.getElementById('field-ptr-no').value.trim(),
+        ptr_no_location: document.getElementById('field-ptr-location').value.trim(),
+        ptr_no_date: document.getElementById('field-ptr-date').value,
+        ibp_no: document.getElementById('field-ibp-no').value.trim(),
+        ibp_no_date: document.getElementById('field-ibp-date').value,
+        notary_address: document.getElementById('field-notary-address').value.trim(),
+        home_street: document.getElementById('field-home-street').value.trim(),
+        barangay: document.getElementById('field-barangay').value.trim(),
+        city_province: document.getElementById('field-city-province').value.trim(),
+        mcle_no_period: document.getElementById('field-mcle-period').value.trim(),
+        mcle_no: document.getElementById('field-mcle-no').value.trim(),
+        mcle_no_date: document.getElementById('field-mcle-date').value,
+      });
+    } else if (role === 'client') {
+      Object.assign(payload, {
+        organization: document.getElementById('field-organization').value.trim(),
+        position: document.getElementById('field-position').value.trim(),
+      });
+    }
+
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        currentUser = data.user;
+        showToast('Profile saved successfully.', 'success');
+        // Update nav name
+        document.getElementById('nav-name').textContent = data.user.first_name || '';
+        document.getElementById('menu-name').textContent = [data.user.first_name, data.user.last_name].filter(Boolean).join(' ');
+        const initials = getInitials(data.user);
+        document.getElementById('nav-initials').textContent = initials;
+        document.getElementById('menu-initials').textContent = initials;
+        document.getElementById('avatar-circle').textContent = initials;
+      } else {
+        showToast(data.detail || 'Failed to save. Please try again.', 'error');
+      }
+    } catch (err) {
+      showToast('Network error. Please try again.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="hgi-stroke hgi-floppy-disk"></i> Save Changes';
+    }
+  }
+
+  async function init() {
+    try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
+    try {
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!res.ok) throw new Error('Unauthorized');
+      const user = await res.json();
+
+      // Fetch full profile (includes profile sub-object)
+      const profileRes = await fetch('/api/auth/me', { credentials: 'include' });
+      // We need profile fields — fetch them via a secondary call if needed,
+      // but /api/auth/me doesn't return profile sub-object.
+      // Fallback: use what we have and rely on populateForm to merge.
+      // Try /api/profile GET if it exists, otherwise use /api/auth/me data.
+      let fullUser = user;
+      try {
+        const pRes = await fetch('/api/profile', { credentials: 'include' });
+        if (pRes.ok) {
+          const pData = await pRes.json();
+          if (pData.user) fullUser = pData.user;
+        }
+      } catch(_) {}
+
+      currentUser = fullUser;
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('profile-page').style.display = '';
+
+      populateNav(fullUser);
+      populateForm(fullUser);
+    } catch (err) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = '';
+    }
+  }
+
+  // Spin animation for loading icon
+  const style = document.createElement('style');
+  style.textContent = '@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}';
+  document.head.appendChild(style);
+
+  init();
+</script>
+</body>
+</html>

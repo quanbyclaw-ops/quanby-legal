@@ -339,6 +339,8 @@ let _activeCreditOrgId = null;
 
 // ── Init ───────────────────────────────────────────────────────────────────
 (async function init() {
+  // Silently refresh access token first (prevents false redirect on page refresh)
+  try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
   try {
     const r = await fetch('/api/auth/me', { credentials: 'include' });
     if (!r.ok) { location.href = '/dashboard'; return; }

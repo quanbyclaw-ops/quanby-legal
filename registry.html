@@ -283,6 +283,7 @@ let debounceTimer = null;
 
 // ─── Auth & Boot ──────────────────────────────────────────────────────────────
 async function boot() {
+  try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
   try {
     const res = await fetch('/api/auth/me', { credentials: 'include' });
     if (!res.ok) { window.location = '/'; return; }
