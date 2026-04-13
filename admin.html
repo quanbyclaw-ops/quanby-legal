@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:           #0f1117;
@@ -86,15 +86,15 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
   flex-shrink: 0; z-index: 100; transition: transform .25s;
 }
 #sidebar-logo {
-  padding: 20px 20px 16px; border-bottom: 1px solid var(--border);
+  padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.08);
 }
 #sidebar-logo img { height: 36px; }
 #sidebar-logo span { display: block; font-size: 10px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
 .nav-group { padding: 16px 12px 8px; }
-.nav-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: 0 8px; margin-bottom: 4px; }
+.nav-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,.35); padding: 0 8px; margin-bottom: 4px; }
 .nav-item {
   display: flex; align-items: center; gap: 10px;
-  padding: 9px 12px; border-radius: 8px; cursor: pointer;
+  padding: 12px 12px; border-radius: 8px; cursor: pointer;
   color: var(--muted); font-size: 13px; font-weight: 500;
   border-left: 3px solid transparent; margin-bottom: 2px;
   transition: all .15s;
@@ -102,7 +102,6 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
 .nav-item:hover { background: var(--surface); color: var(--text); }
 .nav-item.active {
   background: rgba(124,58,237,.15); color: var(--purple-light);
-  border-left: 3px solid var(--purple-light); padding-left: calc(0.75rem - 3px);
   border-left-color: var(--purple);
 }
 .nav-icon { font-size: 16px; width: 20px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
@@ -112,12 +111,12 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
 }
 .logout-btn {
   display: flex; align-items: center; gap: 10px;
-  padding: 9px 12px; border-radius: 8px; cursor: pointer;
+  padding: 12px 12px; border-radius: 8px; cursor: pointer;
   color: var(--muted); font-size: 13px; font-weight: 500;
   width: 100%; background: none; border: none; font-family: inherit;
-  transition: all .15s;
+  transition: background .2s, color .2s;
 }
-.logout-btn:hover { background: rgba(248,113,113,.1); color: var(--red); }
+.logout-btn:hover { background: rgba(248,113,113,.12); color: var(--red); }
 
 /* ── Mobile overlay ──────────────────────────────────── */
 #sidebar-overlay {
@@ -129,18 +128,18 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
 
 /* ── Topbar ──────────────────────────────────────────── */
 #topbar {
-  height: var(--topbar-h); background: #0c0f1e; border-bottom: 1px solid rgba(255,255,255,.06);
-  border-bottom: 1px solid var(--border);
+  height: var(--topbar-h); background: #0c0f1e;
+  border-bottom: 1px solid rgba(255,255,255,.06);
   display: flex; align-items: center; gap: 12px; padding: 0 24px;
   flex-shrink: 0;
 }
 #hamburger { display: none; background: none; border: none; cursor: pointer; color: var(--text); font-size: 20px; padding: 4px; }
-#page-title { font-size: 18px; font-weight: 600; flex: 1; }
+#page-title { font-size: 18px; font-weight: 800; flex: 1; }
 #last-updated { font-size: 11px; color: var(--muted); }
 #refresh-btn {
   background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
   padding: 7px 14px; color: var(--text); font-size: 12px; cursor: pointer; font-family: inherit;
-  transition: background .15s;
+  transition: background .15s; display: flex; align-items: center; gap: 6px;
 }
 #refresh-btn:hover { background: rgba(255,255,255,.08); }
 
@@ -272,6 +271,7 @@ tr:hover td { background: rgba(124,58,237,.06); }
   #hamburger { display: block; }
   #content { padding: 16px; }
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .refresh-label { display: none; }
 }
 </style>
 </head>
@@ -354,7 +354,10 @@ tr:hover td { background: rgba(124,58,237,.06); }
       <button id="hamburger" onclick="openSidebar()">☰</button>
       <span id="page-title">Overview</span>
       <span id="last-updated"></span>
-      <button id="refresh-btn" onclick="refreshPage()"><i class="hgi-stroke hgi-refresh-02"></i> Refresh</button>
+      <button id="refresh-btn" onclick="refreshPage()">
+        <i class="hgi-stroke hgi-refresh-02"></i>
+        <span class="refresh-label">Refresh</span>
+      </button>
     </div>
 
     <!-- Content -->
@@ -457,18 +460,20 @@ tr:hover td { background: rgba(124,58,237,.06); }
       <div id="page-suborgs" class="page">
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;">
           <div>
-            <div class="page-title" style="font-size:20px;font-weight:700;color:var(--text);">Sub-Organizations</div>
+            <div class="page-title" style="font-size:20px;font-weight:800;color:var(--text);">Sub-Organizations</div>
             <div class="page-subtitle" style="color:var(--muted);font-size:13px;margin-top:4px;">Manage sub-organizations and their members</div>
           </div>
           <button class="btn btn-primary" onclick="openCreateSubOrg()" style="background:var(--purple);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;">
             <i class="hgi-stroke hgi-add-01"></i> Create Sub-Org
           </button>
         </div>
-        <div style="margin-bottom:14px;position:relative;">
-          <i class="hgi-stroke hgi-search-01" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;"></i>
-          <input id="suborgs-search" type="text" placeholder="Search by name, type, or address…" oninput="_filterSubOrgs(this.value)"
-            style="width:100%;box-sizing:border-box;padding:.6rem .85rem .6rem 34px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.85rem;font-family:Inter,sans-serif;outline:none;transition:border-color .15s;"
-            onfocus="this.style.borderColor='rgba(124,58,237,.6)'" onblur="this.style.borderColor='var(--border)'">
+        <div style="margin-bottom:16px;position:relative;">
+          <i class="hgi-stroke hgi-search-01" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none;"></i>
+          <input id="suborgs-search" type="text" placeholder="Search sub-organizations…"
+            oninput="filterSubOrgs(this.value)"
+            style="width:100%;box-sizing:border-box;padding:.65rem .85rem .65rem 38px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.875rem;font-family:Inter,sans-serif;outline:none;transition:border-color .15s;"
+            onfocus="this.style.borderColor='rgba(124,58,237,.6)'"
+            onblur="this.style.borderColor='var(--border)'">
         </div>
         <div id="suborgs-list"><!-- cards rendered here --></div>
       </div>
@@ -590,6 +595,7 @@ function refreshPage() {
   if (hash === 'users') loadUsers();
   if (hash === 'appointments') loadAppointments();
   if (hash === 'registry') loadRegistry();
+  if (hash === 'suborgs') loadSubOrgs();
   updateLastUpdated();
 }
 
@@ -845,6 +851,89 @@ async function syncAll() {
 let _editSubOrgId = null;
 let _addMemberSubOrgId = null;
 let _transferCreditsSubOrgId = null;
+let _allSubOrgs = [];
+
+/* Type badge color map */
+const _typeColors = {
+  Department: { bg: 'rgba(124,58,237,.2)',  color: '#a78bfa' },
+  Branch:     { bg: 'rgba(14,165,233,.2)',   color: '#38bdf8' },
+  Division:   { bg: 'rgba(245,158,11,.2)',   color: '#fbbf24' },
+  Team:       { bg: 'rgba(16,185,129,.2)',   color: '#34d399' },
+};
+
+function renderSubOrgCards(orgs, container) {
+  container.innerHTML = '';
+  for (const org of orgs) {
+    const tc = _typeColors[org.type] || _typeColors.Department;
+
+    const photoHtml = org.dc_photo_url
+      ? `<img src="${escHtml(org.dc_photo_url)}" alt="${escHtml(org.name)}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;border:2px solid rgba(124,58,237,.4);flex-shrink:0;">`
+      : `<div style="width:52px;height:52px;border-radius:10px;background:rgba(124,58,237,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(124,58,237,.25);"><i class="hgi-stroke hgi-building-03" style="font-size:1.4rem;color:var(--purple);"></i></div>`;
+
+    const dcDot = org.dc_sub_org_uuid
+      ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#34d399;"><span style="width:7px;height:7px;border-radius:50%;background:#34d399;display:inline-block;"></span>DC Provisioned</span>`
+      : '';
+
+    const card = document.createElement('div');
+    card.style.cssText = [
+      'background:linear-gradient(135deg,rgba(255,255,255,.05) 0%,rgba(255,255,255,.03) 100%)',
+      'border:1px solid var(--border)',
+      'border-radius:14px',
+      'padding:20px',
+      'margin-bottom:16px',
+      'box-shadow:0 2px 12px rgba(0,0,0,.3)',
+      'transition:border-color .2s',
+    ].join(';');
+    card.addEventListener('mouseenter', () => { card.style.borderColor = 'rgba(124,58,237,.4)'; });
+    card.addEventListener('mouseleave', () => { card.style.borderColor = 'var(--border)'; });
+
+    const nameSafe = escHtml(org.name).replace(/'/g, '&#39;');
+    const addrSafe = escHtml(org.address || '').replace(/'/g, '&#39;');
+    const typeSafe = escHtml(org.type || 'Department');
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          ${photoHtml}
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+              <span style="font-size:17px;font-weight:800;color:var(--text);">${escHtml(org.name)}</span>
+              <span style="background:${tc.bg};color:${tc.color};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;">${typeSafe}</span>
+              ${dcDot}
+            </div>
+            <div style="color:var(--muted);font-size:12px;">Created ${fmtDate(org.created_at)}</div>
+          </div>
+        </div>
+      </div>
+      ${org.address ? `<div style="color:var(--muted);font-size:12px;margin-bottom:14px;"><i class="hgi-stroke hgi-location-01" style="vertical-align:middle;margin-right:4px;"></i>${escHtml(org.address)}</div>` : ''}
+      <div style="display:grid;gap:10px;margin-bottom:14px;">
+        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px;">
+          <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">Credits</div>
+          <div id="credits-${org.id}" style="color:var(--muted);font-size:12px;">Loading…</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px;">
+          <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">DC Credentials</div>
+          <div id="creds-${org.id}" style="color:var(--muted);font-size:12px;">Loading…</div>
+        </div>
+        <div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:12px;">
+          <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">Members</div>
+          <div id="members-${org.id}" style="color:var(--muted);font-size:12px;">Loading members…</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);">
+        <button onclick="openEditSubOrg('${org.id}','${nameSafe}','${addrSafe}','${typeSafe}')" style="background:rgba(14,165,233,.15);color:#38bdf8;border:1px solid rgba(14,165,233,.3);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;"><i class="hgi-stroke hgi-edit-01"></i> Edit</button>
+        <button onclick="openAddMember('${org.id}')" style="background:rgba(16,185,129,.15);color:#34d399;border:1px solid rgba(16,185,129,.3);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;"><i class="hgi-stroke hgi-user-add-01"></i> Add Member</button>
+        <button onclick="openTransferCredits('${org.id}')" style="background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;"><i class="hgi-stroke hgi-coins-01"></i> Transfer Credits</button>
+        <button onclick="deleteSubOrg('${org.id}')" style="background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3);padding:6px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:500;"><i class="hgi-stroke hgi-delete-02"></i> Delete</button>
+      </div>
+    `;
+    container.appendChild(card);
+    // Load credits, credentials, members in parallel
+    loadSubOrgCredits(org.id);
+    loadSubOrgCreds(org.id);
+    loadSubOrgMembers(org.id);
+  }
+}
 
 async function loadSubOrgs() {
   const container = document.getElementById('suborgs-list');
@@ -853,55 +942,33 @@ async function loadSubOrgs() {
     const r = await fetch('/api/sub-orgs', { credentials: 'include' });
     if (!r.ok) { container.innerHTML = '<div style="color:var(--red);padding:32px;text-align:center;">Error loading sub-organizations.</div>'; return; }
     const orgs = await r.json();
-    orgs.sort((a, b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+    // Sort newest first
+    orgs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     _allSubOrgs = orgs;
     if (!orgs.length) {
       container.innerHTML = `<div style="color:var(--muted);padding:48px;text-align:center;"><i class="hgi-stroke hgi-building-03" style="font-size:2rem;display:block;margin-bottom:12px;"></i>No sub-organizations yet.<br><span style="font-size:12px;">Create one to get started.</span></div>`;
       return;
     }
-    container.innerHTML = '';
-    for (const org of orgs) {
-      const card = document.createElement('div');
-      const _typeColors = {Department:{bg:'rgba(124,58,237,.18)',c:'#a78bfa'},Branch:{bg:'rgba(14,165,233,.18)',c:'#38bdf8'},Division:{bg:'rgba(245,158,11,.18)',c:'#fbbf24'},Team:{bg:'rgba(16,185,129,.18)',c:'#34d399'}};
-      const _tc = _typeColors[org.type||'Department'] || _typeColors.Department;
-      card.style.cssText = 'background:linear-gradient(135deg,rgba(255,255,255,.055) 0%,rgba(255,255,255,.025) 100%);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.25);transition:border-color .2s,box-shadow .2s;cursor:default;';
-      card.onmouseenter = function(){ this.style.borderColor='rgba(124,58,237,.4)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,.35)'; };
-      card.onmouseleave = function(){ this.style.borderColor='var(--border)'; this.style.boxShadow='0 2px 12px rgba(0,0,0,.25)'; };
-      card.innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            ${org.dc_photo_url ? `<img src="${escHtml(org.dc_photo_url)}" alt="${escHtml(org.name)}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,.1);">` : `<div style="width:44px;height:44px;border-radius:8px;background:rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="hgi-stroke hgi-building-03" style="font-size:1.2rem;color:var(--purple);"></i></div>`}
-            <div>
-              <span style="font-size:16px;font-weight:700;color:var(--text);">${escHtml(org.name)}</span>
-              <span style="margin-left:8px;background:${_tc.bg};color:${_tc.c};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">${escHtml(org.type||'Department')}</span>
-              ${org.dc_sub_org_uuid ? '<span style="margin-left:6px;display:inline-flex;align-items:center;gap:3px;background:rgba(16,185,129,.12);color:#34d399;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;"><span style=\"width:6px;height:6px;border-radius:50%;background:#34d399;display:inline-block;\"></span>DC</span>' : ''}
-            </div>
-          </div>
-          <span style="color:var(--muted);font-size:12px;">Created ${fmtDate(org.created_at)}</span>
-        </div>
-        ${org.address ? `<div style="color:var(--muted);font-size:12px;margin-bottom:12px;"><i class="hgi-stroke hgi-location-01" style="vertical-align:middle;"></i> ${escHtml(org.address)}</div>` : ''}
-        <div id="credits-${org.id}" style="color:var(--muted);font-size:12px;margin-bottom:12px;">Credits: loading…</div>
-        <div id="creds-${org.id}" style="margin-bottom:12px;"></div>
-        <div style="margin-bottom:12px;">
-          <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Members</div>
-          <div id="members-${org.id}" style="color:var(--muted);font-size:12px;">Loading members…</div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--border);">
-          <button onclick="openEditSubOrg('${org.id}','${escHtml(org.name).replace(/'/g,"\\'")}','${escHtml(org.address||'').replace(/'/g,"\\'")}','${escHtml(org.type||'Department')}')" style="background:rgba(14,165,233,.15);color:var(--teal);border:1px solid rgba(14,165,233,.3);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;"><i class="hgi-stroke hgi-edit-01"></i> Edit</button>
-          <button onclick="openAddMember('${org.id}')" style="background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;"><i class="hgi-stroke hgi-user-add-01"></i> Add Member</button>
-          <button onclick="openTransferCredits('${org.id}')" style="background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;"><i class="hgi-stroke hgi-coins-01"></i> Transfer Credits</button>
-          <button onclick="deleteSubOrg('${org.id}')" style="background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;"><i class="hgi-stroke hgi-delete-02"></i> Delete</button>
-        </div>
-      `;
-      container.appendChild(card);
-      // Load credits, credentials, members in parallel
-      loadSubOrgCredits(org.id);
-      loadSubOrgCreds(org.id);
-      loadSubOrgMembers(org.id);
-    }
+    renderSubOrgCards(orgs, container);
   } catch(e) {
     container.innerHTML = `<div style="color:var(--red);padding:32px;text-align:center;">Error: ${e.message}</div>`;
   }
+}
+
+function filterSubOrgs(query) {
+  const q = (query || '').toLowerCase().trim();
+  if (!q) { loadSubOrgs(); return; }
+  const container = document.getElementById('suborgs-list');
+  const filtered = _allSubOrgs.filter(o =>
+    (o.name||'').toLowerCase().includes(q) ||
+    (o.type||'').toLowerCase().includes(q) ||
+    (o.address||'').toLowerCase().includes(q)
+  );
+  if (!filtered.length) {
+    container.innerHTML = `<div style="color:var(--muted);padding:32px;text-align:center;">No sub-organizations match &ldquo;${escHtml(query)}&rdquo;</div>`;
+    return;
+  }
+  renderSubOrgCards(filtered, container);
 }
 
 async function loadSubOrgCredits(id) {
@@ -909,7 +976,7 @@ async function loadSubOrgCredits(id) {
     const r = await fetch(`/api/sub-orgs/${id}/credits`, { credentials: 'include' });
     const d = await r.json();
     const el = document.getElementById('credits-'+id);
-    if (el) el.innerHTML = `<i class="hgi-stroke hgi-coins-01" style="vertical-align:middle;"></i> Credits — Total: <b style="color:var(--text);">${d.total||0}</b> · Used: <b style="color:var(--text);">${d.used||0}</b> · Remaining: <b style="color:var(--green);">${d.remaining||0}</b>`;
+    if (el) el.innerHTML = `<i class="hgi-stroke hgi-coins-01" style="vertical-align:middle;margin-right:4px;"></i>Total: <b style="color:var(--text);">${d.total||0}</b> &nbsp;·&nbsp; Used: <b style="color:var(--text);">${d.used||0}</b> &nbsp;·&nbsp; Remaining: <b style="color:#34d399;">${d.remaining||0}</b>`;
   } catch(e) {}
 }
 
@@ -920,18 +987,17 @@ async function loadSubOrgCreds(id) {
     const el = document.getElementById('creds-'+id);
     if (!el) return;
     el.innerHTML = `
-      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">DC Credentials</div>
-      <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;">
+      <div style="font-size:12px;">
         <div style="margin-bottom:6px;"><span style="color:var(--muted);">Email:</span> <span style="color:var(--text);">${escHtml(d.dc_email||'—')}</span></div>
-        <div style="margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+        <div style="margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <span style="color:var(--muted);">Client Key:</span>
           <span id="ck-${id}" style="color:var(--text);font-family:monospace;">${escHtml(d.dc_client_key||'—')}</span>
-          ${d.dc_client_key_raw ? `<button onclick="toggleReveal('ck-${id}','${escHtml(d.dc_client_key_raw).replace(/'/g,"\\'")}','${escHtml(d.dc_client_key||'').replace(/'/g,"\\'")}')" style="background:rgba(255,255,255,.08);border:none;color:var(--muted);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Reveal</button>` : ''}
+          ${d.dc_client_key_raw ? `<button onclick="toggleReveal('ck-${id}','${escHtml(d.dc_client_key_raw).replace(/'/g,"&#39;")}','${escHtml(d.dc_client_key||'').replace(/'/g,"&#39;")}')" style="background:rgba(255,255,255,.08);border:none;color:var(--muted);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Reveal</button>` : ''}
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <span style="color:var(--muted);">Client Secret:</span>
           <span id="cs-${id}" style="color:var(--text);font-family:monospace;">${escHtml(d.dc_client_secret||'—')}</span>
-          ${d.dc_client_secret_raw ? `<button onclick="toggleReveal('cs-${id}','${escHtml(d.dc_client_secret_raw).replace(/'/g,"\\'")}','${escHtml(d.dc_client_secret||'').replace(/'/g,"\\'")}')" style="background:rgba(255,255,255,.08);border:none;color:var(--muted);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Reveal</button>` : ''}
+          ${d.dc_client_secret_raw ? `<button onclick="toggleReveal('cs-${id}','${escHtml(d.dc_client_secret_raw).replace(/'/g,"&#39;")}','${escHtml(d.dc_client_secret||'').replace(/'/g,"&#39;")}')" style="background:rgba(255,255,255,.08);border:none;color:var(--muted);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Reveal</button>` : ''}
         </div>
       </div>
     `;
@@ -946,18 +1012,18 @@ async function loadSubOrgMembers(id) {
     if (!el) return;
     if (!members.length) { el.innerHTML = '<span style="color:var(--muted);font-size:12px;">No members yet.</span>'; return; }
     el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
-      <thead><tr style="color:var(--muted);border-bottom:1px solid var(--border);">
+      <thead><tr style="color:rgba(255,255,255,.35);border-bottom:1px solid rgba(255,255,255,.07);">
         <th style="text-align:left;padding:6px 8px;">Name</th>
         <th style="text-align:left;padding:6px 8px;">Email</th>
         <th style="text-align:left;padding:6px 8px;">Role</th>
         <th style="text-align:left;padding:6px 8px;">Status</th>
         <th style="padding:6px 8px;"></th>
       </tr></thead>
-      <tbody>${members.map(m => `<tr style="border-bottom:1px solid var(--border);">
+      <tbody>${members.map(m => `<tr style="border-bottom:1px solid rgba(255,255,255,.05);">
         <td style="padding:6px 8px;color:var(--text);">${escHtml(m.name||'—')}</td>
         <td style="padding:6px 8px;color:var(--muted);">${escHtml(m.email||'—')}</td>
-        <td style="padding:6px 8px;"><span style="background:${m.role==='ENP'?'rgba(124,58,237,.2)':'rgba(14,165,233,.2)'};color:${m.role==='ENP'?'var(--purple)':'var(--teal)'};padding:2px 8px;border-radius:10px;font-size:11px;">${escHtml(m.role||'Staff')}</span></td>
-        <td style="padding:6px 8px;"><span style="color:${m.status==='active'?'var(--green)':'var(--gold)'};">${escHtml(m.status||'active')}</span></td>
+        <td style="padding:6px 8px;"><span style="background:${m.role==='ENP'?'rgba(124,58,237,.2)':'rgba(14,165,233,.2)'};color:${m.role==='ENP'?'#a78bfa':'#38bdf8'};padding:2px 8px;border-radius:10px;font-size:11px;">${escHtml(m.role||'Staff')}</span></td>
+        <td style="padding:6px 8px;"><span style="color:${m.status==='active'?'#34d399':'var(--gold)'};">${escHtml(m.status||'active')}</span></td>
         <td style="padding:6px 8px;"><button onclick="removeMember('${id}','${m.user_id}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;padding:2px 6px;">✕ Remove</button></td>
       </tr>`).join('')}</tbody>
     </table>`;
