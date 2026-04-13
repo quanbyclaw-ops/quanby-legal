@@ -1630,9 +1630,12 @@ function setupRoomEvents(room, localName, localRole) {
         var _pb = document.getElementById('plot-sign-btn-' + obj.project_uuid);
         if (_pb) {
           _pb.disabled = true;
-          _pb.style.opacity = '.45';
-          _pb.style.cursor = 'not-allowed';
-          _pb.innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.82rem;"></i> Fields Plotted';
+          _pb.style.opacity = '1';
+          _pb.style.cursor = 'default';
+          _pb.style.background = 'rgba(16,185,129,.12)';
+          _pb.style.borderColor = 'rgba(16,185,129,.4)';
+          _pb.style.color = '#10b981';
+          _pb.innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.82rem;"></i> ✓ Fields Plotted';
           _pb.onclick = null;
         }
       } else if (obj.type === 'doc_uploaded') {
@@ -2511,9 +2514,12 @@ async function openPlotSignature(projectUuid) {
     var _plotBtn = document.getElementById('plot-sign-btn-' + projectUuid);
     if (_plotBtn) {
       _plotBtn.disabled = true;
-      _plotBtn.style.opacity = '.55';
+      _plotBtn.style.opacity = '1';
       _plotBtn.style.cursor = 'not-allowed';
-      _plotBtn.innerHTML = '<i class="hgi-stroke hgi-pen-tool-01" style="font-size:.82rem;"></i> Plotting…';
+      _plotBtn.style.background = 'rgba(107,114,128,.15)';
+      _plotBtn.style.borderColor = 'rgba(107,114,128,.35)';
+      _plotBtn.style.color = '#9ca3af';
+      _plotBtn.innerHTML = '<i class="hgi-stroke hgi-loading-03" style="font-size:.82rem;animation:spin .9s linear infinite;"></i> Plotting…';
       _plotBtn._origHTML = '<i class="hgi-stroke hgi-pen-tool-01" style="font-size:.82rem;"></i> Plot Signature Fields';
       _plotBtn._projectUuid = projectUuid;
     }
@@ -2525,14 +2531,19 @@ async function openPlotSignature(projectUuid) {
     // Mark locally that plotting is confirmed done (prevents re-enable on modal close)
     if (!window._plottingDone) window._plottingDone = {};
     window._plottingDone[projectUuid] = true;
-    // Lock plot button permanently now that plotting IS done
+    // Lock plot button permanently — green confirmed state
     var _pbFinal = document.getElementById('plot-sign-btn-' + projectUuid);
     if (_pbFinal) {
       _pbFinal.disabled = true;
-      _pbFinal.style.opacity = '.45';
-      _pbFinal.style.cursor = 'not-allowed';
-      _pbFinal.innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.82rem;"></i> Fields Plotted';
+      _pbFinal.style.opacity = '1';
+      _pbFinal.style.cursor = 'default';
+      _pbFinal.style.background = 'rgba(16,185,129,.12)';
+      _pbFinal.style.borderColor = 'rgba(16,185,129,.4)';
+      _pbFinal.style.color = '#10b981';
+      _pbFinal.innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.82rem;"></i> ✓ Fields Plotted';
       _pbFinal.onclick = null;
+      _pbFinal.onmouseover = null;
+      _pbFinal.onmouseout  = null;
     }
     // Broadcast to clients that plotting is done → their Sign button should unlock
     if (_room && _room.state === 'connected') {
@@ -2576,7 +2587,13 @@ async function openPlotSignature(projectUuid) {
               _pb.disabled = false;
               _pb.style.opacity = '1';
               _pb.style.cursor = 'pointer';
-              _pb.innerHTML = _pb._origHTML || '<i class="hgi-stroke hgi-pen-tool-01" style="font-size:.82rem;"></i> Plot Signature Fields';
+              _pb.style.background = 'rgba(245,158,11,.12)';
+              _pb.style.borderColor = 'rgba(245,158,11,.45)';
+              _pb.style.color = '#f59e0b';
+              _pb.innerHTML = '<i class="hgi-stroke hgi-alert-02" style="font-size:.82rem;"></i> ✕ Closed — Try Again';
+              _pb.title = 'Window was closed without plotting — click to reopen';
+              _pb.onmouseover = function() { this.style.background = 'rgba(245,158,11,.22)'; };
+              _pb.onmouseout  = function() { this.style.background = 'rgba(245,158,11,.12)'; };
               _pb.onclick = function() { openPlotSignature(projectUuid); };
               // Also reset workflow state so Add Signer stays unblocked
               if (_sessionInfo && Array.isArray(_sessionInfo.session_documents)) {
