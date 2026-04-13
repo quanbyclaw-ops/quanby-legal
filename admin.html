@@ -511,7 +511,9 @@ async function init() {
     const r = await fetch('/api/admin/me', { credentials: 'include' });
     if (!r.ok) { showLogin(); return; }
     showApp();
-    navigate('overview');
+    // Restore the page the user was on before refresh
+    const hash = location.hash.replace('#', '');
+    navigate(PAGES[hash] ? hash : 'overview');
   } catch(e) { showLogin(); }
 }
 
@@ -981,25 +983,32 @@ function openCreateSubOrg() {
   document.getElementById('form-create-suborg').reset();
   document.getElementById('dc-creds-section').style.display = 'none';
 }
-function closeCreateSubOrg() { document.getElementById('modal-create-suborg').style.display = 'none'; }
+function closeCreateSubOrg() {
+  document.getElementById('modal-create-suborg').style.display = 'none';
+  const ph = document.getElementById('so-photo');
+  if (ph) ph.value = '';
+}
 
 async function submitCreateSubOrg() {
   const btn = document.getElementById('btn-create-suborg');
   const err = document.getElementById('err-create-suborg');
   err.style.display = 'none';
+  const name = document.getElementById('so-name').value.trim();
+  if (!name) { err.textContent = 'Name is required.'; err.style.display = ''; return; }
   btn.disabled = true; btn.textContent = 'Creating…';
-  const body = {
-    name: document.getElementById('so-name').value.trim(),
-    address: document.getElementById('so-address').value.trim(),
-    type: document.getElementById('so-type').value,
-    dc_email: document.getElementById('so-dc-email').value.trim(),
-    dc_client_key: document.getElementById('so-dc-key').value.trim(),
-    dc_client_secret: document.getElementById('so-dc-secret').value.trim(),
-    owner_email: document.getElementById('so-owner-email').value.trim(),
-  };
-  if (!body.name) { err.textContent = 'Name is required.'; err.style.display = ''; btn.disabled = false; btn.textContent = 'Create'; return; }
   try {
-    const r = await fetch('/api/sub-orgs', { method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    // Use FormData to support optional photo upload
+    const fd = new FormData();
+    fd.append('name', name);
+    fd.append('address', document.getElementById('so-address').value.trim());
+    fd.append('type', document.getElementById('so-type').value);
+    fd.append('owner_email', document.getElementById('so-owner-email').value.trim());
+    fd.append('dc_email', document.getElementById('so-dc-email').value.trim());
+    fd.append('dc_client_key', document.getElementById('so-dc-key').value.trim());
+    fd.append('dc_client_secret', document.getElementById('so-dc-secret').value.trim());
+    const photoInput = document.getElementById('so-photo');
+    if (photoInput && photoInput.files && photoInput.files[0]) fd.append('photo', photoInput.files[0]);
+    const r = await fetch('/api/sub-orgs', { method: 'POST', credentials: 'include', body: fd });
     const d = await r.json();
     if (!r.ok) { err.textContent = d.detail || 'Failed to create.'; err.style.display = ''; btn.disabled = false; btn.textContent = 'Create'; return; }
     closeCreateSubOrg();
@@ -1149,6 +1158,10 @@ init();
       <div class="so-field">
         <label>Owner Email <span style="color:var(--muted);font-weight:400;">(optional — assign to ENP)</span></label>
         <input id="so-owner-email" type="email" placeholder="enp@example.com">
+      </div>
+      <div class="so-field">
+        <label>Branding Photo <span style="color:var(--muted);font-weight:400;">(optional — shown on emails &amp; signing page)</span></label>
+        <input id="so-photo" type="file" accept="image/*" style="width:100%;padding:.55rem .75rem;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.85rem;cursor:pointer;font-family:inherit;">
       </div>
       <div class="so-field">
         <span class="so-toggle-link" onclick="const s=document.getElementById('dc-creds-section');s.style.display=s.style.display==='none'?'block':'none'">

@@ -5502,7 +5502,29 @@ async def list_sub_orgs(request: Request):
 
 # ── POST /api/sub-orgs ────────────────────────────────────────────────────────
 @app.post("/api/sub-orgs")
-async def create_sub_org(req: _SubOrgCreateReq, request: Request):
+async def create_sub_org(
+    request: Request,
+    name: str = Form(...),
+    address: str = Form(""),
+    type: str = Form("Department"),
+    owner_email: str = Form(""),
+    dc_client_key: str = Form(""),
+    dc_client_secret: str = Form(""),
+    dc_email: str = Form(""),
+    photo: UploadFile = File(None),
+):
+    # Wrap into a req-like object for compatibility
+    class _Req:
+        pass
+    req = _Req()
+    req.name = name
+    req.address = address
+    req.type = type
+    req.owner_email = owner_email
+    req.dc_client_key = dc_client_key
+    req.dc_client_secret = dc_client_secret
+    req.dc_email = dc_email
+    req._photo = photo
     user = _require_attorney_or_admin(request)
     if not req.name or not req.name.strip():
         raise HTTPException(400, "name is required")
@@ -5534,6 +5556,16 @@ async def create_sub_org(req: _SubOrgCreateReq, request: Request):
     org["dc_sub_org_id"]   = None
     org["dc_sub_org_uuid"] = None
 
+    # Read photo bytes if provided
+    _photo_bytes = None
+    _photo_name = None
+    if hasattr(req, '_photo') and req._photo and req._photo.filename:
+        try:
+            _photo_bytes = await req._photo.read()
+            _photo_name = req._photo.filename
+        except Exception:
+            pass
+
     # Provision sub-org in DoconChain (non-blocking)
     _dc_provision_error = None
     try:
@@ -5563,9 +5595,20 @@ async def create_sub_org(req: _SubOrgCreateReq, request: Request):
             _field("name", org["name"]) +
             _field("address", org["address"] or org["name"]) +
             _field("sub_organization_type_name", org["type"]) +
-            _field("organization_uuid", _DC_ORG_ID) +
-            b"--" + _bd.encode() + b"--" + _CRLF
+            _field("organization_uuid", _DC_ORG_ID)
         )
+        # Attach photo if provided
+        if _photo_bytes and _photo_name:
+            _ext = _photo_name.rsplit('.', 1)[-1].lower() if '.' in _photo_name else 'png'
+            _mime = {'jpg':'image/jpeg','jpeg':'image/jpeg','png':'image/png','gif':'image/gif','webp':'image/webp'}.get(_ext, 'image/png')
+            _body_so += (
+                b"--" + _bd.encode() + b"\r\n" +
+                b"Content-Disposition: form-data; name=\"photo\"; filename=\"" + _photo_name.encode() + b"\"\r\n" +
+                b"Content-Type: " + _mime.encode() + b"\r\n\r\n" +
+                _photo_bytes + b"\r\n"
+            )
+        _body_so += b"--" + _bd.encode() + b"--" + b"\r\n"
+        # (removed trailing b"--" + _bd.encode() + b"--" + _CRLF — now inline above)
         print(f"[SubOrg] Creating DC sub-org: name={org['name']} type={org['type']} org_id={_DC_ORG_ID} token_email={_enp_email_so}", flush=True)
         _req_so = _ur_so.Request(
             f"{_DC_BASE}/api/v2/organizations/sub?user_type=ENTERPRISE_API",
