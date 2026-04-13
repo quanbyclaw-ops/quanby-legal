@@ -1481,7 +1481,7 @@
     <section id="contract-agent">
         <div class="container">
             <div class="agent-header">
-                <div class="agent-badge">✨ Powered by xAI Grok · Philippine Law Expert</div>
+                <div class="agent-badge"><i class="hgi-stroke hgi-cpu-01" style="font-size:.75rem;vertical-align:middle;margin-right:.25rem;"></i> Powered by xAI Grok · Philippine Law Expert</div>
                 <h2>Contract <span class="gradient-text">AI Agent</span></h2>
                 <p class="section-subtitle">Upload any contract for instant AI analysis, ask questions, or generate new contracts — all compliant with Philippine law</p>
             </div>
@@ -1490,7 +1490,7 @@
             <div class="agent-tabs">
                 <button class="agent-tab active" onclick="switchTab('analyze')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Analyze Contract</button>
                 <button class="agent-tab" onclick="switchTab('chat')">💬 Ask AI</button>
-                <button class="agent-tab" onclick="switchTab('generate')">✨ Generate Contract</button>
+                <button class="agent-tab" onclick="switchTab('generate')"><i class="hgi-stroke hgi-magic-wand-01" style="font-size:.85rem;vertical-align:middle;margin-right:.3rem;"></i> Generate Contract</button>
             </div>
 
             <!-- TAB: ANALYZE -->
@@ -1646,7 +1646,7 @@
                         <div id="generate-form-fields">
                             <!-- Dynamic fields populated by JS -->
                         </div>
-                        <button class="btn btn-filled" onclick="generateContract()" id="generate-btn">✨ Generate Contract with AI</button>
+                        <button class="btn btn-filled" onclick="generateContract()" id="generate-btn"><i class="hgi-stroke hgi-magic-wand-01" style="font-size:.9rem;vertical-align:middle;margin-right:.35rem;"></i> Generate Contract with AI</button>
 
                         <!-- Generated Contract Output -->
                         <div class="generated-contract" id="generated-contract">
@@ -2167,7 +2167,7 @@
             partiesEl.innerHTML = '<div style="color:var(--muted);font-size:0.875rem">No parties identified</div>';
         }
         parties.forEach(p => {
-            const avatarEmoji = p.type === 'Corporation' ? '🏢' : '👤';
+            const avatarEmoji = p.type === 'Corporation' ? 'hgi-building-05' : '👤';
             partiesEl.innerHTML += `
                 <div class="party-item">
                     <div class="party-avatar">${avatarEmoji}</div>
@@ -2379,15 +2379,15 @@
 
     // ─── GENERATE CONTRACT ──────────────────────────────────────────────────────
     const TEMPLATES = [
-        { id: 'deed_of_sale', name: 'Deed of Absolute Sale', icon: '🏡', category: 'Real Estate' },
-        { id: 'lease_agreement', name: 'Contract of Lease', icon: '🏢', category: 'Real Estate' },
-        { id: 'employment_contract', name: 'Employment Contract', icon: '👔', category: 'Labor' },
-        { id: 'service_agreement', name: 'Service Agreement', icon: '🤝', category: 'Business' },
-        { id: 'loan_agreement', name: 'Loan Agreement', icon: '💰', category: 'Finance' },
+        { id: 'deed_of_sale', name: 'Deed of Absolute Sale', icon: 'hgi-home-01', category: 'Real Estate' },
+        { id: 'lease_agreement', name: 'Contract of Lease', icon: 'hgi-building-05', category: 'Real Estate' },
+        { id: 'employment_contract', name: 'Employment Contract', icon: 'hgi-briefcase-01', category: 'Labor' },
+        { id: 'service_agreement', name: 'Service Agreement', icon: 'hgi-handshake-02', category: 'Business' },
+        { id: 'loan_agreement', name: 'Loan Agreement', icon: 'hgi-money-bag-01', category: 'Finance' },
         { id: 'partnership_agreement', name: 'Partnership Agreement', icon: 'hgi-building-01', category: 'Corporate' },
         { id: 'nda', name: 'Non-Disclosure Agreement', icon: 'hgi-lock-01', category: 'Corporate' },
         { id: 'memorandum_of_agreement', name: 'Memorandum of Agreement', icon: 'hgi-file-02', category: 'Business' },
-        { id: 'power_of_attorney', name: 'Special Power of Attorney', icon: '⚖️', category: 'Legal' },
+        { id: 'power_of_attorney', name: 'Special Power of Attorney', icon: 'hgi-justice-scale-01', category: 'Legal' },
     ];
 
     const TEMPLATE_FIELDS = {
@@ -2473,7 +2473,10 @@
         TEMPLATES.forEach(t => {
             const el = document.createElement('div');
             el.className = 'template-item' + (t.id === selectedTemplate ? ' active' : '');
-            el.innerHTML = `<div class="template-icon">${t.icon}</div><div><div class="template-name">${t.name}</div><div class="template-cat">${t.category}</div></div>`;
+            const _iconHtml = t.icon && t.icon.startsWith('hgi-')
+              ? `<i class="hgi-stroke ${t.icon}" style="font-size:1.25rem;"></i>`
+              : `<span>${t.icon}</span>`;
+            el.innerHTML = `<div class="template-icon">${_iconHtml}</div><div><div class="template-name">${t.name}</div><div class="template-cat">${t.category}</div></div>`;
             el.onclick = () => selectTemplate(t.id, t.name, t.icon);
             list.appendChild(el);
         });
@@ -2485,7 +2488,10 @@
         document.querySelectorAll('.template-item').forEach(el => el.classList.remove('active'));
         event.currentTarget.classList.add('active');
         const t = TEMPLATES.find(t => t.id === id);
-        document.getElementById('generate-form-title').textContent = `${t.icon} ${t.name}`;
+        const _fIconHtml = t.icon && t.icon.startsWith('hgi-')
+              ? `<i class="hgi-stroke ${t.icon}" style="font-size:1.1rem;margin-right:.35rem;vertical-align:middle;"></i>`
+              : (t.icon + ' ');
+            document.getElementById('generate-form-title').innerHTML = `${_fIconHtml}${t.name}`;
         document.getElementById('generated-contract').style.display = 'none';
         renderGenerateForm(id);
     }
@@ -2526,7 +2532,10 @@
         btn.textContent = '⏳ Generating...';
 
         const t = TEMPLATES.find(t => t.id === selectedTemplate);
-        document.getElementById('generated-title').textContent = `${t.icon} ${t.name}`;
+        const _gIconHtml = t.icon && t.icon.startsWith('hgi-')
+              ? `<i class="hgi-stroke ${t.icon}" style="font-size:1.1rem;margin-right:.4rem;vertical-align:middle;"></i>`
+              : (t.icon + ' ');
+            document.getElementById('generated-title').innerHTML = `${_gIconHtml}${t.name}`;
 
         const abortGen = new AbortController();
         setTimeout(() => abortGen.abort(), 60000);
@@ -3014,13 +3023,13 @@
             'role_select': { cls: 'step-profile',     icon: 'hgi-file-02', label: 'Complete Profile' },
             'profile':     { cls: 'step-profile',     icon: 'hgi-file-02', label: 'Complete Profile' },
             'test':        { cls: 'step-exam',         icon: '📝', label: 'Take Exam' },
-            'kyc':         { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
-            'kyc_id':      { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
-            'liveness':    { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
-            'survey':      { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
-            'certificate': { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
-            'sc_redirect': { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
-            'certified':   { cls: 'step-certified',    icon: '🏠', label: 'My Dashboard' },
+            'kyc':         { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
+            'kyc_id':      { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
+            'liveness':    { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
+            'survey':      { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
+            'certificate': { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
+            'sc_redirect': { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
+            'certified':   { cls: 'step-certified',    icon: 'hgi-home-01', label: 'My Dashboard' },
         };
         var cfg = config[step] || config['test'];
         badge.className = 'nav-cert-badge ' + cfg.cls;
