@@ -1629,13 +1629,7 @@ function setupRoomEvents(room, localName, localRole) {
         window._plottingDone[obj.project_uuid] = true;
         var _pb = document.getElementById('plot-sign-btn-' + obj.project_uuid);
         if (_pb) {
-          _pb.disabled = true;
-          _pb.style.opacity = '1';
-          _pb.style.cursor = 'default';
-          _pb.style.background = 'rgba(16,185,129,.12)';
-          _pb.style.borderColor = 'rgba(16,185,129,.4)';
-          _pb.style.color = '#10b981';
-          _pb.innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.82rem;"></i> ✓ Fields Plotted';
+          _lockPlotButtonDone(obj.project_uuid);
           _pb.onclick = null;
         }
       } else if (obj.type === 'doc_uploaded') {
@@ -2524,48 +2518,10 @@ async function openPlotSignature(projectUuid) {
       _plotBtn._projectUuid = projectUuid;
     }
 
-    // Enable Sign Document button for all participants via data attribute
-    var _signBtn = document.getElementById('sign-doc-btn-' + projectUuid);
-    if (_signBtn) { _signBtn.dataset.signLink = '1'; }
-
-    // Mark locally that plotting is confirmed done (prevents re-enable on modal close)
-    if (!window._plottingDone) window._plottingDone = {};
-    window._plottingDone[projectUuid] = true;
-    // Lock plot button permanently — green confirmed state
-    var _pbFinal = document.getElementById('plot-sign-btn-' + projectUuid);
-    if (_pbFinal) {
-      _pbFinal.disabled = true;
-      _pbFinal.style.opacity = '1';
-      _pbFinal.style.cursor = 'default';
-      _pbFinal.style.background = 'rgba(16,185,129,.12)';
-      _pbFinal.style.borderColor = 'rgba(16,185,129,.4)';
-      _pbFinal.style.color = '#10b981';
-      _pbFinal.innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.82rem;"></i> ✓ Fields Plotted';
-      _pbFinal.onclick = null;
-      _pbFinal.onmouseover = null;
-      _pbFinal.onmouseout  = null;
-    }
-    // Broadcast to clients that plotting is done → their Sign button should unlock
-    if (_room && _room.state === 'connected') {
-      var _plotMsg = JSON.stringify({
-        type: 'plotting_done',
-        project_uuid: projectUuid,
-        enp_email: (_sessionInfo && _sessionInfo.enp_email) || '',
-      });
-      _room.localParticipant.publishData(new TextEncoder().encode(_plotMsg), { reliable: true });
-    }
-
-    // Immediately refresh signer badges — then also fetch DC status for accuracy
-    _refreshSignerBadges(projectUuid);
-    var _enp_plot_aptId = (typeof APT_ID !== 'undefined' && APT_ID) ? APT_ID : (_sessionInfo && _sessionInfo.apt_id) || '';
-    if (_enp_plot_aptId) {
-      refreshSignerStatus(projectUuid, _enp_plot_aptId, true).then(function() {
-        _refreshSignerBadges(projectUuid);
-      }).catch(function() {});
-    }
-
-    // Open DoconChain signing in new tab
-    // Open in floating modal instead of new tab
+    // Open DoconChain plot interface
+    // NOTE: do NOT set _plottingDone here — the button locks green only after
+    // the plotting_done LiveKit broadcast confirms the ENP actually plotted fields.
+    // If ENP closes without plotting, the closeDcModal override re-enables the button.
     openDcModal(link, 'Plot Signature Fields');
     var _signingWin = { closed: false }; // mock for polling
 
@@ -2578,33 +2534,47 @@ async function openPlotSignature(projectUuid) {
       window.closeDcModal = function() {
         _prevClose();
         window.closeDcModal = _prevClose;
-        // If plotting_done was NOT received, re-enable the Plot button so ENP can try again
         var _pb = document.getElementById('plot-sign-btn-' + projectUuid);
-        if (_pb && !window._plottingDone[projectUuid]) {
-          // Small delay to let any pending plotting_done broadcast arrive
+        if (!window._plottingDone[projectUuid]) {
+          // ENP closed without a confirmed plotting_done event.
+          // Show a prompt: "Did you finish plotting?" → Yes locks green, No → amber retry
           setTimeout(function() {
-            if (!window._plottingDone[projectUuid]) {
-              _pb.disabled = false;
-              _pb.style.opacity = '1';
-              _pb.style.cursor = 'pointer';
-              _pb.style.background = 'rgba(245,158,11,.12)';
-              _pb.style.borderColor = 'rgba(245,158,11,.45)';
-              _pb.style.color = '#f59e0b';
-              _pb.innerHTML = '<i class="hgi-stroke hgi-alert-02" style="font-size:.82rem;"></i> ✕ Closed — Try Again';
-              _pb.title = 'Window was closed without plotting — click to reopen';
-              _pb.onmouseover = function() { this.style.background = 'rgba(245,158,11,.22)'; };
-              _pb.onmouseout  = function() { this.style.background = 'rgba(245,158,11,.12)'; };
-              _pb.onclick = function() { openPlotSignature(projectUuid); };
-              // Also reset workflow state so Add Signer stays unblocked
-              if (_sessionInfo && Array.isArray(_sessionInfo.session_documents)) {
-                _sessionInfo.session_documents.forEach(function(d) {
-                  if ((d.project_uuid || d.doconchain_project_uuid) === projectUuid) {
-                    d.dc_workflow_state = null;
-                  }
-                });
+            if (window._plottingDone[projectUuid]) return; // arrived in time
+            // Ask ENP if they actually plotted
+            qlConfirm(
+              'Did you finish plotting?',
+              'Did you successfully place all signature fields before closing?',
+              '✅ Yes, done plotting'
+            ).then(function(confirmed) {
+              if (confirmed) {
+                if (!window._plottingDone) window._plottingDone = {};
+                window._plottingDone[projectUuid] = true;
+                _lockPlotButtonDone(projectUuid);
+                if (_room && _room.state === 'connected') {
+                  var _msg = JSON.stringify({ type: 'plotting_done', project_uuid: projectUuid, enp_email: (_sessionInfo && _sessionInfo.enp_email) || '' });
+                  try { _room.localParticipant.publishData(new TextEncoder().encode(_msg), { reliable: true }); } catch(e) {}
+                }
+                refreshSignerStatus(projectUuid, _plotAptId, true);
+              } else {
+                if (_pb) {
+                  _pb.disabled = false; _pb.style.opacity = '1'; _pb.style.cursor = 'pointer';
+                  _pb.style.background = 'rgba(245,158,11,.12)';
+                  _pb.style.borderColor = 'rgba(245,158,11,.45)';
+                  _pb.style.color = '#f59e0b';
+                  _pb.innerHTML = '<i class="hgi-stroke hgi-alert-02" style="font-size:.82rem;"></i> ✕ Closed — Try Again';
+                  _pb.title = 'Closed without plotting — click to reopen';
+                  _pb.onmouseover = function() { this.style.background='rgba(245,158,11,.22)'; };
+                  _pb.onmouseout  = function() { this.style.background='rgba(245,158,11,.12)'; };
+                  _pb.onclick = function() { openPlotSignature(projectUuid); };
+                }
+                if (_sessionInfo && Array.isArray(_sessionInfo.session_documents)) {
+                  _sessionInfo.session_documents.forEach(function(d) {
+                    if ((d.project_uuid || d.doconchain_project_uuid) === projectUuid) { d.dc_workflow_state = null; }
+                  });
+                }
               }
-            }
-          }, 2500);
+            });
+          }, 800);
         }
         setTimeout(function() { refreshSignerStatus(projectUuid, _plotAptId, true); }, 2000);
       };
@@ -2730,6 +2700,23 @@ function _broadcastRecordingAlert(started) {
     console.warn('[Record] broadcast failed:', e);
   }
 }
+
+function _lockPlotButtonDone(projectUuid) {
+  var _pb = document.getElementById('plot-sign-btn-' + projectUuid);
+  if (_pb) {
+    _pb.disabled = true;
+    _pb.style.opacity = '1';
+    _pb.style.cursor = 'default';
+    _pb.style.background = 'rgba(16,185,129,.12)';
+    _pb.style.borderColor = 'rgba(16,185,129,.4)';
+    _pb.style.color = '#10b981';
+    _pb.innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.82rem;"></i> ✓ Fields Plotted';
+    _pb.onclick = null;
+    _pb.onmouseover = null;
+    _pb.onmouseout  = null;
+  }
+}
+
 
 function _showRecordingBanner(byName) {
   var existing = document.getElementById('rec-banner');
