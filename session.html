@@ -519,15 +519,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   <div class="topbar-right">
     <div class="recording-dot" id="rec-dot" style="display:none;"></div><span id="rec-label" style="font-size:.7rem;font-weight:700;color:var(--red);margin-left:.3rem;display:none;">REC</span>
     <div class="timer" id="session-timer">00:00</div>
-    <!-- DoconChain token display — ENP only, shown after join -->
-    <div id="dc-token-display" style="display:none;align-items:center;gap:.4rem;max-width:220px;">
-      <span style="font-size:.65rem;color:var(--muted);white-space:nowrap;">DC Token:</span>
-      <span id="dc-token-value" style="font-size:.6rem;color:var(--gold);font-family:monospace;
-        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;cursor:pointer;"
-        title="Click to copy" onclick="copyDcToken()">—</span>
-      <button onclick="copyDcToken()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.75rem;padding:0;" title="Copy full token">📋</button>
-      <button onclick="refreshDcToken()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.75rem;padding:0;" title="Refresh token"><i class="hgi-stroke hgi-refresh" style="font-size:.8rem;"></i></button>
-    </div>
+    <!-- DC token display removed for security -->
     <button class="btn-end" id="btn-end-call" style="display:none" onclick="endSession()"><i class="hgi-stroke hgi-telephone-off-01" style="font-size:.95rem;"></i>End Session</button>
     <button class="ctrl-btn" onclick="toggleSidebar()" title="Toggle sidebar" style="padding:.3rem .6rem;min-width:auto">
       <i class="hgi-stroke hgi-user-multiple-02" style="font-size:1rem;"></i>
@@ -1448,39 +1440,7 @@ async function joinSession(me, userRole) {
   if (role === 'ENP') loadDcToken();
 }
 
-let _dcToken = '';
-
-async function loadDcToken() {
-  try {
-    const r = await fetch('/api/sessions/dc-token', { credentials: 'include' });
-    if (!r.ok) return;
-    const data = await r.json();
-    _dcToken = data.token || '';
-    if (_dcToken) {
-      const display = document.getElementById('dc-token-display');
-      const val     = document.getElementById('dc-token-value');
-      if (display) display.style.display = 'flex';
-      if (val)     val.textContent = _dcToken.substring(0, 32) + '…';
-      if (val)     val.setAttribute('data-full', _dcToken);
-    }
-  } catch(e) { /* non-critical */ }
-}
-
-async function refreshDcToken() {
-  document.getElementById('dc-token-value').textContent = '⏳ refreshing…';
-  await loadDcToken();
-}
-
-function copyDcToken() {
-  const full = document.getElementById('dc-token-value')?.getAttribute('data-full') || _dcToken;
-  if (!full) return;
-  navigator.clipboard.writeText(full).then(() => {
-    const val = document.getElementById('dc-token-value');
-    const orig = val.textContent;
-    val.textContent = '✅ Copied!';
-    setTimeout(() => val.textContent = orig, 2000);
-  });
-}
+let _dcToken = ''; // token kept in memory only, not displayed
 
 function postJoinSetup(userName, role, userRole) {
   // Show ENP-only controls
