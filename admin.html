@@ -25,7 +25,7 @@
   --green:        #10B981;
   --red:          #F87171;
   --amber:        #F59E0B;
-  --sidebar-w:    240px;
+  --sidebar-w:    256px;
   --topbar-h:     64px;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -129,7 +129,7 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
 
 /* ── Topbar ──────────────────────────────────────────── */
 #topbar {
-  height: var(--topbar-h); background: #0c0f1e;
+  height: var(--topbar-h); background: #0c0f1e; border-bottom: 1px solid rgba(255,255,255,.06);
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; gap: 12px; padding: 0 24px;
   flex-shrink: 0;
@@ -463,6 +463,12 @@ tr:hover td { background: rgba(124,58,237,.06); }
           <button class="btn btn-primary" onclick="openCreateSubOrg()" style="background:var(--purple);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;">
             <i class="hgi-stroke hgi-add-01"></i> Create Sub-Org
           </button>
+        </div>
+        <div style="margin-bottom:14px;position:relative;">
+          <i class="hgi-stroke hgi-search-01" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none;"></i>
+          <input id="suborgs-search" type="text" placeholder="Search by name, type, or address…" oninput="_filterSubOrgs(this.value)"
+            style="width:100%;box-sizing:border-box;padding:.6rem .85rem .6rem 34px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.85rem;font-family:Inter,sans-serif;outline:none;transition:border-color .15s;"
+            onfocus="this.style.borderColor='rgba(124,58,237,.6)'" onblur="this.style.borderColor='var(--border)'">
         </div>
         <div id="suborgs-list"><!-- cards rendered here --></div>
       </div>
@@ -847,6 +853,8 @@ async function loadSubOrgs() {
     const r = await fetch('/api/sub-orgs', { credentials: 'include' });
     if (!r.ok) { container.innerHTML = '<div style="color:var(--red);padding:32px;text-align:center;">Error loading sub-organizations.</div>'; return; }
     const orgs = await r.json();
+    orgs.sort((a, b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+    _allSubOrgs = orgs;
     if (!orgs.length) {
       container.innerHTML = `<div style="color:var(--muted);padding:48px;text-align:center;"><i class="hgi-stroke hgi-building-03" style="font-size:2rem;display:block;margin-bottom:12px;"></i>No sub-organizations yet.<br><span style="font-size:12px;">Create one to get started.</span></div>`;
       return;
@@ -854,14 +862,19 @@ async function loadSubOrgs() {
     container.innerHTML = '';
     for (const org of orgs) {
       const card = document.createElement('div');
-      card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;';
+      const _typeColors = {Department:{bg:'rgba(124,58,237,.18)',c:'#a78bfa'},Branch:{bg:'rgba(14,165,233,.18)',c:'#38bdf8'},Division:{bg:'rgba(245,158,11,.18)',c:'#fbbf24'},Team:{bg:'rgba(16,185,129,.18)',c:'#34d399'}};
+      const _tc = _typeColors[org.type||'Department'] || _typeColors.Department;
+      card.style.cssText = 'background:linear-gradient(135deg,rgba(255,255,255,.055) 0%,rgba(255,255,255,.025) 100%);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px;box-shadow:0 2px 12px rgba(0,0,0,.25);transition:border-color .2s,box-shadow .2s;cursor:default;';
+      card.onmouseenter = function(){ this.style.borderColor='rgba(124,58,237,.4)'; this.style.boxShadow='0 4px 20px rgba(0,0,0,.35)'; };
+      card.onmouseleave = function(){ this.style.borderColor='var(--border)'; this.style.boxShadow='0 2px 12px rgba(0,0,0,.25)'; };
       card.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
           <div style="display:flex;align-items:center;gap:12px;">
             ${org.dc_photo_url ? `<img src="${escHtml(org.dc_photo_url)}" alt="${escHtml(org.name)}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,.1);">` : `<div style="width:44px;height:44px;border-radius:8px;background:rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="hgi-stroke hgi-building-03" style="font-size:1.2rem;color:var(--purple);"></i></div>`}
             <div>
               <span style="font-size:16px;font-weight:700;color:var(--text);">${escHtml(org.name)}</span>
-              <span style="margin-left:10px;background:rgba(124,58,237,.2);color:var(--purple);padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">${escHtml(org.type||'Department')}</span>
+              <span style="margin-left:8px;background:${_tc.bg};color:${_tc.c};padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">${escHtml(org.type||'Department')}</span>
+              ${org.dc_sub_org_uuid ? '<span style="margin-left:6px;display:inline-flex;align-items:center;gap:3px;background:rgba(16,185,129,.12);color:#34d399;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;"><span style=\"width:6px;height:6px;border-radius:50%;background:#34d399;display:inline-block;\"></span>DC</span>' : ''}
             </div>
           </div>
           <span style="color:var(--muted);font-size:12px;">Created ${fmtDate(org.created_at)}</span>
