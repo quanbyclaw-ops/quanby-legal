@@ -91,8 +91,8 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
 }
 #sidebar-logo img { height: 36px; }
 #sidebar-logo span { display: block; font-size: 10px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
-.nav-group { padding: 16px 12px 8px; }
-.nav-group-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,.35); padding: 0 8px; margin-bottom: 4px; }
+/* removed: .nav-group { padding: 16px 12p... */
+/* removed: .nav-group-label { font-size: ... */
 .nav-item {
   display: flex; align-items: center; gap: 10px;
   padding: 12px 12px; border-radius: 8px; cursor: pointer;
@@ -534,7 +534,7 @@ function togglePw() {
 /* ── Navigation ────────────────────────────────────────── */
 function navigate(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.nav-item, .sb-item').forEach(n => n.classList.remove('active'));
   const el = document.getElementById('page-' + page);
   if (el) el.classList.add('active');
   const nav = document.querySelector('[data-page="' + page + '"]');
@@ -1176,7 +1176,7 @@ async function loadComponents() {
     document.getElementById('topbar').classList.remove('loading');
     // Re-highlight active nav item after load
     const hash = location.hash.replace('#','') || 'overview';
-    document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+    document.querySelectorAll('.nav-item[data-page], .sb-item[data-page]').forEach(el => {
       el.classList.toggle('active', el.dataset.page === hash);
     });
     // Sync topbar title
