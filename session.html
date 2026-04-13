@@ -2521,66 +2521,86 @@ async function openPlotSignature(projectUuid) {
     // Open DoconChain plot interface
     // NOTE: do NOT set _plottingDone here — the button locks green only after
     // the plotting_done LiveKit broadcast confirms the ENP actually plotted fields.
-    // If ENP closes without plotting, the closeDcModal override re-enables the button.
+    // Open the DoconChain plot interface
     openDcModal(link, 'Plot Signature Fields');
-    var _signingWin = { closed: false }; // mock for polling
 
-    // Plotting window closed — do NOT mark as signed.
-    // ENP is setting up signature fields, not signing.
-    // Signing is done separately via "Sign Document" → openSignDocument.
-    // When user closes the modal, refresh status from DoconChain
+    // Poll for popup close — handles BOTH programmatic closeDcModal()
+    // AND user closing with browser X button (which never fires closeDcModal).
     if (_plotAptId) {
-      var _prevClose = window.closeDcModal;
-      window.closeDcModal = function() {
-        _prevClose();
-        window.closeDcModal = _prevClose;
+      var _plotPopupPollId = null;
+      var _plotClosedHandled = false;
+
+      function _handlePlotWindowClosed() {
+        if (_plotClosedHandled) return;
+        _plotClosedHandled = true;
+        if (_plotPopupPollId) { clearInterval(_plotPopupPollId); _plotPopupPollId = null; }
+        // Restore closeDcModal to original
+        if (window.closeDcModal === _plotCloseDcModalOverride) {
+          window.closeDcModal = _origCloseDcModal;
+        }
+
         var _pb = document.getElementById('plot-sign-btn-' + projectUuid);
         if (!window._plottingDone[projectUuid]) {
-          // ENP closed without a confirmed plotting_done event.
-          // Show a prompt: "Did you finish plotting?" → Yes locks green, No → amber retry
-          setTimeout(function() {
-            if (window._plottingDone[projectUuid]) return; // arrived in time
-            // Ask ENP if they actually plotted
-            qlConfirm(
-              'Did you finish plotting?',
-              'Did you successfully place all signature fields before closing?',
-              '✅ Yes, done plotting'
-            ).then(function(confirmed) {
-              if (confirmed) {
-                if (!window._plottingDone) window._plottingDone = {};
-                window._plottingDone[projectUuid] = true;
-                _lockPlotButtonDone(projectUuid);
-                if (_room && _room.state === 'connected') {
-                  var _msg = JSON.stringify({ type: 'plotting_done', project_uuid: projectUuid, enp_email: (_sessionInfo && _sessionInfo.enp_email) || '' });
-                  try { _room.localParticipant.publishData(new TextEncoder().encode(_msg), { reliable: true }); } catch(e) {}
-                }
-                refreshSignerStatus(projectUuid, _plotAptId, true);
-              } else {
-                // No — fully restore to original purple enabled state
-                if (_pb) {
-                  _pb.disabled = false;
-                  _pb.style.opacity = '1';
-                  _pb.style.cursor = 'pointer';
-                  _pb.style.background = 'rgba(167,139,250,.1)';
-                  _pb.style.borderColor = 'rgba(167,139,250,.3)';
-                  _pb.style.color = '#a78bfa';
-                  _pb.innerHTML = '<i class="hgi-stroke hgi-pen-tool-01" style="font-size:.82rem;"></i> Plot Signature Fields';
-                  _pb.title = 'Plot signature fields in DoconChain';
-                  _pb.onmouseover = function() { this.style.background='rgba(167,139,250,.22)'; };
-                  _pb.onmouseout  = function() { this.style.background='rgba(167,139,250,.1)'; };
-                  _pb.onclick = function() { openPlotSignature(projectUuid); };
-                }
-                if (_sessionInfo && Array.isArray(_sessionInfo.session_documents)) {
-                  _sessionInfo.session_documents.forEach(function(d) {
-                    if ((d.project_uuid || d.doconchain_project_uuid) === projectUuid) { d.dc_workflow_state = null; }
-                  });
-                }
+          // Window closed without confirmed plotting — show dialog
+          qlConfirm(
+            'Did you finish plotting?',
+            'Did you successfully place all signature fields in DoconChain before closing?',
+            '✅ Yes, done plotting'
+          ).then(function(confirmed) {
+            if (confirmed) {
+              if (!window._plottingDone) window._plottingDone = {};
+              window._plottingDone[projectUuid] = true;
+              _lockPlotButtonDone(projectUuid);
+              if (_room && _room.state === 'connected') {
+                var _msg = JSON.stringify({ type: 'plotting_done', project_uuid: projectUuid, enp_email: (_sessionInfo && _sessionInfo.enp_email) || '' });
+                try { _room.localParticipant.publishData(new TextEncoder().encode(_msg), { reliable: true }); } catch(e) {}
               }
-            });
-          }, 800);
+              refreshSignerStatus(projectUuid, _plotAptId, true);
+            } else {
+              // No — restore button to original purple enabled state
+              if (_pb) {
+                _pb.disabled = false;
+                _pb.style.opacity = '1';
+                _pb.style.cursor = 'pointer';
+                _pb.style.background = 'rgba(167,139,250,.1)';
+                _pb.style.borderColor = 'rgba(167,139,250,.3)';
+                _pb.style.color = '#a78bfa';
+                _pb.innerHTML = '<i class="hgi-stroke hgi-pen-tool-01" style="font-size:.82rem;"></i> Plot Signature Fields';
+                _pb.title = 'Plot signature fields in DoconChain';
+                _pb.onmouseover = function() { this.style.background='rgba(167,139,250,.22)'; };
+                _pb.onmouseout  = function() { this.style.background='rgba(167,139,250,.1)'; };
+                _pb.onclick = function() { openPlotSignature(projectUuid); };
+              }
+              if (_sessionInfo && Array.isArray(_sessionInfo.session_documents)) {
+                _sessionInfo.session_documents.forEach(function(d) {
+                  if ((d.project_uuid || d.doconchain_project_uuid) === projectUuid) { d.dc_workflow_state = null; }
+                });
+              }
+            }
+          });
         }
-        setTimeout(function() { refreshSignerStatus(projectUuid, _plotAptId, true); }, 2000);
-      };
+        setTimeout(function() { refreshSignerStatus(projectUuid, _plotAptId, true); }, 1000);
+      }
+
+      // Override closeDcModal so programmatic close also triggers the dialog
+      var _origCloseDcModal = window.closeDcModal;
+      function _plotCloseDcModalOverride() {
+        _origCloseDcModal();
+        window.closeDcModal = _origCloseDcModal;
+        _handlePlotWindowClosed();
+      }
+      window.closeDcModal = _plotCloseDcModalOverride;
+
+      // Poll _dcPopupRef.closed every 600ms — catches browser X button close
+      _plotPopupPollId = setInterval(function() {
+        if (typeof _dcPopupRef !== 'undefined' && _dcPopupRef && _dcPopupRef.closed) {
+          _handlePlotWindowClosed();
+        }
+        // Also stop polling if plotting was confirmed via LiveKit broadcast
+        if (window._plottingDone && window._plottingDone[projectUuid]) {
+          if (_plotPopupPollId) { clearInterval(_plotPopupPollId); _plotPopupPollId = null; }
+        }
+      }, 600);
     }
 
   } catch(err) {
