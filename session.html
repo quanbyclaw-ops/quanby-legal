@@ -1740,6 +1740,20 @@ function setupRoomEvents(room, localName, localRole) {
           }
           switchSidebarTab('documents');
         }
+      } else if (obj.type === 'session_ended') {
+        // ENP ended the session — redirect all participants immediately
+        if (!window._isEnp) {
+          _hideRecordingBanner();
+          clearInterval(_timerInt);
+          // Show a brief overlay then redirect
+          var _endOverlay = document.createElement('div');
+          _endOverlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(8,11,24,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;';
+          _endOverlay.innerHTML = '<i class="hgi-stroke hgi-telephone-off-01" style="font-size:2.5rem;color:#f87171;"></i>'
+            + '<div style="color:#e6edf3;font-size:1.1rem;font-weight:700;">Session Ended</div>'
+            + '<div style="color:#8b949e;font-size:.85rem;">The ENP has ended this session. Redirecting…</div>';
+          document.body.appendChild(_endOverlay);
+          setTimeout(function() { location.href = '/appointments?session_ended=1'; }, 2000);
+        }
       } else if (obj.type === 'recording_alert') {
         const who = obj.by || 'A participant';
         if (obj.started) {
@@ -1785,8 +1799,9 @@ function setupRoomEvents(room, localName, localRole) {
   room.on(LivekitClient.RoomEvent.Disconnected, (reason) => {
     clearInterval(_timerInt);
     const isEnp = _sessionInfo && localRole === 'ENP';
-    if (!isEnp) {
-      setTimeout(() => { location.href = '/appointments?session_ended=1'; }, 1500);
+    if (!isEnp && !document.querySelector('[data-session-end-overlay]')) {
+      // Fallback redirect if session_ended data message wasn't received
+      setTimeout(function() { location.href = '/appointments?session_ended=1'; }, 1000);
     }
   });
 }
@@ -2348,6 +2363,14 @@ async function sendChat() {
 // ─── END SESSION ──────────────────────────────────────────────────────────────
 async function endSession() {
   if (!(await qlConfirm('End Session', 'This will end the notarization session for all participants. This cannot be undone.', 'End Session', '🔴'))) return;
+  // Broadcast session_ended BEFORE disconnecting so clients redirect immediately
+  if (_room && _room.state === 'connected') {
+    try {
+      var _endMsg = JSON.stringify({ type: 'session_ended', by: 'enp' });
+      await _room.localParticipant.publishData(new TextEncoder().encode(_endMsg), { reliable: true });
+      await new Promise(function(r) { setTimeout(r, 600); });
+    } catch(e) {}
+  }
   try {
     await fetch(`/api/sessions/${APT_ID}/end`, { method: 'POST', credentials: 'include' });
   } catch(e) {}
