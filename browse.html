@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-  async function _authMeWithRetry() {
-    for (let i = 0; i < 3; i++) {
-      if (i > 0) await new Promise(r => setTimeout(r, 600 * i));
-      try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-      try { const res = await fetch('/api/auth/me', { credentials: 'include' }); if (res.ok) return res; } catch(e) {}
-    }
+  <script src="/assets/ql-auth.js"></script>
+ <script>
     return null;
   }
 
@@ -240,42 +235,29 @@ let _currentEnpId = null;
 let _currentUser = null;
 
 async function init() {
-  // Auth check
-  try {
-    const _authResult = await _authMeWithRetry();
-    let r = _authResult;
-    if (!r || !r.ok) { window.location.href = '/'; return; }
-    _currentUser = await r.json();
-    if (_currentUser.role !== 'client') {
-      // ENPs shouldn't browse — redirect to dashboard
-      window.location.href = '/dashboard';
-      return;
-    }
-  } catch(e) {
-    window.location.href = '/';
-    return;
-  }
-
-  // Populate nav
-  const name = ((_currentUser.first_name || '') + ' ' + (_currentUser.last_name || '')).trim() || _currentUser.email || '?';
-  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
-  document.getElementById('nav-name').textContent = name.split(' ')[0];
-  document.getElementById('menu-name').textContent = name;
-  document.getElementById('menu-email').textContent = _currentUser.email || '';
-  if (_currentUser.picture) {
-    const a = document.getElementById('nav-avatar');
-    const b = document.getElementById('menu-avatar');
-    a.src = b.src = _currentUser.picture;
-    a.style.display = b.style.display = '';
-  } else {
-    const a = document.getElementById('nav-initials');
-    const b = document.getElementById('menu-initials');
-    a.textContent = b.textContent = initials;
-    a.style.display = b.style.display = 'flex';
-  }
-
-  // Load ENPs
-  await loadEnps();
+  await QLAuth.requireAuth(async function(user) {
+    _currentUser = user;
+    if (user.role !== 'client') { window.location.href = '/dashboard'; return; }
+    try {
+      const name = ((user.first_name || '') + ' ' + (user.last_name || '')).trim() || user.email || '?';
+      const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      document.getElementById('nav-name').textContent = name.split(' ')[0];
+      document.getElementById('menu-name').textContent = name;
+      document.getElementById('menu-email').textContent = user.email || '';
+      if (user.picture) {
+        const a = document.getElementById('nav-avatar');
+        const b = document.getElementById('menu-avatar');
+        a.src = b.src = user.picture;
+        a.style.display = b.style.display = '';
+      } else {
+        const a = document.getElementById('nav-initials');
+        const b = document.getElementById('menu-initials');
+        a.textContent = b.textContent = initials;
+        a.style.display = b.style.display = 'flex';
+      }
+      await loadEnps();
+    } catch(e) { console.error('[Browse] page error:', e); }
+  });
 }
 
 async function loadEnps() {

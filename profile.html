@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="/assets/ql-auth.js"></script>
   <script>
-  async function _authMeWithRetry() {
-    for (let i = 0; i < 3; i++) {
-      if (i > 0) await new Promise(r => setTimeout(r, 600 * i));
-      try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-      try { const res = await fetch('/api/auth/me', { credentials: 'include' }); if (res.ok) return res; } catch(e) {}
-    }
     return null;
   }
 
@@ -641,39 +636,31 @@
   }
 
   async function init() {
-    try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-    const _retryRes = await _authMeWithRetry();
-    try {
-      const res = _retryRes;
-      if (!res || !res.ok) throw new Error('Unauthorized');
-      const user = await res.json();
-
-      // Fetch full profile (includes profile sub-object)
-      const profileRes = await fetch('/api/auth/me', { credentials: 'include' });
-      // We need profile fields — fetch them via a secondary call if needed,
-      // but /api/auth/me doesn't return profile sub-object.
-      // Fallback: use what we have and rely on populateForm to merge.
-      // Try /api/profile GET if it exists, otherwise use /api/auth/me data.
-      let fullUser = user;
+    await QLAuth.requireAuth(async function(user) {
       try {
-        const pRes = await fetch('/api/profile', { credentials: 'include' });
-        if (pRes.ok) {
-          const pData = await pRes.json();
-          if (pData.user) fullUser = pData.user;
-        }
-      } catch(_) {}
+        // Fetch full profile including profile sub-object
+        let fullUser = user;
+        try {
+          const pRes = await fetch('/api/profile', { credentials: 'include' });
+          if (pRes.ok) {
+            const pData = await pRes.json();
+            if (pData.user) fullUser = pData.user;
+          }
+        } catch(_) {}
 
-      currentUser = fullUser;
+        currentUser = fullUser;
 
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('profile-page').style.display = '';
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('profile-page').style.display = '';
 
-      populateNav(fullUser);
-      populateForm(fullUser);
-    } catch (err) {
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('error').style.display = '';
-    }
+        populateNav(fullUser);
+        populateForm(fullUser);
+      } catch(pageErr) {
+        console.error('[Profile] page error (not auth):', pageErr);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = '';
+      }
+    });
   }
 
   // Spin animation for loading icon

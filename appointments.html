@@ -1,13 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-  async function _authMeWithRetry() {
-    for (let i = 0; i < 3; i++) {
-      if (i > 0) await new Promise(r => setTimeout(r, 600 * i));
-      try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-      try { const res = await fetch('/api/auth/me', { credentials: 'include' }); if (res.ok) return res; } catch(e) {}
-    }
+  <script src="/assets/ql-auth.js"></script>
+ <script>
     return null;
   }
 
@@ -227,18 +222,16 @@ const TYPE_LABELS = {
 const MODE_LABELS = { REN: 'Remote (REN)', IEN: 'In-Person (IEN)' };
 
 async function init() {
-  try {
-    const _authResult = await _authMeWithRetry();
-    let r = _authResult;
-    if (!r || !r.ok) { window.location.href = '/'; return; }
-    _user = await r.json();
-  } catch(e) {
-    window.location.href = '/';
-    return;
-  }
-
-  populateNav();
-  await loadAppointments();
+  await QLAuth.requireAuth(async function(user) {
+    _user = user;
+    try {
+      populateNav();
+      await loadAppointments();
+    } catch(pageErr) {
+      console.error('[Appointments] page error (not auth):', pageErr);
+      // Don't redirect — show error in place
+    }
+  });
 }
 
 function populateNav() {

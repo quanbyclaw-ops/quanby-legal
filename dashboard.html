@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="/assets/ql-auth.js"></script>
   <script>
     /* Quanby Legal: silently block Cloudflare beacon to prevent CORS/SRI errors */
     (function() {
@@ -588,16 +589,15 @@
 <script>
 async function loadDashboard() {
   try {
-    // Silently refresh access token — retry up to 3 times with delay (handles post-OAuth cookie propagation)
-    let _authRes = null;
-    for (let _attempt = 0; _attempt < 3; _attempt++) {
-      if (_attempt > 0) await new Promise(r => setTimeout(r, 800 * _attempt)); // 0.8s, 1.6s delay
-      try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-      _authRes = await fetch('/api/auth/me', { credentials: 'include' });
-      if (_authRes.ok) break;
-    }
+    const _authRes = await QLAuth.authMeWithRetry(4);
     let res = _authRes;
-    if (!res || !res.ok) throw new Error('Not authenticated');
+    if (!res || !res.ok) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error-msg').textContent = 'Please sign in to continue.';
+      document.getElementById('error').style.display = '';
+      setTimeout(() => { window.location.href = '/?sso=1'; }, 1500);
+      return;
+    }
     const user = await res.json();
 
     // Avatar — use SSO picture if available, else initials

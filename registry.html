@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="/assets/ql-auth.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notarial Registry — Quanby Legal</title>
@@ -283,48 +284,38 @@ let debounceTimer = null;
 
 // ─── Auth & Boot ──────────────────────────────────────────────────────────────
 
-  async function _authMeWithRetry() {
-    for (let i = 0; i < 3; i++) {
-      if (i > 0) await new Promise(r => setTimeout(r, 600 * i));
-      try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-      try { const res = await fetch('/api/auth/me', { credentials: 'include' }); if (res.ok) return res; } catch(e) {}
-    }
     return null;
   }
 async function boot() {
-  const _authResult = await _authMeWithRetry();
-  try {
-    const res = _authResult;
-    if (!res || !res.ok) { window.location = '/'; return; }
-    const user = await res.json();
+  await QLAuth.requireAuth(async function(user) {
+    try {
+      const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.email || '?';
+      const _initials = fullName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      document.getElementById('nav-name').textContent = user.first_name || fullName.split(' ')[0];
+      document.getElementById('menu-name').textContent = fullName;
+      document.getElementById('menu-email').textContent = user.email || '';
+      if (user.picture) {
+        ['nav-avatar','menu-avatar'].forEach(function(id) {
+          const el = document.getElementById(id);
+          if (el) { el.src = user.picture; el.style.display = ''; }
+        });
+      } else {
+        ['nav-initials','menu-initials'].forEach(function(id) {
+          const el = document.getElementById(id);
+          if (el) { el.textContent = _initials; el.style.display = 'flex'; }
+        });
+      }
 
-    const _name = (user.first_name || '' + ' ' + user.last_name || '').trim() || user.email || '?';
-    const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.email || '?';
-    const _initials = fullName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
-    document.getElementById('nav-name').textContent = user.first_name || fullName.split(' ')[0];
-    document.getElementById('menu-name').textContent = fullName;
-    document.getElementById('menu-email').textContent = user.email || '';
-    if (user.picture) {
-      ['nav-avatar','menu-avatar'].forEach(function(id) {
-        const el = document.getElementById(id);
-        if (el) { el.src = user.picture; el.style.display = ''; }
-      });
-    } else {
-      ['nav-initials','menu-initials'].forEach(function(id) {
-        const el = document.getElementById(id);
-        if (el) { el.textContent = _initials; el.style.display = 'flex'; }
-      });
+      if (user.role !== 'attorney') {
+        document.getElementById('enp-gate').style.display = 'flex';
+        return;
+      }
+      document.getElementById('registry-ui').style.display = 'block';
+      loadActs(1);
+    } catch(e) {
+      console.error('[Registry] page error (not auth):', e);
     }
-
-    if (user.role !== 'attorney') {
-      document.getElementById('enp-gate').style.display = 'flex';
-      return;
-    }
-    document.getElementById('registry-ui').style.display = 'block';
-    loadActs(1);
-  } catch(e) {
-    window.location = '/';
-  }
+  });
 }
 
 // ─── Load Acts ────────────────────────────────────────────────────────────────
