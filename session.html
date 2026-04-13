@@ -1485,16 +1485,8 @@ function postJoinSetup(userName, role, userRole) {
   // Show ENP-only controls
   const isEnp = (role === 'ENP');
   window._isEnp = isEnp; // used by signer modal
-  // Record button: visible for all, but only ENP can control it
-  var _recBtn = document.getElementById('ctrl-record');
-  if (_recBtn) {
-    if (!isEnp) {
-      _recBtn.disabled = true;
-      _recBtn.style.opacity = '0.45';
-      _recBtn.style.cursor = 'not-allowed';
-      _recBtn.title = 'Only the ENP can start/stop recording';
-    }
-  }
+  // Record button: available to ALL participants (ENP and client)
+  // Each participant records their own local copy independently
   document.getElementById('btn-end-call').style.display = isEnp ? '' : 'none';
   document.getElementById('ctrl-add').style.display = isEnp ? '' : 'none';
   document.getElementById('sidebar-invite-btn').style.display = isEnp ? '' : 'none';
@@ -1993,12 +1985,10 @@ async function toggleMic() {
 // ── RECORDING ─────────────────────────────────────────────────────────────────
 let _isRecording = false;
 let _egressId = null;
+let _mediaRecorder = null;
+let _recordedChunks = [];
 
 async function toggleRecording() {
-  if (!window._isEnp) {
-    qlToast('Only the ENP can control recording.', 'warn');
-    return;
-  }
   if (_isRecording) {
     await stopRecording();
   } else {
@@ -2010,18 +2000,62 @@ async function startRecording() {
   const btn = document.getElementById('ctrl-record');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="hgi-stroke hgi-record" style="font-size:1.3rem;"></i><span>Starting…</span>'; }
   try {
-    const aptId = (typeof _currentAptId !== 'undefined' && _currentAptId) || APT_ID;
-    const r = await fetch(`/api/sessions/${aptId}/recording/start`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.detail || 'Failed to start recording');
+    // Capture the current tab using getDisplayMedia (tab capture)
+    // Fall back to getUserMedia (camera+mic only) if tab capture not supported
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { mediaSource: 'screen', frameRate: 30 },
+        audio: { echoCancellation: false, noiseSuppression: false },
+        preferCurrentTab: true,
+      });
+    } catch(displayErr) {
+      // Fallback: record local camera + mic only
+      console.warn('[Record] getDisplayMedia failed, falling back to camera+mic:', displayErr);
+      stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    }
 
-    _egressId = data.egress_id;
+    // Determine best supported format
+    const mimeTypes = [
+      'video/webm;codecs=vp9,opus',
+      'video/webm;codecs=vp8,opus',
+      'video/webm',
+      'video/mp4',
+    ];
+    const mimeType = mimeTypes.find(t => MediaRecorder.isTypeSupported(t)) || 'video/webm';
+
+    _mediaRecorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 2500000 });
+    _recordedChunks = [];
+
+    _mediaRecorder.ondataavailable = function(e) {
+      if (e.data && e.data.size > 0) _recordedChunks.push(e.data);
+    };
+
+    _mediaRecorder.onstop = function() {
+      // Stop all tracks
+      stream.getTracks().forEach(t => t.stop());
+      // Build download blob
+      const blob = new Blob(_recordedChunks, { type: mimeType });
+      const ext  = mimeType.includes('mp4') ? 'mp4' : 'webm';
+      const ts   = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+      const fname = `session-recording-${ts}.${ext}`;
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href = url; a.download = fname; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+      _showRecordingToast('✅ Recording saved as ' + fname, '#10b981');
+      _recordedChunks = [];
+    };
+
+    // If user stops screen share from browser UI, treat as recording stop
+    stream.getVideoTracks()[0].onended = function() {
+      if (_isRecording) stopRecording();
+    };
+
+    _mediaRecorder.start(1000); // collect chunks every 1s
     _isRecording = true;
+    _egressId = null; // not used for local recording
 
-    // Update UI
     if (btn) { btn.disabled = false; btn.classList.add('recording-active'); btn.innerHTML = '<i class="hgi-stroke hgi-stop" style="font-size:1.3rem;"></i><span>Stop Rec</span>'; }
     const dot = document.getElementById('rec-dot');
     const lbl = document.getElementById('rec-label');
@@ -2029,58 +2063,34 @@ async function startRecording() {
     if (lbl) lbl.style.display = '';
 
     _broadcastRecordingAlert(true);
-    _showRecordingToast('🔴 Recording started (server-side). All participants notified.', '#f85149');
-
+    _showRecordingToast('🔴 Recording started (local save). All participants notified.', '#f85149');
   } catch(err) {
+    console.error('[Record] startRecording error:', err);
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="hgi-stroke hgi-record" style="font-size:1.3rem;"></i><span>Record</span>'; }
-    qlAlert('Recording Error', err.message || 'Could not start recording. Please try again.', '🎬');
+    qlAlert('Recording Error', (err.message || 'Could not start recording.') + ' Make sure to allow screen/tab sharing when prompted.', '🎬');
   }
 }
+
 
 async function stopRecording() {
   const btn = document.getElementById('ctrl-record');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="hgi-stroke hgi-record" style="font-size:1.3rem;"></i><span>Stopping…</span>'; }
-  try {
-    const aptId = (typeof _currentAptId !== 'undefined' && _currentAptId) || APT_ID;
-    const r = await fetch(`/api/sessions/${aptId}/recording/stop`, {
-      method: 'POST',
-      credentials: 'include',
-    });
-    if (!r.ok) {
-      const d = await r.json();
-      throw new Error(d.detail || 'Failed to stop recording');
-    }
-  } catch(err) {
-    console.warn('Stop recording error:', err);
+
+  if (_mediaRecorder && _mediaRecorder.state !== 'inactive') {
+    _mediaRecorder.stop(); // triggers onstop → auto-download
   }
 
   _isRecording = false;
   _egressId = null;
 
   if (btn) { btn.disabled = false; btn.classList.remove('recording-active'); btn.innerHTML = '<i class="hgi-stroke hgi-record" style="font-size:1.3rem;"></i><span>Record</span>'; }
-  // Show download button after recording stops
-  if (APT_ID) {
-    var _dlBtn = document.getElementById('ctrl-download-recording');
-    if (!_dlBtn) {
-      _dlBtn = document.createElement('button');
-      _dlBtn.id = 'ctrl-download-recording';
-      _dlBtn.className = 'ctrl-btn';
-      _dlBtn.title = 'Download Recording';
-      _dlBtn.style.cssText = 'background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4);color:#34d399;';
-      _dlBtn.innerHTML = '<i class="hgi-stroke hgi-download-01" style="font-size:1.3rem;"></i><span>Download</span>';
-      _dlBtn.onclick = function() { downloadRecording(APT_ID); };
-      btn.parentNode.insertBefore(_dlBtn, btn.nextSibling);
-    }
-    _dlBtn.style.display = '';
-  }
-  const dot = document.getElementById('rec-dot');
-  const lbl = document.getElementById('rec-label');
-  if (dot) dot.style.display = 'none';
-  if (lbl) lbl.style.display = 'none';
-
+  document.getElementById('rec-dot').style.display = 'none';
+  document.getElementById('rec-label').style.display = 'none';
   _broadcastRecordingAlert(false);
-  _showRecordingToast('⏹️ Recording stopped. The file will be available on the LiveKit dashboard.', '#f0b429');
+  _showRecordingToast('⏹️ Recording stopped — file downloading now.', '#f0b429');
 }
+
+
 
 
 async function downloadRecording(aptId) {
