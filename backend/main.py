@@ -5026,7 +5026,7 @@ import jwt as _pyjwt_admin
 from fastapi.responses import FileResponse as _FileResponse
 from datetime import datetime as _admin_dt, timezone as _admin_tz, timedelta as _admin_td
 
-_ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+_ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "michael@quanbyai.com")
 _ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "Alyssa7719!!")
 _ADMIN_SECRET   = os.getenv("SECRET_KEY", "change-me-in-production")
 _ADMIN_COOKIE   = "ql_admin"
