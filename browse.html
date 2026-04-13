@@ -201,15 +201,6 @@
       <input id="modal-title" type="text" placeholder="e.g. Deed of Sale, Affidavit of Loss, SPA…" style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:.65rem .85rem;color:#e8eaf2;font-size:.875rem;outline:none;font-family:Inter,sans-serif;transition:border-color .15s;color-scheme:dark;" onfocus="this.style.borderColor='rgba(201,168,76,.6)'" onblur="this.style.borderColor='rgba(255,255,255,.15)'" maxlength="200">
     </div>
     <div class="form-group">
-      <label>Notarization Type</label>
-      <select id="modal-type">
-        <option value="ACKNOWLEDGMENT">Acknowledgment</option>
-        <option value="JURAT">Jurat</option>
-        <option value="AFFIRMATION">Affirmation</option>
-        <option value="SIGNATURE_WITNESSING">Signature Witnessing</option>
-      </select>
-    </div>
-    <div class="form-group">
       <label>Mode</label>
       <select id="modal-mode">
         <option value="REN">REN — Remote Electronic Notarization</option>
@@ -347,7 +338,6 @@ async function submitBooking() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         enp_id: _currentEnpId,
-        notarization_type: document.getElementById('modal-type').value,
         mode: document.getElementById('modal-mode').value,
         notes: document.getElementById('modal-notes').value.trim(),
         title: document.getElementById('modal-title').value.trim(),

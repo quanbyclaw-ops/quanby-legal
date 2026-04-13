@@ -1986,7 +1986,7 @@ _load_appointments()
 
 class AppointmentCreateRequest(BaseModel):
     enp_id: str
-    notarization_type: str  # ACKNOWLEDGMENT | JURAT | AFFIRMATION | SIGNATURE_WITNESSING
+    notarization_type: str = "ACKNOWLEDGMENT"  # ACKNOWLEDGMENT | JURAT | AFFIRMATION | SIGNATURE_WITNESSING
     mode: str               # REN | IEN
     notes: str = ""
     title: str = ""
@@ -2039,9 +2039,7 @@ async def create_appointment(
     if user.get("role") != "client":
         raise HTTPException(403, "Only clients can book appointments")
 
-    valid_types = {"ACKNOWLEDGMENT", "JURAT", "AFFIRMATION", "SIGNATURE_WITNESSING"}
-    if req.notarization_type not in valid_types:
-        raise HTTPException(400, f"Invalid notarization_type. Valid: {valid_types}")
+
     if req.mode not in {"REN", "IEN"}:
         raise HTTPException(400, "Invalid mode. Valid: REN, IEN")
 
