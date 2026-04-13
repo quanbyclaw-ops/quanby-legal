@@ -276,6 +276,34 @@ tr:hover td { background: rgba(124,58,237,.06); }
   .kpi-grid { grid-template-columns: repeat(2, 1fr); }
   .refresh-label { display: none; }
 }
+
+/* ── Page hero header ─────────────────────────────── */
+.page-hero {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; padding-bottom: 22px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  gap: 16px; flex-wrap: wrap;
+}
+.page-hero-left { display: flex; align-items: center; gap: 14px; }
+.page-hero-icon {
+  width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+}
+.page-hero-icon i { font-size: 1.4rem; }
+.page-hero-icon.purple { background: rgba(124,58,237,.18); color: #a78bfa; border: 1px solid rgba(124,58,237,.3); box-shadow: 0 0 16px rgba(124,58,237,.12); }
+.page-hero-icon.teal   { background: rgba(14,165,233,.18);  color: #38bdf8; border: 1px solid rgba(14,165,233,.3); box-shadow: 0 0 16px rgba(14,165,233,.1); }
+.page-hero-icon.green  { background: rgba(16,185,129,.18);  color: #34d399; border: 1px solid rgba(16,185,129,.3); box-shadow: 0 0 16px rgba(16,185,129,.1); }
+.page-hero-icon.gold   { background: rgba(201,168,76,.15);  color: #f0c040; border: 1px solid rgba(201,168,76,.25); box-shadow: 0 0 16px rgba(201,168,76,.1); }
+.page-hero-icon.amber  { background: rgba(245,158,11,.15);  color: #fbbf24; border: 1px solid rgba(245,158,11,.22); box-shadow: 0 0 16px rgba(245,158,11,.1); }
+.page-hero-icon.blue   { background: rgba(59,130,246,.18);  color: #93c5fd; border: 1px solid rgba(59,130,246,.25); box-shadow: 0 0 16px rgba(59,130,246,.1); }
+.page-hero-text h1 {
+  font-size: 22px; font-weight: 800; color: #fff;
+  line-height: 1.15; margin: 0 0 4px; letter-spacing: -.02em;
+}
+.page-hero-text p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.5; }
+.page-hero-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
 </style>
 </head>
 <body>
@@ -335,7 +363,7 @@ tr:hover td { background: rgba(124,58,237,.06); }
             </div>
           </div>
           <div class="page-hero-actions">
-            <button class="btn btn-outline btn-sm" onclick="refreshPage()"><i class="hgi-stroke hgi-refresh-02"></i> Refresh</button>
+            <button onclick="refreshPage()" style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:rgba(255,255,255,.7);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;transition:all .15s;" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.06)'"><i class="hgi-stroke hgi-refresh-02" style="font-size:13px;"></i> Refresh</button>
           </div>
         </div>
         <div class="kpi-grid" id="kpi-grid">
