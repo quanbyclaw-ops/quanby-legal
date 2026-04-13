@@ -2539,8 +2539,8 @@ async function openPlotSignature(projectUuid) {
           // Window closed without confirmed plotting — show dialog
           qlConfirm(
             'Did you finish plotting?',
-            'Did you successfully place all signature fields in DoconChain before closing?',
-            '✅ Yes, done plotting'
+            'Did you successfully place all signature fields in DoconChain before closing?<br><br><span style="font-size:.8rem;color:#8b949e;">If DoconChain showed “Session Ended”, click <strong style="color:#a78bfa">Cancel</strong> — the button resets so you can reopen and log back in.</span>',
+            'Yes, done plotting'
           ).then(function(confirmed) {
             if (confirmed) {
               if (!window._plottingDone) window._plottingDone = {};
