@@ -25,7 +25,7 @@
   --green:        #10B981;
   --red:          #F87171;
   --amber:        #F59E0B;
-  --sidebar-w:    256px;
+  --sidebar-w:    260px;
   --topbar-h:     64px;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -80,10 +80,11 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
 
 /* ── Sidebar ──────────────────────────────────────────── */
 #sidebar {
-  width: var(--sidebar-w); background: var(--sidebar-bg);
-  border-right: 1px solid var(--border);
+  width: 260px; background: linear-gradient(180deg, #0a0d1a 0%, #080b16 100%);
+  border-right: 1px solid rgba(255,255,255,.06);
   display: flex; flex-direction: column;
   flex-shrink: 0; z-index: 100; transition: transform .25s;
+  overflow: hidden;
 }
 #sidebar-logo {
   padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,.08);
@@ -128,10 +129,12 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
 
 /* ── Topbar ──────────────────────────────────────────── */
 #topbar {
-  height: var(--topbar-h); background: #0c0f1e;
+  height: 60px; background: rgba(8,11,24,.95);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255,255,255,.06);
-  display: flex; align-items: center; gap: 12px; padding: 0 24px;
-  flex-shrink: 0;
+  box-shadow: 0 1px 0 rgba(255,255,255,.04);
+  display: flex; align-items: center;
+  flex-shrink: 0; overflow: hidden;
 }
 #hamburger { display: none; background: none; border: none; cursor: pointer; color: var(--text); font-size: 20px; padding: 4px; }
 #page-title { font-size: 18px; font-weight: 800; flex: 1; }
@@ -307,58 +310,16 @@ tr:hover td { background: rgba(124,58,237,.06); }
   <!-- Sidebar overlay (mobile) -->
   <div id="sidebar-overlay" onclick="closeSidebar()"></div>
 
-  <!-- Sidebar -->
-  <nav id="sidebar">
-    <div id="sidebar-logo">
-      <img src="/qlegal-logo-sm.png" alt="Quanby Legal" onerror="this.style.display='none'">
-      <span>Admin Portal</span>
-    </div>
-    <div class="nav-group">
-      <div class="nav-group-label">Main</div>
-      <div class="nav-item active" data-page="overview" onclick="navigate('overview')">
-        <span class="nav-icon"><i class="hgi-stroke hgi-chart-bar-line-02"></i></span> Overview
-      </div>
-      <div class="nav-item" data-page="users" onclick="navigate('users')">
-        <span class="nav-icon"><i class="hgi-stroke hgi-user-group"></i></span> Users
-      </div>
-      <div class="nav-item" data-page="appointments" onclick="navigate('appointments')">
-        <span class="nav-icon"><i class="hgi-stroke hgi-calendar-02"></i></span> Appointments
-      </div>
-      <div class="nav-item" data-page="registry" onclick="navigate('registry')">
-        <span class="nav-icon"><i class="hgi-stroke hgi-book-open-01"></i></span> Notarial Registry
-      </div>
-    </div>
-    <div class="nav-group">
-      <div class="nav-group-label">Management</div>
-      <div class="nav-item" data-page="suborgs" onclick="navigate('suborgs')">
-        <span class="nav-icon"><i class="hgi-stroke hgi-building-03"></i></span> Sub-Organizations
-      </div>
-    </div>
-    <div class="nav-group">
-      <div class="nav-group-label">System</div>
-      <div class="nav-item" data-page="settings" onclick="navigate('settings')">
-        <span class="nav-icon"><i class="hgi-stroke hgi-settings-01"></i></span> Settings
-      </div>
-    </div>
-    <div class="sidebar-bottom">
-      <button class="logout-btn" onclick="doLogout()">
-        <i class="hgi-stroke hgi-logout-02"></i> Logout
-      </button>
-    </div>
-  </nav>
+  <!-- Sidebar (loaded dynamically) -->
+  <nav id="sidebar" class="loading"></nav>
 
   <!-- Main -->
   <div id="main">
-    <!-- Topbar -->
-    <div id="topbar">
-      <button id="hamburger" onclick="openSidebar()">☰</button>
-      <span id="page-title">Overview</span>
-      <span id="last-updated"></span>
-      <button id="refresh-btn" onclick="refreshPage()">
-        <i class="hgi-stroke hgi-refresh-02"></i>
-        <span class="refresh-label">Refresh</span>
-      </button>
-    </div>
+    <!-- Topbar (loaded dynamically) -->
+    <div id="topbar" class="loading"></div>
+    <!-- Legacy compat spans (hidden, kept for JS refs) -->
+    <span id="page-title" style="display:none">Overview</span>
+    <span id="last-updated" style="display:none"></span>
 
     <!-- Content -->
     <div id="content">
@@ -578,7 +539,10 @@ function navigate(page) {
   if (el) el.classList.add('active');
   const nav = document.querySelector('[data-page="' + page + '"]');
   if (nav) nav.classList.add('active');
-  document.getElementById('page-title').textContent = PAGES[page] || page;
+  const _pageLabel = PAGES[page] || page;
+  const _ptEl = document.getElementById('page-title'); if(_ptEl) _ptEl.textContent = _pageLabel;
+  const _tbTitle = document.getElementById('tb-page-title'); if(_tbTitle) _tbTitle.textContent = _pageLabel;
+  const _tbBc = document.getElementById('tb-breadcrumb-page'); if(_tbBc) _tbBc.textContent = _pageLabel;
   closeSidebar();
   updateLastUpdated();
   if (page === 'overview') loadOverview();
@@ -600,7 +564,9 @@ function refreshPage() {
 }
 
 function updateLastUpdated() {
-  document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  const _ts = 'Updated ' + new Date().toLocaleTimeString();
+  const _luEl = document.getElementById('last-updated'); if(_luEl) _luEl.textContent = _ts;
+  const _tbLu = document.getElementById('tb-last-updated'); if(_tbLu) _tbLu.textContent = _ts;
 }
 
 /* ── Sidebar (mobile) ──────────────────────────────────── */
@@ -1195,8 +1161,33 @@ window.addEventListener('hashchange', () => {
   if (PAGES[page]) navigate(page);
 });
 
+/* ── Component Loader ─────────────────────────────────── */
+async function loadComponents() {
+  try {
+    const [sidebarRes, topbarRes] = await Promise.all([
+      fetch('/assets/admin-sidebar.html'),
+      fetch('/assets/admin-topbar.html'),
+    ]);
+    const sidebarHtml = await sidebarRes.text();
+    const topbarHtml = await topbarRes.text();
+    document.getElementById('sidebar').innerHTML = sidebarHtml;
+    document.getElementById('topbar').innerHTML = topbarHtml;
+    document.getElementById('sidebar').classList.remove('loading');
+    document.getElementById('topbar').classList.remove('loading');
+    // Re-highlight active nav item after load
+    const hash = location.hash.replace('#','') || 'overview';
+    document.querySelectorAll('.nav-item[data-page]').forEach(el => {
+      el.classList.toggle('active', el.dataset.page === hash);
+    });
+    // Sync topbar title
+    const _label = PAGES[hash] || hash;
+    const _tbTitle = document.getElementById('tb-page-title'); if(_tbTitle) _tbTitle.textContent = _label;
+    const _tbBc = document.getElementById('tb-breadcrumb-page'); if(_tbBc) _tbBc.textContent = _label;
+  } catch(e) { console.warn('Component load failed:', e); }
+}
+
 /* ── Boot ──────────────────────────────────────────────── */
-init();
+loadComponents().then(() => init());
 </script>
 
 <!-- ── SUB-ORG MODALS ──────────────────────────────────────────────────────── -->

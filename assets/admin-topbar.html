@@ -1,0 +1,145 @@
+<style>
+/* ── Topbar Component Styles ──────────────────────────── */
+#topbar-inner {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 24px;
+  gap: 14px;
+}
+
+/* Hamburger — mobile only */
+#tb-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255,255,255,.7);
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 20px;
+  line-height: 1;
+  transition: background .15s, color .15s;
+  flex-shrink: 0;
+}
+#tb-hamburger:hover {
+  background: rgba(255,255,255,.06);
+  color: #fff;
+}
+
+/* Title + breadcrumb block */
+#tb-title-block {
+  flex: 1;
+  min-width: 0;
+}
+#tb-page-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#tb-breadcrumb {
+  font-size: 11px;
+  color: #8b90a8;
+  margin-top: 2px;
+  letter-spacing: .01em;
+}
+
+/* Right side controls */
+#tb-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+#tb-last-updated {
+  font-size: 12px;
+  color: #8b90a8;
+  white-space: nowrap;
+}
+#tb-refresh {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 8px;
+  padding: 6px 13px;
+  color: rgba(255,255,255,.7);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+  white-space: nowrap;
+}
+#tb-refresh i {
+  font-size: 15px;
+  flex-shrink: 0;
+}
+#tb-refresh:hover {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border-color: rgba(255,255,255,.14);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  #tb-hamburger { display: flex; align-items: center; justify-content: center; }
+  #tb-breadcrumb { display: none; }
+  #tb-last-updated { display: none; }
+  #tb-refresh .tb-refresh-label { display: none; }
+  #tb-refresh { padding: 6px 8px; }
+}
+</style>
+
+<div id="topbar-inner">
+  <!-- Hamburger (mobile) -->
+  <button id="tb-hamburger" onclick="openSidebar()">
+    <i class="hgi-stroke hgi-menu-01"></i>
+  </button>
+
+  <!-- Title + breadcrumb -->
+  <div id="tb-title-block">
+    <div id="tb-page-title">Overview</div>
+    <div id="tb-breadcrumb">Admin / <span id="tb-breadcrumb-page">Overview</span></div>
+  </div>
+
+  <!-- Controls -->
+  <div id="tb-controls">
+    <span id="tb-last-updated"></span>
+    <button id="tb-refresh" onclick="refreshPage()">
+      <i class="hgi-stroke hgi-refresh-02"></i>
+      <span class="tb-refresh-label">Refresh</span>
+    </button>
+  </div>
+</div>
+
+<script>
+(function() {
+  // Sync topbar title/breadcrumb with navigate()
+  // Patch the global navigate to also update topbar elements
+  const _origNavigate = window.navigate;
+  window._topbarPatchNavigate = function(page, label) {
+    const titleEl = document.getElementById('tb-page-title');
+    const bcEl = document.getElementById('tb-breadcrumb-page');
+    const pageTitleEl = document.getElementById('page-title'); // legacy compat
+    if (titleEl) titleEl.textContent = label || page;
+    if (bcEl) bcEl.textContent = label || page;
+    if (pageTitleEl) pageTitleEl.textContent = label || page;
+  };
+
+  // Sync last-updated with updateLastUpdated
+  const _origUpdateLU = window.updateLastUpdated;
+  window.updateLastUpdated = function() {
+    const ts = 'Updated ' + new Date().toLocaleTimeString();
+    const tbEl = document.getElementById('tb-last-updated');
+    const legacyEl = document.getElementById('last-updated');
+    if (tbEl) tbEl.textContent = ts;
+    if (legacyEl) legacyEl.textContent = ts;
+  };
+})();
+</script>
