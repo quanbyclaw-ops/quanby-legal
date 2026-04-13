@@ -2499,11 +2499,6 @@ async function openPlotSignature(projectUuid) {
 
     // Show signer guide toast before opening
     var clientEmail = (_sessionInfo && _sessionInfo.client_email) || '';
-    var enpEmail    = (_sessionInfo && _sessionInfo.enp_email)    || '';
-    var clientName  = (_sessionInfo && _sessionInfo.client_name)  || 'Client';
-    var enpName     = (_sessionInfo && _sessionInfo.enp_name)     || 'ENP';
-    showPlotSignatureGuide(enpName, enpEmail, clientName, clientEmail, projectUuid);
-
     // Mark button as "in progress" — will re-enable if window is closed without plotting
     var _plotBtn = document.getElementById('plot-sign-btn-' + projectUuid);
     if (_plotBtn) {
