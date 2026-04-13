@@ -2513,10 +2513,39 @@ if (!APT_ID) {
 <script>
 async function openPlotSignature(projectUuid) {
   if (!window._isEnp) return;
-  // Track per-project plotting_done state
   if (!window._plottingDone) window._plottingDone = {};
 
-  // Silently refresh token first
+  // Show loading state on button immediately
+  var _plotBtn = document.getElementById('plot-sign-btn-' + projectUuid);
+  var _origBtnHTML = _plotBtn ? _plotBtn.innerHTML : '';
+  if (_plotBtn) {
+    _plotBtn.disabled = true;
+    _plotBtn.style.opacity = '1';
+    _plotBtn.style.cursor = 'not-allowed';
+    _plotBtn.style.background = 'rgba(107,114,128,.15)';
+    _plotBtn.style.borderColor = 'rgba(107,114,128,.35)';
+    _plotBtn.style.color = '#9ca3af';
+    _plotBtn.innerHTML = '<div style="width:12px;height:12px;border:2px solid rgba(167,139,250,.3);border-top-color:#a78bfa;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;"></div> Getting link…';
+  }
+
+  function _resetBtn(errMsg) {
+    if (_plotBtn) {
+      _plotBtn.disabled = false;
+      _plotBtn.style.opacity = '1';
+      _plotBtn.style.cursor = 'pointer';
+      _plotBtn.style.background = 'rgba(167,139,250,.1)';
+      _plotBtn.style.borderColor = 'rgba(167,139,250,.3)';
+      _plotBtn.style.color = '#a78bfa';
+      _plotBtn.innerHTML = _origBtnHTML || '<i class="hgi-stroke hgi-pen-tool-01" style="font-size:.82rem;"></i> Plot Signature Fields';
+      _plotBtn.onmouseover = function() { this.style.background='rgba(167,139,250,.22)'; };
+      _plotBtn.onmouseout  = function() { this.style.background='rgba(167,139,250,.1)'; };
+    }
+    if (errMsg) {
+      qlAlert('Plot Signature Error', errMsg, '<i class="hgi-stroke hgi-pen-tool-01" style="color:#a78bfa"></i>');
+    }
+  }
+
+  // Silently refresh auth token first
   try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
 
   try {
@@ -2534,10 +2563,16 @@ async function openPlotSignature(projectUuid) {
       if (raw.trim().startsWith('<')) throw new Error('Server error (HTTP ' + r.status + '). DoconChain may be temporarily unavailable.');
       try { data = JSON.parse(raw); } catch(e) { throw new Error('Unexpected response (HTTP ' + r.status + '). Please try again.'); }
     }
-    if (!r.ok) throw new Error(data.detail || data.message || ('Server error ' + r.status));
+    if (!r.ok) {
+      _resetBtn(data.detail || data.message || ('DoconChain error ' + r.status + '. Please try again.'));
+      return;
+    }
 
     const link = data.link;
-    if (!link) throw new Error('No link returned from DoconChain.');
+    if (!link) {
+      _resetBtn('No link returned from DoconChain. Please try again.');
+      return;
+    }
 
     // Show refresh status button (visible to all participants after plotting)
     var _rsb = document.getElementById('refresh-status-btn-' + projectUuid);
@@ -2581,8 +2616,7 @@ async function openPlotSignature(projectUuid) {
 
     // Show signer guide toast before opening
     var clientEmail = (_sessionInfo && _sessionInfo.client_email) || '';
-    // Mark button as "in progress" — will re-enable if window is closed without plotting
-    var _plotBtn = document.getElementById('plot-sign-btn-' + projectUuid);
+    // Link obtained — update button to "Plotting..." state
     if (_plotBtn) {
       _plotBtn.disabled = true;
       _plotBtn.style.opacity = '1';
@@ -2682,7 +2716,7 @@ async function openPlotSignature(projectUuid) {
     }
 
   } catch(err) {
-    qlAlert('Plot Signature Error', err.message || 'Could not open. Please try again.', '<i class="hgi-stroke hgi-pen-tool-01" style="color:#a78bfa"></i>');
+    _resetBtn(err.message || 'Could not open. Please try again.');
   }
 }
 
