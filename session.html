@@ -2719,6 +2719,31 @@ async function openSignDocument(projectUuid, aptId) {
   }
 }
 
+function _broadcastRecordingAlert(started) {
+  // Broadcast recording state to all room participants via LiveKit data channel
+  if (!window._room || window._room.state !== 'connected') return;
+  var localName = '';
+  try {
+    var localP = window._room.localParticipant;
+    var meta = localP.metadata ? JSON.parse(localP.metadata) : {};
+    localName = meta.display_name || meta.name || localP.identity || 'A participant';
+  } catch(e) {
+    localName = (window._sessionInfo && (window._sessionInfo.enp_name || window._sessionInfo.client_name)) || 'A participant';
+  }
+  var msg = JSON.stringify({ type: 'recording_alert', started: started, by: localName });
+  try {
+    window._room.localParticipant.publishData(new TextEncoder().encode(msg), { reliable: true });
+  } catch(e) {
+    console.warn('[Record] broadcast failed:', e);
+  }
+  // Also show/hide banner locally for the recorder
+  if (started) {
+    _showRecordingBanner('you (local recording)');
+  } else {
+    _hideRecordingBanner();
+  }
+}
+
 function _showRecordingBanner(byName) {
   var existing = document.getElementById('rec-banner');
   if (existing) existing.remove();
