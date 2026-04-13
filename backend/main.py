@@ -3233,7 +3233,7 @@ async def get_plot_link(
                 continue
             try:
                 resp_data = _call_plot_link(_tok)
-                print(f"[PlotLink] success on attempt {_retry+1}", flush=True)
+                print(f"[PlotLink] success on attempt {_retry+1} raw={str(resp_data)[:400]}", flush=True)
                 break
             except _uerr2.HTTPError as he:
                 _last_code = he.code
@@ -3273,6 +3273,23 @@ async def get_plot_link(
                         _save_appointments()
                         break
 
+        # Strip token/api_token params from the link (DC embeds credentials in URL).
+        # Previous repo called this "cleanPlotUrl" — same approach.
+        # The link works without these params; stripping prevents credential exposure.
+        try:
+            from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+            _parsed = urlparse(link)
+            _params = parse_qs(_parsed.query, keep_blank_values=True)
+            # Remove credential params, keep everything else (page, user_type, email, signer_role, api)
+            for _rm in ('token', 'api_token', 'access_token'):
+                _params.pop(_rm, None)
+            # Rebuild — use doseq=True to keep single-value params clean
+            _clean_query = urlencode({k: v[0] if len(v)==1 else v for k, v in _params.items()}, doseq=True)
+            link = urlunparse(_parsed._replace(query=_clean_query))
+        except Exception as _clean_err:
+            print(f"[PlotLink] URL clean failed (non-fatal): {_clean_err}", flush=True)
+
+        print(f"[PlotLink] link (clean): {link[:180]}", flush=True)
         return {"link": link, "project_uuid": project_uuid}
 
     except HTTPException:
