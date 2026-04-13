@@ -5371,3 +5371,383 @@ async def admin_list_registry(
         "per_page": per_page,
         "pages": max(1, (total + per_page - 1) // per_page),
     }
+
+# ── Sub-Organizations ─────────────────────────────────────────────────────────
+# Appended to main.py before `if __name__ == "__main__":`
+
+_SUB_ORGS_FILE = os.path.join(os.path.dirname(__file__), "data", "sub_orgs.json")
+_sub_orgs_lock = threading.Lock()
+
+
+def _load_sub_orgs() -> list:
+    """Load sub-orgs from disk."""
+    try:
+        with open(_SUB_ORGS_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            return data if isinstance(data, list) else []
+    except (FileNotFoundError, json.JSONDecodeError):
+        return []
+
+
+def _save_sub_orgs(data: list) -> None:
+    """Persist sub-orgs to disk atomically."""
+    tmp = _SUB_ORGS_FILE + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    os.replace(tmp, _SUB_ORGS_FILE)
+
+
+def _require_attorney_or_admin(request: Request):
+    """Return current user if attorney or admin, else raise 401/403."""
+    from onboarding import get_user as _gu
+    token = None
+    auth_header = request.headers.get("authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header.split(" ", 1)[1]
+    if not token:
+        token = request.cookies.get("ql_access")
+    if not token:
+        raise HTTPException(401, "Unauthorized")
+    from auth import verify_jwt as _vj
+    payload = _vj(token)
+    if not payload:
+        raise HTTPException(401, "Unauthorized")
+    # Admin path
+    if payload.get("role") == "admin":
+        return {"id": payload.get("sub", "admin"), "role": "admin", "email": payload.get("email", "")}
+    user = _gu(payload.get("user_id", ""))
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    if user.get("role") not in ("attorney", "admin"):
+        raise HTTPException(403, "Forbidden: attorney or admin role required")
+    return user
+
+
+def _find_user_by_email(email: str):
+    """Find a user by email from in-memory USERS dict."""
+    from onboarding import USERS as _USERS
+    email_lower = email.lower().strip()
+    for uid, u in _USERS.items():
+        if (u.get("email") or "").lower() == email_lower:
+            return dict(u)
+    return None
+
+
+class _SubOrgCreateReq(BaseModel):
+    name: str
+    address: Optional[str] = ""
+    type: Optional[str] = "Department"
+    dc_client_key: Optional[str] = ""
+    dc_client_secret: Optional[str] = ""
+    dc_email: Optional[str] = ""
+
+
+class _SubOrgPatchReq(BaseModel):
+    name: Optional[str] = None
+    address: Optional[str] = None
+    type: Optional[str] = None
+    dc_client_key: Optional[str] = None
+    dc_client_secret: Optional[str] = None
+    dc_email: Optional[str] = None
+
+
+class _SubOrgMemberReq(BaseModel):
+    email: str
+    role: str = "Staff"
+
+
+class _SubOrgCredReq(BaseModel):
+    dc_client_key: str = ""
+    dc_client_secret: str = ""
+    dc_email: str = ""
+
+
+class _SubOrgCreditTransferReq(BaseModel):
+    amount: int
+
+
+# ── GET /api/sub-orgs ─────────────────────────────────────────────────────────
+@app.get("/api/sub-orgs")
+async def list_sub_orgs(request: Request):
+    user = _require_attorney_or_admin(request)
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+    uid = user["id"]
+    role = user.get("role")
+    if role == "admin":
+        result = orgs
+    else:
+        result = [
+            o for o in orgs
+            if o.get("owner_id") == uid
+            or any(m.get("user_id") == uid for m in o.get("members", []))
+        ]
+    # Strip sensitive DC credentials from list view
+    safe = []
+    for o in result:
+        s = {k: v for k, v in o.items() if k not in ("dc_client_key", "dc_client_secret")}
+        s["dc_client_key_set"] = bool(o.get("dc_client_key"))
+        s["dc_client_secret_set"] = bool(o.get("dc_client_secret"))
+        safe.append(s)
+    return safe
+
+
+# ── POST /api/sub-orgs ────────────────────────────────────────────────────────
+@app.post("/api/sub-orgs")
+async def create_sub_org(req: _SubOrgCreateReq, request: Request):
+    user = _require_attorney_or_admin(request)
+    if not req.name or not req.name.strip():
+        raise HTTPException(400, "name is required")
+    valid_types = ("Department", "Branch", "Division", "Team")
+    org_type = req.type if req.type in valid_types else "Department"
+    now = _dt.now(_tz.utc).isoformat()
+    org = {
+        "id": str(uuid.uuid4()),
+        "name": req.name.strip(),
+        "address": req.address or "",
+        "type": org_type,
+        "owner_id": user["id"],
+        "dc_client_key": req.dc_client_key or "",
+        "dc_client_secret": req.dc_client_secret or "",
+        "dc_email": req.dc_email or "",
+        "credits_total": 0,
+        "credits_used": 0,
+        "members": [],
+        "created_at": now,
+        "updated_at": now,
+    }
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+        orgs.append(org)
+        _save_sub_orgs(orgs)
+    return {"success": True, "id": org["id"], "sub_org": org}
+
+
+# ── GET /api/sub-orgs/{sub_org_id} ───────────────────────────────────────────
+@app.get("/api/sub-orgs/{sub_org_id}")
+async def get_sub_org(sub_org_id: str, request: Request):
+    user = _require_attorney_or_admin(request)
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+    org = next((o for o in orgs if o["id"] == sub_org_id), None)
+    if not org:
+        raise HTTPException(404, "Sub-org not found")
+    uid = user["id"]
+    role = user.get("role")
+    if role != "admin" and org.get("owner_id") != uid and not any(m.get("user_id") == uid for m in org.get("members", [])):
+        raise HTTPException(403, "Forbidden")
+    s = {k: v for k, v in org.items() if k not in ("dc_client_key", "dc_client_secret")}
+    s["dc_client_key_set"] = bool(org.get("dc_client_key"))
+    s["dc_client_secret_set"] = bool(org.get("dc_client_secret"))
+    return s
+
+
+# ── PATCH /api/sub-orgs/{sub_org_id} ─────────────────────────────────────────
+@app.patch("/api/sub-orgs/{sub_org_id}")
+async def patch_sub_org(sub_org_id: str, req: _SubOrgPatchReq, request: Request):
+    user = _require_attorney_or_admin(request)
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+        org = next((o for o in orgs if o["id"] == sub_org_id), None)
+        if not org:
+            raise HTTPException(404, "Sub-org not found")
+        uid = user["id"]
+        role = user.get("role")
+        if role != "admin" and org.get("owner_id") != uid:
+            raise HTTPException(403, "Forbidden: only owner or admin can edit")
+        valid_types = ("Department", "Branch", "Division", "Team")
+        if req.name is not None:
+            org["name"] = req.name.strip()
+        if req.address is not None:
+            org["address"] = req.address
+        if req.type is not None and req.type in valid_types:
+            org["type"] = req.type
+        if req.dc_client_key is not None:
+            org["dc_client_key"] = req.dc_client_key
+        if req.dc_client_secret is not None:
+            org["dc_client_secret"] = req.dc_client_secret
+        if req.dc_email is not None:
+            org["dc_email"] = req.dc_email
+        org["updated_at"] = _dt.now(_tz.utc).isoformat()
+        _save_sub_orgs(orgs)
+    return {"success": True, "sub_org": org}
+
+
+# ── DELETE /api/sub-orgs/{sub_org_id} ────────────────────────────────────────
+@app.delete("/api/sub-orgs/{sub_org_id}")
+async def delete_sub_org(sub_org_id: str, request: Request):
+    user = _require_attorney_or_admin(request)
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+        org = next((o for o in orgs if o["id"] == sub_org_id), None)
+        if not org:
+            raise HTTPException(404, "Sub-org not found")
+        uid = user["id"]
+        role = user.get("role")
+        if role != "admin" and org.get("owner_id") != uid:
+            raise HTTPException(403, "Forbidden: only owner or admin can delete")
+        orgs = [o for o in orgs if o["id"] != sub_org_id]
+        _save_sub_orgs(orgs)
+    return {"success": True}
+
+
+# ── GET /api/sub-orgs/{sub_org_id}/members ───────────────────────────────────
+@app.get("/api/sub-orgs/{sub_org_id}/members")
+async def list_sub_org_members(sub_org_id: str, request: Request):
+    user = _require_attorney_or_admin(request)
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+    org = next((o for o in orgs if o["id"] == sub_org_id), None)
+    if not org:
+        raise HTTPException(404, "Sub-org not found")
+    uid = user["id"]
+    role = user.get("role")
+    if role != "admin" and org.get("owner_id") != uid and not any(m.get("user_id") == uid for m in org.get("members", [])):
+        raise HTTPException(403, "Forbidden")
+    return org.get("members", [])
+
+
+# ── POST /api/sub-orgs/{sub_org_id}/members ──────────────────────────────────
+@app.post("/api/sub-orgs/{sub_org_id}/members")
+async def add_sub_org_member(sub_org_id: str, req: _SubOrgMemberReq, request: Request):
+    user = _require_attorney_or_admin(request)
+    if req.role not in ("ENP", "Staff"):
+        raise HTTPException(400, "role must be ENP or Staff")
+    target = _find_user_by_email(req.email)
+    if not target:
+        raise HTTPException(404, f"No user found with email: {req.email}")
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+        org = next((o for o in orgs if o["id"] == sub_org_id), None)
+        if not org:
+            raise HTTPException(404, "Sub-org not found")
+        uid = user["id"]
+        role = user.get("role")
+        if role != "admin" and org.get("owner_id") != uid:
+            raise HTTPException(403, "Forbidden: only owner or admin can add members")
+        # Check if already a member
+        if any(m.get("user_id") == target["id"] for m in org.get("members", [])):
+            raise HTTPException(409, "User is already a member of this sub-org")
+        member = {
+            "user_id": target["id"],
+            "email": target.get("email", ""),
+            "name": f"{target.get('first_name', '')} {target.get('last_name', '')}".strip() or target.get("email", ""),
+            "role": req.role,
+            "status": "active",
+        }
+        org.setdefault("members", []).append(member)
+        org["updated_at"] = _dt.now(_tz.utc).isoformat()
+        _save_sub_orgs(orgs)
+    return {"success": True, "member": member}
+
+
+# ── DELETE /api/sub-orgs/{sub_org_id}/members/{user_id} ──────────────────────
+@app.delete("/api/sub-orgs/{sub_org_id}/members/{member_user_id}")
+async def remove_sub_org_member(sub_org_id: str, member_user_id: str, request: Request):
+    user = _require_attorney_or_admin(request)
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+        org = next((o for o in orgs if o["id"] == sub_org_id), None)
+        if not org:
+            raise HTTPException(404, "Sub-org not found")
+        uid = user["id"]
+        role = user.get("role")
+        if role != "admin" and org.get("owner_id") != uid:
+            raise HTTPException(403, "Forbidden: only owner or admin can remove members")
+        before = len(org.get("members", []))
+        org["members"] = [m for m in org.get("members", []) if m.get("user_id") != member_user_id]
+        if len(org["members"]) == before:
+            raise HTTPException(404, "Member not found")
+        org["updated_at"] = _dt.now(_tz.utc).isoformat()
+        _save_sub_orgs(orgs)
+    return {"success": True}
+
+
+# ── GET /api/sub-orgs/{sub_org_id}/credits ───────────────────────────────────
+@app.get("/api/sub-orgs/{sub_org_id}/credits")
+async def get_sub_org_credits(sub_org_id: str, request: Request):
+    user = _require_attorney_or_admin(request)
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+    org = next((o for o in orgs if o["id"] == sub_org_id), None)
+    if not org:
+        raise HTTPException(404, "Sub-org not found")
+    uid = user["id"]
+    role = user.get("role")
+    if role != "admin" and org.get("owner_id") != uid and not any(m.get("user_id") == uid for m in org.get("members", [])):
+        raise HTTPException(403, "Forbidden")
+    total = org.get("credits_total", 0)
+    used = org.get("credits_used", 0)
+    return {"total": total, "used": used, "remaining": max(0, total - used)}
+
+
+# ── POST /api/sub-orgs/{sub_org_id}/credits/transfer ─────────────────────────
+@app.post("/api/sub-orgs/{sub_org_id}/credits/transfer")
+async def transfer_sub_org_credits(sub_org_id: str, req: _SubOrgCreditTransferReq, request: Request):
+    user = _require_attorney_or_admin(request)
+    if req.amount <= 0:
+        raise HTTPException(400, "amount must be positive")
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+        org = next((o for o in orgs if o["id"] == sub_org_id), None)
+        if not org:
+            raise HTTPException(404, "Sub-org not found")
+        uid = user["id"]
+        role = user.get("role")
+        if role != "admin" and org.get("owner_id") != uid:
+            raise HTTPException(403, "Forbidden: only owner or admin can transfer credits")
+        org["credits_total"] = org.get("credits_total", 0) + req.amount
+        org["updated_at"] = _dt.now(_tz.utc).isoformat()
+        _save_sub_orgs(orgs)
+    return {"success": True, "credits_total": org["credits_total"]}
+
+
+# ── GET /api/sub-orgs/{sub_org_id}/credentials ───────────────────────────────
+@app.get("/api/sub-orgs/{sub_org_id}/credentials")
+async def get_sub_org_credentials(sub_org_id: str, request: Request):
+    user = _require_attorney_or_admin(request)
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+    org = next((o for o in orgs if o["id"] == sub_org_id), None)
+    if not org:
+        raise HTTPException(404, "Sub-org not found")
+    uid = user["id"]
+    role = user.get("role")
+    if role != "admin" and org.get("owner_id") != uid:
+        raise HTTPException(403, "Forbidden: only owner or admin can view credentials")
+
+    def _mask(s: str) -> str:
+        if not s:
+            return ""
+        if len(s) <= 8:
+            return "*" * len(s)
+        return s[:4] + "*" * (len(s) - 8) + s[-4:]
+
+    return {
+        "dc_client_key": _mask(org.get("dc_client_key", "")),
+        "dc_client_secret": _mask(org.get("dc_client_secret", "")),
+        "dc_email": org.get("dc_email", ""),
+        "dc_client_key_raw": org.get("dc_client_key", ""),
+        "dc_client_secret_raw": org.get("dc_client_secret", ""),
+    }
+
+
+# ── PUT /api/sub-orgs/{sub_org_id}/credentials ───────────────────────────────
+@app.put("/api/sub-orgs/{sub_org_id}/credentials")
+async def update_sub_org_credentials(sub_org_id: str, req: _SubOrgCredReq, request: Request):
+    user = _require_attorney_or_admin(request)
+    with _sub_orgs_lock:
+        orgs = _load_sub_orgs()
+        org = next((o for o in orgs if o["id"] == sub_org_id), None)
+        if not org:
+            raise HTTPException(404, "Sub-org not found")
+        uid = user["id"]
+        role = user.get("role")
+        if role != "admin" and org.get("owner_id") != uid:
+            raise HTTPException(403, "Forbidden: only owner or admin can update credentials")
+        org["dc_client_key"] = req.dc_client_key
+        org["dc_client_secret"] = req.dc_client_secret
+        org["dc_email"] = req.dc_email
+        org["updated_at"] = _dt.now(_tz.utc).isoformat()
+        _save_sub_orgs(orgs)
+    return {"success": True}

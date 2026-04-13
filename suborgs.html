@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sub-Organizations — Quanby Legal</title>
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
+  <link rel="icon" href="/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080B18;
+      --surface: rgba(255,255,255,.04);
+      --surface2: rgba(255,255,255,.07);
+      --border: rgba(255,255,255,.08);
+      --purple: #7c3aed;
+      --gold: #C9A84C;
+      --teal: #0EA5E9;
+      --green: #10B981;
+      --red: #F87171;
+      --text: #e8eaf2;
+      --muted: #8b90a8;
+      --navy: #1B2A6B;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; }
+
+    /* NAV */
+    nav { background: rgba(8,11,24,0.97); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); }
+    .nav-content { max-width: 1280px; margin: 0 auto; padding: 0 2rem; height: 64px; display: flex; align-items: center; gap: 2rem; }
+    .logo { display: flex; align-items: center; gap: 0.625rem; text-decoration: none; flex-shrink: 0; }
+    .logo-img { height: 32px; width: auto; }
+    .logo-text { font-size: 1.1rem; font-weight: 700; color: #e8eaf2; letter-spacing: -0.02em; }
+    .nav-links { display: flex; gap: 0.25rem; align-items: center; flex: 1; justify-content: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.875rem; font-weight: 500; padding: 0.4rem 0.75rem; border-radius: 6px; transition: background 0.15s, color 0.15s; white-space: nowrap; }
+    .nav-links a:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+    .nav-links a.active { background: rgba(255,255,255,0.08); color: var(--text); }
+    .nav-user { display: flex; align-items: center; gap: 0.625rem; cursor: pointer; position: relative; }
+    .nav-user-name { font-size: 0.85rem; color: var(--muted); max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nav-user-initials { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--navy), var(--teal)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: #fff; border: 2px solid rgba(201,168,76,0.4); flex-shrink: 0; }
+    .nav-user-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); }
+    .nav-user-menu { position: absolute; right: 0; top: calc(100% + 8px); background: #111525; border: 1px solid var(--border); border-radius: 0.75rem; min-width: 220px; box-shadow: 0 8px 32px rgba(0,0,0,0.5); overflow: hidden; z-index: 200; display: none; }
+    .nav-user-menu.open { display: block; }
+    .num-header { padding: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+    .num-initials { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--navy), var(--teal)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: #fff; flex-shrink: 0; }
+    .num-info { display: flex; flex-direction: column; min-width: 0; }
+    .num-name { font-size: 0.875rem; font-weight: 600; color: #e8eaf2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .num-email { font-size: 0.75rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .num-divider { height: 1px; background: var(--border); }
+    .num-item { display: flex; align-items: center; gap: 0.625rem; width: 100%; padding: 0.625rem 1rem; background: none; border: none; color: var(--muted); font-size: 0.8rem; cursor: pointer; text-align: left; transition: background 0.15s, color 0.15s; text-decoration: none; }
+    .num-item:hover { background: rgba(255,255,255,.05); color: var(--text); }
+    .num-signout { color: var(--red); }
+    .num-signout:hover { background: rgba(248,113,113,.08); color: var(--red); }
+
+    /* LAYOUT */
+    .container { max-width: 1280px; margin: 0 auto; padding: 2rem; }
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .page-title { font-size: 1.75rem; font-weight: 700; display: flex; align-items: center; gap: 0.75rem; }
+    .page-title i { color: var(--purple); }
+    .page-subtitle { color: var(--muted); font-size: 0.875rem; margin-top: 0.375rem; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.625rem 1.25rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: none; transition: opacity 0.15s, transform 0.1s; font-family: inherit; text-decoration: none; }
+    .btn:hover { opacity: 0.88; }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--purple); color: #fff; }
+    .btn-teal { background: var(--teal); color: #fff; }
+    .btn-gold { background: var(--gold); color: #000; }
+    .btn-danger { background: rgba(248,113,113,.15); color: var(--red); border: 1px solid rgba(248,113,113,.25); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-ghost { background: transparent; border: none; color: var(--muted); padding: 0.375rem 0.625rem; }
+    .btn-ghost:hover { color: var(--text); background: rgba(255,255,255,.06); }
+    .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
+    .btn-xs { padding: 0.2rem 0.5rem; font-size: 0.75rem; border-radius: 0.375rem; }
+
+    /* CARDS GRID */
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(560px, 1fr)); gap: 1.5rem; }
+    @media (max-width: 640px) { .cards-grid { grid-template-columns: 1fr; } }
+
+    .org-card { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; overflow: hidden; }
+    .org-card-header { padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); gap: 1rem; }
+    .org-card-title { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+    .org-icon { width: 40px; height: 40px; border-radius: 0.625rem; background: rgba(124,58,237,.15); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--purple); flex-shrink: 0; }
+    .org-name { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .org-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.125rem; }
+    .org-actions { display: flex; gap: 0.375rem; flex-shrink: 0; }
+
+    .org-card-body { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+
+    /* SECTION */
+    .section-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.625rem; display: flex; align-items: center; gap: 0.5rem; }
+
+    /* CREDENTIALS */
+    .cred-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .cred-label { font-size: 0.75rem; color: var(--muted); width: 110px; flex-shrink: 0; }
+    .cred-value { flex: 1; font-family: monospace; font-size: 0.8rem; background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 0.375rem; padding: 0.3rem 0.6rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cred-actions { display: flex; gap: 0.25rem; }
+    .icon-btn { background: none; border: 1px solid var(--border); border-radius: 0.375rem; color: var(--muted); cursor: pointer; padding: 0.25rem; display: flex; align-items: center; transition: color 0.15s, background 0.15s; font-size: 0.85rem; }
+    .icon-btn:hover { color: var(--text); background: rgba(255,255,255,.06); }
+
+    /* CREDITS */
+    .credits-bar { background: rgba(255,255,255,.06); border-radius: 999px; height: 6px; margin-top: 0.5rem; overflow: hidden; }
+    .credits-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--purple), var(--teal)); transition: width 0.4s; }
+    .credits-nums { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-top: 0.375rem; }
+
+    /* MEMBERS TABLE */
+    .members-table-wrap { overflow-x: auto; border-radius: 0.5rem; border: 1px solid var(--border); }
+    .members-table { width: 100%; border-collapse: collapse; min-width: 380px; }
+    .members-table thead { background: rgba(255,255,255,.03); }
+    .members-table th { padding: 0.5rem 0.75rem; font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); text-align: left; }
+    .members-table td { padding: 0.5rem 0.75rem; font-size: 0.8rem; border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: middle; }
+    .members-table tbody tr:last-child td { border-bottom: none; }
+    .members-table tbody tr:hover td { background: rgba(255,255,255,.025); }
+    .no-members { text-align: center; color: var(--muted); padding: 1rem; font-size: 0.8rem; }
+
+    /* BADGES */
+    .badge { display: inline-flex; align-items: center; padding: 0.15rem 0.55rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+    .badge-purple { background: rgba(124,58,237,.15); color: #c4b5fd; }
+    .badge-teal { background: rgba(14,165,233,.15); color: #7dd3fc; }
+    .badge-green { background: rgba(16,185,129,.15); color: #6ee7b7; }
+    .badge-gold { background: rgba(201,168,76,.15); color: #fcd34d; }
+    .badge-gray { background: rgba(139,145,168,.15); color: var(--muted); }
+    .badge-red { background: rgba(248,113,113,.15); color: var(--red); }
+
+    /* INLINE EDIT */
+    .edit-form { display: none; flex-direction: column; gap: 0.75rem; }
+    .edit-form.open { display: flex; }
+    .form-group { display: flex; flex-direction: column; gap: 0.375rem; }
+    .form-label { font-size: 0.75rem; font-weight: 500; color: var(--muted); }
+    .form-input, .form-select { background: rgba(255,255,255,.06); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem 0.75rem; color: var(--text); font-size: 0.875rem; font-family: inherit; outline: none; width: 100%; transition: border-color 0.15s; }
+    .form-input:focus, .form-select:focus { border-color: var(--purple); }
+    .form-select option { background: #0f1324; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    /* EMPTY STATE */
+    .empty-state { text-align: center; padding: 4rem 2rem; }
+    .empty-icon { font-size: 3rem; color: rgba(124,58,237,.4); margin-bottom: 1rem; }
+    .empty-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .empty-sub { color: var(--muted); font-size: 0.875rem; }
+
+    /* MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #111525; border: 1px solid var(--border); border-radius: 1rem; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(0,0,0,.6); }
+    .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: #111525; z-index: 10; }
+    .modal-title { font-size: 1.1rem; font-weight: 700; }
+    .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; padding: 0.25rem; border-radius: 0.375rem; transition: color 0.15s, background 0.15s; }
+    .modal-close:hover { color: var(--text); background: rgba(255,255,255,.08); }
+    .modal-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+    /* COLLAPSIBLE */
+    .collapsible-toggle { width: 100%; background: rgba(255,255,255,.04); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.625rem 0.875rem; color: var(--muted); font-size: 0.8rem; font-weight: 500; cursor: pointer; text-align: left; display: flex; align-items: center; justify-content: space-between; transition: color 0.15s, background 0.15s; font-family: inherit; }
+    .collapsible-toggle:hover { color: var(--text); background: rgba(255,255,255,.06); }
+    .collapsible-body { display: none; flex-direction: column; gap: 0.75rem; margin-top: 0.75rem; }
+    .collapsible-body.open { display: flex; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1a2038; border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.875rem 1.25rem; font-size: 0.875rem; color: var(--text); box-shadow: 0 8px 32px rgba(0,0,0,.4); z-index: 9999; opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s; max-width: 320px; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-color: rgba(16,185,129,.4); }
+    .toast.error { border-color: rgba(248,113,113,.4); }
+
+    /* LOADER */
+    .loader { text-align: center; padding: 3rem; color: var(--muted); }
+    .spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,.1); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-content">
+    <a class="logo" href="/dashboard">
+      <img class="logo-img" src="/logo.png" onerror="this.style.display='none'" alt="">
+      <span class="logo-text">Quanby Legal</span>
+    </a>
+    <div class="nav-links" id="nav-links">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/appointments">Appointments</a>
+      <a href="/registry"><i class="hgi-stroke hgi-book-open-01" style="font-size:.9rem;vertical-align:middle;margin-right:.25rem;"></i>Registry</a>
+      <a href="/management/sub-orgs" class="active"><i class="hgi-stroke hgi-building-03" style="font-size:.9rem;vertical-align:middle;margin-right:.25rem;"></i>Sub-Orgs</a>
+      <a href="/profile"><i class="hgi-stroke hgi-user-circle" style="font-size:.9rem;vertical-align:middle;margin-right:.25rem;"></i>Profile</a>
+    </div>
+    <div class="nav-user" id="nav-user" onclick="toggleUserMenu()">
+      <span class="nav-user-name" id="nav-user-name">Loading...</span>
+      <div class="nav-user-initials" id="nav-user-initials">?</div>
+      <div class="nav-user-menu" id="nav-user-menu">
+        <div class="num-header">
+          <div class="num-initials" id="menu-initials">?</div>
+          <div class="num-info">
+            <span class="num-name" id="menu-name">...</span>
+            <span class="num-email" id="menu-email">...</span>
+          </div>
+        </div>
+        <div class="num-divider"></div>
+        <a class="num-item" href="/profile"><i class="hgi-stroke hgi-user-circle"></i>Profile</a>
+        <div class="num-divider"></div>
+        <button class="num-item num-signout" onclick="signOut()"><i class="hgi-stroke hgi-logout-01"></i>Sign Out</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title"><i class="hgi-stroke hgi-building-03"></i>Sub-Organizations</h1>
+      <p class="page-subtitle">Manage branches, departments, divisions, and teams under your organization</p>
+    </div>
+    <button class="btn btn-primary" onclick="openCreateModal()">
+      <i class="hgi-stroke hgi-plus-sign"></i>Create Sub-Org
+    </button>
+  </div>
+
+  <div id="orgs-container">
+    <div class="loader"><div class="spinner"></div>Loading sub-organizations...</div>
+  </div>
+</div>
+
+<!-- CREATE MODAL -->
+<div class="modal-overlay" id="create-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title"><i class="hgi-stroke hgi-building-03" style="color:var(--purple);margin-right:.5rem;"></i>Create Sub-Organization</span>
+      <button class="modal-close" onclick="closeModal('create-modal')"><i class="hgi-stroke hgi-cancel-01"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Name <span style="color:var(--red)">*</span></label>
+        <input class="form-input" id="create-name" placeholder="e.g. Manila Branch" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <input class="form-input" id="create-address" placeholder="Full address">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <select class="form-select" id="create-type">
+          <option value="Department">Department</option>
+          <option value="Branch">Branch</option>
+          <option value="Division">Division</option>
+          <option value="Team">Team</option>
+        </select>
+      </div>
+      <!-- DC Credentials collapsible -->
+      <button class="collapsible-toggle" onclick="toggleCollapsible('create-dc-body', this)">
+        <span><i class="hgi-stroke hgi-key-01" style="margin-right:.5rem;"></i>DocuSign Credentials (optional)</span>
+        <i class="hgi-stroke hgi-arrow-down-01" id="create-dc-chevron"></i>
+      </button>
+      <div class="collapsible-body" id="create-dc-body">
+        <div class="form-group">
+          <label class="form-label">DC Email</label>
+          <input class="form-input" id="create-dc-email" type="email" placeholder="docusign@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">DC Client Key</label>
+          <input class="form-input" id="create-dc-key" placeholder="Client Key / Integration Key">
+        </div>
+        <div class="form-group">
+          <label class="form-label">DC Client Secret</label>
+          <input class="form-input" id="create-dc-secret" type="password" placeholder="Client Secret">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('create-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitCreate()" id="create-submit-btn">
+        <i class="hgi-stroke hgi-plus-sign"></i>Create
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MEMBER MODAL -->
+<div class="modal-overlay" id="member-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title"><i class="hgi-stroke hgi-user-add-01" style="color:var(--teal);margin-right:.5rem;"></i>Add Member</span>
+      <button class="modal-close" onclick="closeModal('member-modal')"><i class="hgi-stroke hgi-cancel-01"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.8rem;color:var(--muted);">The user must already have an account on Quanby Legal.</p>
+      <div class="form-group">
+        <label class="form-label">Email Address <span style="color:var(--red)">*</span></label>
+        <input class="form-input" id="member-email" type="email" placeholder="user@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role</label>
+        <select class="form-select" id="member-role">
+          <option value="Staff">Staff</option>
+          <option value="ENP">ENP (Notary)</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('member-modal')">Cancel</button>
+      <button class="btn btn-teal" onclick="submitAddMember()" id="member-submit-btn">
+        <i class="hgi-stroke hgi-user-add-01"></i>Add Member
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSFER CREDITS MODAL -->
+<div class="modal-overlay" id="credits-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title"><i class="hgi-stroke hgi-coins-01" style="color:var(--gold);margin-right:.5rem;"></i>Transfer Credits</span>
+      <button class="modal-close" onclick="closeModal('credits-modal')"><i class="hgi-stroke hgi-cancel-01"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Amount of Credits to Add</label>
+        <input class="form-input" id="credits-amount" type="number" min="1" placeholder="e.g. 100">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('credits-modal')">Cancel</button>
+      <button class="btn btn-gold" onclick="submitTransferCredits()" id="credits-submit-btn">
+        <i class="hgi-stroke hgi-coins-01"></i>Transfer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let _currentUser = null;
+let _orgs = [];
+let _activeMemberOrgId = null;
+let _activeCreditOrgId = null;
+
+// ── Init ───────────────────────────────────────────────────────────────────
+(async function init() {
+  try {
+    const r = await fetch('/api/auth/me', { credentials: 'include' });
+    if (!r.ok) { location.href = '/dashboard'; return; }
+    _currentUser = await r.json();
+    if (!['attorney','admin'].includes(_currentUser.role)) {
+      location.href = '/dashboard'; return;
+    }
+    const name = [_currentUser.first_name, _currentUser.last_name].filter(Boolean).join(' ') || _currentUser.email || 'User';
+    const initials = name.split(' ').map(p => p[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('nav-user-name').textContent = name;
+    document.getElementById('nav-user-initials').textContent = initials;
+    document.getElementById('menu-initials').textContent = initials;
+    document.getElementById('menu-name').textContent = name;
+    document.getElementById('menu-email').textContent = _currentUser.email || '';
+    await loadOrgs();
+  } catch(e) {
+    location.href = '/dashboard';
+  }
+})();
+
+// ── Load Orgs ──────────────────────────────────────────────────────────────
+async function loadOrgs() {
+  try {
+    const r = await fetch('/api/sub-orgs', { credentials: 'include' });
+    if (!r.ok) throw new Error('Failed');
+    _orgs = await r.json();
+    renderOrgs();
+  } catch(e) {
+    document.getElementById('orgs-container').innerHTML = '<div class="empty-state"><div class="empty-icon"><i class="hgi-stroke hgi-alert-02"></i></div><div class="empty-title">Failed to load</div><div class="empty-sub">Could not load sub-organizations. Please refresh.</div></div>';
+  }
+}
+
+// ── Render Orgs ────────────────────────────────────────────────────────────
+function renderOrgs() {
+  const container = document.getElementById('orgs-container');
+  if (!_orgs.length) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-icon"><i class="hgi-stroke hgi-building-03"></i></div>
+      <div class="empty-title">No Sub-Organizations Yet</div>
+      <div class="empty-sub">Create your first sub-organization to manage teams, branches, or departments.</div>
+    </div>`;
+    return;
+  }
+  const grid = document.createElement('div');
+  grid.className = 'cards-grid';
+  _orgs.forEach(org => {
+    grid.appendChild(buildOrgCard(org));
+  });
+  container.innerHTML = '';
+  container.appendChild(grid);
+}
+
+function typeBadge(type) {
+  const map = { Department:'badge-purple', Branch:'badge-teal', Division:'badge-gold', Team:'badge-green' };
+  return `<span class="badge ${map[type]||'badge-gray'}">${type}</span>`;
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  try { return new Date(iso).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' }); } catch(e) { return iso; }
+}
+
+function buildOrgCard(org) {
+  const isOwner = _currentUser && (org.owner_id === _currentUser.id || _currentUser.role === 'admin');
+  const card = document.createElement('div');
+  card.className = 'org-card';
+  card.id = `org-card-${org.id}`;
+
+  // Members rows HTML
+  const memberRows = (org.members || []).map(m => `
+    <tr>
+      <td>${escHtml(m.name || m.email)}</td>
+      <td style="color:var(--muted);font-size:.75rem;">${escHtml(m.email)}</td>
+      <td><span class="badge ${m.role==='ENP'?'badge-purple':'badge-teal'}">${m.role}</span></td>
+      <td><span class="badge ${m.status==='active'?'badge-green':'badge-gray'}">${m.status}</span></td>
+      ${isOwner ? `<td><button class="btn btn-danger btn-xs" onclick="removeMember('${org.id}','${m.user_id}')"><i class="hgi-stroke hgi-user-remove-01"></i></button></td>` : '<td></td>'}
+    </tr>`).join('');
+
+  card.innerHTML = `
+    <div class="org-card-header">
+      <div class="org-card-title">
+        <div class="org-icon"><i class="hgi-stroke hgi-building-03"></i></div>
+        <div>
+          <div class="org-name">${escHtml(org.name)}</div>
+          <div class="org-meta">${typeBadge(org.type)} &nbsp; Created ${formatDate(org.created_at)}</div>
+        </div>
+      </div>
+      <div class="org-actions">
+        ${isOwner ? `
+          <button class="btn btn-ghost btn-sm" title="Edit" onclick="toggleEdit('${org.id}')">
+            <i class="hgi-stroke hgi-pencil-edit-01"></i>
+          </button>
+          <button class="btn btn-danger btn-sm" title="Delete" onclick="confirmDelete('${org.id}')">
+            <i class="hgi-stroke hgi-delete-01"></i>
+          </button>
+        ` : ''}
+      </div>
+    </div>
+
+    <div class="org-card-body">
+
+      <!-- INLINE EDIT FORM -->
+      ${isOwner ? `
+      <div class="edit-form" id="edit-form-${org.id}">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Name</label>
+            <input class="form-input" id="edit-name-${org.id}" value="${escHtml(org.name)}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select class="form-select" id="edit-type-${org.id}">
+              ${['Department','Branch','Division','Team'].map(t=>`<option value="${t}"${org.type===t?' selected':''}>${t}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Address</label>
+          <input class="form-input" id="edit-address-${org.id}" value="${escHtml(org.address||'')}">
+        </div>
+        <div style="display:flex;gap:.5rem;justify-content:flex-end;">
+          <button class="btn btn-outline btn-sm" onclick="toggleEdit('${org.id}')">Cancel</button>
+          <button class="btn btn-primary btn-sm" onclick="submitEdit('${org.id}')"><i class="hgi-stroke hgi-checkmark-circle-01"></i>Save</button>
+        </div>
+      </div>
+      ` : ''}
+
+      <!-- CREDENTIALS -->
+      <div>
+        <div class="section-label"><i class="hgi-stroke hgi-key-01"></i>DocuSign Credentials</div>
+        <div id="creds-${org.id}">
+          <div style="color:var(--muted);font-size:.8rem;">
+            <span id="cred-status-${org.id}">${org.dc_client_key_set||org.dc_email ? 'Credentials configured' : 'No credentials set'}</span>
+            ${isOwner ? `<button class="btn btn-ghost btn-xs" style="margin-left:.5rem;" onclick="loadCreds('${org.id}')"><i class="hgi-stroke hgi-eye"></i>View</button>` : ''}
+          </div>
+          <div id="creds-detail-${org.id}" style="display:none;margin-top:.625rem;">
+            <div class="cred-row">
+              <span class="cred-label">DC Email</span>
+              <span class="cred-value" id="cd-email-${org.id}">—</span>
+            </div>
+            <div class="cred-row">
+              <span class="cred-label">Client Key</span>
+              <span class="cred-value" id="cd-key-${org.id}">—</span>
+              <div class="cred-actions">
+                <button class="icon-btn" title="Reveal/Hide" onclick="toggleReveal('cd-key-${org.id}','cd-key-raw-${org.id}')"><i class="hgi-stroke hgi-eye"></i></button>
+                <button class="icon-btn" title="Copy" onclick="copyText(document.getElementById('cd-key-raw-${org.id}').value)"><i class="hgi-stroke hgi-copy-01"></i></button>
+              </div>
+              <input type="hidden" id="cd-key-raw-${org.id}">
+            </div>
+            <div class="cred-row">
+              <span class="cred-label">Client Secret</span>
+              <span class="cred-value" id="cd-secret-${org.id}">—</span>
+              <div class="cred-actions">
+                <button class="icon-btn" title="Reveal/Hide" onclick="toggleReveal('cd-secret-${org.id}','cd-secret-raw-${org.id}')"><i class="hgi-stroke hgi-eye"></i></button>
+                <button class="icon-btn" title="Copy" onclick="copyText(document.getElementById('cd-secret-raw-${org.id}').value)"><i class="hgi-stroke hgi-copy-01"></i></button>
+              </div>
+              <input type="hidden" id="cd-secret-raw-${org.id}">
+            </div>
+            ${isOwner ? `
+            <div style="margin-top:.75rem;display:flex;gap:.5rem;align-items:center;">
+              <button class="btn btn-outline btn-sm" onclick="openUpdateCreds('${org.id}')"><i class="hgi-stroke hgi-pencil-edit-01"></i>Update Credentials</button>
+            </div>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+
+      <!-- CREDITS -->
+      <div>
+        <div class="section-label"><i class="hgi-stroke hgi-coins-01"></i>Credits</div>
+        <div id="credits-display-${org.id}">
+          ${renderCreditsHtml(org)}
+        </div>
+        ${isOwner ? `<button class="btn btn-gold btn-sm" style="margin-top:.625rem;" onclick="openCreditModal('${org.id}')"><i class="hgi-stroke hgi-coins-01"></i>Transfer Credits</button>` : ''}
+      </div>
+
+      <!-- MEMBERS -->
+      <div>
+        <div class="section-label" style="justify-content:space-between;">
+          <span><i class="hgi-stroke hgi-users-group"></i>Members (${(org.members||[]).length})</span>
+          ${isOwner ? `<button class="btn btn-teal btn-xs" onclick="openMemberModal('${org.id}')"><i class="hgi-stroke hgi-user-add-01"></i>Add Member</button>` : ''}
+        </div>
+        <div class="members-table-wrap">
+          <table class="members-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="members-tbody-${org.id}">
+              ${memberRows || '<tr><td colspan="5" class="no-members">No members yet</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  `;
+  return card;
+}
+
+function renderCreditsHtml(org) {
+  const total = org.credits_total || 0;
+  const used = org.credits_used || 0;
+  const remaining = Math.max(0, total - used);
+  const pct = total > 0 ? Math.min(100, Math.round(used / total * 100)) : 0;
+  return `
+    <div class="credits-bar"><div class="credits-fill" style="width:${pct}%"></div></div>
+    <div class="credits-nums">
+      <span>Used: ${used} / ${total}</span>
+      <span style="color:var(--green);">Remaining: ${remaining}</span>
+    </div>`;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function toggleUserMenu() {
+  document.getElementById('nav-user-menu').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const nav = document.getElementById('nav-user');
+  if (nav && !nav.contains(e.target)) {
+    document.getElementById('nav-user-menu').classList.remove('open');
+  }
+});
+
+async function signOut() {
+  await fetch('/api/auth/logout', { method:'POST', credentials:'include' }).catch(()=>{});
+  location.href = '/';
+}
+
+function toggleCollapsible(bodyId, btn) {
+  const body = document.getElementById(bodyId);
+  body.classList.toggle('open');
+  const icon = btn.querySelector('i:last-child');
+  if (icon) icon.className = body.classList.contains('open') ? 'hgi-stroke hgi-arrow-up-01' : 'hgi-stroke hgi-arrow-down-01';
+}
+
+function toggleEdit(orgId) {
+  const form = document.getElementById(`edit-form-${orgId}`);
+  form.classList.toggle('open');
+}
+
+// ── Credentials ────────────────────────────────────────────────────────────
+async function loadCreds(orgId) {
+  try {
+    const r = await fetch(`/api/sub-orgs/${orgId}/credentials`, { credentials:'include' });
+    if (!r.ok) { showToast('Failed to load credentials', 'error'); return; }
+    const data = await r.json();
+    document.getElementById(`cd-email-${orgId}`).textContent = data.dc_email || '—';
+    document.getElementById(`cd-key-${orgId}`).textContent = data.dc_client_key || '—';
+    document.getElementById(`cd-secret-${orgId}`).textContent = data.dc_client_secret || '—';
+    document.getElementById(`cd-key-raw-${orgId}`).value = data.dc_client_key_raw || '';
+    document.getElementById(`cd-secret-raw-${orgId}`).value = data.dc_client_secret_raw || '';
+    document.getElementById(`creds-detail-${orgId}`).style.display = '';
+    document.getElementById(`cred-status-${orgId}`).style.display = 'none';
+  } catch(e) {
+    showToast('Error loading credentials', 'error');
+  }
+}
+
+let _revealed = {};
+function toggleReveal(displayId, rawId) {
+  const el = document.getElementById(displayId);
+  const raw = document.getElementById(rawId);
+  if (_revealed[displayId]) {
+    el.textContent = el.dataset.masked || '—';
+    _revealed[displayId] = false;
+  } else {
+    el.dataset.masked = el.textContent;
+    el.textContent = raw.value || '—';
+    _revealed[displayId] = true;
+  }
+}
+
+function copyText(text) {
+  if (!text) { showToast('Nothing to copy', 'error'); return; }
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard')).catch(() => showToast('Copy failed', 'error'));
+}
+
+// ── Update Credentials ─────────────────────────────────────────────────────
+let _credOrgId = null;
+function openUpdateCreds(orgId) {
+  _credOrgId = orgId;
+  const org = _orgs.find(o => o.id === orgId);
+  // Simple prompt-based flow using existing modal structure
+  // Reuse member modal for creds update
+  const modal = document.getElementById('member-modal');
+  modal.querySelector('.modal-title').innerHTML = '<i class="hgi-stroke hgi-key-01" style="color:var(--gold);margin-right:.5rem;"></i>Update DC Credentials';
+  modal.querySelector('.modal-body').innerHTML = `
+    <div class="form-group"><label class="form-label">DC Email</label><input class="form-input" id="uc-email" type="email" placeholder="docusign@example.com"></div>
+    <div class="form-group"><label class="form-label">Client Key</label><input class="form-input" id="uc-key" placeholder="Client / Integration Key"></div>
+    <div class="form-group"><label class="form-label">Client Secret</label><input class="form-input" id="uc-secret" type="password" placeholder="Client Secret"></div>
+  `;
+  modal.querySelector('.modal-footer').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal('member-modal');restoreMemberModal()">Cancel</button>
+    <button class="btn btn-gold" onclick="submitUpdateCreds()"><i class="hgi-stroke hgi-checkmark-circle-01"></i>Update</button>
+  `;
+  openModal('member-modal');
+}
+
+function restoreMemberModal() {
+  const modal = document.getElementById('member-modal');
+  modal.querySelector('.modal-title').innerHTML = '<i class="hgi-stroke hgi-user-add-01" style="color:var(--teal);margin-right:.5rem;"></i>Add Member';
+  modal.querySelector('.modal-body').innerHTML = `
+    <p style="font-size:.8rem;color:var(--muted);">The user must already have an account on Quanby Legal.</p>
+    <div class="form-group"><label class="form-label">Email Address <span style="color:var(--red)">*</span></label><input class="form-input" id="member-email" type="email" placeholder="user@example.com"></div>
+    <div class="form-group"><label class="form-label">Role</label><select class="form-select" id="member-role"><option value="Staff">Staff</option><option value="ENP">ENP (Notary)</option></select></div>
+  `;
+  modal.querySelector('.modal-footer').innerHTML = `
+    <button class="btn btn-outline" onclick="closeModal('member-modal')">Cancel</button>
+    <button class="btn btn-teal" onclick="submitAddMember()" id="member-submit-btn"><i class="hgi-stroke hgi-user-add-01"></i>Add Member</button>
+  `;
+}
+
+async function submitUpdateCreds() {
+  const email = document.getElementById('uc-email').value.trim();
+  const key = document.getElementById('uc-key').value.trim();
+  const secret = document.getElementById('uc-secret').value.trim();
+  try {
+    const r = await fetch(`/api/sub-orgs/${_credOrgId}/credentials`, {
+      method: 'PUT', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dc_client_key: key, dc_client_secret: secret, dc_email: email })
+    });
+    if (!r.ok) throw new Error((await r.json()).detail || 'Failed');
+    closeModal('member-modal');
+    restoreMemberModal();
+    showToast('Credentials updated');
+    await loadOrgs();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ── Create Sub-Org ─────────────────────────────────────────────────────────
+function openCreateModal() {
+  document.getElementById('create-name').value = '';
+  document.getElementById('create-address').value = '';
+  document.getElementById('create-type').value = 'Department';
+  document.getElementById('create-dc-email').value = '';
+  document.getElementById('create-dc-key').value = '';
+  document.getElementById('create-dc-secret').value = '';
+  document.getElementById('create-dc-body').classList.remove('open');
+  openModal('create-modal');
+  setTimeout(() => document.getElementById('create-name').focus(), 100);
+}
+
+async function submitCreate() {
+  const name = document.getElementById('create-name').value.trim();
+  if (!name) { showToast('Name is required', 'error'); return; }
+  const btn = document.getElementById('create-submit-btn');
+  btn.disabled = true; btn.textContent = 'Creating...';
+  try {
+    const r = await fetch('/api/sub-orgs', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        address: document.getElementById('create-address').value.trim(),
+        type: document.getElementById('create-type').value,
+        dc_email: document.getElementById('create-dc-email').value.trim(),
+        dc_client_key: document.getElementById('create-dc-key').value.trim(),
+        dc_client_secret: document.getElementById('create-dc-secret').value.trim(),
+      })
+    });
+    if (!r.ok) throw new Error((await r.json()).detail || 'Failed');
+    closeModal('create-modal');
+    showToast('Sub-organization created');
+    await loadOrgs();
+  } catch(e) { showToast(e.message, 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="hgi-stroke hgi-plus-sign"></i>Create'; }
+}
+
+// ── Edit Sub-Org ───────────────────────────────────────────────────────────
+async function submitEdit(orgId) {
+  const name = document.getElementById(`edit-name-${orgId}`).value.trim();
+  if (!name) { showToast('Name is required', 'error'); return; }
+  try {
+    const r = await fetch(`/api/sub-orgs/${orgId}`, {
+      method: 'PATCH', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name,
+        address: document.getElementById(`edit-address-${orgId}`).value.trim(),
+        type: document.getElementById(`edit-type-${orgId}`).value,
+      })
+    });
+    if (!r.ok) throw new Error((await r.json()).detail || 'Failed');
+    showToast('Sub-organization updated');
+    await loadOrgs();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ── Delete Sub-Org ─────────────────────────────────────────────────────────
+async function confirmDelete(orgId) {
+  const org = _orgs.find(o => o.id === orgId);
+  if (!confirm(`Delete "${org ? org.name : 'this sub-org'}"? This cannot be undone.`)) return;
+  try {
+    const r = await fetch(`/api/sub-orgs/${orgId}`, { method: 'DELETE', credentials: 'include' });
+    if (!r.ok) throw new Error((await r.json()).detail || 'Failed');
+    showToast('Sub-organization deleted');
+    await loadOrgs();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ── Members ────────────────────────────────────────────────────────────────
+function openMemberModal(orgId) {
+  _activeMemberOrgId = orgId;
+  const el = document.getElementById('member-email');
+  if (el) el.value = '';
+  const sel = document.getElementById('member-role');
+  if (sel) sel.value = 'Staff';
+  openModal('member-modal');
+  setTimeout(() => { if (el) el.focus(); }, 100);
+}
+
+async function submitAddMember() {
+  const email = (document.getElementById('member-email')||{}).value?.trim();
+  const role = (document.getElementById('member-role')||{}).value || 'Staff';
+  if (!email) { showToast('Email is required', 'error'); return; }
+  const btn = document.getElementById('member-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Adding...'; }
+  try {
+    const r = await fetch(`/api/sub-orgs/${_activeMemberOrgId}/members`, {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, role })
+    });
+    if (!r.ok) throw new Error((await r.json()).detail || 'Failed');
+    closeModal('member-modal');
+    showToast('Member added');
+    await loadOrgs();
+  } catch(e) { showToast(e.message, 'error'); }
+  finally { if (btn) { btn.disabled = false; btn.innerHTML = '<i class="hgi-stroke hgi-user-add-01"></i>Add Member'; } }
+}
+
+async function removeMember(orgId, userId) {
+  if (!confirm('Remove this member?')) return;
+  try {
+    const r = await fetch(`/api/sub-orgs/${orgId}/members/${userId}`, { method: 'DELETE', credentials: 'include' });
+    if (!r.ok) throw new Error((await r.json()).detail || 'Failed');
+    showToast('Member removed');
+    await loadOrgs();
+  } catch(e) { showToast(e.message, 'error'); }
+}
+
+// ── Credits ────────────────────────────────────────────────────────────────
+function openCreditModal(orgId) {
+  _activeCreditOrgId = orgId;
+  document.getElementById('credits-amount').value = '';
+  openModal('credits-modal');
+  setTimeout(() => document.getElementById('credits-amount').focus(), 100);
+}
+
+async function submitTransferCredits() {
+  const amount = parseInt(document.getElementById('credits-amount').value, 10);
+  if (!amount || amount <= 0) { showToast('Enter a valid amount', 'error'); return; }
+  const btn = document.getElementById('credits-submit-btn');
+  btn.disabled = true; btn.textContent = 'Transferring...';
+  try {
+    const r = await fetch(`/api/sub-orgs/${_activeCreditOrgId}/credits/transfer`, {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount })
+    });
+    if (!r.ok) throw new Error((await r.json()).detail || 'Failed');
+    closeModal('credits-modal');
+    showToast(`${amount} credits transferred`);
+    await loadOrgs();
+  } catch(e) { showToast(e.message, 'error'); }
+  finally { btn.disabled = false; btn.innerHTML = '<i class="hgi-stroke hgi-coins-01"></i>Transfer'; }
+}
+
+// ── Keyboard shortcuts ─────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    ['create-modal','member-modal','credits-modal'].forEach(closeModal);
+    restoreMemberModal();
+  }
+});
+</script>
+</body>
+</html>
