@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <script>
@@ -807,50 +807,45 @@
             font-family: 'Courier New', monospace;
         }
 
-        /* GET IN TOUCH */
-        .contact-section { display: flex; gap: 2rem; }
-        @media (max-width: 768px) { .contact-section { flex-direction: column; } }
-        .topics { flex: 1; }
-        .topic-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 0.5rem; padding: 1rem;
-            margin-bottom: 1rem; cursor: pointer;
-            transition: border-color 0.2s;
+        /* ── FAQ ACCORDION ── */
+        .faq-category { margin-bottom: 2rem; }
+        .faq-cat-header {
+          display: flex; align-items: center; gap: 0.6rem;
+          font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+          letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.75rem;
+          padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06);
         }
-        .topic-card.active { border-color: var(--purple); background: rgba(124,58,237,0.05); }
-        .topic-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
-        .topic-title { font-weight: 600; }
-        .topic-desc { color: var(--muted); font-size: 0.875rem; }
-        .chat-panel {
-            flex: 1; background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 0.5rem;
-            display: flex; flex-direction: column;
+        .faq-item {
+          background: var(--card-bg); border: 1px solid var(--card-border);
+          border-radius: 10px; margin-bottom: 0.5rem; overflow: hidden;
+          transition: border-color 0.2s;
         }
-        .chat-header {
-            padding: 1rem; border-bottom: 1px solid var(--card-border);
-            display: flex; align-items: center; gap: 0.5rem;
+        .faq-item:hover { border-color: rgba(124,58,237,0.35); }
+        .faq-item.open { border-color: rgba(124,58,237,0.45); }
+        .faq-question {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 1rem 1.25rem; cursor: pointer; gap: 1rem;
+          font-size: 0.93rem; font-weight: 600; color: var(--text);
+          user-select: none;
         }
-        .chat-messages { flex: 1; padding: 1rem; min-height: 200px; overflow-y: auto; }
-        .empty-state { text-align: center; color: var(--muted); padding: 2rem 0; }
-        .message { margin-bottom: 1rem; }
-        .user-message { text-align: right; }
-        .bot-message { text-align: left; }
-        .chat-input {
-            display: flex; padding: 1rem;
-            border-top: 1px solid var(--card-border);
-            gap: 0.5rem;
+        .faq-question:hover { color: #fff; }
+        .faq-chevron {
+          flex-shrink: 0; font-size: 0.85rem; color: var(--muted);
+          transition: transform 0.25s ease;
         }
-        .chat-input input {
-            flex: 1; background: transparent;
-            border: none; color: var(--text); outline: none;
+        .faq-item.open .faq-chevron { transform: rotate(180deg); }
+        .faq-answer {
+          max-height: 0; overflow: hidden; padding: 0 1.25rem;
+          color: var(--muted); font-size: 0.875rem; line-height: 1.7;
+          transition: max-height 0.3s ease, padding 0.25s ease;
         }
-        .chat-input button {
-            background: var(--purple); border: none;
-            color: white; padding: 0.5rem 0.875rem;
-            border-radius: 0.375rem; cursor: pointer;
+        .faq-item.open .faq-answer { max-height: 600px; padding: 0 1.25rem 1.1rem; }
+        .faq-source {
+          text-align: center; margin-top: 2.5rem;
+          font-size: 0.78rem; color: rgba(148,163,184,0.5);
         }
+        .faq-source a { color: var(--gold); text-decoration: none; }
+        .faq-source a:hover { text-decoration: underline; }
 
         /* FOOTER */
         footer { padding: 4rem 0; border-top: 1px solid var(--card-border); }
@@ -1106,7 +1101,7 @@
                 <a href="#compliance">Compliance</a>
                 <a href="#regulatory">Regulatory</a>
                 <a href="#pricing">Pricing</a>
-                <a href="#about">About</a>
+                <a href="#faq">FAQ</a>
             </div>
             <button class="nav-signin-btn" id="nav-signin-btn" onclick="openSSO()" style="display:none;">Sign In</button>
             <a id="admin-nav-btn" href="/admin" title="Admin Portal" style="
@@ -1211,7 +1206,7 @@
         <a href="#compliance" onclick="closeMobileMenu()">Compliance</a>
         <a href="#regulatory" onclick="closeMobileMenu()">Regulatory</a>
         <a href="#pricing" onclick="closeMobileMenu()">Pricing</a>
-        <a href="#about" onclick="closeMobileMenu()">About</a>
+        <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
         <button class="btn btn-filled" onclick="document.getElementById('contract-agent').scrollIntoView({behavior:'smooth'}); closeMobileMenu()">Try Contract AI</button>
     </div>
 
@@ -1889,50 +1884,13 @@
         </div>
     </section>
 
-    <!-- GET IN TOUCH -->
-    <section id="about">
-        <div class="container">
-            <h2>Get in touch</h2>
-            <p class="section-subtitle">Select a topic to tailor our conversation</p>
-            <div class="contact-section">
-                <div class="topics">
-                    <div class="topic-card" data-topic="enp">
-                        <div class="topic-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-                        <div class="topic-title">I Need an ENP</div>
-                        <p class="topic-desc">ENP is an Electronic Notary Public</p>
-                    </div>
-                    <div class="topic-card" data-topic="lawyer">
-                        <div class="topic-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M3 9h18M5 9l2 6a4 4 0 004 4 4 4 0 004-4l2-6M3 9a9 9 0 0018 0"/></svg></div>
-                        <div class="topic-title">I'm a Lawyer</div>
-                        <p class="topic-desc">Apply to become a certified ENP on the platform</p>
-                    </div>
-                    <div class="topic-card" data-topic="investor">
-                        <div class="topic-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2M12 12v4M8 12h8"/></svg></div>
-                        <div class="topic-title">Investment Inquiry</div>
-                        <p class="topic-desc">Quanby Legal is seeking strategic investors</p>
-                    </div>
-                    <div class="topic-card" data-topic="question">
-                        <div class="topic-icon">❓</div>
-                        <div class="topic-title">I Have a Question</div>
-                        <p class="topic-desc">General inquiries about the platform</p>
-                    </div>
-                </div>
-                <div class="chat-panel">
-                    <div class="chat-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V7M8 7h8a2 2 0 000-4H8a2 2 0 000 4zM8 15h2M14 15h2"/></svg> Quanby Assistant <span class="online-dot"></span></div>
-                    <div class="chat-messages" id="chat-messages">
-                        <div class="empty-state">
-                            <div style="margin-bottom:0.5rem;display:flex;justify-content:center;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M12 11V7M8 7h8a2 2 0 000-4H8a2 2 0 000 4zM8 15h2M14 15h2"/></svg></div>
-                            <div style="font-weight:500">Quanby Legal Assistant</div>
-                            <p style="font-size:0.875rem;margin-top:0.25rem">Select a topic to start</p>
-                        </div>
-                    </div>
-                    <div class="chat-input">
-                        <input type="text" placeholder="Type your message..." id="contact-chat-input" disabled>
-                        <button id="send-btn">→</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- FAQ -->
+    <section id="faq">
+      <div class="container">
+        <h2>Frequently Asked Questions</h2>
+        <p class="section-subtitle">Official guidance from the Supreme Court of the Philippines on Electronic Notarization — <a href="https://sc.judiciary.gov.ph/enotary-services/faqs/" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">A.M. No. 24-10-14-SC</a></p>
+        <div id="faq-list" style="max-width:860px;margin:0 auto;"></div>
+      </div>
     </section>
 
     <!-- FOOTER -->
@@ -2513,94 +2471,84 @@
         URL.revokeObjectURL(url);
     }
 
-    // ─── CONTACT CHAT (AI-powered via /api/chatbot) ─────────────────────────────
-    const topicGreetings = {
-        enp:      "I need to find a certified Electronic Notary Public (ENP).",
-        lawyer:   "I am a lawyer and I want to apply to become a certified ENP on Quanby Legal.",
-        investor: "I have an investment inquiry about Quanby Legal.",
-        question: "I have a general question about Quanby Legal."
-    };
+    // ─── FAQ ─────────────────────────────────────────────────────────────────────
+    const FAQ_DATA = [
+      {
+        cat: 'General',
+        icon: 'hgi-information-circle',
+        color: '#a78bfa',
+        items: [
+          { q: 'What is Electronic Notarization (eNotarization)?', a: 'Electronic notarization is the performance of a notarial act using an Electronic Notarization Facility (ENF) by a commissioned Electronic Notary Public (ENP). It allows notarial acts to be performed remotely or in-person using electronic means, with the same legal force and effect as traditional notarization under Philippine law (A.M. No. 24-10-14-SC).' },
+          { q: 'What is the legal basis for eNotarization in the Philippines?', a: 'Electronic notarization in the Philippines is governed by A.M. No. 24-10-14-SC (Rules on Electronic Notarization) issued by the Supreme Court, in conjunction with Republic Act No. 8792 (E-Commerce Act), Republic Act No. 10173 (Data Privacy Act), BSP Circular No. 944, and SEC Memorandum Circular No. 28-2020.' },
+          { q: 'What notarial acts can be performed electronically?', a: 'The following notarial acts may be performed electronically: (1) Acknowledgment — confirming identity and voluntary execution of a document; (2) Jurat — administering an oath or affirmation; (3) Signature Witnessing — attesting to the signing of a document; (4) Affirmation/Oath — administering an oath without a written document. Note: Other notarial acts such as copy certification, protests, and other acts under existing rules may also be covered subject to Supreme Court guidelines.' },
+          { q: 'What are the two modes of Electronic Notarization?', a: 'There are two modes: (1) IEN (In-Person Electronic Notarization) — the principal physically appears before the ENP but the notarial act is performed using electronic means; and (2) REN (Remote Electronic Notarization) — the principal and ENP communicate through a video conference platform, allowing notarization without physical presence. Quanby Legal supports both IEN and REN.' },
+        ]
+      },
+      {
+        cat: 'Electronic Notary Public (ENP)',
+        icon: 'hgi-user-star-01',
+        color: '#c9a84c',
+        items: [
+          { q: 'Who is an Electronic Notary Public (ENP)?', a: 'An Electronic Notary Public (ENP) is a commissioned notary public who has obtained accreditation from the Electronic Notarization Authority (ENA) of the Supreme Court to perform notarial acts using an accredited Electronic Notarization Facility (ENF). ENPs must be active members of the Philippine Bar in good standing.' },
+          { q: 'How does a lawyer apply to become an ENP?', a: 'To become an ENP, a lawyer must: (1) Hold a valid notarial commission; (2) Complete the required training or seminar on electronic notarization; (3) Pass the ENP certification requirements of the ENA; (4) Register on an accredited ENF platform such as Quanby Legal; (5) Obtain accreditation from the Electronic Notarization Authority (ENA) under the Supreme Court. On Quanby Legal, attorneys can apply through the platform after completing onboarding and KYC verification.' },
+          { q: 'What are the qualifications of an ENP?', a: 'An ENP must be: (1) A Filipino citizen or a foreign national as allowed by law; (2) An active member of the Philippine Bar in good standing; (3) A commissioned notary public in the Philippines; (4) Accredited by the ENA; and (5) Using only accredited Electronic Notarization Facilities (ENFs) for performing electronic notarial acts.' },
+          { q: 'Where can an ENP perform electronic notarization?', a: 'An ENP may perform IEN and REN within the Philippines. Limited extraterritorial REN is allowed as provided under Section 5, Rule IV of A.M. No. 24-10-14-SC. ENFs are required to have geolocation functionality and must prevent use outside the Philippines except where allowed by the Rules.' },
+        ]
+      },
+      {
+        cat: 'Documents & Validity',
+        icon: 'hgi-file-validated',
+        color: '#34d399',
+        items: [
+          { q: 'Are electronically notarized documents legally valid?', a: 'Yes. Under A.M. No. 24-10-14-SC and Republic Act No. 8792 (E-Commerce Act), electronically notarized documents carry the same legal force and effect as traditionally notarized documents. They are admissible as evidence in Philippine courts and government agencies.' },
+          { q: 'What documents can be electronically notarized?', a: 'Any document that may be traditionally notarized may generally be electronically notarized, including: Deeds of Sale, Affidavits, Special Powers of Attorney (SPA), Contracts, Sworn Statements, Loan Agreements, and corporate documents. Some documents may still require specific requirements under other laws or regulations.' },
+          { q: 'How are electronically notarized documents stored and retrieved?', a: "ENFs are required to maintain an Electronic Notarial Book (automatically populated after each act), store electronically notarized documents and audiovisual recordings, transmit documents to the Supreme Court Central Notarial Database, and retain copies for the required period. Quanby Legal uses DOCONCHAIN's blockchain infrastructure for tamper-evident document storage and verification." },
+          { q: 'What is the Electronic Notarial Seal?', a: "The Electronic Notarial Seal is the electronic equivalent of a traditional notarial seal. It is affixed by the ENP to electronically notarized documents to indicate that the notarial act was performed in accordance with A.M. No. 24-10-14-SC. The seal includes the ENP's name, commission details, and expiry date." },
+        ]
+      },
+      {
+        cat: 'Platform & Technology',
+        icon: 'hgi-computer',
+        color: '#60a5fa',
+        items: [
+          { q: 'What is an Electronic Notarization Facility (ENF)?', a: "An ENF is a platform or software accredited by the Supreme Court's Electronic Notarization Authority (ENA) that enables ENPs to perform electronic notarial acts. Quanby Legal is an accredited ENF that supports both IEN and REN, with features including e-KYC, MFA, liveness detection, video conferencing (HD), electronic signatures, Electronic Notarial Book, and blockchain-based document integrity via DOCONCHAIN." },
+          { q: 'What are the technical requirements for Remote Electronic Notarization (REN)?', a: 'For REN, the ENF must support: HD video conferencing (minimum 1280×720 pixels); minimum 2 Mbps internet connection per user; geolocation detection and VPN blocking; liveness detection and anti-spoofing; audiovisual recording capability; multi-factor authentication (MFA); and e-KYC compliant with BSP issuances. Parties must have stable internet and a device with camera and microphone.' },
+          { q: 'How does Quanby Legal ensure document integrity?', a: 'Quanby Legal is secured by DOCONCHAIN Group Pte. Ltd. (Singapore), which provides blockchain-based document integrity. All notarial acts are recorded on an immutable Hyperledger Fabric blockchain, providing transparent and tamper-proof audit trails. Documents are cryptographically sealed and verifiable by the Supreme Court and authorized parties.' },
+          { q: 'Is my personal data protected on Quanby Legal?', a: 'Yes. Quanby Legal complies with Republic Act No. 10173 (Data Privacy Act of 2012) and is registered with the National Privacy Commission (NPC). The platform uses end-to-end encryption and adopts tamper-evident security measures as required by A.M. No. 24-10-14-SC. Personal information collected during notarization is processed in accordance with the Electronic Notarization Data Sharing Guidelines of the Supreme Court.' },
+        ]
+      },
+    ];
 
-    let _contactSessionId = null;
-    let _contactWaiting = false;
-
-    function _contactAddMessage(text, role) {
-        const msgs = document.getElementById('chat-messages');
-        const div = document.createElement('div');
-        div.className = 'message ' + (role === 'user' ? 'user-message' : 'bot-message');
-        div.textContent = text;
-        msgs.appendChild(div);
-        msgs.scrollTop = msgs.scrollHeight;
-        return div;
+    function renderFAQ() {
+      const list = document.getElementById('faq-list');
+      if (!list) return;
+      list.innerHTML = FAQ_DATA.map(cat => `
+        <div class="faq-category">
+          <div class="faq-cat-header">
+            <i class="hgi-stroke ${cat.icon}" style="font-size:0.9rem;color:${cat.color}"></i>
+            ${cat.cat}
+          </div>
+          ${cat.items.map((item, i) => `
+            <div class="faq-item" id="faq-${cat.cat.replace(/\s/g,'-')}-${i}">
+              <div class="faq-question" onclick="toggleFAQ(this.parentElement)">
+                <span>${item.q}</span>
+                <i class="hgi-stroke hgi-arrow-down-01 faq-chevron"></i>
+              </div>
+              <div class="faq-answer">${item.a}</div>
+            </div>
+          `).join('')}
+        </div>
+      `).join('') + `<div class="faq-source">Source: <a href="https://sc.judiciary.gov.ph/enotary-services/faqs/" target="_blank" rel="noopener">Supreme Court of the Philippines — eNotary FAQs</a> | <a href="https://sc.judiciary.gov.ph/10869/" target="_blank" rel="noopener">A.M. No. 24-10-14-SC</a></div>`;
     }
 
-    function _contactShowTyping() {
-        const msgs = document.getElementById('chat-messages');
-        const div = document.createElement('div');
-        div.className = 'message bot-message contact-typing';
-        div.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
-        msgs.appendChild(div);
-        msgs.scrollTop = msgs.scrollHeight;
+    function toggleFAQ(el) {
+      document.querySelectorAll('.faq-item.open').forEach(function(item) {
+        if (item !== el) item.classList.remove('open');
+      });
+      el.classList.toggle('open');
     }
 
-    function _contactRemoveTyping() {
-        const t = document.querySelector('.contact-typing');
-        if (t) t.remove();
-    }
-
-    async function _contactCallAPI(message) {
-        _contactWaiting = true;
-        const input = document.getElementById('contact-chat-input');
-        const btn = document.getElementById('send-btn');
-        if (input) input.disabled = true;
-        if (btn) btn.disabled = true;
-        _contactShowTyping();
-        try {
-            const res = await fetch('/api/chatbot', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: message, session_id: _contactSessionId || '' })
-            });
-            _contactRemoveTyping();
-            if (!res.ok) throw new Error('Server error');
-            const data = await res.json();
-            if (data.session_id) _contactSessionId = data.session_id;
-            _contactAddMessage(data.reply || 'Sorry, I could not process that. Please try again.', 'bot');
-        } catch(e) {
-            _contactRemoveTyping();
-            _contactAddMessage('Sorry, I ran into an issue. Please try again or email legal@quanby.legal.', 'bot');
-        } finally {
-            _contactWaiting = false;
-            if (input) { input.disabled = false; input.focus(); }
-            if (btn) btn.disabled = false;
-        }
-    }
-
-    document.querySelectorAll('.topic-card').forEach(card => {
-        card.addEventListener('click', () => {
-            document.querySelectorAll('.topic-card').forEach(t => t.classList.remove('active'));
-            card.classList.add('active');
-            const msgs = document.getElementById('chat-messages');
-            msgs.innerHTML = '';
-            _contactSessionId = null;
-            const greeting = topicGreetings[card.dataset.topic] || topicGreetings.question;
-            _contactCallAPI(greeting);
-        });
-    });
-
-    document.getElementById('send-btn').addEventListener('click', sendContactChat);
-    document.getElementById('contact-chat-input').addEventListener('keypress', e => {
-        if (e.key === 'Enter') sendContactChat();
-    });
-
-    function sendContactChat() {
-        const input = document.getElementById('contact-chat-input');
-        const text = input.value.trim();
-        if (!text || _contactWaiting) return;
-        input.value = '';
-        _contactAddMessage(text, 'user');
-        _contactCallAPI(text);
-    }
+    renderFAQ();
 
     // ─── UTILITIES ──────────────────────────────────────────────────────────────
     function escHtml(str) {
