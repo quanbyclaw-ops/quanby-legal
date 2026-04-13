@@ -639,7 +639,7 @@ async function loadOverview() {
     if (!r.ok) return;
     const d = await r.json();
     const tbody = document.getElementById('recent-apts-body');
-    const apts = d.items || [];
+    const apts = d.appointments || [];
     if (!apts.length) {
       tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">No appointments yet.</td></tr>';
       return;
@@ -670,10 +670,10 @@ async function loadUsers() {
     const r = await fetch('/api/admin/users?' + qs, { credentials: 'include' });
     if (!r.ok) return;
     const d = await r.json();
-    const users = d.items || [];
+    const users = d.users || [];
     if (!users.length) {
       tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">No users found.</td></tr>';
-      renderPagination('users-pagination', d.page, Math.ceil(d.total/d.per_page)||1, p => { _usersPage = p; loadUsers(); });
+      renderPagination('users-pagination', d.page||1, Math.ceil((d.total||0)/(d.per_page||20))||1, p => { _usersPage = p; loadUsers(); });
       return;
     }
     tbody.innerHTML = users.map(u => `
@@ -695,7 +695,7 @@ async function loadUsers() {
           </div>
         </td>
       </tr>`).join('');
-    renderPagination('users-pagination', d.page, Math.ceil(d.total/d.per_page)||1, p => { _usersPage = p; loadUsers(); });
+    renderPagination('users-pagination', d.page||1, Math.ceil((d.total||0)/(d.per_page||20))||1, p => { _usersPage = p; loadUsers(); });
   } catch(e) {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error loading users.</td></tr>';
   }
@@ -734,10 +734,10 @@ async function loadAppointments() {
     const r = await fetch('/api/admin/appointments?' + qs, { credentials: 'include' });
     if (!r.ok) return;
     const d = await r.json();
-    const apts = d.items || [];
+    const apts = d.appointments || [];
     if (!apts.length) {
       tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">No appointments found.</td></tr>';
-      renderPagination('apts-pagination', d.page, Math.ceil(d.total/d.per_page)||1, p => { _aptsPage = p; loadAppointments(); });
+      renderPagination('apts-pagination', d.page||1, Math.ceil((d.total||0)/(d.per_page||20))||1, p => { _aptsPage = p; loadAppointments(); });
       return;
     }
     tbody.innerHTML = apts.map(a => `
@@ -750,7 +750,7 @@ async function loadAppointments() {
         <td>${a.doc_count??0}</td>
         <td style="color:var(--muted);font-size:12px">${fmtDateTime(a.created_at)}</td>
       </tr>`).join('');
-    renderPagination('apts-pagination', d.page, Math.ceil(d.total/d.per_page)||1, p => { _aptsPage = p; loadAppointments(); });
+    renderPagination('apts-pagination', d.page||1, Math.ceil((d.total||0)/(d.per_page||20))||1, p => { _aptsPage = p; loadAppointments(); });
   } catch(e) {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error loading appointments.</td></tr>';
   }
@@ -769,10 +769,10 @@ async function loadRegistry() {
     const r = await fetch('/api/admin/registry?' + qs, { credentials: 'include' });
     if (!r.ok) return;
     const d = await r.json();
-    const acts = d.items || [];
+    const acts = d.acts || [];
     if (!acts.length) {
       tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">No registry acts found.</td></tr>';
-      renderPagination('reg-pagination', d.page, Math.ceil(d.total/d.per_page)||1, p => { _regPage = p; loadRegistry(); });
+      renderPagination('reg-pagination', d.page||1, Math.ceil((d.total||0)/(d.per_page||20))||1, p => { _regPage = p; loadRegistry(); });
       return;
     }
     tbody.innerHTML = acts.map(a => `
@@ -787,7 +787,7 @@ async function loadRegistry() {
           ? '<span class="badge badge-synced">✓ Synced</span>'
           : '<span class="badge badge-unsynced">Pending</span>'}</td>
       </tr>`).join('');
-    renderPagination('reg-pagination', d.page, Math.ceil(d.total/d.per_page)||1, p => { _regPage = p; loadRegistry(); });
+    renderPagination('reg-pagination', d.page||1, Math.ceil((d.total||0)/(d.per_page||20))||1, p => { _regPage = p; loadRegistry(); });
   } catch(e) {
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error loading registry.</td></tr>';
   }
