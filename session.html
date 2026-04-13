@@ -1018,6 +1018,52 @@ function renderSignerChip(projectUuid, signer) {
   _refreshSignerBadges(projectUuid);
 }
 
+function _ensureMyChipRendered(projectUuid) {
+  // Ensure the current user's signer chip exists in the DOM.
+  // If it doesn't (because ENP added signers before client joined), render it from _sessionInfo.
+  if (!_sessionInfo) return;
+  var myEmail = (window._isEnp
+    ? (_sessionInfo.enp_email || '')
+    : (_sessionInfo.client_email || '')
+  ).toLowerCase().trim();
+  if (!myEmail) return;
+
+  var container = document.getElementById('signers-' + projectUuid);
+  if (!container) return;
+
+  // Already rendered?
+  if (container.querySelector('[data-email="' + myEmail + '"]')) return;
+
+  // Find this user in session_documents signers list
+  var doc = null;
+  if (Array.isArray(_sessionInfo.session_documents)) {
+    doc = _sessionInfo.session_documents.find(function(d) {
+      return (d.project_uuid || d.doconchain_project_uuid) === projectUuid;
+    });
+  }
+  if (!doc || !Array.isArray(doc.signers)) return;
+
+  var mySigner = doc.signers.find(function(s) {
+    return (s.email || '').toLowerCase() === myEmail;
+  });
+  if (mySigner) {
+    renderSignerChip(projectUuid, mySigner);
+    return;
+  }
+
+  // Fallback: render from _sessionInfo fields (client is always a signer)
+  if (!window._isEnp && _sessionInfo.client_email) {
+    var nameParts = (_sessionInfo.client_name || 'Client').split(' ');
+    renderSignerChip(projectUuid, {
+      email:         _sessionInfo.client_email,
+      first_name:    nameParts[0] || 'Client',
+      last_name:     nameParts.slice(1).join(' ') || '',
+      signer_role:   'Signer',
+      signing_order: 1,
+    });
+  }
+}
+
 function _refreshSignerBadges(projectUuid) {
   const container = document.getElementById('signers-' + projectUuid);
   if (!container) return;
@@ -1615,18 +1661,27 @@ function setupRoomEvents(room, localName, localRole) {
           refreshSignerStatus(_pduuid, _pdAptId, true).then(function() {
             var _sb2 = document.getElementById('sign-doc-btn-' + _pduuid);
             if (_sb2) _sb2.dataset.signLink = '1';
+            _ensureMyChipRendered(_pduuid);
             _refreshSignerBadges(_pduuid);
           }).catch(function() {
+            _ensureMyChipRendered(_pduuid);
             _refreshSignerBadges(_pduuid);
           });
         } else {
+          _ensureMyChipRendered(_pduuid);
           _refreshSignerBadges(_pduuid);
         }
-        // Also retry after a short delay in case DOM isn't ready yet
-        setTimeout(function() {
-          var _sb3 = document.getElementById('sign-doc-btn-' + _pduuid);
-          if (_sb3) { _sb3.dataset.signLink = '1'; _refreshSignerBadges(_pduuid); }
-        }, 800);
+        // Sync session state immediately to pull latest signers from backend
+        _syncSessionState();
+        // Retry at 800ms, 2s, 4s — catches slow DC responses and late DOM renders
+        [800, 2000, 4000].forEach(function(delay) {
+          setTimeout(function() {
+            var _sb3 = document.getElementById('sign-doc-btn-' + _pduuid);
+            if (_sb3) { _sb3.dataset.signLink = '1'; }
+            _ensureMyChipRendered(_pduuid);
+            _refreshSignerBadges(_pduuid);
+          }, delay);
+        });
         // Also disable the Plot button on client side (visual cue)
         // Mark plotting as confirmed done (prevents button re-enable on modal close)
         if (!window._plottingDone) window._plottingDone = {};
