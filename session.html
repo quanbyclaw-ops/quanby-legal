@@ -1741,18 +1741,38 @@ function setupRoomEvents(room, localName, localRole) {
           switchSidebarTab('documents');
         }
       } else if (obj.type === 'session_ended') {
-        // ENP ended the session — redirect all participants immediately
+        // ENP ended the session — show message then redirect
         if (!window._isEnp) {
           _hideRecordingBanner();
           clearInterval(_timerInt);
-          // Show a brief overlay then redirect
+          var _countdown = 8;
           var _endOverlay = document.createElement('div');
-          _endOverlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(8,11,24,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;';
-          _endOverlay.innerHTML = '<i class="hgi-stroke hgi-telephone-off-01" style="font-size:2.5rem;color:#f87171;"></i>'
-            + '<div style="color:#e6edf3;font-size:1.1rem;font-weight:700;">Session Ended</div>'
-            + '<div style="color:#8b949e;font-size:.85rem;">The ENP has ended this session. Redirecting…</div>';
+          _endOverlay.setAttribute('data-session-end-overlay', '1');
+          _endOverlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(8,11,24,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;font-family:Inter,sans-serif;padding:2rem;text-align:center;';
+          _endOverlay.innerHTML = ''
+            + '<div style="width:64px;height:64px;border-radius:50%;background:rgba(248,113,113,.12);border:2px solid rgba(248,113,113,.3);display:flex;align-items:center;justify-content:center;">'
+            +   '<i class="hgi-stroke hgi-telephone-off-01" style="font-size:1.8rem;color:#f87171;"></i>'
+            + '</div>'
+            + '<div style="color:#e6edf3;font-size:1.25rem;font-weight:800;margin-top:.5rem;">Notarization Session Ended</div>'
+            + '<div style="color:#9ba3c4;font-size:.9rem;max-width:380px;line-height:1.6;">'
+            +   'The Electronic Notary Public has ended this session. Thank you for using Quanby Legal.'
+            + '</div>'
+            + '<div style="display:flex;flex-direction:column;align-items:center;gap:.75rem;margin-top:.5rem;">'
+            +   '<a href="/appointments" style="display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.75rem;background:linear-gradient(135deg,rgba(124,58,237,.8),rgba(109,40,217,.8));border:none;border-radius:10px;color:#fff;font-size:.9rem;font-weight:700;text-decoration:none;cursor:pointer;">'
+            +     '<i class="hgi-stroke hgi-arrow-left-02" style="font-size:.9rem;"></i> Go to Appointments'
+            +   '</a>'
+            +   '<div id="end-redirect-msg" style="color:#6b7280;font-size:.78rem;">Redirecting automatically in <span id="end-countdown">8</span>s</div>'
+            + '</div>';
           document.body.appendChild(_endOverlay);
-          setTimeout(function() { location.href = '/appointments?session_ended=1'; }, 2000);
+          var _endTimer = setInterval(function() {
+            _countdown--;
+            var ct = document.getElementById('end-countdown');
+            if (ct) ct.textContent = _countdown;
+            if (_countdown <= 0) {
+              clearInterval(_endTimer);
+              location.href = '/appointments?session_ended=1';
+            }
+          }, 1000);
         }
       } else if (obj.type === 'recording_alert') {
         const who = obj.by || 'A participant';
@@ -1800,8 +1820,17 @@ function setupRoomEvents(room, localName, localRole) {
     clearInterval(_timerInt);
     const isEnp = _sessionInfo && localRole === 'ENP';
     if (!isEnp && !document.querySelector('[data-session-end-overlay]')) {
-      // Fallback redirect if session_ended data message wasn't received
-      setTimeout(function() { location.href = '/appointments?session_ended=1'; }, 1000);
+      // Fallback: session_ended data message wasn't received — show simple overlay
+      var _fbOverlay = document.createElement('div');
+      _fbOverlay.setAttribute('data-session-end-overlay', '1');
+      _fbOverlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(8,11,24,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;font-family:Inter,sans-serif;text-align:center;padding:2rem;';
+      _fbOverlay.innerHTML = '<div style="width:56px;height:56px;border-radius:50%;background:rgba(248,113,113,.12);border:2px solid rgba(248,113,113,.3);display:flex;align-items:center;justify-content:center;"><i class="hgi-stroke hgi-telephone-off-01" style="font-size:1.6rem;color:#f87171;"></i></div>'
+        + '<div style="color:#e6edf3;font-size:1.1rem;font-weight:700;">Session Ended</div>'
+        + '<div style="color:#9ba3c4;font-size:.85rem;max-width:340px;">The notarization session has been closed.</div>'
+        + '<a href="/appointments" style="margin-top:.5rem;display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.5rem;background:linear-gradient(135deg,rgba(124,58,237,.8),rgba(109,40,217,.8));border-radius:10px;color:#fff;font-size:.875rem;font-weight:700;text-decoration:none;">'
+        + '<i class="hgi-stroke hgi-arrow-left-02" style="font-size:.875rem;"></i> Go to Appointments</a>';
+      document.body.appendChild(_fbOverlay);
+      setTimeout(function() { location.href = '/appointments?session_ended=1'; }, 8000);
     }
   });
 }
