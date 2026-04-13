@@ -3090,18 +3090,18 @@
     })();
 
         function routeToStep(step, role) {
-        // Certified users go directly to dashboard, never show modal on homepage
-        if (step === 'certified' || (role === 'attorney' && step === 'certified')) {
+        // Certified → dashboard
+        if (step === 'certified') {
             window.location.href = '/dashboard';
             return;
         }
-        // Clients who completed onboarding go to dashboard
-        if (role === 'client' && step === 'certified') {
+        // Fresh registration (no role chosen yet) → dashboard first
+        // The nav will show "Complete Profile" badge so they can finish later
+        if (step === 'role_select') {
             window.location.href = '/dashboard';
             return;
         }
-        // All incomplete onboarding → go to /onboard page (not modal)
-        // This includes: role_select (fresh), profile, test, kyc, liveness, survey
+        // Mid-onboarding (profile, test, kyc, liveness, survey) → continue on /onboard
         window.location.href = '/onboard';
     }
 
