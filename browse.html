@@ -232,10 +232,9 @@ let _currentUser = null;
 async function init() {
   // Auth check
   try {
-    try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-    let r = await fetch('/api/auth/me', { credentials: 'include' });
-    if (r.status === 401) { try { const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); if (ref.ok) r = await fetch('/api/auth/me', { credentials: 'include' }); } catch(e) {} }
-    if (!r.ok) { window.location.href = '/'; return; }
+    const _authResult = await _authMeWithRetry();
+    let r = _authResult;
+    if (!r || !r.ok) { window.location.href = '/'; return; }
     _currentUser = await r.json();
     if (_currentUser.role !== 'client') {
       // ENPs shouldn't browse — redirect to dashboard

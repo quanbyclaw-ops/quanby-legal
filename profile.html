@@ -632,9 +632,10 @@
 
   async function init() {
     try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
+    const _retryRes = await _authMeWithRetry();
     try {
-      const res = await fetch('/api/auth/me', { credentials: 'include' });
-      if (!res.ok) throw new Error('Unauthorized');
+      const res = _retryRes;
+      if (!res || !res.ok) throw new Error('Unauthorized');
       const user = await res.json();
 
       // Fetch full profile (includes profile sub-object)

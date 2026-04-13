@@ -3098,10 +3098,11 @@
             window.location.href = '/dashboard';
             return;
         }
-        // Fresh registration (no role chosen yet) → dashboard first
-        // The nav will show "Complete Profile" badge so they can finish later
+        // Fresh registration (no role chosen yet) → stay on landing page
+        // The "Complete Profile" badge in nav lets them choose when ready
         if (step === 'role_select') {
-            window.location.href = '/dashboard';
+            // Already on landing page — just update the nav badge
+            // (handleAuthReturn clears ?step= from URL)
             return;
         }
         // Mid-onboarding (profile, test, kyc, liveness, survey) → continue on /onboard

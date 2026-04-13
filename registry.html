@@ -282,11 +282,20 @@ let expandedRow = null;
 let debounceTimer = null;
 
 // ─── Auth & Boot ──────────────────────────────────────────────────────────────
+
+  async function _authMeWithRetry() {
+    for (let i = 0; i < 3; i++) {
+      if (i > 0) await new Promise(r => setTimeout(r, 600 * i));
+      try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
+      try { const res = await fetch('/api/auth/me', { credentials: 'include' }); if (res.ok) return res; } catch(e) {}
+    }
+    return null;
+  }
 async function boot() {
-  try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
+  const _authResult = await _authMeWithRetry();
   try {
-    const res = await fetch('/api/auth/me', { credentials: 'include' });
-    if (!res.ok) { window.location = '/'; return; }
+    const res = _authResult;
+    if (!res || !res.ok) { window.location = '/'; return; }
     const user = await res.json();
 
     const _name = (user.first_name || '' + ' ' + user.last_name || '').trim() || user.email || '?';
