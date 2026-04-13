@@ -1,0 +1,2695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    /* Quanby Legal: silently block Cloudflare beacon to prevent CORS/SRI errors */
+    (function() {
+      function isCFBeacon(el) {
+        return el && el.tagName === 'SCRIPT' && typeof el.src === 'string' &&
+               el.src.indexOf('cloudflareinsights') !== -1;
+      }
+      /* Intercept DOM insertions before they reach the browser */
+      var _ac = Element.prototype.appendChild;
+      Element.prototype.appendChild = function(c) {
+        if (isCFBeacon(c)) return c;
+        return _ac.call(this, c);
+      };
+      var _ib = Element.prototype.insertBefore;
+      Element.prototype.insertBefore = function(c, r) {
+        if (isCFBeacon(c)) return c;
+        return _ib.call(this, c, r);
+      };
+      /* Remove any already-injected beacon tags */
+      function stripNow() {
+        document.querySelectorAll('script[src*="cloudflareinsights"]').forEach(function(s) {
+          if (s.parentNode) s.parentNode.removeChild(s);
+        });
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', stripNow);
+      } else {
+        stripNow();
+      }
+      /* Suppress any resulting errors silently */
+      var _oe = window.onerror;
+      window.onerror = function(m, src, l, c, e) {
+        if (src && src.indexOf('cloudflareinsights') !== -1) return true;
+        if (_oe) return _oe.apply(this, arguments);
+      };
+    })();
+  </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENP Certification — Quanby Legal</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <meta name="theme-color" content="#7c3aed">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #05060f;
+            --purple: #7c3aed;
+            --purple-light: #9d5ff3;
+            --pink: #ec4899;
+            --teal: #10b981;
+            --gold: #c9a84c;
+            --gold-bright: #c9a227;
+            --navy: #1B2A6B;
+            --card-bg: rgba(255,255,255,0.05);
+            --card-border: rgba(255,255,255,0.1);
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        a { text-decoration: none; color: inherit; }
+
+        /* NAV */
+        nav {
+            position: sticky; top: 0;
+            background: rgba(5,6,15,0.92);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .container { max-width: 860px; margin: 0 auto; padding: 0 1.5rem; }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; gap: 1rem; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+        .logo { display: flex; align-items: center; flex-shrink: 0; text-decoration: none; }
+        .logo-img { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; margin-right: 0.4rem; image-rendering: -webkit-optimize-contrast; background: transparent; }
+        .logo-text { font-weight: bold; font-size: 1.25rem; white-space: nowrap; color: var(--text); }
+        .nav-right { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+        .nav-user { display: none; align-items: center; gap: 0.625rem; position: relative; }
+        .nav-user.visible { display: flex; }
+        .nav-signout-btn { display: none; }
+        /* Profile trigger */
+        .nav-profile-wrap {
+            display: flex; align-items: center; gap: 0.5rem;
+            cursor: pointer; padding: 0.3rem 0.6rem; border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: background 0.15s, border-color 0.15s; position: relative; user-select: none;
+        }
+        .nav-profile-wrap:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.2); }
+        .nav-user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); flex-shrink: 0; }
+        .nav-user-initials {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            display: none; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .nav-user-name { font-size: 0.85rem; color: var(--muted); max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nav-profile-chevron { transition: transform 0.2s; flex-shrink: 0; }
+        .nav-profile-wrap.open .nav-profile-chevron { transform: rotate(180deg); }
+        /* Dropdown */
+        .nav-user-menu {
+            position: absolute; top: calc(100% + 8px); right: 0;
+            background: #111827; border: 1px solid rgba(124,58,237,0.3);
+            border-radius: 0.75rem; min-width: 220px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6); z-index: 200; overflow: hidden;
+        }
+        .num-header { display: flex; align-items: center; gap: 0.75rem; padding: 0.875rem 1rem; background: rgba(124,58,237,0.08); }
+        .num-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(201,168,76,0.4); flex-shrink: 0; }
+        .num-initials {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed, #c9a84c);
+            display: none; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .num-info { display: flex; flex-direction: column; min-width: 0; }
+        .num-name { font-size: 0.85rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .num-email { font-size: 0.72rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .num-divider { height: 1px; background: rgba(255,255,255,0.07); margin: 0.25rem 0; }
+        .num-item { display: flex; align-items: center; gap: 0.625rem; width: 100%; padding: 0.6rem 1rem; font-size: 0.85rem; color: var(--text); background: none; border: none; cursor: pointer; transition: background 0.12s; text-align: left; font-family: "Inter", sans-serif; }
+        .num-item:hover { background: rgba(255,255,255,0.06); }
+        .num-item svg { opacity: 0.6; flex-shrink: 0; }
+        .num-signout { color: #f87171; }
+        .num-signout svg { opacity: 0.8; }
+        .num-signout:hover { background: rgba(239,68,68,0.08); }
+        .nav-home-link { color: var(--muted); font-size: 0.85rem; text-decoration: none; }
+        .nav-home-link:hover { color: var(--text); }
+
+        /* PAGE LAYOUT */
+        .page-wrap {
+            min-height: calc(100vh - 70px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2.5rem 1.5rem 4rem;
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .page-header p {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        /* PROGRESS BAR */
+        .ob-progress {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            row-gap: 0.5rem;
+        }
+        .ob-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.72rem;
+            color: var(--muted);
+            min-width: 60px;
+        }
+        .ob-step-num {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+            border: 2px solid rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--muted);
+            transition: all 0.3s;
+        }
+        .ob-step-num.active {
+            background: var(--purple);
+            border-color: var(--purple);
+            color: #fff;
+        }
+        .ob-step-num.done {
+            background: var(--teal);
+            border-color: var(--teal);
+            color: #fff;
+        }
+        .ob-line {
+            width: 40px; height: 2px;
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 18px;
+            flex-shrink: 0;
+        }
+        .ob-line.done { background: var(--teal); }
+
+        /* CARD */
+        .ob-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 680px;
+        }
+        .ob-card h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .ob-card .sub {
+            color: var(--muted);
+            font-size: 0.88rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ROLE CARDS */
+        .role-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .role-card {
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.03);
+        }
+        .role-card:hover { border-color: var(--purple); background: rgba(124,58,237,0.08); }
+        .role-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+        .role-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+        .role-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.35rem; }
+        .role-desc { color: var(--muted); font-size: 0.8rem; }
+
+        /* FORM FIELDS */
+        .field-row { display: flex; gap: 0.75rem; }
+        .ob-field { margin-bottom: 1rem; flex: 1; }
+        .ob-field label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 0.4rem; font-weight: 500; }
+        .ob-field input, .ob-field textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.5rem;
+            padding: 0.65rem 0.875rem;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+        .ob-field input:focus, .ob-field textarea:focus {
+            outline: none;
+            border-color: var(--purple);
+        }
+        .ob-field input::placeholder { color: rgba(148,163,184,0.5); }
+
+        /* BUTTONS */
+        .btn-row { display: flex; gap: 0.75rem; margin-top: 1.5rem; align-items: center; }
+        .btn-back {
+            flex: 0 0 auto;
+            padding: 0.75rem 1.25rem;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.15);
+            color: var(--muted);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+        .btn-back:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
+        .btn-primary {
+            flex: 1;
+            padding: 0.85rem 1.5rem;
+            background: var(--purple);
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-primary:hover:not(:disabled) { background: var(--purple-light); }
+        .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+        .btn-gold {
+            display: inline-block;
+            background: var(--gold);
+            color: #000;
+            font-weight: 700;
+            padding: 0.875rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            border: none;
+            transition: opacity 0.2s;
+        }
+        .btn-gold:hover { opacity: 0.88; }
+        .btn-navy {
+            display: inline-block;
+            background: var(--navy);
+            color: #fff;
+            font-weight: 700;
+            padding: 0.875rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            border: 2px solid var(--gold);
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-navy:hover { opacity: 0.88; }
+        .btn-teal {
+            background: var(--teal);
+            color: #fff;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: opacity 0.2s;
+        }
+        .btn-teal:hover { opacity: 0.88; }
+
+        /* SPINNER */
+        .spinner {
+            display: inline-block;
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ERROR */
+        .qi { display: inline-flex; align-items: center; justify-content: center; margin-right: 0.3em; vertical-align: -0.15em; }
+        .qi svg { width: 1em; height: 1em; stroke: currentColor; stroke-width: 1.75; fill: none; }
+        .ob-field-error { color: #f87171; font-size: 0.78rem; margin-top: 0.3rem; min-height: 1em; display: block; }
+        /* Phone picker */
+        .phone-input-wrap {
+            display: flex; align-items: center;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.5rem; overflow: hidden;
+            transition: border-color 0.2s; position: relative;
+            height: 44px;
+        }
+        .phone-input-wrap:focus-within { border-color: var(--purple); }
+        .phone-input-wrap.invalid-phone { border-color: #f87171 !important; }
+        .phone-country-btn {
+            display: flex; align-items: center; gap: 0.35rem;
+            padding: 0 0.75rem; background: rgba(255,255,255,0.04);
+            border: none; border-right: 1px solid rgba(255,255,255,0.1);
+            color: var(--text); font-size: 0.9rem; cursor: pointer;
+            white-space: nowrap; height: 100%;
+            font-family: "Inter", sans-serif; flex-shrink: 0;
+            transition: background 0.15s; position: relative;
+        }
+        .phone-country-btn:hover { background: rgba(255,255,255,0.08); }
+        .phone-country-flag { font-size: 1.1rem; line-height: 1; }
+        .phone-country-code { font-size: 0.82rem; color: var(--muted); }
+        .phone-country-chevron { opacity: 0.5; }
+        .phone-number-input {
+            flex: 1; background: transparent; border: none;
+            padding: 0 0.875rem; color: var(--text);
+            font-family: "Inter", sans-serif; font-size: 0.9rem; outline: none;
+            min-width: 0; height: 100%;
+        }
+        .phone-number-input::placeholder { color: rgba(148,163,184,0.5); }
+        .phone-country-dropdown {
+            position: absolute; top: calc(100% + 4px); left: 0; z-index: 100;
+            background: #111827; border: 1px solid rgba(124,58,237,0.35);
+            border-radius: 0.5rem; min-width: 220px; max-height: 240px;
+            overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        }
+        .phone-country-option {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.55rem 0.875rem; cursor: pointer; font-size: 0.85rem;
+            color: var(--text); transition: background 0.12s;
+        }
+        .phone-country-option:hover { background: rgba(124,58,237,0.2); }
+        .phone-country-option.selected { background: rgba(124,58,237,0.3); font-weight: 600; }
+        .phone-country-option .opt-code { color: var(--muted); font-size: 0.78rem; margin-left: auto; }
+        /* Name row improvements */
+        .ob-field label { letter-spacing: 0.01em; }
+        .ob-select-field {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.5rem;
+            padding: 0.65rem 0.75rem;
+            color: var(--text);
+            font-family: "Inter", sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.6rem center;
+            padding-right: 2rem;
+        }
+        .ob-select-field:focus { outline: none; border-color: var(--purple); }
+        .ob-select-field option { background: #0f1020; color: var(--text); }
+        .ob-field input[type="date"] {
+            color-scheme: dark;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        .ob-field input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.6) sepia(1) saturate(3) hue-rotate(230deg) brightness(1.1);
+            cursor: pointer;
+            opacity: 0.7;
+            padding: 0;
+            margin-left: 0.25rem;
+        }
+        .ob-field input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+        .ob-field input[type="date"]::-webkit-datetime-edit-text { color: rgba(148,163,184,0.4); }
+        .ob-field input[type="date"]::-webkit-datetime-edit-month-field,
+        .ob-field input[type="date"]::-webkit-datetime-edit-day-field,
+        .ob-field input[type="date"]::-webkit-datetime-edit-year-field { color: var(--text); }
+        .ob-field input[type="date"]::-webkit-datetime-edit-month-field:focus,
+        .ob-field input[type="date"]::-webkit-datetime-edit-day-field:focus,
+        .ob-field input[type="date"]::-webkit-datetime-edit-year-field:focus {
+            background: rgba(124,58,237,0.35); color: #fff; border-radius: 2px; outline: none;
+        }
+        .ob-field select {
+            width: 100%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.5rem;
+            padding: 0.65rem 0.875rem;
+            color: var(--text);
+            font-family: "Inter", sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.875rem center;
+            padding-right: 2.5rem;
+        }
+        .ob-field select:focus { outline: none; border-color: var(--purple); }
+        .ob-field select option { background: #0f1020; color: var(--text); }
+        /* ── Custom Date Picker ─────────────────────────────────── */
+        .ql-datepicker { position: relative; width: 100%; }
+        .ql-datepicker-trigger {
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12); border-radius: 0.5rem;
+            padding: 0.65rem 0.875rem; color: var(--text);
+            font-family: "Inter", sans-serif; font-size: 0.9rem;
+            cursor: pointer; transition: border-color 0.2s; text-align: left;
+        }
+        .ql-datepicker-trigger:hover { border-color: rgba(255,255,255,0.25); }
+        .ql-datepicker-trigger.open { border-color: var(--purple); }
+        .ql-datepicker-trigger.invalid-dp { border-color: #f87171 !important; }
+        .dp-placeholder { color: rgba(148,163,184,0.5); }
+        .dp-selected-val { color: var(--text); }
+        .ql-datepicker-popup {
+            position: absolute; top: calc(100% + 6px); left: 0; z-index: 100;
+            background: #111827; border: 1px solid rgba(124,58,237,0.35);
+            border-radius: 0.75rem; padding: 1rem; min-width: 260px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+        }
+        .dp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+        .dp-nav {
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text); border-radius: 0.375rem; width: 28px; height: 28px;
+            cursor: pointer; font-size: 1.1rem; display: flex; align-items: center;
+            justify-content: center; transition: background 0.15s;
+        }
+        .dp-nav:hover { background: rgba(124,58,237,0.25); border-color: rgba(124,58,237,0.5); }
+        .dp-month-year { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+        .dp-weekdays { display: grid; grid-template-columns: repeat(7,1fr); margin-bottom: 0.35rem; }
+        .dp-weekdays span { text-align: center; font-size: 0.72rem; color: var(--muted); padding: 0.2rem 0; font-weight: 500; }
+        .dp-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+        .dp-day {
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            font-size: 0.82rem; border-radius: 0.375rem; cursor: pointer;
+            color: var(--text); transition: background 0.12s;
+            background: transparent; border: none;
+        }
+        .dp-day:hover { background: rgba(124,58,237,0.2); color: #fff; }
+        .dp-day.today { color: var(--purple-light, #9d5ff3); font-weight: 700; }
+        .dp-day.selected { background: var(--purple); color: #fff; font-weight: 600; }
+        .dp-day.other-month { color: rgba(148,163,184,0.3); }
+        .dp-day.other-month:hover { background: rgba(255,255,255,0.05); }
+        /* Custom select dropdown */
+        .custom-select { position: relative; width: 100%; }
+        .custom-select-trigger {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 0.5rem;
+            padding: 0.65rem 0.875rem;
+            color: var(--muted);
+            font-family: "Inter", sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            user-select: none;
+        }
+        .custom-select-trigger:hover { border-color: rgba(255,255,255,0.25); }
+        .custom-select-trigger.selected { color: var(--text); }
+        .custom-select-trigger.open { border-color: var(--purple); }
+        .custom-select-trigger.invalid-select { border-color: #f87171 !important; }
+        .custom-select-arrow { width: 12px; height: 12px; flex-shrink: 0; transition: transform 0.2s; }
+        .custom-select-trigger.open .custom-select-arrow { transform: rotate(180deg); }
+        .custom-select-arrow path { stroke: #94a3b8; }
+        .custom-select-trigger.open .custom-select-arrow path { stroke: var(--purple-light, #9d5ff3); }
+        .custom-select-dropdown {
+            display: none;
+            position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 50;
+            background: #111827;
+            border: 1px solid rgba(124,58,237,0.4);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+        .custom-select-dropdown.open { display: block; }
+        .custom-select-option {
+            padding: 0.65rem 0.875rem;
+            font-size: 0.9rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .custom-select-option:hover { background: rgba(124,58,237,0.2); color: #fff; }
+        .custom-select-option.selected { background: rgba(124,58,237,0.3); color: #fff; font-weight: 600; }
+        .ob-field input.invalid { border-color: #f87171 !important; }
+        .ob-error {
+            color: #f87171;
+            font-size: 0.82rem;
+            margin-top: 0.75rem;
+            min-height: 1rem;
+        }
+
+        /* DISCLAIMER BOX */
+        .disclaimer-box {
+            border: 2px solid var(--gold);
+            border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            margin: 1.25rem 0;
+            background: rgba(201,168,76,0.06);
+        }
+        .disclaimer-box .disc-title {
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .disclaimer-box ul {
+            margin: 0.5rem 0 0 1.25rem;
+            color: var(--muted);
+            font-size: 0.875rem;
+            line-height: 1.8;
+        }
+        .disclaimer-box strong { color: var(--text); }
+
+        /* COURSE MODULE BOX */
+        .course-box {
+            background: rgba(201,162,71,0.08);
+            border: 1.5px solid var(--gold-bright);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+        .course-box h4 { color: var(--gold-bright); margin: 0 0 0.5rem; font-size: 1.05rem; }
+        .course-box p { color: var(--muted); font-size: 0.85rem; margin: 0 0 1rem; }
+
+        /* CHECKBOX */
+        .check-row {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .check-row label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        .check-row input[type="checkbox"] {
+            width: 18px; height: 18px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            accent-color: var(--gold-bright);
+        }
+
+        /* TIMER BANNER */
+        .timer-banner {
+            position: sticky;
+            top: 70px;
+            z-index: 50;
+            background: rgba(5,6,15,0.95);
+            border-bottom: 1px solid rgba(201,168,76,0.3);
+            padding: 0.75rem 1.5rem;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gold);
+            backdrop-filter: blur(8px);
+        }
+        .timer-banner.urgent { color: #f87171; animation: pulse-red 1s infinite; }
+        @keyframes pulse-red { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+        /* EXAM */
+        .exam-wrap { width: 100%; max-width: 680px; }
+        .exam-header {
+            margin-bottom: 1.5rem;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+        }
+        .exam-header h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .exam-header .sub { color: var(--muted); font-size: 0.85rem; }
+        .page-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .page-nav button {
+            padding: 0.4rem 0.75rem;
+            border-radius: 0.4rem;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.05);
+            color: var(--muted);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            transition: all 0.2s;
+        }
+        .page-nav button.active { border-color: var(--purple); background: rgba(124,58,237,0.15); color: var(--purple-light); font-weight: 600; }
+        .page-nav button.complete { border-color: var(--teal); background: rgba(16,185,129,0.1); color: var(--teal); }
+        .ob-question {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .ob-question p { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.875rem; }
+        .ob-choice {
+            padding: 0.65rem 1rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            font-size: 0.88rem;
+            color: var(--muted);
+            transition: all 0.15s;
+        }
+        .ob-choice:hover { border-color: var(--purple); color: var(--text); background: rgba(124,58,237,0.07); }
+        .ob-choice.selected { border-color: var(--gold); background: rgba(201,168,76,0.12); color: var(--text); }
+        .exam-submit-row { margin-top: 1.5rem; text-align: center; }
+        .answer-progress {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 1rem;
+        }
+        .answer-progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .answer-progress-fill {
+            height: 100%;
+            background: var(--teal);
+            border-radius: 2px;
+            transition: width 0.3s;
+        }
+
+        /* RESULT BANNERS */
+        .result-banner {
+            border-radius: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+        .result-banner.pass {
+            background: rgba(16,185,129,0.12);
+            border: 2px solid rgba(16,185,129,0.4);
+            color: #34d399;
+        }
+        .result-banner.fail {
+            background: rgba(239,68,68,0.1);
+            border: 2px solid rgba(239,68,68,0.35);
+            color: #f87171;
+        }
+
+        /* CERT STEP */
+        .cert-box {
+            background: rgba(201,168,76,0.08);
+            border: 1px solid rgba(201,168,76,0.3);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        .cert-box .cert-emoji { font-size: 3rem; margin-bottom: 1rem; }
+        .cert-box .cert-id { font-weight: 600; color: var(--gold); margin-bottom: 0.5rem; }
+        .cert-box .cert-hint { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+
+        /* SC STEP */
+        .sc-box {
+            background: rgba(27,42,107,0.3);
+            border: 1px solid rgba(201,168,76,0.35);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+        .sc-box .sc-emoji { font-size: 3rem; margin-bottom: 1rem; }
+        .sc-box h4 { font-weight: 600; color: var(--gold); font-size: 1.1rem; margin-bottom: 0.35rem; }
+        .sc-box p { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
+        .sc-instructions {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.875rem;
+            color: var(--muted);
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        /* ALREADY CERTIFIED */
+        .certified-card {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        .certified-card .cert-big { font-size: 4rem; margin-bottom: 1rem; }
+        .certified-card h2 { font-size: 1.5rem; font-weight: 700; color: var(--teal); margin-bottom: 0.5rem; }
+        .certified-card p { color: var(--muted); margin-bottom: 1.5rem; }
+
+        /* PAYMENT MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-card {
+            background: #0e101e;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+        }
+        .modal-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .modal-card .sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.25rem; }
+
+        /* NOT LOGGED IN */
+        .auth-gate {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        .auth-gate .gate-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .auth-gate h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .auth-gate p { color: var(--muted); margin-bottom: 1.5rem; }
+
+        /* LOADING */
+        .loading-screen {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--muted);
+        }
+        .loading-screen .big-spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--purple);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .role-cards { grid-template-columns: 1fr; }
+            .field-row { flex-direction: column; gap: 0; }
+            .ob-card { padding: 1.5rem 1.25rem; }
+            .course-tabs { gap:0.25rem; }
+            .course-tab { padding:0.3rem 0.6rem; font-size:0.72rem; }
+            .ob-line { width: 24px; }
+            .ob-step { min-width: 48px; font-size: 0.65rem; }
+        }
+
+        /* === INLINE COURSE MODULE === */
+        .course-module { display:flex; flex-direction:column; gap:1.25rem; }
+        /* ── Course Module ─────────────────────────────────── */
+        .course-tabs {
+            display:flex; flex-wrap:wrap; gap:0.375rem; margin-bottom:1.25rem;
+            width:100%; box-sizing:border-box;
+        }
+        .course-tab {
+            padding:0.35rem 0.75rem; border-radius:999px; font-size:0.75rem; font-weight:600;
+            background:rgba(255,255,255,0.06); color:#94a3b8;
+            border:1px solid rgba(255,255,255,0.1); cursor:pointer; transition:all 0.15s; white-space:nowrap;
+        }
+        .course-tab:hover { background:rgba(255,255,255,0.1); color:#f1f5f9; }
+        .course-tab.active { background:#7c3aed; color:#fff; border-color:#7c3aed; }
+        .course-tab.done { background:rgba(124,58,237,0.15); color:#a78bfa; border-color:rgba(124,58,237,0.3); }
+        /* Progress */
+        .course-progress-row { display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem; }
+        #lesson-label { font-size:0.75rem; font-weight:600; color:#94a3b8; white-space:nowrap; }
+        .course-progress-bar { flex:1; height:3px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; }
+        .course-progress-fill { height:100%; background:linear-gradient(90deg,#7c3aed,#a78bfa); border-radius:999px; transition:width 0.4s; }
+        /* Lesson content */
+        .lesson-pane { display:flex; flex-direction:column; gap:1rem; min-height:220px; }
+        .lesson-pane h3 { color:#c9a84c; font-size:1rem; font-weight:700; margin:0 0 0.5rem; letter-spacing:0.01em; }
+        .lesson-pane p { color:#cbd5e1; font-size:0.875rem; line-height:1.7; margin:0; }
+        .lesson-pane ul, .lesson-pane ol { color:#cbd5e1; font-size:0.875rem; line-height:1.7; padding-left:1.25rem; margin:0; }
+        .lesson-pane li { margin-bottom:0.4rem; }
+        /* Key term cards */
+        .key-term-card {
+            background:rgba(17,24,39,0.8); border-left:3px solid #7c3aed;
+            padding:0.875rem 1rem; border-radius:0 0.5rem 0.5rem 0;
+            font-size:0.85rem; line-height:1.6;
+        }
+        .key-term-card strong { color:#a78bfa; display:block; margin-bottom:0.2rem; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.05em; }
+        .key-term-card span { color:#94a3b8; }
+        /* Nav */
+        .lesson-nav { display:grid; grid-template-columns:1fr 1fr; gap:0.625rem; margin-top:1.5rem; border-top:1px solid rgba(255,255,255,0.07); padding-top:1.25rem; }
+        .lesson-nav button { padding:0.65rem 1rem; border-radius:0.5rem; font-size:0.85rem; font-weight:600; border:none; cursor:pointer; transition:all 0.15s; font-family:"Inter",sans-serif; }
+        .btn-lesson-prev { background:rgba(255,255,255,0.06); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); }
+        .btn-lesson-prev:hover:not(:disabled) { background:rgba(255,255,255,0.1); color:#f1f5f9; }
+        .btn-lesson-next { background:#7c3aed; color:#fff; }
+        .btn-lesson-next:hover:not(:disabled) { background:#6d28d9; }
+        .btn-lesson-next:disabled, .btn-lesson-prev:disabled { opacity:0.3; cursor:not-allowed; }
+        /* Completion */
+        .course-complete-notice {
+            display:none; align-items:center; justify-content:center; gap:0.5rem;
+            background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25);
+            border-radius:0.5rem; padding:0.875rem 1rem; color:#34d399; font-size:0.85rem;
+            font-weight:600; margin-top:1.25rem;
+        }
+        .course-complete-notice.visible { display:flex; }
+        /* Proceed button */
+        #course-btn-row { justify-content:center; margin-top:1rem; }
+        #btn-proceed-exam { font-size:0.9rem; padding:0.75rem 2rem; border-radius:0.5rem; max-width:240px; }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-content">
+        <a class="logo" href="/">
+            <img src="/qlegal-logo-sm.png" alt="Quanby Legal" class="logo-img">
+            <span class="logo-text">Quanby Legal</span>
+        </a>
+        <div class="nav-right">
+            <a class="nav-home-link" href="/">← Back to Home</a>
+            <div class="nav-user" id="nav-user">
+                <div class="nav-profile-wrap" id="nav-profile-wrap" onclick="toggleUserMenu()">
+                    <img class="nav-user-avatar" id="nav-user-avatar" src="" alt="User avatar" style="display:none;" onload="this.style.display='block';document.getElementById('nav-user-initials').style.display='none';" onerror="this.style.display='none';document.getElementById('nav-user-initials').style.display='flex';">
+                    <div class="nav-user-initials" id="nav-user-initials" style="display:none;"></div>
+                    <span class="nav-user-name" id="nav-user-name"></span>
+                    <svg class="nav-profile-chevron" width="12" height="12" viewBox="0 0 12 12"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div class="nav-user-menu" id="nav-user-menu" style="display:none;">
+                    <div class="num-header">
+                        <img class="num-avatar" id="num-avatar" src="" alt="" style="display:none;" onload="this.style.display='block';document.getElementById('num-initials').style.display='none';" onerror="this.style.display='none';document.getElementById('num-initials').style.display='flex';">
+                        <div class="num-initials" id="num-initials" style="display:none;"></div>
+                        <div class="num-info">
+                            <span class="num-name" id="num-name"></span>
+                            <span class="num-email" id="num-email"></span>
+                        </div>
+                    </div>
+                    <div class="num-divider"></div>
+                    <button class="num-item" onclick="toggleUserMenu()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm0 1c-3.31 0-6 1.79-6 4v1h12v-1c0-2.21-2.69-4-6-4z" fill="currentColor"/></svg>
+                        My Certification
+                    </button>
+                    <div class="num-divider"></div>
+                    <button class="num-item num-signout" onclick="signOut()">
+                        <svg width="14" height="14" viewBox="0 0 16 16"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- TIMER (shown during exam) -->
+<div id="timer-banner" class="timer-banner" style="display:none;">
+    <i data-lucide="timer" class="qi"></i> Time Remaining: <span id="timer-display">90:00</span>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="page-wrap">
+    <!-- LOADING STATE -->
+    <div id="loading-screen" class="loading-screen" style="display:none;">
+        <div class="big-spinner"></div>
+        <p>Checking your account…</p>
+    </div>
+
+    <!-- AUTH GATE (not logged in) -->
+    <div id="auth-gate" class="auth-gate" style="display:none;">
+        <div class="gate-icon">🔒</div>
+        <h2>Sign In Required</h2>
+        <p>You need to sign in with Google to access the ENP Certification process.</p>
+        <button onclick="signInWithGoogle()" class="btn-primary" style="max-width:280px;margin-bottom:0.75rem;">
+            <i data-lucide="log-in" class="qi"></i> Sign In with Google
+        </button>
+        <br>
+        <a href="/" style="color:var(--muted);font-size:0.85rem;">← Back to Home</a>
+    </div>
+
+    <!-- ALREADY CERTIFIED -->
+    <div id="certified-screen" class="ob-card" style="display:none;">
+        <div class="certified-card">
+            <div class="cert-big">✅</div>
+            <h2>You Are ENP Certified!</h2>
+            <p>Your Electronic Notary Public certification is on file. No further action is needed.</p>
+            <a href="/" class="btn-primary" style="display:inline-flex;text-decoration:none;max-width:240px;">
+                <i data-lucide="house" class="qi"></i> Return to Home
+            </a>
+        </div>
+    </div>
+
+    <!-- STEP PROGRESS -->
+    <div id="progress-wrap" style="display:none; width:100%; max-width:680px;">
+        <div class="page-header">
+            <h1 id="page-header-title">⚖️ ENP Certification</h1>
+            <p id="page-header-sub">Electronic Notary Public Certification under A.M. No. 24-10-14-SC</p>
+        </div>
+        <div class="ob-progress" id="ob-progress"></div>
+    </div>
+
+    <!-- STEP 1: ROLE -->
+    <div id="step-role" class="ob-card" style="display:none;">
+        <h2>Choose Your Role</h2>
+        <div class="role-cards">
+            <div class="role-card selected" id="role-attorney" onclick="selectRole('attorney')">
+                <div class="role-icon">⚖️</div>
+                <div class="role-title">Electronic Notary Public</div>
+                <div class="role-desc">IBP-registered, certified to perform electronic notarization</div>
+            </div>
+            <div class="role-card" id="role-client" onclick="selectRole('client')">
+                <div class="role-icon">👤</div>
+                <div class="role-title">Client / Individual</div>
+                <div class="role-desc">Get documents notarized electronically</div>
+            </div>
+        </div>
+        <div id="err-role" class="ob-error"></div>
+    </div>
+
+    <!-- STEP 2: PROFILE -->
+    <div id="step-profile" class="ob-card" style="display:none;">
+        <h2 id="profile-step-title">Complete Your Profile</h2>
+        <p class="sub" id="profile-step-sub">Required for ENP certification under A.M. No. 24-10-14-SC.</p>
+        <div class="field-row">
+            <div class="ob-field" style="flex:0 0 100px;">
+                <label>Prefix</label>
+                <select id="ob-prefix" class="ob-select-field">
+                    <option value="">None</option>
+                    <option value="Atty.">Atty.</option>
+                    <option value="Dr.">Dr.</option>
+                    <option value="Mr.">Mr.</option>
+                    <option value="Mrs.">Mrs.</option>
+                    <option value="Ms.">Ms.</option>
+                    <option value="Engr.">Engr.</option>
+                    <option value="Arch.">Arch.</option>
+                </select>
+            </div>
+            <div class="ob-field">
+                <label>First Name *</label>
+                <input type="text" id="ob-first-name" placeholder="Juan">
+                <span class="ob-field-error" id="err-first-name"></span>
+            </div>
+            <div class="ob-field" style="flex:0 0 80px;">
+                <label>M.I.</label>
+                <input type="text" id="ob-middle-initial" placeholder="A." maxlength="3">
+            </div>
+        </div>
+        <div class="field-row">
+            <div class="ob-field">
+                <label>Last Name *</label>
+                <input type="text" id="ob-last-name" placeholder="dela Cruz">
+                <span class="ob-field-error" id="err-last-name"></span>
+            </div>
+            <div class="ob-field" style="flex:0 0 100px;">
+                <label>Suffix</label>
+                <select id="ob-suffix" class="ob-select-field">
+                    <option value="">None</option>
+                    <option value="Jr.">Jr.</option>
+                    <option value="Sr.">Sr.</option>
+                    <option value="II">II</option>
+                    <option value="III">III</option>
+                    <option value="IV">IV</option>
+                </select>
+            </div>
+        </div>
+        <div class="ob-field">
+            <label>Phone Number *</label>
+            <div class="phone-input-wrap" id="phone-input-wrap">
+                <button type="button" class="phone-country-btn" id="phone-country-btn" onclick="toggleCountryDropdown()">
+                    <span class="phone-country-flag" id="phone-flag">🇵🇭</span>
+                    <span class="phone-country-code" id="phone-code">+63</span>
+                    <svg class="phone-country-chevron" width="10" height="10" viewBox="0 0 12 12"><path d="M2 4.5L6 8.5L10 4.5" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <div class="phone-country-dropdown" id="phone-country-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:200;" onclick="event.stopPropagation()">
+                        <div class="phone-country-option selected" data-code="+63" data-flag="🇵🇭" data-name="Philippines" onclick="selectCountry('+63','🇵🇭','PH')">🇵🇭 Philippines <span class="opt-code">+63</span></div>
+                        <div class="phone-country-option" data-code="+1" data-flag="🇺🇸" data-name="United States" onclick="selectCountry('+1','🇺🇸','US')">🇺🇸 United States <span class="opt-code">+1</span></div>
+                        <div class="phone-country-option" data-code="+44" data-flag="🇬🇧" data-name="United Kingdom" onclick="selectCountry('+44','🇬🇧','GB')">🇬🇧 United Kingdom <span class="opt-code">+44</span></div>
+                        <div class="phone-country-option" data-code="+61" data-flag="🇦🇺" data-name="Australia" onclick="selectCountry('+61','🇦🇺','AU')">🇦🇺 Australia <span class="opt-code">+61</span></div>
+                        <div class="phone-country-option" data-code="+65" data-flag="🇸🇬" data-name="Singapore" onclick="selectCountry('+65','🇸🇬','SG')">🇸🇬 Singapore <span class="opt-code">+65</span></div>
+                        <div class="phone-country-option" data-code="+971" data-flag="🇦🇪" data-name="UAE" onclick="selectCountry('+971','🇦🇪','AE')">🇦🇪 UAE <span class="opt-code">+971</span></div>
+                        <div class="phone-country-option" data-code="+81" data-flag="🇯🇵" data-name="Japan" onclick="selectCountry('+81','🇯🇵','JP')">🇯🇵 Japan <span class="opt-code">+81</span></div>
+                        <div class="phone-country-option" data-code="+82" data-flag="🇰🇷" data-name="South Korea" onclick="selectCountry('+82','🇰🇷','KR')">🇰🇷 South Korea <span class="opt-code">+82</span></div>
+                        <div class="phone-country-option" data-code="+86" data-flag="🇨🇳" data-name="China" onclick="selectCountry('+86','🇨🇳','CN')">🇨🇳 China <span class="opt-code">+86</span></div>
+                        <div class="phone-country-option" data-code="+60" data-flag="🇲🇾" data-name="Malaysia" onclick="selectCountry('+60','🇲🇾','MY')">🇲🇾 Malaysia <span class="opt-code">+60</span></div>
+                        <div class="phone-country-option" data-code="+66" data-flag="🇹🇭" data-name="Thailand" onclick="selectCountry('+66','🇹🇭','TH')">🇹🇭 Thailand <span class="opt-code">+66</span></div>
+                        <div class="phone-country-option" data-code="+91" data-flag="🇮🇳" data-name="India" onclick="selectCountry('+91','🇮🇳','IN')">🇮🇳 India <span class="opt-code">+91</span></div>
+                    </div>
+                </button>
+                <input type="tel" id="ob-phone-number" class="phone-number-input" placeholder="9XX XXX XXXX" inputmode="numeric">
+                <input type="hidden" id="ob-phone" value="">
+            </div>
+            <span class="ob-field-error" id="err-phone"></span>
+        </div>
+        <!-- Attorney / ENP fields -->
+        <div id="attorney-fields">
+            <div class="field-row">
+                <div class="ob-field">
+                    <label>IBP Roll No. *</label>
+                    <input type="text" id="ob-roll-no" placeholder="e.g. 12345" maxlength="5" inputmode="numeric" pattern="[0-9]{5}">
+                    <span class="ob-field-error" id="err-roll-no"></span>
+                </div>
+                <div class="ob-field">
+                    <label>Roll Date *</label>
+                    <div class="ql-datepicker" id="dp-wrap-ob-roll-date">
+                        <button type="button" class="ql-datepicker-trigger" id="dp-trigger-ob-roll-date" onclick="dpToggle('ob-roll-date')">
+                            <span id="dp-display-ob-roll-date" class="dp-placeholder">Pick a date</span>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#94a3b8" stroke-width="1.3"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>
+                        </button>
+                        <div class="ql-datepicker-popup" id="dp-popup-ob-roll-date" style="display:none;">
+                            <div class="dp-header">
+                                <button type="button" class="dp-nav" onclick="dpNav('ob-roll-date',-1)">&#8249;</button>
+                                <span class="dp-month-year" id="dp-title-ob-roll-date"></span>
+                                <button type="button" class="dp-nav" onclick="dpNav('ob-roll-date',1)">&#8250;</button>
+                            </div>
+                            <div class="dp-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+                            <div class="dp-days" id="dp-days-ob-roll-date"></div>
+                        </div>
+                        <input type="hidden" id="ob-roll-date" value="">
+                    </div>
+                    <span class="ob-field-error" id="err-roll-date"></span>
+                </div>
+            </div>
+            <div class="ob-field">
+                <label>Commission No. *</label>
+                <input type="text" id="ob-commission-no" placeholder="e.g. 2024 - 024">
+                <span class="ob-field-error" id="err-commission-no"></span>
+            </div>
+            <div class="ob-field">
+                <label>Commission Valid Until *</label>
+                <div class="ql-datepicker" id="dp-wrap-ob-commission-valid">
+                    <button type="button" class="ql-datepicker-trigger" id="dp-trigger-ob-commission-valid" onclick="dpToggle('ob-commission-valid')">
+                        <span id="dp-display-ob-commission-valid" class="dp-placeholder">Pick a date</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#94a3b8" stroke-width="1.3"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    </button>
+                    <div class="ql-datepicker-popup" id="dp-popup-ob-commission-valid" style="display:none;">
+                        <div class="dp-header">
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-commission-valid',-1)">&#8249;</button>
+                            <span class="dp-month-year" id="dp-title-ob-commission-valid"></span>
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-commission-valid',1)">&#8250;</button>
+                        </div>
+                        <div class="dp-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+                        <div class="dp-days" id="dp-days-ob-commission-valid"></div>
+                    </div>
+                    <input type="hidden" id="ob-commission-valid" value="">
+                </div>
+                <span class="ob-field-error" id="err-commission-valid"></span>
+            </div>
+            <div class="field-row">
+                <div class="ob-field">
+                    <label>PTR No. *</label>
+                    <input type="text" id="ob-ptr-no" placeholder="e.g. 1234567">
+                    <span class="ob-field-error" id="err-ptr-no"></span>
+                </div>
+                <div class="ob-field">
+                    <label>PTR Location *</label>
+                    <input type="text" id="ob-ptr-location" placeholder="e.g. Manila">
+                    <span class="ob-field-error" id="err-ptr-location"></span>
+                </div>
+            </div>
+            <div class="ob-field">
+                <label>PTR Date *</label>
+                <div class="ql-datepicker" id="dp-wrap-ob-ptr-date">
+                    <button type="button" class="ql-datepicker-trigger" id="dp-trigger-ob-ptr-date" onclick="dpToggle('ob-ptr-date')">
+                        <span id="dp-display-ob-ptr-date" class="dp-placeholder">Pick a date</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#94a3b8" stroke-width="1.3"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    </button>
+                    <div class="ql-datepicker-popup" id="dp-popup-ob-ptr-date" style="display:none;">
+                        <div class="dp-header">
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-ptr-date',-1)">&#8249;</button>
+                            <span class="dp-month-year" id="dp-title-ob-ptr-date"></span>
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-ptr-date',1)">&#8250;</button>
+                        </div>
+                        <div class="dp-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+                        <div class="dp-days" id="dp-days-ob-ptr-date"></div>
+                    </div>
+                    <input type="hidden" id="ob-ptr-date" value="">
+                </div>
+                <span class="ob-field-error" id="err-ptr-date"></span>
+            </div>
+            <div class="field-row">
+                <div class="ob-field">
+                    <label>IBP No. *</label>
+                    <input type="text" id="ob-ibp-no" placeholder="e.g. 123456" maxlength="6" inputmode="numeric" pattern="[0-9]{6}">
+                    <span class="ob-field-error" id="err-ibp-no"></span>
+                </div>
+                <div class="ob-field">
+                    <label>IBP Date *</label>
+                    <div class="ql-datepicker" id="dp-wrap-ob-ibp-date">
+                    <button type="button" class="ql-datepicker-trigger" id="dp-trigger-ob-ibp-date" onclick="dpToggle('ob-ibp-date')">
+                        <span id="dp-display-ob-ibp-date" class="dp-placeholder">Pick a date</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#94a3b8" stroke-width="1.3"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    </button>
+                    <div class="ql-datepicker-popup" id="dp-popup-ob-ibp-date" style="display:none;">
+                        <div class="dp-header">
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-ibp-date',-1)">&#8249;</button>
+                            <span class="dp-month-year" id="dp-title-ob-ibp-date"></span>
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-ibp-date',1)">&#8250;</button>
+                        </div>
+                        <div class="dp-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+                        <div class="dp-days" id="dp-days-ob-ibp-date"></div>
+                    </div>
+                    <input type="hidden" id="ob-ibp-date" value="">
+                </div>
+                    <span class="ob-field-error" id="err-ibp-date"></span>
+                </div>
+            </div>
+
+            <div class="ob-field">
+                <label>Notary Address *</label>
+                <input type="text" id="ob-notary-address" placeholder="e.g. 123 The Actual Bldg., 1234 Avenue, Malate, Manila">
+                <span class="ob-field-error" id="err-notary-address"></span>
+            </div>
+            <div class="field-row">
+                <div class="ob-field">
+                    <label>MCLE Compliance Period *</label>
+                    <input type="text" id="ob-mcle-period" placeholder="e.g. VIII">
+                    <span class="ob-field-error" id="err-mcle-period"></span>
+                </div>
+                <div class="ob-field">
+                    <label>MCLE No. *</label>
+                    <input type="text" id="ob-mcle-no" placeholder="e.g. 1234567">
+                    <span class="ob-field-error" id="err-mcle-no"></span>
+                </div>
+            </div>
+            <div class="ob-field">
+                <label>MCLE Date *</label>
+                <div class="ql-datepicker" id="dp-wrap-ob-mcle-date">
+                    <button type="button" class="ql-datepicker-trigger" id="dp-trigger-ob-mcle-date" onclick="dpToggle('ob-mcle-date')">
+                        <span id="dp-display-ob-mcle-date" class="dp-placeholder">Pick a date</span>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#94a3b8" stroke-width="1.3"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#94a3b8" stroke-width="1.3" stroke-linecap="round"/></svg>
+                    </button>
+                    <div class="ql-datepicker-popup" id="dp-popup-ob-mcle-date" style="display:none;">
+                        <div class="dp-header">
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-mcle-date',-1)">&#8249;</button>
+                            <span class="dp-month-year" id="dp-title-ob-mcle-date"></span>
+                            <button type="button" class="dp-nav" onclick="dpNav('ob-mcle-date',1)">&#8250;</button>
+                        </div>
+                        <div class="dp-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+                        <div class="dp-days" id="dp-days-ob-mcle-date"></div>
+                    </div>
+                    <input type="hidden" id="ob-mcle-date" value="">
+                </div>
+                <span class="ob-field-error" id="err-mcle-date"></span>
+            </div>
+
+        </div>
+        <!-- Client fields (principals don't need org/position) -->
+        <div id="client-fields" style="display:none;"></div>
+        <div id="err-profile" class="ob-error"></div>
+        <div class="btn-row">
+            <button class="btn-back" onclick="goToStep('role')">← Back</button>
+            <button class="btn-primary" id="btn-profile-continue" onclick="submitProfile()">Continue →</button>
+        </div>
+    </div>
+
+    <!-- STEP 3: COURSE + DISCLAIMER -->
+    <div id="step-course" class="ob-card" style="display:none;overflow-x:hidden;">
+        <h2><i data-lucide="book" class="qi"></i> Course Module</h2>
+        <p class="sub">Complete all lessons before taking your certification exam.</p>
+
+        <div class="course-module">
+            <div class="course-tabs" id="course-tabs">
+                <button class="course-tab active" data-mod="0" onclick="switchModule(0)">Introduction</button>
+                <button class="course-tab" data-mod="1" onclick="switchModule(1)">Platform Dashboards</button>
+                <button class="course-tab" data-mod="2" onclick="switchModule(2)">Core Services</button>
+                <button class="course-tab" data-mod="3" onclick="switchModule(3)">Stakeholder Roles</button>
+                <button class="course-tab" data-mod="4" onclick="switchModule(4)">Compliance</button>
+            </div>
+            <div class="course-progress-row">
+                <span id="lesson-label">Lesson 1 of 10</span>
+                <div class="course-progress-bar"><div class="course-progress-fill" id="course-progress-fill" style="width:0%"></div></div>
+            </div>
+            <div id="lesson-content" class="lesson-pane"></div>
+            <div class="lesson-nav">
+                <button class="btn-lesson-prev" id="btn-lesson-prev" onclick="lessonNav(-1)">&#8592; Previous</button>
+                <button class="btn-lesson-next" id="btn-lesson-next" onclick="lessonNav(1)">Next &#8594;</button>
+            </div>
+        </div>
+
+        <div class="course-complete-notice" id="course-complete-notice">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            All lessons complete &mdash; you may now proceed to the exam.
+        </div>
+
+        <div id="err-course" class="ob-error"></div>
+        <div class="btn-row" id="course-btn-row" style="display:none;margin-top:1rem;">
+            <button class="btn-primary" id="btn-proceed-exam" onclick="goToStep('exam')" style="width:100%;max-width:280px;margin:0 auto;"><i data-lucide="arrow-right" class="qi"></i> Proceed to Exam</button>
+        </div>
+    </div>
+
+        <!-- STEP 4: EXAM -->
+    <div id="step-exam" style="display:none;" class="exam-wrap">
+
+        <!-- PRE-EXAM RULES SCREEN -->
+        <div id="exam-pre-screen" class="ob-card" style="max-width:680px;margin:0 auto;">
+            <h2 style="display:flex;align-items:center;gap:0.5rem;"><i data-lucide="graduation-cap" class="qi" style="color:var(--gold);"></i> ENP Certification Exam</h2>
+            <p class="sub" style="margin-bottom:1.5rem;">Please read the rules before you begin.</p>
+            <div class="disclaimer-box" style="margin-bottom:1.5rem;">
+                <div class="disc-title"><i data-lucide="triangle-alert" class="qi"></i> Exam Rules</div>
+                <p style="color:var(--muted);font-size:0.875rem;margin-bottom:0.75rem;">Read carefully before starting:</p>
+                <ul>
+                    <li>This exam consists of <strong>50 questions</strong> and is <strong>timed at 90 minutes</strong>.</li>
+                    <li>Once started, the timer <strong>cannot be paused</strong>.</li>
+                    <li>You must score <strong>70% (35 out of 50)</strong> to pass.</li>
+                    <li>If you do not pass, you will be redirected to the course material.</li>
+                    <li><strong>Retaking the exam requires a &#8369;500 GCash fee.</strong></li>
+                    <li>Ensure you are in a quiet environment and ready before proceeding.</li>
+                </ul>
+            </div>
+            <div class="check-row" style="margin-bottom:1.5rem;">
+                <label>
+                    <input type="checkbox" id="exam-ready-checkbox" onchange="toggleExamStart()">
+                    <span>I have read and understood the exam rules above and I am ready to begin.</span>
+                </label>
+            </div>
+            <div class="btn-row">
+                <button class="btn-back" onclick="goToStep('course')">&#8592; Back to Course</button>
+                <button class="btn-primary" id="btn-begin-exam" disabled onclick="beginExam()">
+                    <i data-lucide="play" class="qi"></i> Begin Exam
+                </button>
+            </div>
+        </div>
+
+        <!-- EXAM QUESTIONS (hidden until Begin is clicked) -->
+        <div id="exam-questions-wrap" style="display:none;width:100%;">
+        <div class="exam-header">
+            <h2>ENP Certification Exam</h2>
+            <p class="sub">Answer all 50 questions. You need 70% (35/50) to pass.</p>
+            <div class="answer-progress" id="answer-progress">
+                <span id="answer-count">0/50 answered</span>
+                <div class="answer-progress-bar"><div class="answer-progress-fill" id="answer-bar" style="width:0%"></div></div>
+            </div>
+        </div>
+        <div id="page-nav" class="page-nav"></div>
+        <div id="exam-questions"></div>
+        <div id="err-exam" class="ob-error" style="text-align:center;"></div>
+        <div class="exam-submit-row">
+            <button class="btn-primary" id="btn-submit-exam" onclick="submitExam()" style="max-width:280px;margin:0 auto;">
+                Submit Test
+            </button>
+        </div><!-- end exam-submit-row -->
+        </div><!-- end exam-questions-wrap -->
+    </div><!-- end step-exam -->
+
+    <!-- EXAM RESULT -->
+    <div id="step-result" class="ob-card" style="display:none;">
+        <h2><i data-lucide="chart-bar" class="qi"></i> Exam Result</h2>
+        <div id="result-banner"></div>
+        <div id="result-content"></div>
+    </div>
+
+    <!-- STEP 5: DOWNLOAD CERTIFICATE -->
+    <div id="step-certificate" class="ob-card" style="display:none;">
+        <h2><i data-lucide="award" class="qi"></i> Download Your Certificate</h2>
+        <p class="sub">Your ENP Course Completion Certificate is ready. Download it and submit it to the Supreme Court.</p>
+        <div class="cert-box">
+            <div class="cert-emoji">📜</div>
+            <div class="cert-id">Certificate ID: <span id="cert-id-display"></span></div>
+            <div class="cert-hint">Keep this ID — you will need it for Supreme Court submission.</div>
+            <a id="cert-download-link" href="#" target="_blank" class="btn-gold">
+                ⬇️ Download Certificate (PDF)
+            </a>
+        </div>
+        <div style="text-align:center;margin-top:1rem;">
+            <button class="btn-primary" onclick="goToStep('sc')" style="max-width:320px;margin:0 auto;">
+                Continue to Supreme Court Submission →
+            </button>
+        </div>
+    </div>
+
+    <!-- STEP 6: SC SUBMISSION -->
+    <div id="step-sc" class="ob-card" style="display:none;">
+        <h2>📋 Submit to the Supreme Court</h2>
+        <p class="sub">You are required to submit your certificate to the Supreme Court of the Philippines Electronic Notarization Portal.</p>
+        <div class="sc-box">
+            <div class="sc-emoji">⚖️</div>
+            <h4>Supreme Court of the Philippines</h4>
+            <p>Electronic Notarization Portal</p>
+            <a href="https://efiling.sc.judiciary.gov.ph" target="_blank" class="btn-navy">
+                Go to Supreme Court Portal →
+            </a>
+        </div>
+        <div class="sc-instructions">
+            After submitting your certificate on the Supreme Court portal, your ENP registration will be processed. 
+            You will receive confirmation from the Supreme Court directly. 
+            Please keep your Certificate ID handy during submission.
+        </div>
+        <div style="text-align:center;margin-top:1.5rem;">
+            <button class="btn-teal" onclick="completeOnboarding()">
+                ✅ Done — Return to Home
+            </button>
+        </div>
+    </div>
+
+    <!-- STEP: CLIENT DONE -->
+    <div id="step-done" class="ob-card" style="display:none;text-align:center;margin:0 auto;">
+        <div style="font-size:3.5rem;margin-bottom:1rem;">🎉</div>
+        <h2 style="margin-bottom:0.5rem;">You're all set!</h2>
+        <p class="sub" style="margin-bottom:2rem;">Your profile is complete. You can now book a notarization session with an ENP.</p>
+        <button class="btn-primary" onclick="completeOnboarding()" style="max-width:280px;margin:0 auto;">
+            Go to Dashboard →
+        </button>
+    </div>
+
+</div><!-- end page-wrap -->
+
+<!-- RETAKE PAYMENT MODAL -->
+<div class="modal-overlay" id="retake-modal">
+    <div class="modal-card">
+        <h3>💳 Retake Fee Payment</h3>
+        <p class="sub">A ₱500 retake fee is required to attempt the exam again.</p>
+        <div style="display:flex;gap:0.75rem;margin-bottom:1.25rem;">
+            <button id="tab-gcash" onclick="switchPayTab('gcash')" style="flex:1;padding:0.65rem;border-radius:0.5rem;border:2px solid rgba(201,168,76,0.5);background:rgba(201,168,76,0.1);color:#c9a84c;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;">📱 GCash</button>
+            <button id="tab-bank" onclick="switchPayTab('bank')" style="flex:1;padding:0.65rem;border-radius:0.5rem;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);cursor:pointer;font-family:Inter,sans-serif;">🏦 Bank Transfer</button>
+        </div>
+        <div id="pay-gcash">
+            <div style="background:rgba(0,168,107,0.08);border:1px solid rgba(0,168,107,0.3);border-radius:0.5rem;padding:1.25rem;text-align:center;">
+                <div style="font-size:2rem;margin-bottom:0.5rem;">📱</div>
+                <p style="margin:0 0 0.5rem;font-weight:600;color:#00a86b;">GCash</p>
+                <p style="font-size:1.4rem;font-weight:700;margin:0 0 0.25rem;color:#fff;" id="pay-gcash-number">Loading…</p>
+                <p style="color:var(--muted);font-size:0.875rem;margin:0;">Account Name: Quanby Solutions, Inc.</p>
+                <div style="margin-top:1rem;padding:0.75rem;background:rgba(255,255,255,0.05);border-radius:0.4rem;">
+                    <p style="margin:0;font-size:0.8rem;color:var(--muted);">Reference Number</p>
+                    <p style="margin:0.25rem 0 0;font-weight:700;color:#c9a84c;letter-spacing:0.05em;" id="pay-ref">Loading…</p>
+                </div>
+            </div>
+        </div>
+        <div id="pay-bank" style="display:none;">
+            <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.3);border-radius:0.5rem;padding:1.25rem;">
+                <div style="font-size:2rem;margin-bottom:0.5rem;text-align:center;">🏦</div>
+                <table style="width:100%;font-size:0.875rem;border-collapse:collapse;">
+                    <tr><td style="padding:0.4rem 0;color:var(--muted);">Bank:</td><td style="padding:0.4rem 0;font-weight:600;" id="pay-bank-name">Loading…</td></tr>
+                    <tr><td style="padding:0.4rem 0;color:var(--muted);">Account Number:</td><td style="padding:0.4rem 0;font-weight:600;" id="pay-bank-account">Loading…</td></tr>
+                    <tr><td style="padding:0.4rem 0;color:var(--muted);">Account Name:</td><td style="padding:0.4rem 0;font-weight:600;" id="pay-bank-acname">Loading…</td></tr>
+                    <tr><td style="padding:0.4rem 0;color:var(--muted);">Amount:</td><td style="padding:0.4rem 0;font-weight:700;color:#c9a84c;">₱500.00</td></tr>
+                    <tr><td style="padding:0.4rem 0;color:var(--muted);">Reference:</td><td style="padding:0.4rem 0;font-weight:600;color:#c9a84c;" id="pay-ref-bank">Loading…</td></tr>
+                </table>
+            </div>
+        </div>
+        <div style="margin:1rem 0;background:rgba(255,255,255,0.03);border-radius:0.5rem;padding:0.875rem;font-size:0.8rem;color:var(--muted);">
+            ⚠️ After sending payment, click "I've Paid" below. Our team will verify and unlock your retake within 24 hours.
+        </div>
+        <div id="err-pay" class="ob-error"></div>
+        <button class="btn-primary" id="btn-confirm-pay" onclick="submitRetakePayment()">✅ I've Paid — Submit for Verification</button>
+        <button onclick="document.getElementById('retake-modal').classList.remove('open')" style="width:100%;margin-top:0.75rem;padding:0.6rem;background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted);border-radius:0.5rem;cursor:pointer;font-family:Inter,sans-serif;font-size:0.85rem;">Cancel</button>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let _user = null;
+let _role = 'attorney';
+let _currentStep = 'role';
+let _questions = [];
+let _answers = {};
+let _testSessionId = null;
+let _timerInterval = null;
+let _certificateId = null;
+let _currentPage = 0;
+const QUESTIONS_PER_PAGE = 10;
+
+// Steps are role-dependent: attorneys go through full flow, clients just role+profile+done
+const ENP_STEPS  = ['role','profile','course','exam','certificate','sc'];
+const ENP_LABELS = ['Role','Profile','Course','Exam','Certificate','SC Submit'];
+const CLIENT_STEPS  = ['role','profile','done'];
+const CLIENT_LABELS = ['Role','Profile','Done'];
+let OB_STEPS  = ENP_STEPS;
+let OB_LABELS = ENP_LABELS;
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+async function init() {
+    // Show loading screen at start
+    var _ls = document.getElementById('loading-screen');
+    if (_ls) _ls.style.display = 'block';
+    try {
+        let res = await fetch('/api/auth/me', { credentials: 'include' });
+        if (res.status === 401) {
+            try {
+                const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+                if (ref.ok) res = await fetch('/api/auth/me', { credentials: 'include' });
+            } catch(e) {}
+        }
+        if (!res.ok) {
+            // Guard: if we just came back from OAuth (code in URL) or already tried once,
+            // don't redirect again — show auth gate instead to break any loop
+            const params = new URLSearchParams(window.location.search);
+            const justCameFromOAuth = params.has('code') || params.has('error') || params.has('state');
+            const alreadyTriedRedirect = sessionStorage.getItem('ql_sso_attempted') === '1';
+
+            if (!justCameFromOAuth && !alreadyTriedRedirect) {
+                try {
+                    const pr = await fetch('/api/auth/providers', { credentials: 'include' });
+                    const pd = await pr.json();
+                    const url = (pd.providers && pd.providers.google) || null;
+                    if (url) {
+                        sessionStorage.setItem('ql_sso_attempted', '1');
+                        sessionStorage.setItem('post_login_redirect', '/onboard');
+                        window.location.href = url;
+                        return;
+                    }
+                } catch(e) {}
+            }
+            // Clear the attempt flag and show auth gate
+            sessionStorage.removeItem('ql_sso_attempted');
+            showScreen('auth-gate');
+            return;
+        }
+        // Successfully authenticated — clear the attempt flag
+        sessionStorage.removeItem('ql_sso_attempted');
+        _user = await res.json();
+
+        // Update nav
+        const nameEl = document.getElementById('nav-user-name');
+        const avatarEl = document.getElementById('nav-user-avatar');
+        const navUser = document.getElementById('nav-user');
+        if (nameEl) nameEl.textContent = _user.first_name || _user.email || 'Account';
+        // Avatar + initials
+        const initials = ((_user.first_name || '?')[0] + (_user.last_name || '')[0]).toUpperCase();
+        const initialsEl = document.getElementById('nav-user-initials');
+        if (initialsEl) { initialsEl.textContent = initials; initialsEl.style.display = 'flex'; }
+        if (avatarEl) { if (_user.picture) { avatarEl.src = _user.picture; } else { avatarEl.style.display = 'none'; } }
+        // Populate dropdown
+        const numAvatar = document.getElementById('num-avatar');
+        const numInitials = document.getElementById('num-initials');
+        const numName = document.getElementById('num-name');
+        const numEmail = document.getElementById('num-email');
+        const displayName = ((_user.first_name || '') + (_user.last_name ? ' ' + _user.last_name : '')) || _user.email || 'Account';
+        if (numInitials) { numInitials.textContent = initials; numInitials.style.display = 'flex'; }
+        if (numAvatar && _user.picture) { numAvatar.src = _user.picture; }
+        if (numName) numName.textContent = displayName;
+        if (numEmail) numEmail.textContent = _user.email || '';
+        if (navUser) navUser.classList.add('visible');
+
+        // Already certified?
+        if (_user.onboarding_step === 'certified') {
+            showScreen('certified-screen');
+            return;
+        }
+
+        // Resume from their step
+        _role = _user.role || 'attorney';
+        const step = mapApiStepToLocal(_user.onboarding_step || 'role_select');
+        showProgress();
+        if (step === 'certificate') {
+            // Go direct — skip goToStep routing to avoid patched wrapper interference
+            const certId = _user.certificate_id || '';
+            goToDownloadCert(certId);
+        } else if (step === 'certified') {
+            showScreen('certified-screen');
+        } else {
+            // Clients should never see course/exam steps ? guard for existing users stuck at "test"
+            if (_role === "client" && (step === "course" || step === "exam")) {
+                goToStep("done");
+            } else {
+                goToStep(step);
+            }
+        }
+
+    } catch(e) {
+        console.error('init error:', e);
+        var ls = document.getElementById('loading-screen');
+        if (ls) {
+            ls.style.display = 'block';
+            ls.innerHTML = '<div style="text-align:center;padding:2rem;">' +
+                '<p style="color:#f87171;font-weight:600;margin-bottom:0.5rem;">Could not load page</p>' +
+                '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1rem;">' + (e.message || 'Unknown error') + '</p>' +
+                '<button onclick="window.location.reload()" style="background:var(--purple);color:#fff;border:none;padding:0.6rem 1.25rem;border-radius:0.5rem;cursor:pointer;margin-right:0.5rem;">Retry</button>' +
+                '<a href="/" style="color:var(--muted);font-size:0.875rem;">Back to Home</a>' +
+            '</div>';
+        }
+    }
+}
+
+function mapApiStepToLocal(apiStep) {
+    const map = {
+        'role_select': 'role',
+        'profile':     'profile',
+        'test':        'course',
+        'kyc':         'course',
+        'kyc_id':      'certificate',
+        'liveness':    'certificate',
+        'survey':      'certificate',
+        'certificate': 'certificate',
+        'sc_redirect': 'sc',
+        'certified':   'certified'
+    };
+    return map[apiStep] || 'role';
+}
+
+function showProgress() {
+    document.getElementById('progress-wrap').style.display = 'block';
+}
+
+function showScreen(id) {
+    document.getElementById('loading-screen').style.display = 'none';
+    const screens = ['auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc','step-done'];
+    screens.forEach(s => {
+        const el = document.getElementById(s);
+        if (el) el.style.display = 'none';
+    });
+    const target = document.getElementById(id);
+    if (target) target.style.display = '';
+}
+
+function goToStep(step) {
+    _currentStep = step;
+    updateProgress(step);
+    var _screens = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc','step-done'];
+    _screens.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
+
+    const stepMap = {
+        'role':        'step-role',
+        'profile':     'step-profile',
+        'course':      'step-course',
+        'exam':        'step-exam',
+        'result':      'step-result',
+        'certificate': 'step-certificate',
+        'sc':          'step-sc',
+        'done':        'step-done'
+    };
+    const target = stepMap[step];
+    if (target) {
+        const el = document.getElementById(target);
+        if (el) el.style.display = '';
+    }
+
+    // Profile fields toggle + prefill from Google SSO
+    if (step === 'profile') {
+        toggleProfileFields();
+        if (_user) {
+            const fn = document.getElementById('ob-first-name');
+            const ln = document.getElementById('ob-last-name');
+            if (fn && !fn.value && _user.first_name) fn.value = _user.first_name;
+            if (ln && !ln.value && _user.last_name) ln.value = _user.last_name;
+            // Prefill middle initial from Google name if available
+            const mi = document.getElementById('ob-middle-initial');
+            if (mi && !mi.value && _user.middle_name) mi.value = _user.middle_name[0] + '.';
+        }
+    }
+
+    // Hide timer if not on exam
+    if (step !== 'exam') {
+        document.getElementById('timer-banner').style.display = 'none';
+    } else {
+        var _pre = document.getElementById('exam-pre-screen');
+        var _qw = document.getElementById('exam-questions-wrap');
+        var _ec = document.getElementById('exam-ready-checkbox');
+        var _eb = document.getElementById('btn-begin-exam');
+        if (_pre) _pre.style.display = '';
+        if (_qw) _qw.style.display = 'none';
+        if (_ec) _ec.checked = false;
+        if (_eb) _eb.disabled = true;
+    }
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateProgress(activeStep) {
+    const idx = OB_STEPS.indexOf(activeStep);
+    const wrap = document.getElementById('ob-progress');
+    if (!wrap) return;
+    wrap.innerHTML = OB_STEPS.map((s, i) => {
+        const cls = i < idx ? 'done' : (i === idx ? 'active' : '');
+        const lbl = i < idx ? '✓' : (i + 1);
+        const lineClass = i < idx ? 'done' : '';
+        return (i > 0 ? `<div class="ob-line ${lineClass}"></div>` : '') +
+            `<div class="ob-step"><div class="ob-step-num ${cls}">${lbl}</div><span>${OB_LABELS[i]}</span></div>`;
+    }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// STEP 1: ROLE
+// ═══════════════════════════════════════════════
+function selectRole(role) {
+    _role = role;
+    document.getElementById('role-attorney').classList.toggle('selected', role === 'attorney');
+    document.getElementById('role-client').classList.toggle('selected', role === 'client');
+    // Update page header immediately on role selection
+    updatePageHeader(role);
+    submitRole();
+}
+
+function updatePageHeader(role) {
+    const isAttorney = role === 'attorney';
+    const hdrTitle = document.getElementById('page-header-title');
+    const hdrSub   = document.getElementById('page-header-sub');
+    if (hdrTitle) hdrTitle.textContent = isAttorney ? '⚖️ ENP Certification' : '👤 Complete Your Account';
+    if (hdrSub)   hdrSub.textContent   = isAttorney
+        ? 'Electronic Notary Public Certification under A.M. No. 24-10-14-SC'
+        : 'Set up your profile to start booking notarization sessions.';
+}
+
+async function submitRole() {
+    document.getElementById("err-role").textContent = "";
+    try {
+        let res = await fetch("/api/onboarding/role", {
+            method: "POST", credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ role: _role })
+        });
+        // Auto-refresh token on 401 and retry once
+        if (res.status === 401) {
+            try {
+                const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+                if (ref.ok) {
+                    res = await fetch("/api/onboarding/role", {
+                        method: "POST", credentials: "include",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ role: _role })
+                    });
+                } else {
+                    // Refresh failed — session truly expired, redirect to sign in
+                    sessionStorage.setItem('post_login_redirect', '/onboard');
+                    window.location.href = '/';
+                    return;
+                }
+            } catch(e) {}
+        }
+        if (!res.ok) throw new Error((await res.json()).detail || "Failed");
+        goToStep("profile");
+    } catch(e) {
+        document.getElementById("err-role").textContent = e.message;
+    }
+}
+
+// ═══════════════════════════════════════════════
+// STEP 2: PROFILE
+// ═══════════════════════════════════════════════
+function toggleProfileFields() {
+    const isAttorney = _role === 'attorney';
+    document.getElementById('attorney-fields').style.display = isAttorney ? '' : 'none';
+    document.getElementById('client-fields').style.display = isAttorney ? 'none' : '';
+    // Swap step definitions based on role
+    OB_STEPS  = isAttorney ? ENP_STEPS  : CLIENT_STEPS;
+    OB_LABELS = isAttorney ? ENP_LABELS : CLIENT_LABELS;
+    // Update page header via shared helper
+    updatePageHeader(_role);
+    // Update profile step card title/subtitle
+    const titleEl = document.getElementById('profile-step-title');
+    const subEl   = document.getElementById('profile-step-sub');
+    if (titleEl) titleEl.textContent = 'Complete Your Profile';
+    if (subEl) subEl.textContent = isAttorney
+        ? 'Required for ENP certification under A.M. No. 24-10-14-SC.'
+        : 'Tell us a little about yourself to get started.';
+    // Re-render progress bar for current step
+    updateProgress(_currentStep);
+}
+
+/* ── Custom Date Picker Engine ─────────────────────────── */
+const _dpState = {};
+const _dpMonths = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function dpInit(id) {
+    if (!_dpState[id]) {
+        const now = new Date();
+        _dpState[id] = { year: now.getFullYear(), month: now.getMonth(), selected: null };
+    }
+}
+function dpToggle(id) {
+    dpInit(id);
+    const popup = document.getElementById('dp-popup-' + id);
+    const trigger = document.getElementById('dp-trigger-' + id);
+    const isOpen = popup.style.display !== 'none';
+    // Close all open pickers
+    document.querySelectorAll('.ql-datepicker-popup').forEach(p => { p.style.display = 'none'; });
+    document.querySelectorAll('.ql-datepicker-trigger.open').forEach(t => t.classList.remove('open'));
+    if (!isOpen) {
+        popup.style.display = 'block';
+        trigger.classList.add('open');
+        dpRender(id);
+    }
+}
+function dpNav(id, dir) {
+    dpInit(id);
+    _dpState[id].month += dir;
+    if (_dpState[id].month > 11) { _dpState[id].month = 0; _dpState[id].year++; }
+    if (_dpState[id].month < 0)  { _dpState[id].month = 11; _dpState[id].year--; }
+    dpRender(id);
+}
+function dpRender(id) {
+    dpInit(id);
+    const s = _dpState[id];
+    const titleEl = document.getElementById('dp-title-' + id);
+    if (titleEl) titleEl.textContent = _dpMonths[s.month] + ' ' + s.year;
+    const container = document.getElementById('dp-days-' + id);
+    if (!container) return;
+    const today = new Date();
+    const firstDay = new Date(s.year, s.month, 1).getDay();
+    const daysInMonth = new Date(s.year, s.month + 1, 0).getDate();
+    const daysInPrev = new Date(s.year, s.month, 0).getDate();
+    const cells = [];
+    // Prev month trailing days
+    for (let i = firstDay - 1; i >= 0; i--) {
+        const py = s.month - 1 < 0 ? s.year - 1 : s.year;
+        const pm = s.month - 1 < 0 ? 11 : s.month - 1;
+        const pd = daysInPrev - i;
+        cells.push({d: pd, y: py, m: pm, ny: s.year, cls: 'dp-day other-month'});
+    }
+    // Current month days
+    for (let d = 1; d <= daysInMonth; d++) {
+        const isToday = (d === today.getDate() && s.month === today.getMonth() && s.year === today.getFullYear());
+        const isSel = s.selected && s.selected.d === d && s.selected.m === s.month && s.selected.y === s.year;
+        const cls = 'dp-day' + (isToday ? ' today' : '') + (isSel ? ' selected' : '');
+        cells.push({d: d, y: s.year, m: s.month, ny: s.year, cls: cls});
+    }
+    // Next month leading days
+    const remainder = (firstDay + daysInMonth) % 7;
+    const fill = remainder === 0 ? 0 : 7 - remainder;
+    for (let d = 1; d <= fill; d++) {
+        const ny = s.month + 1 > 11 ? s.year + 1 : s.year;
+        const nm = s.month + 1 > 11 ? 0 : s.month + 1;
+        cells.push({d: d, y: ny, m: nm, ny: ny, cls: 'dp-day other-month'});
+    }
+    container.innerHTML = '';
+    cells.forEach(function(c) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = c.cls;
+        btn.textContent = c.d;
+        btn.dataset.did = id;
+        btn.dataset.ny = c.ny;
+        btn.dataset.y = c.y;
+        btn.dataset.m = c.m;
+        btn.dataset.d = c.d;
+        btn.addEventListener('click', function() {
+            dpSelect(this.dataset.did, +this.dataset.ny, +this.dataset.y, +this.dataset.m, +this.dataset.d);
+        });
+        container.appendChild(btn);
+    });
+}
+function dpSelect(id, navYear, y, m, d) {
+    dpInit(id);
+    _dpState[id] = { year: navYear, month: m, selected: { y, m, d } };
+    const val = y + '-' + String(m + 1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    document.getElementById(id).value = val;
+    const display = document.getElementById('dp-display-' + id);
+    display.textContent = _dpMonths[m] + ' ' + String(d).padStart(2,'0') + ', ' + y;
+    display.className = 'dp-selected-val';
+    const trigger = document.getElementById('dp-trigger-' + id);
+    if (trigger) { trigger.classList.remove('open', 'invalid-dp'); }
+    document.getElementById('dp-popup-' + id).style.display = 'none';
+    _fieldErr('err-' + id, '');
+    dpRender(id);
+}
+// Close pickers on outside click
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.ql-datepicker')) {
+        document.querySelectorAll('.ql-datepicker-popup').forEach(p => { p.style.display = 'none'; });
+        document.querySelectorAll('.ql-datepicker-trigger.open').forEach(t => t.classList.remove('open'));
+    }
+});
+
+function toggleCustomSelect(name) {
+    const trigger = document.getElementById('ob-' + name + '-trigger');
+    const dropdown = document.getElementById(name + '-dropdown');
+    const isOpen = dropdown.classList.contains('open');
+    // Close all open custom selects first
+    document.querySelectorAll('.custom-select-dropdown.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.custom-select-trigger.open').forEach(t => t.classList.remove('open'));
+    if (!isOpen) {
+        trigger.classList.add('open');
+        dropdown.classList.add('open');
+    }
+}
+function selectCustomOption(name, value, label) {
+    document.getElementById('ob-' + name).value = value;
+    const lbl = document.getElementById('ob-' + name + '-label');
+    if (lbl) lbl.textContent = label;
+    const trigger = document.getElementById('ob-' + name + '-trigger');
+    if (trigger) { trigger.classList.add('selected'); trigger.classList.remove('open', 'invalid-select'); }
+    const dropdown = document.getElementById(name + '-dropdown');
+    if (dropdown) dropdown.classList.remove('open');
+    // Mark selected option
+    document.querySelectorAll('#custom-' + name + ' .custom-select-option').forEach(opt => {
+        opt.classList.toggle('selected', opt.dataset.value === value);
+    });
+    _fieldErr('err-' + name, '');
+}
+// Close custom selects on outside click
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.custom-select')) {
+        document.querySelectorAll('.custom-select-dropdown.open').forEach(d => d.classList.remove('open'));
+        document.querySelectorAll('.custom-select-trigger.open').forEach(t => t.classList.remove('open'));
+    }
+});
+
+function _fieldErr(id, msg) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = msg || '';
+}
+function _fieldInvalid(inputId, invalid) {
+    const el = document.getElementById(inputId);
+    if (el) el.classList.toggle('invalid', !!invalid);
+    // custom-select trigger
+    const trigger = document.getElementById(inputId + '-trigger');
+    if (trigger) trigger.classList.toggle('invalid-select', !!invalid);
+    // custom datepicker trigger
+    const dpTrigger = document.getElementById('dp-trigger-' + inputId);
+    if (dpTrigger) dpTrigger.classList.toggle('invalid-dp', !!invalid);
+}
+async function submitProfile() {
+    const prefix       = (document.getElementById('ob-prefix')        || {}).value?.trim() || '';
+    const firstName    = (document.getElementById('ob-first-name')    || {}).value?.trim() || '';
+    const middleInit   = (document.getElementById('ob-middle-initial')|| {}).value?.trim() || '';
+    const suffix       = (document.getElementById('ob-suffix')        || {}).value?.trim() || '';
+    const lastName  = (document.getElementById('ob-last-name')  || {}).value?.trim() || '';
+    // Build full phone value into hidden field BEFORE validation reads it
+    const _pNum = (document.getElementById('ob-phone-number') || {}).value?.trim() || '';
+    const _pCode = document.getElementById('phone-code') ? document.getElementById('phone-code').textContent.trim() : '+63';
+    if (_pNum) {
+        const _clean = _pNum.replace(/[\s\-().]/g, '');
+        const _phEl = document.getElementById('ob-phone');
+        if (_phEl) _phEl.value = _pCode + _clean;
+    }
+    const phone     = (document.getElementById('ob-phone')      || {}).value?.trim() || '';
+    const rollNo          = (document.getElementById('ob-roll-no')           || {}).value?.trim() || '';
+    const rollDate        = (document.getElementById('ob-roll-date')          || {}).value?.trim() || '';
+    const commissionNo    = (document.getElementById('ob-commission-no')    || {}).value?.trim() || '';
+    const commissionValid = (document.getElementById('ob-commission-valid') || {}).value?.trim() || '';
+    const ptrNo           = (document.getElementById('ob-ptr-no')           || {}).value?.trim() || '';
+    const ptrLocation     = (document.getElementById('ob-ptr-location')     || {}).value?.trim() || '';
+    const ptrDate         = (document.getElementById('ob-ptr-date')         || {}).value?.trim() || '';
+    const ibpNo           = (document.getElementById('ob-ibp-no')           || {}).value?.trim() || '';
+    const ibpDate         = (document.getElementById('ob-ibp-date')         || {}).value?.trim() || '';
+    const notaryAddress   = (document.getElementById('ob-notary-address')   || {}).value?.trim() || '';
+    const mclePeriod      = (document.getElementById('ob-mcle-period')      || {}).value?.trim() || '';
+    const mcleNo          = (document.getElementById('ob-mcle-no')          || {}).value?.trim() || '';
+    const mcleDate        = (document.getElementById('ob-mcle-date')        || {}).value?.trim() || '';
+
+    const errIds = ['err-first-name','err-last-name','err-phone','err-roll-no','err-roll-date','err-commission-no','err-commission-valid',
+        'err-ptr-no','err-ptr-location','err-ptr-date','err-ibp-no','err-ibp-date',
+        'err-notary-email','err-notary-address','err-mcle-period','err-mcle-no','err-mcle-date'];
+    errIds.forEach(id => _fieldErr(id, ''));
+    const inputIds = ['ob-first-name','ob-last-name','ob-phone','ob-roll-no','ob-roll-date','ob-commission-no','ob-commission-valid',
+        'ob-ptr-no','ob-ptr-location','ob-ptr-date','ob-ibp-no','ob-ibp-date',
+        'ob-notary-email','ob-notary-address','ob-mcle-period','ob-mcle-no','ob-mcle-date'];
+    inputIds.forEach(id => _fieldInvalid(id, false));
+    document.getElementById('err-profile').textContent = '';
+
+    let hasError = false;
+    function _req(val, errId, inputId, msg) {
+        if (!val) { _fieldErr(errId, msg); _fieldInvalid(inputId, true); hasError = true; }
+    }
+    _req(firstName, 'err-first-name', 'ob-first-name', 'First name is required.');
+    _req(lastName,  'err-last-name',  'ob-last-name',  'Last name is required.');
+    // Validate phone (value already set above)
+    if (!_pNum) {
+        _fieldErr('err-phone', 'Phone number is required.');
+        const _wrap = document.getElementById('phone-input-wrap');
+        if (_wrap) _wrap.classList.add('invalid-phone'); hasError = true;
+    } else {
+        const _wrap = document.getElementById('phone-input-wrap');
+        if (_wrap) _wrap.classList.remove('invalid-phone');
+        _fieldErr('err-phone', '');
+    }
+    if (_role === 'attorney') {
+        _req(rollNo,          'err-roll-no',          'ob-roll-no',          'IBP Roll No. is required.');
+        if (rollNo && !/^[0-9]{5}$/.test(rollNo)) { _fieldErr('err-roll-no', 'Roll No. must be exactly 5 digits.'); _fieldInvalid('ob-roll-no', true); hasError = true; }
+        _req(rollDate,        'err-roll-date',        'ob-roll-date',        'Roll date is required.');
+        _req(commissionNo,    'err-commission-no',    'ob-commission-no',    'Commission No. is required.');
+        _req(commissionValid, 'err-commission-valid', 'ob-commission-valid', 'Commission validity date is required.');
+        _req(ptrNo,           'err-ptr-no',           'ob-ptr-no',           'PTR No. is required.');
+        _req(ptrLocation,     'err-ptr-location',     'ob-ptr-location',     'PTR location is required.');
+        _req(ptrDate,         'err-ptr-date',         'ob-ptr-date',         'PTR date is required.');
+        if (!ibpNo) {
+            _fieldErr('err-ibp-no', 'IBP No. is required.'); _fieldInvalid('ob-ibp-no', true); hasError = true;
+        } else if (!/^[0-9]{6}$/.test(ibpNo)) {
+            _fieldErr('err-ibp-no', 'IBP No. must be exactly 6 digits (numbers only).'); _fieldInvalid('ob-ibp-no', true); hasError = true;
+        }
+        _req(ibpDate,         'err-ibp-date',         'ob-ibp-date',         'IBP date is required.');
+        _req(notaryAddress,   'err-notary-address',   'ob-notary-address',   'Notary address is required.');
+        _req(mclePeriod,      'err-mcle-period',      'ob-mcle-period',      'MCLE period is required.');
+        _req(mcleNo,          'err-mcle-no',          'ob-mcle-no',          'MCLE No. is required.');
+        _req(mcleDate,        'err-mcle-date',        'ob-mcle-date',        'MCLE date is required.');
+
+
+    }
+    if (hasError) return;
+    const btn = document.getElementById('btn-profile-continue');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Saving...';
+    const payload = {
+        prefix:     prefix,
+        first_name: firstName,
+        middle_initial: middleInit,
+        suffix:     suffix,
+        last_name:  lastName,
+        phone:      phone,
+        role:       _role,
+        roll_no:                   rollNo,
+        roll_date:                 rollDate,
+        commission_no:             commissionNo,
+        commission_no_valid_until: commissionValid,
+        ptr_no:                    ptrNo,
+        ptr_no_location:           ptrLocation,
+        ptr_no_date:               ptrDate,
+        ibp_no:                    ibpNo,
+        ibp_no_date:               ibpDate,
+        notary_email:              (_user && _user.email) ? _user.email : '',
+        notary_address:            notaryAddress,
+        mcle_no_period:            mclePeriod,
+        mcle_no:                   mcleNo,
+        mcle_no_date:              mcleDate,
+        organization: (document.getElementById('ob-org')      || {}).value?.trim() || '',
+        position:     (document.getElementById('ob-position') || {}).value?.trim() || '',
+    };
+    try {
+        // Refresh token before submit to prevent 401 during onboarding
+        try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
+        const res = await fetch('/api/onboarding/profile', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+            let msg = 'Failed to save profile. Please try again.';
+            try {
+                const errData = await res.json();
+                const detail = errData.detail;
+                if (typeof detail === 'string') msg = detail;
+                else if (Array.isArray(detail)) msg = detail.map(function(e) { return e.msg || e.message || JSON.stringify(e); }).join('; ');
+                else if (detail) msg = JSON.stringify(detail);
+            } catch(jsonErr) {
+                // Server returned non-JSON (e.g. 500 HTML error page)
+                msg = 'Server error (' + res.status + '). Please try again.';
+            }
+            throw new Error(msg);
+        }
+        // Attorneys go to course; clients go straight to done
+        goToStep(_role === 'attorney' ? 'course' : 'done');
+    } catch(e) {
+        document.getElementById('err-profile').textContent = e.message;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Continue';
+    }
+}
+
+// ═══════════════════════════════════════════════
+// STEP 3: COURSE / DISCLAIMER
+// ═══════════════════════════════════════════════
+function toggleStartBtn() { /* no-op - proceed button controlled by course completion */ }
+function toggleExamStart() {
+    const cb = document.getElementById('exam-ready-checkbox');
+    const btn = document.getElementById('btn-begin-exam');
+    if (btn) btn.disabled = !cb.checked;
+}
+function beginExam() {
+    const pre = document.getElementById('exam-pre-screen');
+    const qw = document.getElementById('exam-questions-wrap');
+    if (pre) pre.style.display = 'none';
+    if (qw) qw.style.display = 'block';
+    startExam();
+}
+
+// ═══════════════════════════════════════════════
+// STEP 4: EXAM
+// ═══════════════════════════════════════════════
+async function startExam() {
+    document.getElementById('exam-questions').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);"><div class="big-spinner" style="width:36px;height:36px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;"></div>Loading your 50-question exam…</div>';
+    document.getElementById('page-nav').innerHTML = '';
+    try {
+        const res = await fetch('/api/certification/start', { method: 'GET', credentials: 'include' });
+        if (!res.ok) throw new Error((await res.json()).detail || 'Failed to start exam');
+        const data = await res.json();
+        _questions = data.questions;
+        _answers = {};
+        _testSessionId = data.test_session_id;
+        _currentPage = 0;
+        // Persist session ID so page refresh can resume
+        try { localStorage.setItem('ql_test_session_id', _testSessionId); } catch(e) {}
+
+        // DEV MODE: ?dev=true auto-selects option B for every question
+        const _devMode = new URLSearchParams(window.location.search).get('dev') === 'true';
+        if (_devMode) {
+            _questions.forEach(function(q) {
+                if (q.choices && q.choices.length > 1) {
+                    _answers[q.id] = 'B'; // option B
+                }
+            });
+            console.log('[DEV] Auto-filled', Object.keys(_answers).length, 'answers with option B');
+        }
+
+        renderExamPage(0);
+        startTimer(data.time_limit_minutes || 90);
+        document.getElementById('timer-banner').style.display = 'block';
+    } catch(e) {
+        document.getElementById('exam-questions').innerHTML =
+            '<div class="ob-error" style="text-align:center;padding:2rem;">' + e.message + '</div>';
+    }
+}
+
+function renderExamPage(page) {
+    _currentPage = page;
+    const start = page * QUESTIONS_PER_PAGE;
+    const end = Math.min(start + QUESTIONS_PER_PAGE, _questions.length);
+    const pageQuestions = _questions.slice(start, end);
+
+    // Render pagination
+    const totalPages = Math.ceil(_questions.length / QUESTIONS_PER_PAGE);
+    const navEl = document.getElementById('page-nav');
+    navEl.innerHTML = Array.from({length: totalPages}, (_, i) => {
+        const pageStart = i * QUESTIONS_PER_PAGE;
+        const pageEnd = Math.min(pageStart + QUESTIONS_PER_PAGE, _questions.length);
+        const pageAnswered = _questions.slice(pageStart, pageEnd).filter(q => _answers[q.id] !== undefined).length;
+        const allAnswered = pageAnswered === (pageEnd - pageStart);
+        const cls = i === page ? 'active' : (allAnswered ? 'complete' : '');
+        return `<button class="${cls}" onclick="renderExamPage(${i})">Page ${i+1} (${pageAnswered}/${pageEnd-pageStart})</button>`;
+    }).join('');
+
+    // Render questions
+    const qs = pageQuestions.map((q, i) =>
+        `<div class="ob-question" id="q-${q.id}">
+            <p>${start + i + 1}. ${q.question}</p>
+            ${q.choices.map(c =>
+                `<div class="ob-choice ${(function(){ var q2 = _questions.find(function(x){return x.id===q.id;}); var idx2 = q2 ? q2.choices.indexOf(c) : -1; return _answers[q.id] === String.fromCharCode(65+idx2) ? 'selected' : ''; })()}" onclick="pickAnswer('${q.id}', this)">${c}</div>`
+            ).join('')}
+        </div>`
+    ).join('');
+    document.getElementById('exam-questions').innerHTML = qs;
+
+    updateAnswerProgress();
+
+    // Next page button
+    const hasNext = (page + 1) < totalPages;
+    const hasPrev = page > 0;
+    let navBtns = '';
+    if (hasPrev) navBtns += `<button class="btn-back" onclick="renderExamPage(${page-1})" style="flex:0 0 auto;">← Previous</button>`;
+    if (hasNext) navBtns += `<button class="btn-primary" onclick="renderExamPage(${page+1})" style="max-width:160px;">Next →</button>`;
+    document.getElementById('exam-questions').innerHTML += `<div class="btn-row" style="justify-content:${hasPrev&&hasNext?'space-between':(hasNext?'flex-end':'flex-start')}">${navBtns}</div>`;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateAnswerProgress() {
+    const answered = Object.keys(_answers).length;
+    const total = _questions.length;
+    const pct = total > 0 ? (answered / total * 100) : 0;
+    const countEl = document.getElementById('answer-count');
+    const barEl = document.getElementById('answer-bar');
+    if (countEl) countEl.textContent = `${answered}/${total} answered`;
+    if (barEl) barEl.style.width = pct + '%';
+}
+
+function pickAnswer(qid, el) {
+    const text = el.textContent;
+    // Store the letter (A/B/C/D) based on choice index
+    var q = _questions.find(function(q){ return q.id === qid; });
+    if (q) {
+        var idx = q.choices.indexOf(text);
+        _answers[qid] = idx >= 0 ? String.fromCharCode(65 + idx) : text;
+    } else {
+        _answers[qid] = text;
+    }
+    const block = document.getElementById('q-' + qid);
+    if (block) block.querySelectorAll('.ob-choice').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    updateAnswerProgress();
+    // Update page nav
+    const totalPages = Math.ceil(_questions.length / QUESTIONS_PER_PAGE);
+    const navEl = document.getElementById('page-nav');
+    if (navEl) {
+        navEl.innerHTML = Array.from({length: totalPages}, (_, i) => {
+            const pageStart = i * QUESTIONS_PER_PAGE;
+            const pageEnd = Math.min(pageStart + QUESTIONS_PER_PAGE, _questions.length);
+            const pageAnswered = _questions.slice(pageStart, pageEnd).filter(q => _answers[q.id] !== undefined).length;
+            const allAnswered = pageAnswered === (pageEnd - pageStart);
+            const cls = i === _currentPage ? 'active' : (allAnswered ? 'complete' : '');
+            return `<button class="${cls}" onclick="renderExamPage(${i})">Page ${i+1} (${pageAnswered}/${pageEnd-pageStart})</button>`;
+        }).join('');
+    }
+}
+
+function startTimer(minutes) {
+    if (_timerInterval) clearInterval(_timerInterval);
+    let remaining = minutes * 60;
+    function update() {
+        const el = document.getElementById('timer-display');
+        const banner = document.getElementById('timer-banner');
+        if (!el) { clearInterval(_timerInterval); return; }
+        const m = Math.floor(remaining / 60);
+        const s = remaining % 60;
+        el.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+        if (remaining <= 300 && banner) banner.classList.add('urgent');
+        if (remaining <= 0) {
+            clearInterval(_timerInterval);
+            _timerInterval = null;
+            el.textContent = '00:00';
+            submitExam();
+        }
+        remaining--;
+    }
+    update();
+    _timerInterval = setInterval(update, 1000);
+}
+
+async function submitExam() {
+    const answered = Object.keys(_answers).length;
+    const total = _questions.length;
+    if (answered < total) {
+        document.getElementById('err-exam').textContent =
+            `Please answer all questions (${answered}/${total} answered). Use the page buttons to navigate.`;
+        return;
+    }
+    const btn = document.getElementById('btn-submit-exam');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Grading…';
+    if (_timerInterval) { clearInterval(_timerInterval); _timerInterval = null; }
+    document.getElementById('timer-banner').style.display = 'none';
+    document.getElementById('err-exam').textContent = '';
+    try {
+        const res = await fetch('/api/certification/submit', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ answers: _answers, test_session_id: _testSessionId })
+        });
+        let data;
+        try { data = await res.json(); } catch(jsonErr) { throw new Error('Server error — could not parse response.'); }
+        if (!res.ok) {
+            const msg = (data && (typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail))) || 'Submission failed.';
+            throw new Error(msg);
+        }
+        if (data.passed === undefined && data.success === undefined) {
+            throw new Error('Invalid response from server. Please try again.');
+        }
+        renderResult(data);
+    } catch(e) {
+        btn.disabled = false;
+        btn.textContent = 'Submit Test';
+        document.getElementById('err-exam').textContent = e.message || 'Submission failed. Please try again.';
+    }
+}
+
+// ═══════════════════════════════════════════════
+// EXAM RESULT
+// ═══════════════════════════════════════════════
+function renderResult(data) {
+    if (!data || data.passed === undefined) {
+        document.getElementById('err-exam').textContent = 'Could not load results. Please refresh and try again.';
+        return;
+    }
+    if (data.certificate_id) _certificateId = data.certificate_id;
+    var passed = data.passed;
+    var correct = data.correct !== undefined ? data.correct : 0;
+    var total = data.total || 50;
+    var scorePct = data.score_pct !== undefined ? Math.round(data.score_pct) : Math.round(correct / total * 100);
+    var certId = data.certificate_id || '';
+
+    _clearProgress();
+    try { localStorage.removeItem("ql_test_session_id"); } catch(e) {}
+
+    // Show result directly
+    var allS = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc','step-done'];
+    allS.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
+    var re = document.getElementById('step-result');
+    if (re) re.style.display = '';
+    var pw = document.getElementById('progress-wrap');
+    if (pw) pw.style.display = 'block';
+    var wrap = document.getElementById('page-wrap') || document.querySelector('.page-wrap');
+    if (wrap) wrap.style.display = 'flex';
+    try { updateProgress('exam'); } catch(e) {}
+    window.scrollTo({top:0, behavior:'smooth'});
+
+    var bannerEl = document.getElementById('result-banner');
+    var contentEl = document.getElementById('result-content');
+
+    if (passed) {
+        bannerEl.innerHTML = '<div class="result-banner pass">Passed! ' + correct + ' / ' + total + ' correct (' + scorePct + '%)</div>';
+        var html = '<p style="color:var(--muted);margin-bottom:1.5rem;text-align:center;">Congratulations! Your ENP certificate is ready to download.</p>';
+        html += '<div style="text-align:center;">';
+        html += '<button class="btn-primary" onclick="goToDownloadCert(\'' + certId + '\')" style="max-width:280px;margin:0 auto;display:inline-flex;align-items:center;gap:0.5rem;justify-content:center;">Download Certificate</button>';
+        html += '</div>';
+        contentEl.innerHTML = html;
+    } else {
+        bannerEl.innerHTML = '<div class="result-banner fail">Not Passed &mdash; ' + correct + ' / ' + total + ' correct (' + scorePct + '%)</div>';
+        var html2 = '<p style="color:var(--muted);margin-bottom:1rem;text-align:center;">You need 70% (35/50) to pass. Review the course material and try again.</p>';
+        html2 += '<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:0.5rem;padding:1rem;margin-bottom:1.5rem;font-size:0.875rem;color:var(--muted);text-align:center;">A fail notification has been sent to your registered email.</div>';
+        html2 += '<div style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;">';
+        html2 += '<a href="/mastering-quanby-legal.pdf" target="_blank" class="btn-gold" style="text-align:center;width:100%;max-width:300px;">Review Course Material</a>';
+        html2 += '<button class="btn-primary" onclick="goToStep(\'course\')" style="max-width:300px;">Go to Course</button>';
+        html2 += '</div>';
+        contentEl.innerHTML = html2;
+    }
+}
+
+function _populateCertUI(certId) {
+    if (certId) _certificateId = certId;
+    var certIdEl = document.getElementById('cert-id-display');
+    var dlLink = document.getElementById('cert-download-link');
+    if (certIdEl) certIdEl.textContent = _certificateId || '';
+    if (dlLink) dlLink.href = '/api/certificate/' + (_certificateId || '');
+}
+function goToDownloadCert(certId) {
+    if (certId) _certificateId = certId;
+    // Hide all other screens and show certificate step directly
+    var allScreens = ['loading-screen','auth-gate','certified-screen','step-role','step-profile',
+        'step-course','step-exam','step-result','step-sc','step-done'];
+    allScreens.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
+    var certEl = document.getElementById('step-certificate');
+    if (certEl) certEl.style.display = 'block';
+    var pw = document.getElementById('progress-wrap');
+    if (pw) pw.style.display = 'block';
+    var wrap = document.getElementById('page-wrap') || document.querySelector('.page-wrap');
+    if (wrap) wrap.style.display = 'flex';
+    try { updateProgress('certificate'); } catch(e) {}
+    _populateCertUI(certId);
+    window.scrollTo({top:0, behavior:'smooth'});
+    // Safeguard: re-show in case something hides it afterward
+    setTimeout(function() {
+        var el = document.getElementById('step-certificate');
+        if (el) el.style.display = 'block';
+        _populateCertUI(_certificateId);
+    }, 400);
+}
+
+// ═══════════════════════════════════════════════
+// STEP 5: CERTIFICATE (resume from API step)
+// ═══════════════════════════════════════════════
+// Called on page load if user already has certificate step
+async function loadCertStep() {
+    var certId = (_user && _user.certificate_id) ? _user.certificate_id : _certificateId;
+    if (certId) {
+        goToDownloadCert(certId);
+    } else {
+        // Try fetching from API in case _user not loaded yet
+        try {
+            var res = await fetch('/api/auth/me', { credentials: 'include' });
+            if (res.ok) {
+                var u = await res.json();
+                if (u.certificate_id) { goToDownloadCert(u.certificate_id); return; }
+            }
+        } catch(e) {}
+        goToDownloadCert('');
+    }
+}
+
+// ═══════════════════════════════════════════════
+// RETAKE PAYMENT
+// ═══════════════════════════════════════════════
+function openRetakeModal() {
+    document.getElementById('retake-modal').classList.add('open');
+    loadPaymentDetails();
+}
+
+async function loadPaymentDetails() {
+    try {
+        const res = await fetch('/api/onboarding/retake-payment', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ payment_method: 'gcash' })
+        });
+        const d = await res.json();
+        const ref = d.reference_number || ('RETAKE-' + Math.random().toString(36).substr(2,8).toUpperCase());
+        const gn = document.getElementById('pay-gcash-number');
+        const pr = document.getElementById('pay-ref');
+        const prb = document.getElementById('pay-ref-bank');
+        const bn = document.getElementById('pay-bank-name');
+        const ba = document.getElementById('pay-bank-account');
+        const ban = document.getElementById('pay-bank-acname');
+        if (gn) gn.textContent = d.gcash_number || '09XX-XXX-XXXX';
+        if (pr) pr.textContent = ref;
+        if (prb) prb.textContent = ref;
+        if (bn) bn.textContent = d.bank_name || 'BDO';
+        if (ba) ba.textContent = d.bank_account || 'XXXX-XXXX-XXXX';
+        if (ban) ban.textContent = d.bank_account_name || 'Quanby Solutions, Inc.';
+    } catch(e) {}
+}
+
+function switchPayTab(tab) {
+    document.getElementById('pay-gcash').style.display = tab === 'gcash' ? '' : 'none';
+    document.getElementById('pay-bank').style.display = tab === 'bank' ? '' : 'none';
+    const activeStyle = 'flex:1;padding:0.65rem;border-radius:0.5rem;border:2px solid rgba(201,168,76,0.5);background:rgba(201,168,76,0.1);color:#c9a84c;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;';
+    const inactiveStyle = 'flex:1;padding:0.65rem;border-radius:0.5rem;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--muted);cursor:pointer;font-family:Inter,sans-serif;';
+    document.getElementById('tab-gcash').style.cssText = tab === 'gcash' ? activeStyle : inactiveStyle;
+    document.getElementById('tab-bank').style.cssText = tab === 'bank' ? activeStyle : inactiveStyle;
+}
+
+async function submitRetakePayment() {
+    const btn = document.getElementById('btn-confirm-pay');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Submitting…';
+    document.getElementById('err-pay').textContent = '';
+    try {
+        const res = await fetch('/api/onboarding/retake-payment/verify', { method: 'POST', credentials: 'include' });
+        const d = await res.json();
+        document.getElementById('retake-modal').classList.remove('open');
+        // Show pending message in result content
+        const contentEl = document.getElementById('result-content');
+        if (contentEl) {
+            contentEl.innerHTML = `
+                <div style="text-align:center;padding:2rem 0;">
+                    <div style="font-size:3rem;margin-bottom:1rem;">⏳</div>
+                    <p style="font-weight:600;color:#c9a84c;">Payment verification pending</p>
+                    <p style="color:var(--muted);font-size:0.875rem;margin-top:0.5rem;">Our team will verify your payment within 24 hours and send you a confirmation email with a link to retake the exam.</p>
+                    ${d.reference_number ? `<p style="margin-top:0.75rem;font-size:0.85rem;color:var(--muted);">Reference: <strong style="color:#c9a84c;">${d.reference_number}</strong></p>` : ''}
+                </div>`;
+        }
+    } catch(e) {
+        btn.disabled = false;
+        btn.textContent = "✅ I've Paid — Submit for Verification";
+        document.getElementById('err-pay').textContent = 'Submission failed. Please try again.';
+    }
+}
+
+// ═══════════════════════════════════════════════
+// STEP 6: COMPLETE
+// ═══════════════════════════════════════════════
+async function completeOnboarding() {
+    try { await fetch('/api/onboarding/complete', { method: 'POST', credentials: 'include' }); } catch(e) {}
+    window.location.href = '/dashboard';
+}
+
+// ═══════════════════════════════════════════════
+// SIGN OUT
+// ═══════════════════════════════════════════════
+function toggleUserMenu() {
+    const menu = document.getElementById('nav-user-menu');
+    const wrap = document.getElementById('nav-profile-wrap');
+    const isOpen = menu.style.display !== 'none';
+    menu.style.display = isOpen ? 'none' : 'block';
+    if (wrap) wrap.classList.toggle('open', !isOpen);
+}
+document.addEventListener('click', function(e) {
+    const wrap = document.getElementById('nav-profile-wrap');
+    const menu = document.getElementById('nav-user-menu');
+    if (menu && wrap && !wrap.contains(e.target) && !menu.contains(e.target)) {
+        menu.style.display = 'none';
+        if (wrap) wrap.classList.remove('open');
+    }
+});
+let _selectedCountry = '+63';
+function toggleCountryDropdown() {
+    const dd = document.getElementById('phone-country-dropdown');
+    dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+function selectCountry(code, flag, iso) {
+    _selectedCountry = code;
+    document.getElementById('phone-flag').textContent = flag;
+    document.getElementById('phone-code').textContent = code;
+    document.getElementById('phone-country-dropdown').style.display = 'none';
+    document.querySelectorAll('.phone-country-option').forEach(function(o) {
+        o.classList.toggle('selected', o.dataset.code === code);
+    });
+    document.getElementById('ob-phone-number').focus();
+}
+document.addEventListener('click', function(e) {
+    const btn = document.getElementById('phone-country-btn');
+    const dd = document.getElementById('phone-country-dropdown');
+    if (dd && btn && !btn.contains(e.target)) dd.style.display = 'none';
+});
+async function signOut() {
+    try { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); } catch(e) {}
+    window.location.href = '/';
+}
+
+// ═══════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════
+async function signInWithGoogle() {
+    try {
+        // Store that we want to return to /onboard after login
+        sessionStorage.setItem('post_login_redirect', '/onboard');
+        const res = await fetch('/api/auth/providers', { credentials: 'include' });
+        if (!res.ok) throw new Error('Could not get sign-in URL');
+        const data = await res.json();
+        const url = (data.providers && data.providers.google) || null;
+        if (url) {
+            window.location.href = url;
+        } else {
+            throw new Error('Google sign-in not configured');
+        }
+    } catch(e) {
+        alert('Sign in failed: ' + e.message + '. Please go back to the homepage and sign in.');
+    }
+}
+
+// ═══════════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════════
+window.onerror = function(msg, src, line, col, err) {
+    // Ignore third-party script errors (Cloudflare beacon, etc.)
+    if (src && (src.indexOf('cloudflareinsights') >= 0 || src.indexOf('beacon.min') >= 0)) return true;
+    var ls = document.getElementById('loading-screen');
+    if (ls && ls.style.display !== 'none') {
+        ls.style.display = 'block';
+        ls.innerHTML = '<div style="color:#f87171;padding:2rem;text-align:center;"><h3>Page Error</h3><p style="font-size:0.85rem;margin-top:0.5rem;">' + msg + '<br>Line ' + line + '</p><a href="/" style="color:#c9a84c;margin-top:1rem;display:inline-block;">← Back to Home</a></div>';
+    }
+    return true;
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+
+// Failsafe: if still on loading screen after 6s, show error
+setTimeout(function() {
+    var ls = document.getElementById('loading-screen');
+    if (ls && ls.style.display !== 'none' && ls.innerHTML.indexOf('Page Error') === -1) {
+        ls.innerHTML = '<div style="text-align:center;padding:2rem;">' +
+            '<p style="color:#f87171;font-weight:600;margin-bottom:1rem;">⚠️ Page took too long to load.</p>' +
+            '<p style="color:var(--muted);font-size:0.875rem;margin-bottom:1.5rem;">This may be a network issue or your session expired.</p>' +
+            '<button onclick="window.location.reload()" style="background:var(--purple);color:#fff;border:none;padding:0.75rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-size:1rem;margin-right:0.75rem;">🔄 Retry</button>' +
+            '<a href="/" style="color:var(--muted);font-size:0.875rem;">← Home</a>' +
+        '</div>';
+    }
+}, 6000);
+// === INLINE COURSE MODULE ===
+var COURSE_MODULES = [
+    {
+        title: 'Introduction',
+        lessons: [
+            {
+                title: 'Lesson 1.1 \u2014 What is Quanby Legal?',
+                html: '<h3>What is Quanby Legal?</h3><p>Quanby Legal is a comprehensive digital platform designed to modernize the traditional notarization process. By creating a secure, digital bridge between Principals (clients) and Electronic Notary Publics (ENPs), we enable legal services to be delivered efficiently, regardless of physical location.</p><p style="margin-top:0.75rem;">This is not just a website \u2014 we facilitate legally binding acts requiring strict security, compliance, and seamless user experience.</p>'
+            },
+            {
+                title: 'Lesson 1.2 \u2014 Key Terminology',
+                html: '<h3>Key Terminology</h3><p>Familiarize yourself with the core terms used throughout the platform:</p><div class="key-term-card"><strong>Principal</strong><br><em>Individual or entity seeking legal services. Initiates bookings, uploads documents, and performs electronic signatures.</em></div><div class="key-term-card"><strong>ENP / Electronic Notary Public</strong><br><em>Commissioned legal professional authorized to perform notarial acts electronically. Verifies identities and applies the official digital seal.</em></div><div class="key-term-card"><strong>REN / Remote Electronic Notarization</strong><br><em>Notarization conducted via secure video call, with each party joining from their own location.</em></div><div class="key-term-card"><strong>Face Verification</strong><br><em>Mandatory AI-driven security checkpoint using a live selfie. Images are verified but NOT stored.</em></div><div class="key-term-card"><strong>Notarial Registry</strong><br><em>Secure digital record-keeping system maintained by the ENP \u2014 a compliant log of all notarial acts performed.</em></div>'
+            },
+            {
+                title: 'Lesson 1.3 \u2014 Course Objectives',
+                html: '<h3>Course Objectives</h3><p>By completing this course, you will be able to:</p><ol><li>Understand the dual roles: <strong>Principal</strong> and <strong>ENP</strong>, each with customized dashboards.</li><li>Recognize the importance of security: identity checks and face verification are <strong>mandatory</strong>.</li><li>Learn flexible notarization options: <strong>Remote Online Notarization</strong> and <strong>In-Person appointments</strong>.</li><li>Familiarize with key terminology: Principal, ENP, REN, Face Verification, and Notarial Registry.</li></ol>'
+            }
+        ]
+    },
+    {
+        title: 'Platform Dashboards',
+        lessons: [
+            {
+                title: 'Lesson 2.1 \u2014 Principal Dashboard',
+                html: '<h3>Principal Dashboard</h3><p>The Principal Dashboard is the central command center for clients. It provides a complete overview of your notarization activity.</p><ul><li>Total appointments overview and pending confirmations</li><li>Quick Actions: <strong>Book Consultation</strong> (remote advice) or <strong>Book a Notary</strong> (in-person)</li><li>Signing sessions tracking</li></ul><div class="key-term-card"><strong>Book a Notary Flow</strong><br><em>Select mode (Remote / In-Person) \u2192 Select date and time \u2192 Confirm booking</em></div><p style="margin-top:0.75rem;">Your <strong>Ongoing Sessions</strong> panel shows a gray <em>\u201cWait\u201d</em> button until the ENP starts the meeting. Once started, it turns into a green <strong>\u201cLive\u201d</strong> badge with a Join button.</p>'
+            },
+            {
+                title: 'Lesson 2.2 \u2014 ENP Dashboard',
+                html: '<h3>ENP Dashboard</h3><p>The ENP Dashboard gives legal professionals complete control over their digital notarial practice.</p><ul><li>Manage incoming appointment requests</li><li>Track your schedule and calendar</li><li>Maintain your digital <strong>Notarial Registry</strong></li><li>Manage practice settings and preferences</li></ul><div class="key-term-card"><strong>Mandatory Face Verification</strong><br><em>Before any session begins, all participants \u2014 including the ENP \u2014 must complete biometric face verification to ensure legal validity.</em></div>'
+            }
+        ]
+    },
+    {
+        title: 'Core Services',
+        lessons: [
+            {
+                title: 'Lesson 3.1 \u2014 Remote vs In-Person Notarization',
+                html: '<h3>Remote vs. In-Person Notarization</h3><div class="key-term-card"><strong>Remote Electronic Notarization (REN)</strong><br><em>Entire process is conducted online. A secure video link is sent after booking. Documents are uploaded digitally, identity is verified through digital means, and signing is handled electronically. Requires stable internet and technology familiarity.</em></div><div class="key-term-card"><strong>In-Person Electronic Notarization (IEN)</strong><br><em>Booking is made at a physical location. The Principal brings physical documents and a valid ID to the site. The ENP verifies identity in person, witnesses the signing, and applies the digital seal. Requires coordination and travel.</em></div>'
+            },
+            {
+                title: 'Lesson 3.2 \u2014 Live Session & Identity Verification',
+                html: '<h3>Live Session &amp; Identity Verification</h3><p>All participants must pass mandatory biometric <strong>Face Verification</strong> before entering the virtual notarial room.</p><ol><li>Confirm your booking</li><li>Wait for the ENP to start the session</li><li>Green <strong>\u201cLive\u201d</strong> badge appears on your dashboard</li><li>Click <strong>Join</strong></li><li>Complete <strong>Face Verification</strong> (live selfie, AI-verified, not stored)</li><li>Enter the virtual notarial room</li></ol><div class="key-term-card"><strong>For In-Person Sessions</strong><br><em>Bring your physical documents and a valid government-issued ID to the notary\u2019s location.</em></div>'
+            }
+        ]
+    },
+    {
+        title: 'Stakeholder Roles',
+        lessons: [
+            {
+                title: 'Lesson 4.1 \u2014 Principal, ENP, and Witness',
+                html: '<h3>Stakeholder Roles</h3><div class="key-term-card"><strong>Principal</strong><br><em>Individual or entity seeking legal services. Responsible for initiating the booking, uploading necessary documentation, and performing the electronic signature.</em></div><div class="key-term-card"><strong>ENP \u2014 Electronic Notary Public</strong><br><em>Commissioned legal professional authorized to perform notarial acts electronically. Verifies identities, conducts sessions, and applies the official digital seal to complete the act.</em></div><div class="key-term-card"><strong>Witness</strong><br><em>Present during the session (remote or in-person). Identity must be verified before participating. Witnesses the signing act and may be required for certain document types.</em></div>'
+            }
+        ]
+    },
+    {
+        title: 'Compliance',
+        lessons: [
+            {
+                title: 'Lesson 5.1 \u2014 Legal Framework',
+                html: '<h3>Legal Framework</h3><p>Quanby Legal operates within a robust Philippine legal and regulatory framework:</p><div class="key-term-card"><strong>A.M. No. 24-10-14-SC</strong><br><em>Supreme Court Rules on Electronic Notarization in the Philippines \u2014 the primary legal basis for ENP certification and all electronic notarial acts performed on the platform.</em></div><div class="key-term-card"><strong>RA 8792 \u2014 E-Commerce Act</strong><br><em>Provides legal recognition of electronic documents and electronic signatures in the Philippines.</em></div><div class="key-term-card"><strong>RA 10173 \u2014 Data Privacy Act</strong><br><em>Governs how personal data collected during notarization must be handled and protected.</em></div><div class="key-term-card"><strong>BSP Circular 944</strong><br><em>eKYC compliance framework for digital identity verification \u2014 governs our Face Verification process.</em></div>'
+            },
+            {
+                title: 'Lesson 5.2 \u2014 Security Protocols',
+                html: '<h3>Security Protocols</h3><div class="key-term-card"><strong>Face Verification</strong><br><em>AI-driven, live selfie capture. Images are verified but NOT stored. Mandatory for all session participants before entering the virtual room.</em></div><div class="key-term-card"><strong>Notarial Registry</strong><br><em>Secure, compliant log of all notarial acts performed on the platform. Includes session details and participant information. Maintained by the ENP.</em></div><div class="key-term-card"><strong>Digital Seal</strong><br><em>The ENP applies an official digital seal to complete and authenticate each notarial act \u2014 creating a tamper-evident, legally binding document.</em></div><div class="key-term-card"><strong>Audit Trail</strong><br><em>Every action on the platform is logged for compliance purposes. This ensures full accountability and legal traceability.</em></div>'
+            }
+        ]
+    }
+];
+
+var ALL_LESSONS = [];
+COURSE_MODULES.forEach(function(mod, mi) {
+    mod.lessons.forEach(function(lesson, li) {
+        ALL_LESSONS.push({ modIdx: mi, lessonIdx: li, title: lesson.title, html: lesson.html });
+    });
+});
+var TOTAL_LESSONS = ALL_LESSONS.length;
+var currentLesson = 0;
+
+// Persist course progress across page reloads
+var _QL_PROGRESS_KEY = 'ql_course_progress_v1';
+function _saveProgress() {
+    try { localStorage.setItem(_QL_PROGRESS_KEY, JSON.stringify({ viewedLessons: viewedLessons, currentLesson: currentLesson })); } catch(e) {}
+}
+function _loadProgress() {
+    try {
+        var saved = JSON.parse(localStorage.getItem(_QL_PROGRESS_KEY) || 'null');
+        if (saved && saved.viewedLessons) {
+            viewedLessons = saved.viewedLessons;
+            viewedCount = Object.keys(viewedLessons).filter(function(k){ return viewedLessons[k]; }).length;
+            if (saved.currentLesson !== undefined) currentLesson = Math.min(saved.currentLesson, TOTAL_LESSONS - 1);
+        }
+    } catch(e) {}
+}
+function _clearProgress() {
+    try { localStorage.removeItem(_QL_PROGRESS_KEY); } catch(e) {}
+}
+var viewedLessons = {};
+var viewedCount = 0;
+_loadProgress();
+
+function switchModule(modIdx) {
+    var idx = -1;
+    for (var i = 0; i < ALL_LESSONS.length; i++) {
+        if (ALL_LESSONS[i].modIdx === modIdx) { idx = i; break; }
+    }
+    if (idx >= 0) { currentLesson = idx; renderLesson(); }
+}
+
+function renderLesson() {
+    var lesson = ALL_LESSONS[currentLesson];
+    document.querySelectorAll('.course-tab').forEach(function(tab) {
+        var mi = parseInt(tab.dataset.mod);
+        tab.classList.remove('active', 'done');
+        if (mi === lesson.modIdx) {
+            tab.classList.add('active');
+        } else {
+            var modLessons = ALL_LESSONS.filter(function(l){ return l.modIdx === mi; });
+            var allSeen = modLessons.every(function(l){ return viewedLessons[ALL_LESSONS.indexOf(l)]; });
+            if (allSeen) tab.classList.add('done');
+        }
+    });
+    document.getElementById('lesson-content').innerHTML = lesson.html;
+    if (!viewedLessons[currentLesson]) {
+        viewedLessons[currentLesson] = true;
+        viewedCount++;
+        _saveProgress();
+    }
+    var pct = Math.round((viewedCount / TOTAL_LESSONS) * 100);
+    document.getElementById('course-progress-fill').style.width = pct + '%';
+    document.getElementById('lesson-label').textContent = 'Lesson ' + (currentLesson + 1) + ' of ' + TOTAL_LESSONS;
+    document.getElementById('btn-lesson-prev').disabled = (currentLesson === 0);
+    var isLast = (currentLesson === TOTAL_LESSONS - 1);
+    var nextBtn = document.getElementById('btn-lesson-next');
+    nextBtn.disabled = isLast;
+    nextBtn.textContent = isLast ? '\u2713 All Done' : 'Next \u2192';
+    if (isLast) {
+        nextBtn.onclick = function() {
+            var _br = document.getElementById('course-btn-row');
+            if (_br) { _br.style.display = 'flex'; _br.scrollIntoView({behavior:'smooth',block:'center'}); }
+            document.getElementById('course-complete-notice').classList.add('visible');
+        };
+    } else {
+        nextBtn.onclick = function() { lessonNav(1); };
+    }
+    try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch(e) {}
+    if (viewedCount >= TOTAL_LESSONS) {
+        document.getElementById('course-complete-notice').classList.add('visible');
+        // Show the Proceed to Exam button row
+        var _br = document.getElementById('course-btn-row');
+        if (_br) _br.style.display = 'flex';
+    }
+}
+
+function lessonNav(dir) {
+    var next = currentLesson + dir;
+    if (next < 0 || next >= TOTAL_LESSONS) return;
+    currentLesson = next;
+    renderLesson();
+}
+
+(function patchGoToStep() {
+    if (typeof goToStep === 'function') {
+        var _orig = goToStep;
+        window.goToStep = function(step) {
+            _orig(step);
+            if (step === 'course') {
+                setTimeout(function(){
+                    renderLesson();
+                    // Restore completed state if progress was saved
+                    if (viewedCount >= TOTAL_LESSONS) {
+                        document.getElementById('course-complete-notice').classList.add('visible');
+                        var _br = document.getElementById('course-btn-row');
+                        if (_br) _br.style.display = 'flex';
+                    }
+                }, 50);
+            }
+        };
+    }
+})();
+
+// On page load: if user is at 'test' step and has completed the course, show Proceed button
+// Also: if they have an active test session stored, go straight to exam
+document.addEventListener('DOMContentLoaded', function() {
+    // Check localStorage for an active test session ID
+    var savedSessionId = null;
+    try { savedSessionId = localStorage.getItem('ql_test_session_id'); } catch(e) {}
+    // We expose this for use in startExam to restore the session
+    if (savedSessionId) { window._savedTestSessionId = savedSessionId; }
+});
+
+</script>
+    <script>try { if(typeof lucide!=="undefined") lucide.createIcons(); } catch(e) { console.warn("Lucide icons error:", e); }</script>
+</body>
+</html>
