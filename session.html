@@ -2769,12 +2769,36 @@ async function openPlotSignature(projectUuid) {
         if (window._plottingDone && window._plottingDone[projectUuid]) {
           if (_plotPopupPollId) { clearInterval(_plotPopupPollId); _plotPopupPollId = null; }
         }
+        // If popup is open but redirected to login, silently refresh the plot link
+        try {
+          if (typeof _dcPopupRef !== 'undefined' && _dcPopupRef && !_dcPopupRef.closed) {
+            var _popupHref = _dcPopupRef.location.href;
+            if (_popupHref && _popupHref.indexOf('action=login') !== -1) {
+              if (_plotPopupPollId) { clearInterval(_plotPopupPollId); _plotPopupPollId = null; }
+              _autoRefreshPlotLink(projectUuid);
+            }
+          }
+        } catch(e) { /* cross-origin — cannot inspect popup URL */ }
       }, 600);
     }
 
   } catch(err) {
     _resetBtn(err.message || 'Could not open. Please try again.');
   }
+}
+
+async function _autoRefreshPlotLink(projectUuid) {
+  try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
+  try {
+    const r = await fetch(`/api/sessions/plot-link/${encodeURIComponent(projectUuid)}`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!r.ok) return;
+    const data = await r.json();
+    if (data && data.link) openDcModal(data.link, 'Plot Signature Fields');
+  } catch(e) {}
 }
 
 function _copyEmail(email, btnEl) {
