@@ -326,6 +326,18 @@ tr:hover td { background: rgba(124,58,237,.06); }
 
       <!-- OVERVIEW ──────────────────────────────────────────────────────── -->
       <div id="page-overview" class="page active">
+        <div class="page-hero">
+          <div class="page-hero-left">
+            <div class="page-hero-icon purple"><i class="hgi-stroke hgi-chart-bar-line-02"></i></div>
+            <div class="page-hero-text">
+              <h1>Overview</h1>
+              <p>Platform health, key metrics, and recent activity at a glance</p>
+            </div>
+          </div>
+          <div class="page-hero-actions">
+            <button class="btn btn-outline btn-sm" onclick="refreshPage()"><i class="hgi-stroke hgi-refresh-02"></i> Refresh</button>
+          </div>
+        </div>
         <div class="kpi-grid" id="kpi-grid">
           <div class="kpi-card"><div class="kpi-label">Total Users</div><div class="kpi-value purple" id="kpi-total-users">—</div></div>
           <div class="kpi-card"><div class="kpi-label">ENPs</div><div class="kpi-value teal" id="kpi-enps">—</div></div>
@@ -349,6 +361,15 @@ tr:hover td { background: rgba(124,58,237,.06); }
 
       <!-- USERS ─────────────────────────────────────────────────────────── -->
       <div id="page-users" class="page">
+        <div class="page-hero">
+          <div class="page-hero-left">
+            <div class="page-hero-icon teal"><i class="hgi-stroke hgi-user-group"></i></div>
+            <div class="page-hero-text">
+              <h1>Users</h1>
+              <p>Manage registered ENPs, clients, and administrators</p>
+            </div>
+          </div>
+        </div>
         <div class="filters">
           <input class="filter-input" id="user-search" placeholder="Search name or email…" oninput="debounce(loadUsers, 400)()">
           <select class="filter-select" id="user-role-filter" onchange="loadUsers()">
@@ -371,6 +392,15 @@ tr:hover td { background: rgba(124,58,237,.06); }
 
       <!-- APPOINTMENTS ──────────────────────────────────────────────────── -->
       <div id="page-appointments" class="page">
+        <div class="page-hero">
+          <div class="page-hero-left">
+            <div class="page-hero-icon green"><i class="hgi-stroke hgi-calendar-02"></i></div>
+            <div class="page-hero-text">
+              <h1>Appointments</h1>
+              <p>Track notarization appointments, session status, and document counts</p>
+            </div>
+          </div>
+        </div>
         <div class="filters">
           <input class="filter-input" id="apt-search" placeholder="Search ID, ENP, client…" oninput="debounce(loadAppointments, 400)()">
           <select class="filter-select" id="apt-status-filter" onchange="loadAppointments()">
@@ -395,6 +425,15 @@ tr:hover td { background: rgba(124,58,237,.06); }
 
       <!-- NOTARIAL REGISTRY ─────────────────────────────────────────────── -->
       <div id="page-registry" class="page">
+        <div class="page-hero">
+          <div class="page-hero-left">
+            <div class="page-hero-icon gold"><i class="hgi-stroke hgi-book-open-01"></i></div>
+            <div class="page-hero-text">
+              <h1>Notarial Registry</h1>
+              <p>Immutable record of all completed electronic notarial acts</p>
+            </div>
+          </div>
+        </div>
         <div class="filters">
           <input class="filter-input" id="reg-search" placeholder="Search doc, ENP, principal…" oninput="debounce(loadRegistry, 400)()">
           <select class="filter-select" id="reg-act-filter" onchange="loadRegistry()">
@@ -419,14 +458,19 @@ tr:hover td { background: rgba(124,58,237,.06); }
 
       <!-- SUB-ORGANIZATIONS ────────────────────────────────────────────── -->
       <div id="page-suborgs" class="page">
-        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;">
-          <div>
-            <div class="page-title" style="font-size:20px;font-weight:800;color:var(--text);">Sub-Organizations</div>
-            <div class="page-subtitle" style="color:var(--muted);font-size:13px;margin-top:4px;">Manage sub-organizations and their members</div>
+        <div class="page-hero">
+          <div class="page-hero-left">
+            <div class="page-hero-icon purple"><i class="hgi-stroke hgi-building-03"></i></div>
+            <div class="page-hero-text">
+              <h1>Sub-Organizations</h1>
+              <p>Create and manage sub-organizations, members, and DoconChain credentials</p>
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="openCreateSubOrg()" style="background:var(--purple);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;">
-            <i class="hgi-stroke hgi-add-01"></i> Create Sub-Org
-          </button>
+          <div class="page-hero-actions">
+            <button class="btn btn-primary" onclick="openCreateSubOrg()" style="background:var(--purple);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;">
+              <i class="hgi-stroke hgi-add-01"></i> Create Sub-Org
+            </button>
+          </div>
         </div>
         <div style="margin-bottom:16px;position:relative;">
           <i class="hgi-stroke hgi-search-01" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none;"></i>
@@ -441,6 +485,15 @@ tr:hover td { background: rgba(124,58,237,.06); }
 
       <!-- SETTINGS ──────────────────────────────────────────────────────── -->
       <div id="page-settings" class="page">
+        <div class="page-hero">
+          <div class="page-hero-left">
+            <div class="page-hero-icon blue"><i class="hgi-stroke hgi-settings-01"></i></div>
+            <div class="page-hero-text">
+              <h1>Settings</h1>
+              <p>System configuration, KB management, and platform information</p>
+            </div>
+          </div>
+        </div>
         <div class="settings-card">
           <h3>System Info</h3>
           <div class="info-row"><span class="info-label">Platform</span><span class="info-value">Quanby Legal v2.0</span></div>
