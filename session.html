@@ -2020,8 +2020,8 @@ async function startRecording() {
     if (btn) { btn.disabled = false; btn.classList.add('recording-active'); btn.innerHTML = '<i class="hgi-stroke hgi-stop" style="font-size:1.3rem;"></i><span>Stop Rec</span>'; }
     const dot = document.getElementById('rec-dot');
     const lbl = document.getElementById('rec-label');
-    if (dot) dot.style.display = '';
-    if (lbl) lbl.style.display = '';
+    if (dot) dot.style.display = 'inline-block';
+    if (lbl) lbl.style.display = 'inline-block';
 
     _broadcastRecordingAlert(true);
     _showRecordingToast('🔴 Recording started (local save). All participants notified.', '#f85149');
@@ -2085,7 +2085,7 @@ function _showRecordingToast(msg, color) {
   t.style.cssText = 'position:fixed;top:1rem;left:50%;transform:translateX(-50%);z-index:9999;background:#1c2128;border:2px solid ' + color + ';border-radius:10px;padding:.75rem 1.25rem;font-size:.85rem;font-weight:700;color:' + color + ';box-shadow:0 4px 24px rgba(0,0,0,.6);white-space:nowrap;';
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(function() { if (t.parentNode) t.remove(); }, 5000);
+  setTimeout(function() { if (t.parentNode) t.remove(); }, 8000);
 }
 
 let _camMirrored = false;
@@ -2680,27 +2680,37 @@ async function openSignDocument(projectUuid, aptId) {
 }
 
 function _broadcastRecordingAlert(started) {
-  // Broadcast recording state to all room participants via LiveKit data channel
-  if (!window._room || window._room.state !== 'connected') return;
-  var localName = '';
-  try {
-    var localP = window._room.localParticipant;
-    var meta = localP.metadata ? JSON.parse(localP.metadata) : {};
-    localName = meta.display_name || meta.name || localP.identity || 'A participant';
-  } catch(e) {
-    localName = (window._sessionInfo && (window._sessionInfo.enp_name || window._sessionInfo.client_name)) || 'A participant';
-  }
-  var msg = JSON.stringify({ type: 'recording_alert', started: started, by: localName });
-  try {
-    window._room.localParticipant.publishData(new TextEncoder().encode(msg), { reliable: true });
-  } catch(e) {
-    console.warn('[Record] broadcast failed:', e);
-  }
-  // Also show/hide banner locally for the recorder
+  // Always show/hide the local recording banner for the recorder
   if (started) {
-    _showRecordingBanner('you (local recording)');
+    _showRecordingBanner('you');
   } else {
     _hideRecordingBanner();
+  }
+
+  // Broadcast to other participants via LiveKit data channel
+  // _room is a module-level let — do NOT use window._room
+  if (!_room || _room.state !== 'connected') {
+    console.warn('[Record] room not connected — skipping broadcast');
+    return;
+  }
+  var localName = 'A participant';
+  try {
+    var localP = _room.localParticipant;
+    // Try metadata first, then _sessionInfo
+    var meta = {};
+    try { meta = localP.metadata ? JSON.parse(localP.metadata) : {}; } catch(e) {}
+    localName = meta.display_name || meta.name
+      || (_sessionInfo && (_sessionInfo.enp_name || _sessionInfo.client_name))
+      || localP.identity
+      || 'A participant';
+  } catch(e) { console.warn('[Record] could not get local name:', e); }
+
+  var msg = JSON.stringify({ type: 'recording_alert', started: started, by: localName });
+  try {
+    _room.localParticipant.publishData(new TextEncoder().encode(msg), { reliable: true });
+    console.log('[Record] broadcast sent:', msg);
+  } catch(e) {
+    console.warn('[Record] broadcast failed:', e);
   }
 }
 
