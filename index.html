@@ -1087,16 +1087,16 @@
                 <a href="#about">About</a>
             </div>
             <button class="nav-signin-btn" id="nav-signin-btn" onclick="openSSO()" style="display:none;">Sign In</button>
-            <button id="admin-nav-btn" onclick="openAdminModal()" title="Admin Login" style="
+            <a id="admin-nav-btn" href="/admin" title="Admin Portal" style="
               background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.35);
               color:rgba(200,190,255,0.7);font-size:0.75rem;font-weight:600;
               padding:0.35rem 0.8rem;border-radius:999px;cursor:pointer;
               font-family:'Inter',sans-serif;transition:all 0.2s;white-space:nowrap;
-              display:flex;align-items:center;gap:0.3rem;
+              display:none;align-items:center;gap:0.3rem;text-decoration:none;
             " onmouseover="this.style.background='rgba(124,58,237,0.25)';this.style.color='#c4b5fd'"
                onmouseout="this.style.background='rgba(124,58,237,0.12)';this.style.color='rgba(200,190,255,0.7)'">
-              🔐 Admin
-            </button>
+              <i class="hgi-stroke hgi-lock-02" style="font-size:.75rem;"></i> Admin
+            </a>
             <div class="nav-user" id="nav-user">
                 <button id="nav-cert-badge" class="nav-cert-badge" style="display:none;" onclick="_navBadgeClick()"></button>
                 <!-- User avatar trigger -->
@@ -2818,6 +2818,8 @@
             const res = await fetch('/api/auth/me', { credentials: 'include' });
             if (!res.ok) {
                 if (signinBtn) signinBtn.style.display = 'inline-block';
+                var _adminBtnOut = document.getElementById('admin-nav-btn');
+                if (_adminBtnOut) _adminBtnOut.style.display = 'flex';
                 return;
             }
             const user = await res.json();
@@ -2846,10 +2848,15 @@
             if (numEmail) numEmail.textContent = user.email || '';
             if (navUser) navUser.classList.add('visible');
             if (signinBtn) signinBtn.style.display = 'none';
+            // Hide admin link when user is already logged in (admin portal has separate auth)
+            var _adminBtn = document.getElementById('admin-nav-btn');
+            if (_adminBtn) _adminBtn.style.display = 'none';
             window._currentUser = user;
         _updateCertBadge(user);
         } catch(e) {
             if (signinBtn) signinBtn.style.display = 'inline-block';
+            var _adminBtnCatch = document.getElementById('admin-nav-btn');
+            if (_adminBtnCatch) _adminBtnCatch.style.display = 'flex';
         }
     }
 
