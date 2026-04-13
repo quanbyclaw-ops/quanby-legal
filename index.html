@@ -807,14 +807,26 @@
             font-family: 'Courier New', monospace;
         }
 
-        /* ── FAQ ACCORDION ── */
-        .faq-category { margin-bottom: 2rem; }
-        .faq-cat-header {
-          display: flex; align-items: center; gap: 0.6rem;
-          font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
-          letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.75rem;
-          padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+        /* ── FAQ TABS ── */
+        .faq-tabs {
+          display: flex; gap: 0.4rem; flex-wrap: wrap;
+          margin-bottom: 1.75rem; justify-content: center;
         }
+        .faq-tab {
+          display: inline-flex; align-items: center; gap: 0.4rem;
+          padding: 0.5rem 1.1rem; border-radius: 999px; cursor: pointer;
+          font-size: 0.82rem; font-weight: 600; border: 1px solid var(--card-border);
+          background: var(--card-bg); color: var(--muted);
+          transition: all 0.18s; user-select: none; white-space: nowrap;
+        }
+        .faq-tab:hover { border-color: rgba(124,58,237,0.45); color: var(--text); }
+        .faq-tab.active {
+          background: rgba(124,58,237,0.18); border-color: rgba(124,58,237,0.55);
+          color: #c4b5fd;
+        }
+        .faq-panel { display: none; }
+        .faq-panel.active { display: block; animation: faqFadeIn .2s ease; }
+        @keyframes faqFadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
         .faq-item {
           background: var(--card-bg); border: 1px solid var(--card-border);
           border-radius: 10px; margin-bottom: 0.5rem; overflow: hidden;
@@ -837,11 +849,11 @@
         .faq-answer {
           max-height: 0; overflow: hidden; padding: 0 1.25rem;
           color: var(--muted); font-size: 0.875rem; line-height: 1.7;
-          transition: max-height 0.3s ease, padding 0.25s ease;
+          transition: max-height 0.35s ease, padding 0.25s ease;
         }
-        .faq-item.open .faq-answer { max-height: 600px; padding: 0 1.25rem 1.1rem; }
+        .faq-item.open .faq-answer { max-height: 700px; padding: 0 1.25rem 1.1rem; }
         .faq-source {
-          text-align: center; margin-top: 2.5rem;
+          text-align: center; margin-top: 2rem;
           font-size: 0.78rem; color: rgba(148,163,184,0.5);
         }
         .faq-source a { color: var(--gold); text-decoration: none; }
@@ -2519,32 +2531,40 @@
       },
     ];
 
+    let _activeFaqTab = 0;
+
     function renderFAQ() {
       const list = document.getElementById('faq-list');
       if (!list) return;
-      list.innerHTML = FAQ_DATA.map(cat => `
-        <div class="faq-category">
-          <div class="faq-cat-header">
-            <i class="hgi-stroke ${cat.icon}" style="font-size:0.9rem;color:${cat.color}"></i>
-            ${cat.cat}
-          </div>
-          ${cat.items.map((item, i) => `
-            <div class="faq-item" id="faq-${cat.cat.replace(/\s/g,'-')}-${i}">
-              <div class="faq-question" onclick="toggleFAQ(this.parentElement)">
-                <span>${item.q}</span>
-                <i class="hgi-stroke hgi-arrow-down-01 faq-chevron"></i>
-              </div>
-              <div class="faq-answer">${item.a}</div>
-            </div>
-          `).join('')}
-        </div>
-      `).join('') + `<div class="faq-source">Source: <a href="https://sc.judiciary.gov.ph/enotary-services/faqs/" target="_blank" rel="noopener">Supreme Court of the Philippines — eNotary FAQs</a> | <a href="https://sc.judiciary.gov.ph/10869/" target="_blank" rel="noopener">A.M. No. 24-10-14-SC</a></div>`;
+      const tabsHtml = FAQ_DATA.map((cat, i) =>
+        `<button class="faq-tab${i === 0 ? ' active' : ''}" onclick="switchFaqTab(${i})" id="faq-tab-${i}">` +
+        `<i class="hgi-stroke ${cat.icon}" style="font-size:.8rem;"></i> ${cat.cat}</button>`
+      ).join('');
+      const panelsHtml = FAQ_DATA.map((cat, ci) =>
+        `<div class="faq-panel${ci === 0 ? ' active' : ''}" id="faq-panel-${ci}">` +
+        cat.items.map((item, i) =>
+          `<div class="faq-item" id="faq-${ci}-${i}">` +
+          `<div class="faq-question" onclick="toggleFAQ(this.parentElement)">` +
+          `<span>${item.q}</span><i class="hgi-stroke hgi-arrow-down-01 faq-chevron"></i></div>` +
+          `<div class="faq-answer">${item.a}</div></div>`
+        ).join('') +
+        `</div>`
+      ).join('');
+      list.innerHTML =
+        `<div class="faq-tabs">${tabsHtml}</div>` +
+        panelsHtml +
+        `<div class="faq-source">Source: <a href="https://sc.judiciary.gov.ph/enotary-services/faqs/" target="_blank" rel="noopener">Supreme Court PH — eNotary FAQs</a> | <a href="https://sc.judiciary.gov.ph/10869/" target="_blank" rel="noopener">A.M. No. 24-10-14-SC</a></div>`;
+    }
+
+    function switchFaqTab(idx) {
+      document.querySelectorAll('.faq-tab').forEach(function(t, i) { t.classList.toggle('active', i === idx); });
+      document.querySelectorAll('.faq-panel').forEach(function(p, i) { p.classList.toggle('active', i === idx); });
+      _activeFaqTab = idx;
     }
 
     function toggleFAQ(el) {
-      document.querySelectorAll('.faq-item.open').forEach(function(item) {
-        if (item !== el) item.classList.remove('open');
-      });
+      var panel = el.closest('.faq-panel');
+      if (panel) panel.querySelectorAll('.faq-item.open').forEach(function(it) { if (it !== el) it.classList.remove('open'); });
       el.classList.toggle('open');
     }
 
