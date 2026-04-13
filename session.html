@@ -1519,9 +1519,14 @@ function postJoinSetup(userName, role, userRole) {
   document.getElementById('ctrl-add').style.display = isEnp ? '' : 'none';
   document.getElementById('sidebar-invite-btn').style.display = isEnp ? '' : 'none';
 
-  // Start timer
-  _startTime = Date.now();
-  _timerInt  = setInterval(updateTimer, 1000);
+  // Start timer — sync to session_created_at so all participants/refreshes show the same elapsed time
+  if (_sessionInfo && _sessionInfo.session_created_at) {
+    _startTime = new Date(_sessionInfo.session_created_at).getTime();
+  } else {
+    _startTime = Date.now();
+  }
+  _timerInt = setInterval(updateTimer, 1000);
+  updateTimer(); // render immediately (no 1s delay on load)
 
   // Background session state sync — keeps doc/signer state fresh without refresh
   _startSessionSync();
