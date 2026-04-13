@@ -3203,31 +3203,51 @@ async def get_plot_link(
             with _ureq2.urlopen(_req, timeout=30) as _r:
                 return _json3.loads(_r.read().decode())
 
+        # IMPORTANT: Only use the ENP's own email — NEVER fall back to _DC_EMAIL.
+        # The org default email (stg_quanby@maildrop.cc) generates a different link
+        # format that exposes raw token/api_token params in the URL and belongs to
+        # a different DoconChain account. This is the root cause of the wrong plot link.
+        enp_email = (user.get("email") or "").lower().strip()
+        if not enp_email:
+            raise HTTPException(400, "ENP email not found — cannot generate plot link")
+
+        # Purge ALL cached tokens for this email to force a clean re-auth.
+        # Stale tokens from a previous session (different laptop/browser) cause
+        # the wrong email to appear in the generated link.
+        _dc_token_cache.pop(enp_email, None)
+        _dc_token_cache.pop(_DC_EMAIL, None)
+
         resp_data = None
-        _last_code = 401
+        _last_code = 502
         _last_body = "Unknown error"
-        for _attempt_email in [_plot_email, _DC_EMAIL]:
-            # Force fresh token — invalidate any cached one
-            _dc_token_cache.pop(_attempt_email, None)
+
+        # Retry up to 3 times with a fresh token each time
+        for _retry in range(3):
             try:
-                _tok = _get_dc_token(email=_attempt_email)
+                _tok = _get_dc_token(email=enp_email)
+                print(f"[PlotLink] attempt {_retry+1}: email={enp_email} token={_tok[:12]}...", flush=True)
             except Exception as _te:
-                _last_body = str(_te)
+                _last_body = f"Token error for {enp_email}: {_te}"
+                print(f"[PlotLink] token failed attempt {_retry+1}: {_te}", flush=True)
+                _dc_token_cache.pop(enp_email, None)
                 continue
             try:
                 resp_data = _call_plot_link(_tok)
+                print(f"[PlotLink] success on attempt {_retry+1}", flush=True)
                 break
             except _uerr2.HTTPError as he:
                 _last_code = he.code
                 _last_body = he.read().decode(errors="replace")
-                # Invalidate token and try next email
-                _dc_token_cache.pop(_attempt_email, None)
-                if he.code in (401, 403):
-                    continue
-                raise HTTPException(he.code, f"DoconChain error {he.code}: {_last_body[:300]}")
+                _dc_token_cache.pop(enp_email, None)
+                print(f"[PlotLink] HTTP {he.code} on attempt {_retry+1}: {_last_body[:120]}", flush=True)
+                if he.code not in (401, 403):
+                    raise HTTPException(he.code, f"DoconChain error {he.code}: {_last_body[:300]}")
+                # 401/403 → clear cache and retry with fresh token
+                continue
+
         if resp_data is None:
             raise HTTPException(_last_code,
-                f"DoconChain error {_last_code}: {_last_body[:300]}")
+                f"DoconChain plot link failed for {enp_email}: {_last_body[:300]}")
 
         # Extract link — DC may return { data: { link: "..." } } or { link: "..." }
         link = (
