@@ -5538,22 +5538,35 @@ async def create_sub_org(req: _SubOrgCreateReq, request: Request):
     _dc_provision_error = None
     try:
         import urllib.request as _ur_so, urllib.error as _ue_so, json as _json_so
-        _dc_token_so = _get_dc_token()
+        # Use owner ENP's token if available, else fall back to org token
+        _enp_user_so = None
+        try:
+            from onboarding import get_user as _get_user_so
+            _enp_user_so = _get_user_so(org.get("owner_id", ""))
+        except Exception:
+            pass
+        _enp_email_so = (_enp_user_so.get("email") if _enp_user_so else None) or _DC_EMAIL
+        try:
+            _dc_token_so = _get_dc_token(email=_enp_email_so)
+        except Exception:
+            _dc_token_so = _get_dc_token()
         _bd = "QLSubOrg" + org["id"].replace("-","")[:12]
         _CRLF = b"\r\n"
         def _field(name, value):
             return (
                 b"--" + _bd.encode() + _CRLF +
                 b"Content-Disposition: form-data; name=\"" + name.encode() + b"\"" + _CRLF +
-                _CRLF + value.encode() + _CRLF
+                _CRLF + str(value).encode("utf-8") + _CRLF
             )
+        # organization_uuid = numeric org ID (not UUID) per DC API spec
         _body_so = (
             _field("name", org["name"]) +
             _field("address", org["address"] or org["name"]) +
             _field("sub_organization_type_name", org["type"]) +
-            _field("organization_uuid", _DC_ORG_UUID) +
+            _field("organization_uuid", _DC_ORG_ID) +
             b"--" + _bd.encode() + b"--" + _CRLF
         )
+        print(f"[SubOrg] Creating DC sub-org: name={org['name']} type={org['type']} org_id={_DC_ORG_ID} token_email={_enp_email_so}", flush=True)
         _req_so = _ur_so.Request(
             f"{_DC_BASE}/api/v2/organizations/sub?user_type=ENTERPRISE_API",
             data=_body_so,
