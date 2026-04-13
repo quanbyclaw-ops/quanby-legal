@@ -5530,11 +5530,63 @@ async def create_sub_org(req: _SubOrgCreateReq, request: Request):
         "created_at": now,
         "updated_at": now,
     }
+    # Add DC-tracking fields
+    org["dc_sub_org_id"]   = None
+    org["dc_sub_org_uuid"] = None
+
+    # Provision sub-org in DoconChain (non-blocking)
+    _dc_provision_error = None
+    try:
+        import urllib.request as _ur_so, urllib.error as _ue_so, json as _json_so
+        _dc_token_so = _get_dc_token()
+        _bd = "QLSubOrg" + org["id"].replace("-","")[:12]
+        _CRLF = b"\r\n"
+        def _field(name, value):
+            return (
+                b"--" + _bd.encode() + _CRLF +
+                b"Content-Disposition: form-data; name=\"" + name.encode() + b"\"" + _CRLF +
+                _CRLF + value.encode() + _CRLF
+            )
+        _body_so = (
+            _field("name", org["name"]) +
+            _field("address", org["address"] or org["name"]) +
+            _field("sub_organization_type_name", org["type"]) +
+            _field("organization_uuid", _DC_ORG_UUID) +
+            b"--" + _bd.encode() + b"--" + _CRLF
+        )
+        _req_so = _ur_so.Request(
+            f"{_DC_BASE}/api/v2/organizations/sub?user_type=ENTERPRISE_API",
+            data=_body_so,
+            headers={
+                "Authorization": f"Bearer {_dc_token_so}",
+                "Content-Type": f"multipart/form-data; boundary={_bd}",
+                "Accept": "application/json",
+            },
+            method="POST",
+        )
+        with _ur_so.urlopen(_req_so, timeout=20) as _r_so:
+            _dc_resp = _json_so.loads(_r_so.read().decode())
+        _dc_data = _dc_resp.get("data") or _dc_resp.get("message") or _dc_resp
+        if isinstance(_dc_data, dict):
+            org["dc_sub_org_id"]   = str(_dc_data.get("id") or "")
+            org["dc_sub_org_uuid"] = str(_dc_data.get("uuid") or _dc_data.get("organization_uuid") or "")
+            print(f"[SubOrg] DC provisioned: id={org['dc_sub_org_id']} uuid={org['dc_sub_org_uuid']}", flush=True)
+    except Exception as _dc_so_err:
+        _dc_provision_error = str(_dc_so_err)
+        print(f"[SubOrg] DC provisioning failed (non-fatal): {_dc_so_err}", flush=True)
+
     with _sub_orgs_lock:
         orgs = _load_sub_orgs()
         orgs.append(org)
         _save_sub_orgs(orgs)
-    return {"success": True, "id": org["id"], "sub_org": org}
+
+    result = {"success": True, "id": org["id"], "sub_org": org}
+    if _dc_provision_error:
+        result["dc_warning"] = f"Sub-org created locally. DoconChain: {_dc_provision_error[:150]}"
+    elif org.get("dc_sub_org_uuid"):
+        result["dc_provisioned"] = True
+        result["dc_sub_org_uuid"] = org["dc_sub_org_uuid"]
+    return result
 
 
 # ── GET /api/sub-orgs/{sub_org_id} ───────────────────────────────────────────
