@@ -2973,14 +2973,17 @@
 
     async function initNavUser() {
         const signinBtn = document.getElementById('nav-signin-btn');
-        // Proactively try a silent token refresh before checking /me
-        // This prevents the Sign In flash when access token just expired but refresh is still valid
+        // Retry auth up to 3 times with delay — handles transient refresh/cookie propagation issues
+        let _navAuthRes = null;
+        for (let _attempt = 0; _attempt < 3; _attempt++) {
+            if (_attempt > 0) await new Promise(r => setTimeout(r, 600 * _attempt));
+            try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
+            try { _navAuthRes = await fetch('/api/auth/me', { credentials: 'include' }); } catch(e) {}
+            if (_navAuthRes && _navAuthRes.ok) break;
+        }
         try {
-            await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
-        } catch(e) { /* silent ? if refresh fails, /me will handle it */ }
-        try {
-            const res = await fetch('/api/auth/me', { credentials: 'include' });
-            if (!res.ok) {
+            const res = _navAuthRes;
+            if (!res || !res.ok) {
                 if (signinBtn) signinBtn.style.display = 'inline-block';
                 var _adminBtnOut = document.getElementById('admin-nav-btn');
                 if (_adminBtnOut) _adminBtnOut.style.display = 'flex';
