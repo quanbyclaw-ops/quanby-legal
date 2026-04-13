@@ -329,6 +329,12 @@ tr:hover td { background: rgba(124,58,237,.06); }
       </div>
     </div>
     <div class="nav-group">
+      <div class="nav-group-label">Management</div>
+      <div class="nav-item" data-page="suborgs" onclick="navigate('suborgs')">
+        <span class="nav-icon"><i class="hgi-stroke hgi-building-03"></i></span> Sub-Organizations
+      </div>
+    </div>
+    <div class="nav-group">
       <div class="nav-group-label">System</div>
       <div class="nav-item" data-page="settings" onclick="navigate('settings')">
         <span class="nav-icon"><i class="hgi-stroke hgi-settings-01"></i></span> Settings
@@ -447,6 +453,20 @@ tr:hover td { background: rgba(124,58,237,.06); }
         <div class="pagination" id="reg-pagination"></div>
       </div>
 
+      <!-- SUB-ORGANIZATIONS ────────────────────────────────────────────── -->
+      <div id="page-suborgs" class="page">
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;">
+          <div>
+            <div class="page-title" style="font-size:20px;font-weight:700;color:var(--text);">Sub-Organizations</div>
+            <div class="page-subtitle" style="color:var(--muted);font-size:13px;margin-top:4px;">Manage sub-organizations and their members</div>
+          </div>
+          <button class="btn btn-primary" onclick="openCreateSubOrg()" style="background:var(--purple);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;">
+            <i class="hgi-stroke hgi-add-01"></i> Create Sub-Org
+          </button>
+        </div>
+        <div id="suborgs-list"><!-- cards rendered here --></div>
+      </div>
+
       <!-- SETTINGS ──────────────────────────────────────────────────────── -->
       <div id="page-settings" class="page">
         <div class="settings-card">
@@ -482,7 +502,7 @@ let _usersPage = 1, _aptsPage = 1, _regPage = 1;
 let _stats = {};
 const PAGES = {
   overview: 'Overview', users: 'Users', appointments: 'Appointments',
-  registry: 'Notarial Registry', settings: 'Settings',
+  registry: 'Notarial Registry', suborgs: 'Sub-Organizations', settings: 'Settings',
 };
 
 /* ── Auth flow ─────────────────────────────────────────── */
@@ -552,6 +572,7 @@ function navigate(page) {
   if (page === 'users') { _usersPage = 1; loadUsers(); }
   if (page === 'appointments') { _aptsPage = 1; loadAppointments(); }
   if (page === 'registry') { _regPage = 1; loadRegistry(); }
+  if (page === 'suborgs') loadSubOrgs();
   location.hash = '#' + page;
 }
 
@@ -812,6 +833,259 @@ async function syncAll() {
   }
 }
 
+/* ── SUB-ORGS ──────────────────────────────────────────── */
+let _editSubOrgId = null;
+let _addMemberSubOrgId = null;
+let _transferCreditsSubOrgId = null;
+
+async function loadSubOrgs() {
+  const container = document.getElementById('suborgs-list');
+  container.innerHTML = '<div style="color:var(--muted);padding:32px;text-align:center;">Loading…</div>';
+  try {
+    const r = await fetch('/api/sub-orgs', { credentials: 'include' });
+    if (!r.ok) { container.innerHTML = '<div style="color:var(--red);padding:32px;text-align:center;">Error loading sub-organizations.</div>'; return; }
+    const orgs = await r.json();
+    if (!orgs.length) {
+      container.innerHTML = `<div style="color:var(--muted);padding:48px;text-align:center;"><i class="hgi-stroke hgi-building-03" style="font-size:2rem;display:block;margin-bottom:12px;"></i>No sub-organizations yet.<br><span style="font-size:12px;">Create one to get started.</span></div>`;
+      return;
+    }
+    container.innerHTML = '';
+    for (const org of orgs) {
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;';
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div>
+            <span style="font-size:16px;font-weight:700;color:var(--text);">${escHtml(org.name)}</span>
+            <span style="margin-left:10px;background:rgba(124,58,237,.2);color:var(--purple);padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;">${escHtml(org.type||'Department')}</span>
+          </div>
+          <span style="color:var(--muted);font-size:12px;">Created ${fmtDate(org.created_at)}</span>
+        </div>
+        ${org.address ? `<div style="color:var(--muted);font-size:12px;margin-bottom:12px;"><i class="hgi-stroke hgi-location-01" style="vertical-align:middle;"></i> ${escHtml(org.address)}</div>` : ''}
+        <div id="credits-${org.id}" style="color:var(--muted);font-size:12px;margin-bottom:12px;">Credits: loading…</div>
+        <div id="creds-${org.id}" style="margin-bottom:12px;"></div>
+        <div style="margin-bottom:12px;">
+          <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Members</div>
+          <div id="members-${org.id}" style="color:var(--muted);font-size:12px;">Loading members…</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--border);">
+          <button onclick="openEditSubOrg('${org.id}','${escHtml(org.name).replace(/'/g,"\\'")}','${escHtml(org.address||'').replace(/'/g,"\\'")}','${escHtml(org.type||'Department')}')" style="background:rgba(14,165,233,.15);color:var(--teal);border:1px solid rgba(14,165,233,.3);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;"><i class="hgi-stroke hgi-edit-01"></i> Edit</button>
+          <button onclick="openAddMember('${org.id}')" style="background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.3);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;"><i class="hgi-stroke hgi-user-add-01"></i> Add Member</button>
+          <button onclick="openTransferCredits('${org.id}')" style="background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;"><i class="hgi-stroke hgi-coins-01"></i> Transfer Credits</button>
+          <button onclick="deleteSubOrg('${org.id}')" style="background:rgba(248,113,113,.15);color:var(--red);border:1px solid rgba(248,113,113,.3);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;"><i class="hgi-stroke hgi-delete-02"></i> Delete</button>
+        </div>
+      `;
+      container.appendChild(card);
+      // Load credits, credentials, members in parallel
+      loadSubOrgCredits(org.id);
+      loadSubOrgCreds(org.id);
+      loadSubOrgMembers(org.id);
+    }
+  } catch(e) {
+    container.innerHTML = `<div style="color:var(--red);padding:32px;text-align:center;">Error: ${e.message}</div>`;
+  }
+}
+
+async function loadSubOrgCredits(id) {
+  try {
+    const r = await fetch(`/api/sub-orgs/${id}/credits`, { credentials: 'include' });
+    const d = await r.json();
+    const el = document.getElementById('credits-'+id);
+    if (el) el.innerHTML = `<i class="hgi-stroke hgi-coins-01" style="vertical-align:middle;"></i> Credits — Total: <b style="color:var(--text);">${d.total||0}</b> · Used: <b style="color:var(--text);">${d.used||0}</b> · Remaining: <b style="color:var(--green);">${d.remaining||0}</b>`;
+  } catch(e) {}
+}
+
+async function loadSubOrgCreds(id) {
+  try {
+    const r = await fetch(`/api/sub-orgs/${id}/credentials`, { credentials: 'include' });
+    const d = await r.json();
+    const el = document.getElementById('creds-'+id);
+    if (!el) return;
+    el.innerHTML = `
+      <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">DC Credentials</div>
+      <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;">
+        <div style="margin-bottom:6px;"><span style="color:var(--muted);">Email:</span> <span style="color:var(--text);">${escHtml(d.dc_email||'—')}</span></div>
+        <div style="margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+          <span style="color:var(--muted);">Client Key:</span>
+          <span id="ck-${id}" style="color:var(--text);font-family:monospace;">${escHtml(d.dc_client_key||'—')}</span>
+          ${d.dc_client_key_raw ? `<button onclick="toggleReveal('ck-${id}','${escHtml(d.dc_client_key_raw).replace(/'/g,"\\'")}','${escHtml(d.dc_client_key||'').replace(/'/g,"\\'")}')" style="background:rgba(255,255,255,.08);border:none;color:var(--muted);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Reveal</button>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="color:var(--muted);">Client Secret:</span>
+          <span id="cs-${id}" style="color:var(--text);font-family:monospace;">${escHtml(d.dc_client_secret||'—')}</span>
+          ${d.dc_client_secret_raw ? `<button onclick="toggleReveal('cs-${id}','${escHtml(d.dc_client_secret_raw).replace(/'/g,"\\'")}','${escHtml(d.dc_client_secret||'').replace(/'/g,"\\'")}')" style="background:rgba(255,255,255,.08);border:none;color:var(--muted);padding:2px 8px;border-radius:4px;cursor:pointer;font-size:11px;">Reveal</button>` : ''}
+        </div>
+      </div>
+    `;
+  } catch(e) {}
+}
+
+async function loadSubOrgMembers(id) {
+  try {
+    const r = await fetch(`/api/sub-orgs/${id}/members`, { credentials: 'include' });
+    const members = await r.json();
+    const el = document.getElementById('members-'+id);
+    if (!el) return;
+    if (!members.length) { el.innerHTML = '<span style="color:var(--muted);font-size:12px;">No members yet.</span>'; return; }
+    el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead><tr style="color:var(--muted);border-bottom:1px solid var(--border);">
+        <th style="text-align:left;padding:6px 8px;">Name</th>
+        <th style="text-align:left;padding:6px 8px;">Email</th>
+        <th style="text-align:left;padding:6px 8px;">Role</th>
+        <th style="text-align:left;padding:6px 8px;">Status</th>
+        <th style="padding:6px 8px;"></th>
+      </tr></thead>
+      <tbody>${members.map(m => `<tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:6px 8px;color:var(--text);">${escHtml(m.name||'—')}</td>
+        <td style="padding:6px 8px;color:var(--muted);">${escHtml(m.email||'—')}</td>
+        <td style="padding:6px 8px;"><span style="background:${m.role==='ENP'?'rgba(124,58,237,.2)':'rgba(14,165,233,.2)'};color:${m.role==='ENP'?'var(--purple)':'var(--teal)'};padding:2px 8px;border-radius:10px;font-size:11px;">${escHtml(m.role||'Staff')}</span></td>
+        <td style="padding:6px 8px;"><span style="color:${m.status==='active'?'var(--green)':'var(--gold)'};">${escHtml(m.status||'active')}</span></td>
+        <td style="padding:6px 8px;"><button onclick="removeMember('${id}','${m.user_id}')" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:11px;padding:2px 6px;">✕ Remove</button></td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+  } catch(e) {}
+}
+
+function toggleReveal(elId, raw, masked) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  if (el.dataset.revealed === '1') { el.textContent = masked; el.dataset.revealed = '0'; }
+  else { el.textContent = raw; el.dataset.revealed = '1'; }
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function removeMember(orgId, userId) {
+  if (!confirm('Remove this member from the sub-org?')) return;
+  try {
+    const r = await fetch(`/api/sub-orgs/${orgId}/members/${userId}`, { method: 'DELETE', credentials: 'include' });
+    if (r.ok) loadSubOrgs();
+    else { const d = await r.json(); alert(d.detail || 'Failed to remove member.'); }
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+async function deleteSubOrg(id) {
+  if (!confirm('Delete this sub-organization? This cannot be undone.')) return;
+  try {
+    const r = await fetch(`/api/sub-orgs/${id}`, { method: 'DELETE', credentials: 'include' });
+    if (r.ok) loadSubOrgs();
+    else { const d = await r.json(); alert(d.detail || 'Failed to delete.'); }
+  } catch(e) { alert('Error: ' + e.message); }
+}
+
+/* Sub-Org Modals */
+function openCreateSubOrg() {
+  document.getElementById('modal-create-suborg').style.display = 'flex';
+  document.getElementById('form-create-suborg').reset();
+  document.getElementById('dc-creds-section').style.display = 'none';
+}
+function closeCreateSubOrg() { document.getElementById('modal-create-suborg').style.display = 'none'; }
+
+async function submitCreateSubOrg() {
+  const btn = document.getElementById('btn-create-suborg');
+  const err = document.getElementById('err-create-suborg');
+  err.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Creating…';
+  const body = {
+    name: document.getElementById('so-name').value.trim(),
+    address: document.getElementById('so-address').value.trim(),
+    type: document.getElementById('so-type').value,
+    dc_email: document.getElementById('so-dc-email').value.trim(),
+    dc_client_key: document.getElementById('so-dc-key').value.trim(),
+    dc_client_secret: document.getElementById('so-dc-secret').value.trim(),
+    owner_email: document.getElementById('so-owner-email').value.trim(),
+  };
+  if (!body.name) { err.textContent = 'Name is required.'; err.style.display = ''; btn.disabled = false; btn.textContent = 'Create'; return; }
+  try {
+    const r = await fetch('/api/sub-orgs', { method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const d = await r.json();
+    if (!r.ok) { err.textContent = d.detail || 'Failed to create.'; err.style.display = ''; btn.disabled = false; btn.textContent = 'Create'; return; }
+    closeCreateSubOrg();
+    loadSubOrgs();
+  } catch(e) { err.textContent = 'Error: ' + e.message; err.style.display = ''; btn.disabled = false; btn.textContent = 'Create'; }
+}
+
+function openEditSubOrg(id, name, address, type) {
+  _editSubOrgId = id;
+  document.getElementById('edit-so-name').value = name;
+  document.getElementById('edit-so-address').value = address;
+  document.getElementById('edit-so-type').value = type;
+  document.getElementById('err-edit-suborg').style.display = 'none';
+  document.getElementById('modal-edit-suborg').style.display = 'flex';
+}
+function closeEditSubOrg() { document.getElementById('modal-edit-suborg').style.display = 'none'; }
+
+async function submitEditSubOrg() {
+  const btn = document.getElementById('btn-edit-suborg');
+  const err = document.getElementById('err-edit-suborg');
+  err.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const body = {
+    name: document.getElementById('edit-so-name').value.trim(),
+    address: document.getElementById('edit-so-address').value.trim(),
+    type: document.getElementById('edit-so-type').value,
+  };
+  try {
+    const r = await fetch(`/api/sub-orgs/${_editSubOrgId}`, { method: 'PATCH', credentials: 'include', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const d = await r.json();
+    if (!r.ok) { err.textContent = d.detail || 'Failed to save.'; err.style.display = ''; btn.disabled = false; btn.textContent = 'Save'; return; }
+    closeEditSubOrg();
+    loadSubOrgs();
+  } catch(e) { err.textContent = 'Error: ' + e.message; err.style.display = ''; btn.disabled = false; btn.textContent = 'Save'; }
+}
+
+function openAddMember(orgId) {
+  _addMemberSubOrgId = orgId;
+  document.getElementById('form-add-member').reset();
+  document.getElementById('err-add-member').style.display = 'none';
+  document.getElementById('modal-add-member').style.display = 'flex';
+}
+function closeAddMember() { document.getElementById('modal-add-member').style.display = 'none'; }
+
+async function submitAddMember() {
+  const btn = document.getElementById('btn-add-member');
+  const err = document.getElementById('err-add-member');
+  err.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Adding…';
+  const body = {
+    email: document.getElementById('member-email').value.trim(),
+    role: document.getElementById('member-role').value,
+  };
+  try {
+    const r = await fetch(`/api/sub-orgs/${_addMemberSubOrgId}/members`, { method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const d = await r.json();
+    if (!r.ok) { err.textContent = d.detail || 'Failed to add member.'; err.style.display = ''; btn.disabled = false; btn.textContent = 'Add'; return; }
+    closeAddMember();
+    loadSubOrgs();
+  } catch(e) { err.textContent = 'Error: ' + e.message; err.style.display = ''; btn.disabled = false; btn.textContent = 'Add'; }
+}
+
+function openTransferCredits(orgId) {
+  _transferCreditsSubOrgId = orgId;
+  document.getElementById('form-transfer-credits').reset();
+  document.getElementById('err-transfer-credits').style.display = 'none';
+  document.getElementById('modal-transfer-credits').style.display = 'flex';
+}
+function closeTransferCredits() { document.getElementById('modal-transfer-credits').style.display = 'none'; }
+
+async function submitTransferCredits() {
+  const btn = document.getElementById('btn-transfer-credits');
+  const err = document.getElementById('err-transfer-credits');
+  err.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Transferring…';
+  const amount = parseInt(document.getElementById('credits-amount').value, 10);
+  if (!amount || amount <= 0) { err.textContent = 'Enter a valid positive amount.'; err.style.display = ''; btn.disabled = false; btn.textContent = 'Transfer'; return; }
+  try {
+    const r = await fetch(`/api/sub-orgs/${_transferCreditsSubOrgId}/credits/transfer`, { method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ amount }) });
+    const d = await r.json();
+    if (!r.ok) { err.textContent = d.detail || 'Failed.'; err.style.display = ''; btn.disabled = false; btn.textContent = 'Transfer'; return; }
+    closeTransferCredits();
+    loadSubOrgs();
+  } catch(e) { err.textContent = 'Error: ' + e.message; err.style.display = ''; btn.disabled = false; btn.textContent = 'Transfer'; }
+}
+
 /* ── Pagination renderer ───────────────────────────────── */
 function renderPagination(containerId, page, pages, onPage) {
   const el = document.getElementById(containerId);
@@ -833,5 +1107,150 @@ window.addEventListener('hashchange', () => {
 /* ── Boot ──────────────────────────────────────────────── */
 init();
 </script>
+
+<!-- ── SUB-ORG MODALS ──────────────────────────────────────────────────────── -->
+<style>
+.so-modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:16px; }
+.so-modal { background:#0f1525;border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto; }
+.so-modal h3 { font-size:16px;font-weight:700;margin:0 0 20px;color:var(--text); }
+.so-field { margin-bottom:14px; }
+.so-field label { display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500; }
+.so-field input,.so-field select,.so-field textarea { width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:13px;box-sizing:border-box; }
+.so-field input:focus,.so-field select:focus { outline:none;border-color:var(--purple); }
+.so-btn-row { display:flex;gap:10px;justify-content:flex-end;margin-top:20px; }
+.so-btn-cancel { background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px; }
+.so-btn-submit { background:var(--purple);border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600; }
+.so-err { color:var(--red);font-size:12px;margin-top:10px;display:none; }
+.so-toggle-link { font-size:12px;color:var(--teal);cursor:pointer;text-decoration:underline; }
+</style>
+
+<!-- CREATE SUB-ORG MODAL -->
+<div id="modal-create-suborg" class="so-modal-overlay" onclick="if(event.target===this)closeCreateSubOrg()">
+  <div class="so-modal">
+    <h3><i class="hgi-stroke hgi-building-03"></i> Create Sub-Organization</h3>
+    <form id="form-create-suborg" onsubmit="event.preventDefault();submitCreateSubOrg()">
+      <div class="so-field">
+        <label>Name <span style="color:var(--red);">*</span></label>
+        <input id="so-name" type="text" placeholder="e.g. Manila Branch" required>
+      </div>
+      <div class="so-field">
+        <label>Address</label>
+        <input id="so-address" type="text" placeholder="Optional address">
+      </div>
+      <div class="so-field">
+        <label>Type</label>
+        <select id="so-type">
+          <option value="Department">Department</option>
+          <option value="Branch">Branch</option>
+          <option value="Division">Division</option>
+          <option value="Team">Team</option>
+        </select>
+      </div>
+      <div class="so-field">
+        <label>Owner Email <span style="color:var(--muted);font-weight:400;">(optional — assign to ENP)</span></label>
+        <input id="so-owner-email" type="email" placeholder="enp@example.com">
+      </div>
+      <div class="so-field">
+        <span class="so-toggle-link" onclick="const s=document.getElementById('dc-creds-section');s.style.display=s.style.display==='none'?'block':'none'">
+          ▸ DC Credentials (optional)
+        </span>
+        <div id="dc-creds-section" style="display:none;margin-top:12px;padding:12px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--border);">
+          <div class="so-field">
+            <label>DC Email</label>
+            <input id="so-dc-email" type="email" placeholder="dc@domain.com">
+          </div>
+          <div class="so-field">
+            <label>DC Client Key</label>
+            <input id="so-dc-key" type="text" placeholder="Client key">
+          </div>
+          <div class="so-field" style="margin-bottom:0;">
+            <label>DC Client Secret</label>
+            <input id="so-dc-secret" type="password" placeholder="Client secret">
+          </div>
+        </div>
+      </div>
+      <div id="err-create-suborg" class="so-err"></div>
+      <div class="so-btn-row">
+        <button type="button" class="so-btn-cancel" onclick="closeCreateSubOrg()">Cancel</button>
+        <button type="submit" id="btn-create-suborg" class="so-btn-submit">Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- EDIT SUB-ORG MODAL -->
+<div id="modal-edit-suborg" class="so-modal-overlay" onclick="if(event.target===this)closeEditSubOrg()">
+  <div class="so-modal">
+    <h3><i class="hgi-stroke hgi-edit-01"></i> Edit Sub-Organization</h3>
+    <div class="so-field">
+      <label>Name <span style="color:var(--red);">*</span></label>
+      <input id="edit-so-name" type="text" placeholder="Sub-org name">
+    </div>
+    <div class="so-field">
+      <label>Address</label>
+      <input id="edit-so-address" type="text" placeholder="Address">
+    </div>
+    <div class="so-field">
+      <label>Type</label>
+      <select id="edit-so-type">
+        <option value="Department">Department</option>
+        <option value="Branch">Branch</option>
+        <option value="Division">Division</option>
+        <option value="Team">Team</option>
+      </select>
+    </div>
+    <div id="err-edit-suborg" class="so-err"></div>
+    <div class="so-btn-row">
+      <button type="button" class="so-btn-cancel" onclick="closeEditSubOrg()">Cancel</button>
+      <button type="button" id="btn-edit-suborg" class="so-btn-submit" onclick="submitEditSubOrg()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MEMBER MODAL -->
+<div id="modal-add-member" class="so-modal-overlay" onclick="if(event.target===this)closeAddMember()">
+  <div class="so-modal">
+    <h3><i class="hgi-stroke hgi-user-add-01"></i> Add Member</h3>
+    <form id="form-add-member" onsubmit="event.preventDefault();submitAddMember()">
+      <div class="so-field">
+        <label>Email Address</label>
+        <input id="member-email" type="email" placeholder="user@example.com" required>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Registered users will be added as active. Others will be marked as invited.</div>
+      </div>
+      <div class="so-field">
+        <label>Role</label>
+        <select id="member-role">
+          <option value="ENP">ENP</option>
+          <option value="Staff">Staff</option>
+        </select>
+      </div>
+      <div id="err-add-member" class="so-err"></div>
+      <div class="so-btn-row">
+        <button type="button" class="so-btn-cancel" onclick="closeAddMember()">Cancel</button>
+        <button type="submit" id="btn-add-member" class="so-btn-submit">Add</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- TRANSFER CREDITS MODAL -->
+<div id="modal-transfer-credits" class="so-modal-overlay" onclick="if(event.target===this)closeTransferCredits()">
+  <div class="so-modal">
+    <h3><i class="hgi-stroke hgi-coins-01"></i> Transfer Credits</h3>
+    <form id="form-transfer-credits" onsubmit="event.preventDefault();submitTransferCredits()">
+      <div class="so-field">
+        <label>Amount</label>
+        <input id="credits-amount" type="number" min="1" placeholder="e.g. 100" required>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Credits will be added to the sub-org's total balance.</div>
+      </div>
+      <div id="err-transfer-credits" class="so-err"></div>
+      <div class="so-btn-row">
+        <button type="button" class="so-btn-cancel" onclick="closeTransferCredits()">Cancel</button>
+        <button type="submit" id="btn-transfer-credits" class="so-btn-submit">Transfer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 </body>
 </html>

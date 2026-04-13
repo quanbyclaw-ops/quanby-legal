@@ -5398,7 +5398,14 @@ def _save_sub_orgs(data: list) -> None:
 
 
 def _require_attorney_or_admin(request: Request):
-    """Return current user if attorney or admin, else raise 401/403."""
+    """Return current user if attorney or admin, else raise 401/403.
+    Accepts both ql_admin cookie (admin panel) and ql_access cookie (user JWT).
+    """
+    # First: check ql_admin cookie (admin panel session)
+    admin = _get_admin_user(request)
+    if admin:
+        return {"id": "admin", "role": "admin", "email": "admin@quanby.ai", "first_name": "Admin", "last_name": ""}
+    # Then: check user JWT (ql_access cookie or Authorization header)
     from onboarding import get_user as _gu
     token = None
     auth_header = request.headers.get("authorization")
@@ -5412,7 +5419,7 @@ def _require_attorney_or_admin(request: Request):
     payload = _vj(token)
     if not payload:
         raise HTTPException(401, "Unauthorized")
-    # Admin path
+    # Admin path via user JWT
     if payload.get("role") == "admin":
         return {"id": payload.get("sub", "admin"), "role": "admin", "email": payload.get("email", "")}
     user = _gu(payload.get("user_id", ""))
@@ -5440,6 +5447,7 @@ class _SubOrgCreateReq(BaseModel):
     dc_client_key: Optional[str] = ""
     dc_client_secret: Optional[str] = ""
     dc_email: Optional[str] = ""
+    owner_email: Optional[str] = None  # Admin can set owner to specific ENP by email
 
 
 class _SubOrgPatchReq(BaseModel):
@@ -5501,12 +5509,18 @@ async def create_sub_org(req: _SubOrgCreateReq, request: Request):
     valid_types = ("Department", "Branch", "Division", "Team")
     org_type = req.type if req.type in valid_types else "Department"
     now = _dt.now(_tz.utc).isoformat()
+    # Resolve owner: admin can specify owner_email to assign to a specific ENP
+    owner_id = user["id"]
+    if req.owner_email and req.owner_email.strip():
+        owner_candidate = _find_user_by_email(req.owner_email.strip())
+        if owner_candidate:
+            owner_id = owner_candidate["id"]
     org = {
         "id": str(uuid.uuid4()),
         "name": req.name.strip(),
         "address": req.address or "",
         "type": org_type,
-        "owner_id": user["id"],
+        "owner_id": owner_id,
         "dc_client_key": req.dc_client_key or "",
         "dc_client_secret": req.dc_client_secret or "",
         "dc_email": req.dc_email or "",
@@ -5614,8 +5628,6 @@ async def add_sub_org_member(sub_org_id: str, req: _SubOrgMemberReq, request: Re
     if req.role not in ("ENP", "Staff"):
         raise HTTPException(400, "role must be ENP or Staff")
     target = _find_user_by_email(req.email)
-    if not target:
-        raise HTTPException(404, f"No user found with email: {req.email}")
     with _sub_orgs_lock:
         orgs = _load_sub_orgs()
         org = next((o for o in orgs if o["id"] == sub_org_id), None)
@@ -5625,16 +5637,32 @@ async def add_sub_org_member(sub_org_id: str, req: _SubOrgMemberReq, request: Re
         role = user.get("role")
         if role != "admin" and org.get("owner_id") != uid:
             raise HTTPException(403, "Forbidden: only owner or admin can add members")
-        # Check if already a member
-        if any(m.get("user_id") == target["id"] for m in org.get("members", [])):
-            raise HTTPException(409, "User is already a member of this sub-org")
-        member = {
-            "user_id": target["id"],
-            "email": target.get("email", ""),
-            "name": f"{target.get('first_name', '')} {target.get('last_name', '')}".strip() or target.get("email", ""),
-            "role": req.role,
-            "status": "active",
-        }
+        if not target:
+            # Non-admin: must find registered user
+            if role != "admin":
+                raise HTTPException(404, f"No user found with email: {req.email}")
+            # Admin: invite unregistered user by email
+            invite_id = f"invite_{req.email.lower().strip()}"
+            if any(m.get("user_id") == invite_id for m in org.get("members", [])):
+                raise HTTPException(409, "This email is already invited to this sub-org")
+            member = {
+                "user_id": invite_id,
+                "email": req.email.lower().strip(),
+                "name": req.email.lower().strip(),
+                "role": req.role,
+                "status": "invited",
+            }
+        else:
+            # Check if already a member
+            if any(m.get("user_id") == target["id"] for m in org.get("members", [])):
+                raise HTTPException(409, "User is already a member of this sub-org")
+            member = {
+                "user_id": target["id"],
+                "email": target.get("email", ""),
+                "name": f"{target.get('first_name', '')} {target.get('last_name', '')}".strip() or target.get("email", ""),
+                "role": req.role,
+                "status": "active",
+            }
         org.setdefault("members", []).append(member)
         org["updated_at"] = _dt.now(_tz.utc).isoformat()
         _save_sub_orgs(orgs)
