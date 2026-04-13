@@ -6,6 +6,7 @@
 <title>Quanby Legal — Admin Portal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -104,7 +105,7 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--b
   border-left: 3px solid var(--purple-light); padding-left: calc(0.75rem - 3px);
   border-left-color: var(--purple);
 }
-.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.nav-icon { font-size: 16px; width: 20px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .sidebar-bottom {
   margin-top: auto; padding: 16px 12px;
   border-top: 1px solid var(--border);
@@ -315,27 +316,27 @@ tr:hover td { background: rgba(124,58,237,.06); }
     <div class="nav-group">
       <div class="nav-group-label">Main</div>
       <div class="nav-item active" data-page="overview" onclick="navigate('overview')">
-        <span class="nav-icon">📊</span> Overview
+        <span class="nav-icon"><i class="hgi-stroke hgi-chart-bar-line-02"></i></span> Overview
       </div>
       <div class="nav-item" data-page="users" onclick="navigate('users')">
-        <span class="nav-icon">👥</span> Users
+        <span class="nav-icon"><i class="hgi-stroke hgi-user-group"></i></span> Users
       </div>
       <div class="nav-item" data-page="appointments" onclick="navigate('appointments')">
-        <span class="nav-icon">📅</span> Appointments
+        <span class="nav-icon"><i class="hgi-stroke hgi-calendar-02"></i></span> Appointments
       </div>
       <div class="nav-item" data-page="registry" onclick="navigate('registry')">
-        <span class="nav-icon">📜</span> Notarial Registry
+        <span class="nav-icon"><i class="hgi-stroke hgi-book-open-01"></i></span> Notarial Registry
       </div>
     </div>
     <div class="nav-group">
       <div class="nav-group-label">System</div>
       <div class="nav-item" data-page="settings" onclick="navigate('settings')">
-        <span class="nav-icon">⚙️</span> Settings
+        <span class="nav-icon"><i class="hgi-stroke hgi-settings-01"></i></span> Settings
       </div>
     </div>
     <div class="sidebar-bottom">
       <button class="logout-btn" onclick="doLogout()">
-        <span>🚪</span> Logout
+        <i class="hgi-stroke hgi-logout-02"></i> Logout
       </button>
     </div>
   </nav>
@@ -347,7 +348,7 @@ tr:hover td { background: rgba(124,58,237,.06); }
       <button id="hamburger" onclick="openSidebar()">☰</button>
       <span id="page-title">Overview</span>
       <span id="last-updated"></span>
-      <button id="refresh-btn" onclick="refreshPage()">↺ Refresh</button>
+      <button id="refresh-btn" onclick="refreshPage()"><i class="hgi-stroke hgi-refresh-02"></i> Refresh</button>
     </div>
 
     <!-- Content -->
@@ -458,7 +459,7 @@ tr:hover td { background: rgba(124,58,237,.06); }
         <div class="settings-card">
           <h3>Registry Sync</h3>
           <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Trigger a full registry sync across all ended sessions. This runs in the background.</p>
-          <button class="sync-btn" onclick="syncAll()">🔄 Sync All Ended Sessions</button>
+          <button class="sync-btn" onclick="syncAll()"><i class="hgi-stroke hgi-refresh" style="margin-right:6px;"></i>Sync All Ended Sessions</button>
           <div class="sync-result" id="sync-result" style="display:none"></div>
         </div>
         <div class="settings-card">
@@ -631,15 +632,20 @@ async function loadOverview() {
     document.getElementById('kpi-acts').textContent = _stats.total_acts ?? '—';
     document.getElementById('kpi-new-users').textContent = _stats.new_users_today ?? '—';
     document.getElementById('kpi-new-apts').textContent = _stats.new_appointments_today ?? '—';
-  } catch(e) {}
+  } catch(e) {
+    console.error('[admin] stats error:', e);
+  }
 
   // Recent appointments (last 10)
   try {
-    const r = await fetch('/api/admin/appointments?per_page=10&page=1', { credentials: 'include' });
-    if (!r.ok) return;
-    const d = await r.json();
     const tbody = document.getElementById('recent-apts-body');
-    const apts = d.appointments || [];
+    const r = await fetch('/api/admin/appointments?per_page=10&page=1', { credentials: 'include' });
+    if (!r.ok) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--red);padding:24px;">Error loading appointments (HTTP ${r.status}).</td></tr>`;
+      return;
+    }
+    const d = await r.json();
+    const apts = d.appointments || d.items || [];
     if (!apts.length) {
       tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">No appointments yet.</td></tr>';
       return;
