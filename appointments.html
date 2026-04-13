@@ -197,9 +197,11 @@
     <!-- ENP Tabs -->
     <div id="enp-tabs" style="display:none;">
       <div class="tabs">
-        <button class="tab active" onclick="switchTab('pending')">Pending</button>
-        <button class="tab" onclick="switchTab('confirmed')">Confirmed</button>
-        <button class="tab" onclick="switchTab('all')">All</button>
+        <button class="tab active" data-tab="pending" onclick="switchTab('pending')">Pending</button>
+        <button class="tab" data-tab="confirmed" onclick="switchTab('confirmed')">Confirmed</button>
+        <button class="tab" data-tab="in-session" onclick="switchTab('in-session')">In Session</button>
+        <button class="tab" data-tab="ended" onclick="switchTab('ended')">Ended</button>
+        <button class="tab" data-tab="all" onclick="switchTab('all')">All</button>
       </div>
     </div>
     <div id="apts-list" class="apts-list"></div>
@@ -293,6 +295,9 @@ async function loadAppointments() {
     document.getElementById('page-title').innerHTML = '<i class="hgi-stroke hgi-calendar-check-in-02" style="font-size:.9rem;vertical-align:middle;margin-right:.35rem;"></i>Appointment Requests';
     document.getElementById('page-sub').textContent = 'Review and manage notarization requests from clients';
     document.getElementById('enp-tabs').style.display = '';
+    // Default tab: 'in-session' if active sessions exist, else 'pending'
+    const hasActive = _appointments.some(a => a.session_status === 'active');
+    _activeTab = hasActive ? 'in-session' : 'pending';
     renderEnpView(_activeTab);
   }
 }
@@ -411,23 +416,38 @@ function startClientPoll(aptId) {
 // ─── ENP VIEW ────────────────────────────────────────────────────────────────
 function renderEnpView(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  const tabIdx = ['pending','confirmed','all'].indexOf(tab);
-  document.querySelectorAll('.tab')[tabIdx]?.classList.add('active');
+  document.querySelector(`.tab[data-tab="${tab}"]`)?.classList.add('active');
 
   let filtered = _appointments;
-  if (tab === 'pending') filtered = _appointments.filter(a => a.status === 'PENDING');
-  if (tab === 'confirmed') filtered = _appointments.filter(a => a.status === 'CONFIRMED');
+  if (tab === 'pending')    filtered = _appointments.filter(a => a.status === 'PENDING');
+  if (tab === 'confirmed')  filtered = _appointments.filter(a => a.status === 'CONFIRMED' && a.session_status !== 'active' && a.session_status !== 'ended');
+  if (tab === 'in-session') filtered = _appointments.filter(a => a.session_status === 'active');
+  if (tab === 'ended')      filtered = _appointments.filter(a => a.session_status === 'ended');
 
   const list = document.getElementById('apts-list');
-
-  // Always set up the poll BEFORE early return, so empty-state views still refresh
   if (_enpRefreshTimer) clearInterval(_enpRefreshTimer);
 
+  const msgs = {
+    pending:      'No pending requests',
+    confirmed:    'No confirmed appointments',
+    'in-session': 'No active sessions',
+    ended:        'No ended sessions',
+    all:          'No appointments yet'
+  };
+
   if (!filtered.length) {
-    const msgs = { pending: 'No pending requests', confirmed: 'No confirmed appointments', all: 'No appointments yet' };
-    list.innerHTML = `<div class="empty-state"><div class="icon"><i class="hgi-stroke hgi-inbox-01" style="font-size:2.5rem;color:#8b949e;"></i></div><h3>${msgs[tab]}</h3></div>`;
+    list.innerHTML = `<div class="empty-state"><div class="icon"><i class="hgi-stroke hgi-inbox-01" style="font-size:2.5rem;color:#8b949e;"></i></div><h3>${msgs[tab] || 'No appointments'}</h3></div>`;
   } else {
     list.innerHTML = filtered.map(apt => buildEnpCard(apt)).join('');
+  }
+
+  // Update In Session badge
+  const activeCount = _appointments.filter(a => a.session_status === 'active').length;
+  const inSessionTab = document.querySelector('.tab[data-tab="in-session"]');
+  if (inSessionTab) {
+    inSessionTab.innerHTML = activeCount > 0
+      ? `In Session <span style="background:#0EA5E9;color:#fff;border-radius:9999px;font-size:0.65rem;padding:1px 6px;margin-left:4px;">${activeCount}</span>`
+      : 'In Session';
   }
 
   // Auto-refresh ENP view every 5s to catch new bookings
