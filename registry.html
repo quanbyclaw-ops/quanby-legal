@@ -743,6 +743,7 @@ async function fetchActDocument(actId) {
     const scFile = (data.sc_files || [])[0];
     if (dcFile) { dlUrl = dcFile.downloadUrl || dcFile.url || ''; dlName = dcFile.fileName || dlName; }
     else if (scFile) { dlUrl = scFile.downloadUrl || scFile.url || ''; dlName = scFile.fileName || dlName; }
+    else if (data.dc_vault_url) { dlUrl = data.dc_vault_url; }
     else if (data.doconchain_view_url) { dlUrl = data.doconchain_view_url; }
     if (!dlUrl) { linksEl.innerHTML = '<span style="color:var(--muted);font-size:.75rem;">—</span>'; return; }
     // Store on element to avoid inline quote escaping issues
@@ -752,7 +753,7 @@ async function fetchActDocument(actId) {
       '<a href="' + esc(dlUrl) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" '
       + 'style="display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .6rem;background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.3);border-radius:6px;font-size:.74rem;font-weight:600;text-decoration:none;margin-right:.3rem;">'
       + '<i class="hgi-stroke hgi-download-01" style="font-size:.78rem;"></i>Download</a>'
-      + '<button onclick="event.stopPropagation();openDocModalById(this)" data-url="' + esc(dlUrl) + '" data-name="' + esc(dlName) + '" '
+      + '<button onclick="event.stopPropagation();window.open(this.dataset.url,'_blank')" data-url="' + esc(dlUrl) + '" data-name="' + esc(dlName) + '" '
       + 'style="display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .6rem;background:rgba(88,166,255,.12);color:#58a6ff;border:1px solid rgba(88,166,255,.3);border-radius:6px;font-size:.74rem;font-weight:600;cursor:pointer;">'
       + '<i class="hgi-stroke hgi-eye" style="font-size:.78rem;"></i>View</button>';
   } catch(e) {
