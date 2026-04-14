@@ -4904,17 +4904,19 @@ async def registry_sync_sc(
             print(f'[SC] /public-use/cs warning (continuing): {_cs_err}', flush=True)
 
         # Step 2: Build principals list per SC spec
-        # SC spec: { principalName, principalAddress: { homeStreet, barangay, cityProvince } }
-        list_of_principals = []
-        if act.get("principal_name") or act.get("principal_email"):
-            list_of_principals.append({
-                "principalName": act.get("principal_name") or act.get("principal_email", ""),
-                "principalAddress": {
-                    "homeStreet": profile.get("home_street") or "N/A",
-                    "barangay": profile.get("barangay") or "N/A",
-                    "cityProvince": profile.get("city_province") or act.get("location", "Remote Electronic Notarization"),
-                },
-            })
+        # Always include at least one principal — SC rejects empty list
+        _principal_name = (act.get("principal_name") or act.get("principal") or
+                          act.get("client_name") or act.get("principal_email") or "Principal")
+        _city = (profile.get("city_province") or act.get("location") or
+                 profile.get("notary_address") or "Legazpi City, Albay")
+        list_of_principals = [{
+            "principalName": _principal_name,
+            "principalAddress": {
+                "homeStreet": profile.get("home_street") or "N/A",
+                "barangay": profile.get("barangay") or "N/A",
+                "cityProvince": _city,
+            },
+        }]
 
         # Step 3: Build witnesses list per SC spec
         # SC spec: { witnessName, witnessAddress: { homeStreet, barangay, cityProvince } }
@@ -4941,9 +4943,10 @@ async def registry_sync_sc(
             "COPY_CERTIFICATION": "Copy Certification",
             "OATH": "Oath and Affirmation",
         }
+        _act_type_src = act.get("act_type") or act.get("notarization_type") or "ACKNOWLEDGMENT"
         _notarial_act_type = _act_type_map.get(
-            str(act.get("act_type", "ACKNOWLEDGMENT")).upper(),
-            act.get("act_type", "Acknowledgment")
+            str(_act_type_src).upper(),
+            _act_type_src or "Acknowledgment"
         )
 
         # Step 4: POST /public-use/consolidated — exact SC spec field names
