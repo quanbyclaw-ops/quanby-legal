@@ -1861,19 +1861,26 @@ def _get_dc_token(email: str = None) -> str:
     if not token_str:
         raise ValueError(f"No DC token in response: {data}")
 
-    # Cache it — try to parse JWT exp, else use 5-min TTL
+    # Cache it — cap at 15-min TTL regardless of JWT exp.
+    # DoconChain staging tokens may carry a 24h exp in the JWT payload, but
+    # their server-side session can expire much sooner (especially after long
+    # idle periods). A 15-min hard cap guarantees a fresh token after any
+    # overnight idle without impacting normal intra-session usage.
     import time as _time2
+    _MAX_TTL = 15 * 60  # 15 minutes hard cap
     try:
         import base64 as _b64, json as _j
         parts_jwt = token_str.split('.')
         if len(parts_jwt) >= 2:
             pad = parts_jwt[1] + '=='
             payload = _j.loads(_b64.urlsafe_b64decode(pad))
-            exp = payload.get('exp', _time2.time() + 300)
+            jwt_exp = payload.get('exp', _time2.time() + _MAX_TTL)
+            # Use whichever is sooner: JWT exp or 15-min cap
+            exp = min(jwt_exp, _time2.time() + _MAX_TTL)
         else:
-            exp = _time2.time() + 300
+            exp = _time2.time() + _MAX_TTL
     except Exception:
-        exp = _time2.time() + 300
+        exp = _time2.time() + _MAX_TTL
 
     _dc_token_cache[_email] = (token_str, exp)
     return token_str
