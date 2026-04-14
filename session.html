@@ -325,40 +325,120 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
 }
 
 /* PRE-JOIN SCREEN */
-.prejoin{
-  position:fixed;inset:0;background:var(--bg);z-index:40;
-  display:flex;align-items:center;justify-content:center;
+/* ── Lobby / Pre-join ────────────────────────────────────────────────────── */
+.prejoin {
+  position: fixed; inset: 0; background: var(--bg); z-index: 40;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
 }
-.prejoin-card{
-  background:var(--surface);border:1px solid rgba(201,168,76,.25);
-  border-radius:16px;padding:2rem;max-width:480px;width:90%;text-align:center;
+.prejoin-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  max-width: 880px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid rgba(201,168,76,.2);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.5);
 }
-.prejoin-logo{font-size:2rem;margin-bottom:1rem}
-.prejoin-title{font-size:1.3rem;font-weight:700;color:var(--gold);margin-bottom:.4rem}
-.prejoin-sub{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.5}
-.preview-video{
-  width:100%;height:180px;background:#000;border-radius:8px;
-  margin-bottom:1.2rem;object-fit:cover;
+@media (max-width: 680px) {
+  .prejoin-inner { grid-template-columns: 1fr; }
+  .lobby-right { border-left: none !important; border-top: 1px solid rgba(255,255,255,.08); }
 }
-.preview-placeholder{
-  width:100%;height:180px;background:#111;border-radius:8px;
-  margin-bottom:1.2rem;display:flex;align-items:center;justify-content:center;
-  font-size:2.5rem;color:var(--muted);
+.lobby-left { padding: 1.75rem; display: flex; flex-direction: column; gap: 1rem; }
+.lobby-right {
+  padding: 1.75rem; display: flex; flex-direction: column; gap: 1rem;
+  border-left: 1px solid rgba(255,255,255,.07);
+  background: rgba(0,0,0,.15);
 }
-.btn-join-session{
-  width:100%;padding:.75rem;background:var(--gold);color:#000;
-  font-size:1rem;font-weight:700;border:none;border-radius:8px;cursor:pointer;
-  transition:opacity .15s;margin-bottom:.6rem;
+.lobby-header { margin-bottom: .25rem; }
+.lobby-title {
+  font-size: 1.1rem; font-weight: 800; color: var(--gold); margin: 0 0 .2rem;
+  display: flex; align-items: center; gap: .5rem;
 }
-.btn-join-session:hover{opacity:.85}
-.btn-join-session:disabled{opacity:.5;cursor:not-allowed}
-.prejoin-devices{display:flex;gap:.5rem;justify-content:center;margin-bottom:1rem;flex-wrap:wrap}
-.device-toggle{
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
-  border-radius:6px;padding:.35rem .7rem;font-size:.78rem;color:var(--text);
-  cursor:pointer;display:flex;align-items:center;gap:.3rem;
+.lobby-subtitle { font-size: .8rem; color: var(--muted); margin: 0; line-height: 1.5; }
+.preview-wrap {
+  position: relative; background: #0a0a0a; border-radius: 12px;
+  overflow: hidden; aspect-ratio: 16/9;
 }
-.device-toggle.off{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.3);color:var(--red)}
+.preview-video {
+  width: 100%; height: 100%; object-fit: cover; display: none;
+}
+.preview-placeholder {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .5rem; color: var(--muted); font-size: .8rem;
+}
+.preview-placeholder i { font-size: 2.5rem; }
+.preview-label {
+  position: absolute; bottom: .5rem; left: .75rem;
+  background: rgba(0,0,0,.7); color: #fff; font-size: .72rem; font-weight: 600;
+  padding: .2rem .6rem; border-radius: 6px;
+}
+.device-row { display: flex; gap: .6rem; }
+.device-toggle {
+  flex: 1; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 8px; padding: .5rem .6rem; font-size: .78rem; color: var(--text);
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: .35rem;
+  transition: all .15s;
+}
+.device-toggle:hover { background: rgba(255,255,255,.1); }
+.device-toggle.off { background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.3); color: #f87171; }
+.btn-join-session {
+  width: 100%; padding: .85rem; background: linear-gradient(135deg, #c9a84c, #e0c06a);
+  color: #0a0e1a; font-size: 1rem; font-weight: 800; border: none; border-radius: 10px;
+  cursor: pointer; transition: opacity .15s; letter-spacing: .02em;
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+}
+.btn-join-session:hover { opacity: .88; }
+.btn-join-session:disabled { opacity: .45; cursor: not-allowed; }
+/* Lobby right panel sections */
+.lobby-section { margin-bottom: .25rem; }
+.lobby-section-title {
+  font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em;
+  color: rgba(148,163,184,.6); margin: 0 0 .6rem; display: flex; align-items: center; gap: .4rem;
+}
+.lobby-session-info {
+  background: rgba(201,168,76,.06); border: 1px solid rgba(201,168,76,.2);
+  border-radius: 10px; padding: .85rem 1rem; display: flex; flex-direction: column; gap: .45rem;
+}
+.lobby-info-row { display: flex; gap: .5rem; align-items: flex-start; font-size: .82rem; }
+.lobby-info-label { color: var(--muted); flex-shrink: 0; width: 80px; }
+.lobby-info-val { color: var(--text); font-weight: 600; }
+/* Participants */
+.lobby-participants { display: flex; flex-direction: column; gap: .5rem; }
+.lobby-participant {
+  display: flex; align-items: center; gap: .75rem;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.07);
+  border-radius: 10px; padding: .6rem .85rem;
+}
+.lobby-p-avatar {
+  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #7c3aed, #9d5ff3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .78rem; font-weight: 700; color: #fff;
+  overflow: hidden;
+}
+.lobby-p-info { flex: 1; min-width: 0; }
+.lobby-p-name { font-size: .84rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lobby-p-role { font-size: .7rem; color: var(--muted); }
+.lobby-p-status { font-size: .7rem; font-weight: 600; }
+.lobby-p-status.joined { color: #34d399; }
+.lobby-p-status.waiting { color: #f59e0b; }
+/* Geo / IP check */
+.lobby-checks { display: flex; flex-direction: column; gap: .4rem; }
+.lobby-check {
+  display: flex; align-items: center; gap: .6rem; font-size: .8rem;
+  padding: .4rem .7rem; border-radius: 7px; background: rgba(255,255,255,.03);
+}
+.lobby-check i { font-size: .85rem; flex-shrink: 0; }
+.lobby-check.ok { color: #34d399; }
+.lobby-check.warn { color: #f59e0b; }
+.lobby-check.loading { color: var(--muted); }
+.lobby-check.fail { color: #f87171; }
+/* ── end lobby ── */
 
 /* Loading / Error */
 .loading-screen{
@@ -388,20 +468,101 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   <div class="loading-text" id="loading-text">Initializing session…</div>
 </div>
 
-<!-- PRE-JOIN -->
+<!-- PRE-JOIN / LOBBY -->
 <div class="prejoin" id="prejoin" style="display:none">
-  <div class="prejoin-card">
-    <div class="prejoin-logo"><i class="hgi-stroke hgi-scales" style="font-size:2rem;color:var(--gold);"></i></div>
-    <div class="prejoin-title">Quanby Legal</div>
-    <div class="prejoin-sub" id="prejoin-sub">You are about to join a notarization session.</div>
-    <video class="preview-video" id="preview-video" autoplay muted playsinline style="display:none"></video>
-    <div class="preview-placeholder" id="preview-placeholder"><i class="hgi-stroke hgi-camera-01" style="font-size:2.5rem;color:var(--muted);"></i></div>
-    <div class="prejoin-devices">
-      <button class="device-toggle" id="toggle-mic-pre"><i class="hgi-stroke hgi-mic-01" style="font-size:.85rem;vertical-align:middle;margin-right:.25rem;"></i>Mic On</button>
-      <button class="device-toggle" id="toggle-cam-pre"><i class="hgi-stroke hgi-camera-01" style="font-size:.85rem;vertical-align:middle;margin-right:.25rem;"></i>Camera On</button>
+  <div class="prejoin-inner">
+
+    <!-- LEFT: Camera Preview -->
+    <div class="lobby-left">
+      <div class="lobby-header">
+        <p class="lobby-title"><i class="hgi-stroke hgi-scales" style="font-size:1.1rem;color:var(--gold);"></i> Quanby Legal</p>
+        <p class="lobby-subtitle" id="prejoin-sub">You are about to join a notarization session.</p>
+      </div>
+
+      <div class="preview-wrap">
+        <video class="preview-video" id="preview-video" autoplay muted playsinline></video>
+        <div class="preview-placeholder" id="preview-placeholder">
+          <i class="hgi-stroke hgi-camera-01"></i>
+          <span>Camera preview</span>
+        </div>
+        <div class="preview-label" id="preview-label">You</div>
+      </div>
+
+      <div class="device-row">
+        <button class="device-toggle" id="toggle-mic-pre">
+          <i class="hgi-stroke hgi-mic-01" style="font-size:.85rem;"></i> Mic On
+        </button>
+        <button class="device-toggle" id="toggle-cam-pre">
+          <i class="hgi-stroke hgi-camera-01" style="font-size:.85rem;"></i> Camera On
+        </button>
+      </div>
+
+      <button class="btn-join-session" id="btn-join-session">
+        <i class="hgi-stroke hgi-video-01" style="font-size:1rem;"></i> Join Session
+      </button>
     </div>
-    <button class="btn-join-session" id="btn-join-session">Join Session</button>
-  </div>
+
+    <!-- RIGHT: Session Info + Participants + Checks -->
+    <div class="lobby-right">
+
+      <!-- Session Details -->
+      <div class="lobby-section">
+        <div class="lobby-section-title">
+          <i class="hgi-stroke hgi-document-01" style="font-size:.75rem;"></i> Session Details
+        </div>
+        <div class="lobby-session-info" id="lobby-session-info">
+          <div class="lobby-info-row">
+            <span class="lobby-info-label">Type</span>
+            <span class="lobby-info-val" id="lobby-notarization-type">—</span>
+          </div>
+          <div class="lobby-info-row">
+            <span class="lobby-info-label">ENP</span>
+            <span class="lobby-info-val" id="lobby-enp-name">—</span>
+          </div>
+          <div class="lobby-info-row">
+            <span class="lobby-info-label">Client</span>
+            <span class="lobby-info-val" id="lobby-client-name">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meeting Participants -->
+      <div class="lobby-section" style="flex:1">
+        <div class="lobby-section-title">
+          <i class="hgi-stroke hgi-users-01" style="font-size:.75rem;"></i> Meeting Participants
+        </div>
+        <div class="lobby-participants" id="lobby-participants">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Pre-Join Checks -->
+      <div class="lobby-section">
+        <div class="lobby-section-title">
+          <i class="hgi-stroke hgi-shield-01" style="font-size:.75rem;"></i> Pre-Join Checks
+        </div>
+        <div class="lobby-checks">
+          <div class="lobby-check loading" id="check-location">
+            <i class="hgi-stroke hgi-location-01"></i>
+            <span id="check-location-text">Checking location…</span>
+          </div>
+          <div class="lobby-check loading" id="check-ip">
+            <i class="hgi-stroke hgi-wifi-01"></i>
+            <span id="check-ip-text">Checking IP address…</span>
+          </div>
+          <div class="lobby-check loading" id="check-camera">
+            <i class="hgi-stroke hgi-camera-01"></i>
+            <span id="check-camera-text">Checking camera…</span>
+          </div>
+          <div class="lobby-check loading" id="check-mic">
+            <i class="hgi-stroke hgi-mic-01"></i>
+            <span id="check-mic-text">Checking microphone…</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /lobby-right -->
+  </div><!-- /prejoin-inner -->
 </div>
 
 <!-- INVITE MODAL -->
@@ -594,6 +755,7 @@ body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,san
   </div>
 </div>
 
+<script src="/assets/ql-auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.umd.min.js"></script>
 <script>
 // ─── STATE ───────────────────────────────────────────────────────────────────
@@ -602,6 +764,31 @@ const ROOM_NAME      = params.get('room') || '';
 const FROM_LOBBY     = params.get('from_lobby') === '1';
 const APT_ID      = params.get('apt') || '';
 const GUEST_TOKEN = params.get('guest_token') || '';
+// Pre-fetched LiveKit token — read from URL params first, then sessionStorage fallback
+var LK_TOKEN = params.get('lk_token') || '';
+var LK_USER  = params.get('lk_user')  || '';
+var LK_ROLE  = params.get('lk_role')  || '';
+if (LK_TOKEN) {
+  console.log('[Session] Got pre-fetched token from URL, len=' + LK_TOKEN.length);
+} else {
+  try {
+    var _storedApt = sessionStorage.getItem('ql_lk_apt') || '';
+    if (_storedApt === (params.get('apt') || '')) {
+      LK_TOKEN = sessionStorage.getItem('ql_lk_token') || '';
+      LK_USER  = sessionStorage.getItem('ql_lk_user')  || '';
+      LK_ROLE  = sessionStorage.getItem('ql_lk_role')  || '';
+      var _ssRoom = sessionStorage.getItem('ql_lk_room') || '';
+      if (LK_TOKEN) {
+        sessionStorage.removeItem('ql_lk_token');
+        sessionStorage.removeItem('ql_lk_user');
+        sessionStorage.removeItem('ql_lk_role');
+        sessionStorage.removeItem('ql_lk_apt');
+        sessionStorage.removeItem('ql_lk_room');
+        console.log('[Session] Got token from sessionStorage, len=' + LK_TOKEN.length + ' room=' + (_ssRoom||ROOM_NAME));
+      }
+    }
+  } catch(e) { console.warn('[Session] sessionStorage read failed:', e); }
+}
 
 let _room       = null;
 let _me         = null;
@@ -1342,6 +1529,7 @@ async function submitDocument() {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 async function init() {
+  console.log('[INIT] Starting. FROM_LOBBY=' + FROM_LOBBY + ' APT_ID=' + APT_ID + ' LK_TOKEN_LEN=' + LK_TOKEN.length + ' ROOM=' + ROOM_NAME);
   setLoading('Checking authentication…');
 
   // Guest flow (witness/observer via invite link)
@@ -1349,6 +1537,40 @@ async function init() {
     await startPrejoin(null, 'Guest', 'WITNESS');
     return;
   }
+
+  // Direct join: lk_token in URL = connect immediately, no auth needed
+  if (LK_TOKEN && ROOM_NAME && APT_ID) {
+    console.log('[Session] TOKEN path: connecting directly. room=' + ROOM_NAME + ' token_len=' + LK_TOKEN.length);
+    setLoading('Joining meeting...');
+    (async function() {
+      try {
+        var _role = LK_ROLE || 'ENP';
+        var _uname = LK_USER || 'Participant';
+        _room = new LivekitClient.Room({ adaptiveStream: true, dynacast: true });
+        setupRoomEvents(_room, _uname, _role);
+        await _room.connect('wss://quanby-lms-k4aq44qe.livekit.cloud', LK_TOKEN, { autoSubscribe: true });
+        console.log('[Session] CONNECTED! state=' + _room.state);
+        _room.remoteParticipants.forEach(function(p) {
+          addParticipantTile(p);
+          p.trackPublications.forEach(function(pub) {
+            if (pub.track && pub.isSubscribed) attachTrack(pub.track, p);
+          });
+        });
+        try { await _room.localParticipant.enableCameraAndMicrophone(); } catch(e) {}
+        fetch('/api/sessions/' + APT_ID, { credentials: 'include' })
+          .then(function(r) { return r.ok ? r.json() : null; })
+          .then(function(s) { if (s) { _sessionInfo = s; _currentAptId = APT_ID; if (_sessionInfo) { try { restoreSessionDocuments(); renderParticipantsList(); populateSignPanel(_role === 'ENP'); } catch(e) {} } } })
+          .catch(function() {});
+        hideLoading();
+        postJoinSetup(_uname, _role, _role);
+        if (_role === 'ENP') loadDcToken();
+      } catch(e) {
+        console.error('[Session] Connect error:', e);
+        showError('LiveKit error: ' + e.message + '<br><br>Please <a href= /appointments style=color:#00d4c8>go back to Appointments</a>, end the session and start a new one.');
+      }
+    })();
+    return;
+  }}
 
   // Auth check
   let me;
@@ -1361,10 +1583,33 @@ async function init() {
       r = await fetch('/api/auth/me', { credentials: 'include', signal: _authController.signal });
     } finally { clearTimeout(_authTimeout); }
     if (r.status === 401) { try { const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); if (ref.ok) r = await fetch('/api/auth/me', { credentials: 'include' }); } catch(e) {} }
-    if (!r.ok) { location.href = '/'; return; }
+    if (!r.ok) {
+      // Show visible error instead of reloading (prevents infinite reload loop)
+      document.getElementById('loading-screen').innerHTML = [
+        '<div style="text-align:center;padding:2rem;">',
+        '<div style="font-size:2rem;margin-bottom:1rem">🔒</div>',
+        '<div style="color:var(--text);font-size:1rem;margin-bottom:.5rem;font-weight:600;">Session Expired</div>',
+        '<div style="color:var(--muted);font-size:.85rem;margin-bottom:1.5rem;">Your session expired. Please sign in again to join the meeting.</div>',
+        '<a href="/?sso=1" style="display:inline-block;padding:.6rem 1.5rem;background:linear-gradient(135deg,#c9a84c,#e0c06a);color:#0a0e1a;font-weight:700;border-radius:8px;text-decoration:none;font-size:.9rem;">Sign In &rarr;</a>',
+        '<div style="margin-top:.75rem;"><a href="/appointments" style="color:var(--teal);font-size:.85rem;">← Back to Appointments</a></div>',
+        '</div>'
+      ].join('');
+      return;
+    }
     me = await r.json();
     _me = me;
-  } catch(e) { location.href = '/'; return; }
+  } catch(e) {
+    console.warn('[Session] auth failed', e);
+    document.getElementById('loading-screen').innerHTML = [
+      '<div style="text-align:center;padding:2rem;">',
+      '<div style="font-size:2rem;margin-bottom:1rem">⚠️</div>',
+      '<div style="color:var(--text);font-size:1rem;margin-bottom:.5rem;font-weight:600;">Authentication Error</div>',
+      '<div style="color:var(--muted);font-size:.85rem;margin-bottom:1.5rem;">Could not verify your identity. Please try signing in again.</div>',
+      '<a href="/?sso=1" style="display:inline-block;padding:.6rem 1.5rem;background:linear-gradient(135deg,#c9a84c,#e0c06a);color:#0a0e1a;font-weight:700;border-radius:8px;text-decoration:none;font-size:.9rem;">Sign In &rarr;</a>',
+      '</div>'
+    ].join('');
+    return;
+  }
 
   // Load session info
   setLoading('Loading session info…');
@@ -1391,60 +1636,190 @@ async function init() {
     // Came from lobby — skip session.html's own pre-join screen, join directly
     const userName = isEnp ? _sessionInfo.enp_name : _sessionInfo.client_name;
     const userRole = isEnp ? 'ENP' : 'Client';
-    await joinSession(userName, userRole);
+    // Ensure prejoin is hidden (it should be, but safety check)
+    var _pj = document.getElementById('prejoin');
+    if (_pj) _pj.style.display = 'none';
+    await joinSession(me, userRole);
   } else {
     await startPrejoin(me, isEnp ? _sessionInfo.enp_name : _sessionInfo.client_name, isEnp ? 'ENP' : 'Client');
   }
 }
 
 async function startPrejoin(me, userName, userRole) {
-  setLoading('Preparing camera preview…');
+  setLoading('Preparing lobby…');
+
+  // ── Populate session details ──────────────────────────────────────────────
+  if (_sessionInfo) {
+    const partner = (me && me.id === _sessionInfo.enp_id) ? _sessionInfo.client_name : _sessionInfo.enp_name;
+    const sub = document.getElementById('prejoin-sub');
+    if (sub) sub.textContent = 'Ready to join your notarization session.';
+    const typeEl = document.getElementById('lobby-notarization-type');
+    const enpEl  = document.getElementById('lobby-enp-name');
+    const cliEl  = document.getElementById('lobby-client-name');
+    if (typeEl) typeEl.textContent = (_sessionInfo.notarization_type || 'Notarization').replace(/_/g,' ');
+    if (enpEl)  enpEl.textContent  = _sessionInfo.enp_name || '—';
+    if (cliEl)  cliEl.textContent  = _sessionInfo.client_name || '—';
+  }
+
+  // ── Participants ──────────────────────────────────────────────────────────
+  const pList = document.getElementById('lobby-participants');
+  if (pList && _sessionInfo) {
+    const all = [];
+    if (_sessionInfo.enp_name)    all.push({ name: _sessionInfo.enp_name,    role: 'ENP',    email: _sessionInfo.enp_email    || '' });
+    if (_sessionInfo.client_name) all.push({ name: _sessionInfo.client_name, role: 'Client', email: _sessionInfo.client_email || '' });
+    (_sessionInfo.session_participants || []).forEach(function(p) {
+      all.push({ name: p.name || 'Guest', role: p.role || 'Witness', email: p.email || '' });
+    });
+    pList.innerHTML = all.map(function(p) {
+      const initials = (p.name || '?').split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().slice(0,2);
+      const isMe = me && (p.email.toLowerCase() === (me.email || '').toLowerCase());
+      const bgColor = p.role === 'ENP' ? 'linear-gradient(135deg,#c9a84c,#e0c06a)' : 'linear-gradient(135deg,#7c3aed,#9d5ff3)';
+      const textColor = p.role === 'ENP' ? '#0a0e1a' : '#fff';
+      return '<div class="lobby-participant">' +
+        '<div class="lobby-p-avatar" style="background:' + bgColor + ';color:' + textColor + '">' + initials + '</div>' +
+        '<div class="lobby-p-info">' +
+          '<div class="lobby-p-name">' + (p.name || 'Unknown') + (isMe ? ' <span style="font-size:.68rem;color:#a78bfa;">(You)</span>' : '') + '</div>' +
+          '<div class="lobby-p-role">' + p.role + (p.email ? ' · ' + p.email : '') + '</div>' +
+        '</div>' +
+        '<div class="lobby-p-status ' + (isMe ? 'joined' : 'waiting') + '">' + (isMe ? '● Ready' : '○ Waiting') + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ── Camera + Mic preview ──────────────────────────────────────────────────
+  let camOk = false, micOk = false;
   try {
     _previewStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    document.getElementById('preview-video').srcObject = _previewStream;
-    document.getElementById('preview-video').style.display = '';
-    document.getElementById('preview-placeholder').style.display = 'none';
+    const vid = document.getElementById('preview-video');
+    const ph  = document.getElementById('preview-placeholder');
+    if (vid && ph) { vid.srcObject = _previewStream; vid.style.display = ''; ph.style.display = 'none'; }
+    const lbl = document.getElementById('preview-label');
+    if (lbl) lbl.textContent = userName || 'You';
+    camOk = true; micOk = true;
   } catch(e) {
-    // No camera — that's ok
+    try {
+      _previewStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      micOk = true;
+    } catch(e2) {}
   }
+  _setCheck('check-camera', camOk ? 'ok' : 'warn', camOk ? 'Camera ready' : 'No camera detected');
+  _setCheck('check-mic',    micOk ? 'ok' : 'warn', micOk ? 'Microphone ready' : 'No microphone detected');
+
+  // ── Geolocation ───────────────────────────────────────────────────────────
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        const lat = pos.coords.latitude.toFixed(4);
+        const lon = pos.coords.longitude.toFixed(4);
+        _setCheck('check-location', 'ok', 'Location: ' + lat + ', ' + lon);
+      },
+      function() {
+        _setCheck('check-location', 'warn', 'Location not available');
+      },
+      { timeout: 6000 }
+    );
+  } else {
+    _setCheck('check-location', 'warn', 'Geolocation not supported');
+  }
+
+  // ── IP check ─────────────────────────────────────────────────────────────
+  fetch('/api/sessions/my-ip', { credentials: 'include' })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      const ip = d.ip || 'unknown';
+      _setCheck('check-ip', 'ok', 'IP: ' + ip);
+    })
+    .catch(function(){
+      _setCheck('check-ip', 'warn', 'Could not detect IP');
+    });
+
   hideLoading();
   document.getElementById('prejoin').style.display = 'flex';
 
-  // Fill prejoin info
-  const sub = document.getElementById('prejoin-sub');
-  if (_sessionInfo) {
-    const partner = (me && me.id === _sessionInfo.enp_id) ? _sessionInfo.client_name : _sessionInfo.enp_name;
-    sub.textContent = `You're about to join the notarization session for ${_sessionInfo.notarization_type || 'document'} with ${partner || 'your partner'}.`;
-  }
-
-  // Device toggles
-  document.getElementById('toggle-mic-pre').onclick = () => {
+  // ── Device toggles ────────────────────────────────────────────────────────
+  document.getElementById('toggle-mic-pre').onclick = function() {
     _micEnabled = !_micEnabled;
     const btn = document.getElementById('toggle-mic-pre');
-    btn.innerHTML = _micEnabled ? '<i class="hgi-stroke hgi-mic-01" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Mic On' : '<i class="hgi-stroke hgi-mic-off-01" style="font-size:.85rem;vertical-align:middle;margin-right:.3rem;"></i>Mic Off';
+    btn.innerHTML = _micEnabled
+      ? '<i class="hgi-stroke hgi-mic-01" style="font-size:.85rem;"></i> Mic On'
+      : '<i class="hgi-stroke hgi-mic-off-01" style="font-size:.85rem;"></i> Mic Off';
     btn.className = 'device-toggle' + (_micEnabled ? '' : ' off');
-    if (_previewStream) _previewStream.getAudioTracks().forEach(t => t.enabled = _micEnabled);
+    if (_previewStream) _previewStream.getAudioTracks().forEach(function(t){ t.enabled = _micEnabled; });
   };
-  document.getElementById('toggle-cam-pre').onclick = () => {
+  document.getElementById('toggle-cam-pre').onclick = function() {
     _camEnabled = !_camEnabled;
     const btn = document.getElementById('toggle-cam-pre');
-    btn.innerHTML = _camEnabled ? '<i class="hgi-stroke hgi-camera-01" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Camera On' : '<i class="hgi-stroke hgi-camera-off-01" style="font-size:.85rem;vertical-align:middle;margin-right:.3rem;"></i>Camera Off';
+    btn.innerHTML = _camEnabled
+      ? '<i class="hgi-stroke hgi-camera-01" style="font-size:.85rem;"></i> Camera On'
+      : '<i class="hgi-stroke hgi-camera-off-01" style="font-size:.85rem;"></i> Camera Off';
     btn.className = 'device-toggle' + (_camEnabled ? '' : ' off');
-    if (_previewStream) _previewStream.getVideoTracks().forEach(t => t.enabled = _camEnabled);
+    if (_previewStream) _previewStream.getVideoTracks().forEach(function(t){ t.enabled = _camEnabled; });
   };
 
-  document.getElementById('btn-join-session').onclick = () => joinSession(me, userRole);
+  document.getElementById('btn-join-session').onclick = function() { joinSession(me, userRole); };
+}
+
+function _setCheck(id, status, text) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.className = 'lobby-check ' + status;
+  var icon = el.querySelector('i');
+  var span = el.querySelector('span');
+  if (span) span.textContent = text;
+  if (icon) {
+    var iconMap = {
+      'check-location': status === 'ok' ? 'hgi-location-01' : (status === 'warn' ? 'hgi-location-off-01' : 'hgi-location-01'),
+      'check-ip':       'hgi-wifi-01',
+      'check-camera':   status === 'ok' ? 'hgi-camera-01' : 'hgi-camera-off-01',
+      'check-mic':      status === 'ok' ? 'hgi-mic-01' : 'hgi-mic-off-01',
+    };
+    icon.className = 'hgi-stroke ' + (iconMap[id] || 'hgi-check-circle-01');
+  }
 }
 
 async function joinSession(me, userRole) {
-  const btn = document.getElementById('btn-join-session');
-  btn.disabled = true; btn.textContent = 'Connecting…';
+  var btn = document.getElementById('btn-join-session');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<div style="width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:.5rem;"></div> Connecting…';
+  }
+
+  console.log('[joinSession] called, me=', me ? (typeof me === 'object' ? me.email : me) : 'null', 'userRole=' + userRole);
+  // Preflight auth refresh — critical for InPrivate/fresh sessions
+  try {
+    const _jr = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+    console.log('[joinSession] refresh status:', _jr.status);
+  } catch(e) { console.warn('[joinSession] refresh failed:', e); }
 
   // Stop preview stream
-  if (_previewStream) { _previewStream.getTracks().forEach(t => t.stop()); _previewStream = null; }
+  if (_previewStream) { _previewStream.getTracks().forEach(function(t){ t.stop(); }); _previewStream = null; }
 
   document.getElementById('prejoin').style.display = 'none';
   setLoading('Connecting to session…');
+
+  function _restorePrejoin(errMsg) {
+    // Don't redirect — show error on the prejoin and re-enable the button
+    var _prejoinEl = document.getElementById('prejoin');
+    if (_prejoinEl) _prejoinEl.style.display = 'flex';
+    hideLoading();
+    var _btnEl = document.getElementById('btn-join-session');
+    if (_btnEl) {
+      _btnEl.disabled = false;
+      _btnEl.innerHTML = '🎥 Join Session';
+    }
+    if (errMsg) {
+      var _errEl = document.createElement('div');
+      _errEl.style.cssText = 'color:#f87171;font-size:.8rem;text-align:center;margin-top:.5rem;padding:.4rem .75rem;background:rgba(248,113,113,.1);border-radius:6px;';
+      _errEl.textContent = '⚠️ ' + errMsg;
+      var _joinBtn = document.getElementById('btn-join-session');
+      if (_joinBtn && _joinBtn.parentNode) {
+        var existing = _joinBtn.parentNode.querySelector('.join-err');
+        if (existing) existing.remove();
+        _errEl.className = 'join-err';
+        _joinBtn.parentNode.insertBefore(_errEl, _joinBtn.nextSibling);
+      }
+    }
+  }
 
   let token, userName, role;
   try {
@@ -1453,32 +1828,46 @@ async function joinSession(me, userRole) {
       userName = 'Guest';
       role     = 'WITNESS';
     } else {
-      // Use authoritative room_name from session info (not URL param) so both sides always land in same room
+      // Use authoritative room_name from session info (not URL param)
       const roomName = (_sessionInfo && _sessionInfo.room_name) ? _sessionInfo.room_name : ROOM_NAME;
-      const r = await fetch('/api/sessions/join', {
+      // Use authFetch which auto-retries on 401 with token refresh
+      const _authFetch = (typeof QLAuth !== 'undefined' && QLAuth.authFetch) ? QLAuth.authFetch.bind(QLAuth) : function(u,o){ o.credentials='include'; return fetch(u,o); };
+      console.log('[joinSession] calling /api/sessions/join with room=' + roomName + ' apt=' + APT_ID);
+      const r = await _authFetch('/api/sessions/join', {
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ room_name: roomName, apt_id: APT_ID }),
       });
-      if (!r.ok) { const e = await r.json(); showError(e.detail || 'Failed to join session.'); return; }
+      console.log('[joinSession] /api/sessions/join status:', r.status);
+      if (!r.ok) {
+        var errData = {};
+        try { errData = await r.json(); } catch(je) {}
+        var errMsg = errData.detail || ('Server error ' + r.status);
+        console.error('[joinSession] join API failed:', errMsg);
+        _restorePrejoin(errMsg);
+        return;
+      }
       const data = await r.json();
+      console.log('[joinSession] got token, user_name=' + data.user_name + ' role=' + data.user_role);
       token    = data.token;
       userName = data.user_name;
       role     = data.user_role;
     }
-  } catch(e) { showError('Network error. Could not join session.'); return; }
+  } catch(e) { _restorePrejoin('Network error. Please check your connection.'); return; }
 
   setLoading('Joining LiveKit room…');
+  console.log('[joinSession] connecting to LiveKit, token length=' + (token ? token.length : 0));
   try {
     _room = new LivekitClient.Room({
       adaptiveStream: true,
       dynacast: true,
     });
     setupRoomEvents(_room, userName, role);
+    console.log('[joinSession] room.connect starting...');
     await _room.connect('wss://quanby-lms-k4aq44qe.livekit.cloud', token, {
       autoSubscribe: true,
     });
+    console.log('[joinSession] room.connect SUCCESS, state=' + _room.state);
 
     // ── Enumerate participants already in room BEFORE we joined ──────────────
     // ParticipantConnected only fires for people who join AFTER us.
@@ -1534,14 +1923,13 @@ function postJoinSetup(userName, role, userRole) {
   // Render self thumbnail
   renderSelf(userName, role);
 
-  // Populate sign panel
-  populateSignPanel(isEnp);
-
-  // Render participants sidebar
-  renderParticipantsList();
-
-  // Restore any documents already uploaded in this session (survives refresh)
-  restoreSessionDocuments();
+  // Populate sign panel, participants, docs — only if session info available
+  // (if FROM_LOBBY without session info, these are called after async fetch completes)
+  if (_sessionInfo) {
+    populateSignPanel(isEnp);
+    renderParticipantsList();
+    restoreSessionDocuments();
+  }
 }
 
 function restoreSessionDocuments() {
@@ -1550,7 +1938,7 @@ function restoreSessionDocuments() {
     'ACKNOWLEDGMENT': '₱100 – ₱300', 'JURAT': '₱100 – ₱300',
     'AFFIRMATION': '₱100 – ₱300', 'SIGNATURE_WITNESSING': '₱50 – ₱200',
   };
-  _sessionInfo.session_documents.forEach(doc => {
+  (_sessionInfo && _sessionInfo.session_documents || []).forEach(doc => {
     // Handle both 'name' (new) and 'doc_name' (legacy) field
     const docName = doc.name || doc.doc_name;
     if (!doc || !docName) return;
@@ -1621,7 +2009,7 @@ function restoreSessionDocuments() {
       }, 150);
     }
   });
-  if (_sessionInfo.session_documents.length > 0) {
+  if (_sessionInfo && _sessionInfo.session_documents && _sessionInfo.session_documents.length > 0) {
     switchSidebarTab('documents');
   }
 }
@@ -2029,7 +2417,7 @@ function renderParticipantsList() {
   if (!_room) return;
   // Also add invited participants from session info who may not have joined yet
   if (_sessionInfo && _sessionInfo.session_participants) {
-    _sessionInfo.session_participants.forEach(p => {
+    (_sessionInfo && _sessionInfo.session_participants || []).forEach(p => {
       if (!Object.values(_participants).some(x => x.name === p.name)) {
         const div = document.createElement('div');
         div.className = 'participant-item';
@@ -2283,6 +2671,7 @@ function switchSidebarTab(tab) {
 
 // ─── SIGN PANEL ───────────────────────────────────────────────────────────────
 function populateSignPanel(isEnp) {
+  if (!_sessionInfo) return; // guard: session info not yet loaded
   if (!_sessionInfo) return;
   const meta = document.getElementById('sign-panel-meta');
   meta.innerHTML = `
@@ -2291,7 +2680,7 @@ function populateSignPanel(isEnp) {
     <div class="sign-meta-item">⚖️ ENP: <strong>${_sessionInfo.enp_name || '–'}</strong></div>
   `;
   const acts = document.getElementById('sign-panel-actions');
-  const link = _sessionInfo.doconchain_sign_link;
+  const link = _sessionInfo && _sessionInfo.doconchain_sign_link;
   if (link) {
     acts.innerHTML = `
       <a class="btn-sign-portal" href="${escHtml(link)}" target="_blank" rel="noopener">
@@ -2425,14 +2814,16 @@ function hideLoading() {
   document.getElementById('loading-screen').style.display = 'none';
 }
 function showError(msg) {
-  document.getElementById('loading-screen').style.display = 'flex';
-  document.getElementById('loading-screen').innerHTML = `
-    <div style="text-align:center">
-      <div style="font-size:2rem;margin-bottom:1rem">⚠️</div>
-      <div style="color:var(--red);font-size:1rem;margin-bottom:1rem">${escHtml(msg)}</div>
-      <a href="/appointments" style="color:var(--teal);font-size:.85rem">← Back to Appointments</a>
-    </div>
-  `;
+  var _ls = document.getElementById('loading-screen');
+  if (!_ls) return;
+  _ls.style.display = 'flex';
+  var d = document.createElement('div');
+  d.style.cssText = 'text-align:center;padding:2rem;max-width:500px;';
+  d.innerHTML = '<div style="font-size:2.5rem;margin-bottom:1rem">&#x26A0;&#xFE0F;</div>' +
+    '<div style="color:#f87171;font-size:.95rem;margin-bottom:1.25rem;line-height:1.6">' + msg + '</div>' +
+    '<a href="/appointments" style="display:inline-block;padding:.5rem 1.25rem;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.4);border-radius:8px;color:#00d4c8;font-size:.9rem;text-decoration:none;">← Back to Appointments</a>';
+  _ls.innerHTML = '';
+  _ls.appendChild(d);
 }
 function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -2445,16 +2836,34 @@ function initials(name) {
 if (!APT_ID) {
   showError('Missing appointment ID in URL. Please go back to your appointments.');
 } else if (!ROOM_NAME) {
-  // APT_ID present but no room — session not yet started by ENP
-  // Redirect to appointments so ENP can start it
-  document.getElementById('loading-text').textContent = 'Session not started yet…';
-  document.getElementById('loading-screen').innerHTML =
-    '<div style="text-align:center;padding:2rem;">' +
-    '<div style="font-size:2rem;margin-bottom:1rem">⏳</div>' +
-    '<div style="color:var(--text);font-size:1rem;margin-bottom:.5rem;font-weight:600;">Session not started yet</div>' +
-    '<div style="color:var(--muted);font-size:.85rem;margin-bottom:1.5rem;">The ENP has not started this session. Please go back and start the session from your appointments.</div>' +
-    '<a href="/appointments" style="display:inline-block;padding:.6rem 1.5rem;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.4);border-radius:8px;color:var(--teal);font-size:.9rem;text-decoration:none;">← Back to Appointments</a>' +
-    '</div>';
+  // APT_ID present but no room — try to fetch room_name from the API first
+  // This handles old links and cases where room wasn't included in the URL
+  (async function() {
+    try {
+      await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+      const _r = await fetch('/api/sessions/' + APT_ID, { credentials: 'include' });
+      if (_r.ok) {
+        const _info = await _r.json();
+        const _roomName = _info.room_name || _info.session_room_name || '';
+        const _status = _info.session_status || '';
+        if (_roomName && _status === 'active') {
+          // Session IS active — redirect with room param and continue
+          const _newUrl = '/session?apt=' + encodeURIComponent(APT_ID) + '&room=' + encodeURIComponent(_roomName);
+          window.location.replace(_newUrl);
+          return;
+        }
+      }
+    } catch(e) { /* fall through to error */ }
+    // Truly not started — show the message
+    document.getElementById('loading-text').textContent = 'Session not started yet…';
+    document.getElementById('loading-screen').innerHTML =
+      '<div style="text-align:center;padding:2rem;">' +
+      '<div style="font-size:2rem;margin-bottom:1rem">⏳</div>' +
+      '<div style="color:var(--text);font-size:1rem;margin-bottom:.5rem;font-weight:600;">Session not started yet</div>' +
+      '<div style="color:var(--muted);font-size:.85rem;margin-bottom:1.5rem;">The ENP has not started this session yet. Please wait or ask the ENP to start the session.</div>' +
+      '<a href="/appointments" style="display:inline-block;padding:.6rem 1.5rem;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.4);border-radius:8px;color:var(--teal);font-size:.9rem;text-decoration:none;">← Back to Appointments</a>' +
+      '</div>';
+  })();
 } else {
   init();
 }
