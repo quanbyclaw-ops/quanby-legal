@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
       <button class="btn btn-outline" onclick="exportCsv()"><i class="hgi-stroke hgi-file-csv" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Export CSV</button>
       <button class="btn btn-outline" onclick="exportPdf()"><i class="hgi-stroke hgi-file-pdf" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Export PDF</button>
       <button class="btn btn-outline" onclick="syncAllSessions()" id="sync-all-btn" title="Re-sync all ended sessions to catch any missed acts"><i class="hgi-stroke hgi-cloud-download" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Sync Sessions</button>
-      <button class="btn btn-primary" onclick="loadActs(1)"><i class="hgi-stroke hgi-refresh" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Refresh</button>
+      <button class="btn btn-primary" onclick="syncAndRefresh(this)" id="refresh-btn"><i class="hgi-stroke hgi-refresh" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Refresh</button>
     </div>
 
     <!-- Table -->
@@ -915,6 +915,15 @@ function copyNRID(nrid, btn) {
   }).catch(function() {
     showToast('Could not copy NRID', 'error');
   });
+}
+
+
+async function syncAndRefresh(btn) {
+  if (btn) { btn.disabled=true; btn.innerHTML='<i class="hgi-stroke hgi-loading-03" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;animation:spin .7s linear infinite"></i>Syncing...'; }
+  try { await fetch('/api/registry/sync-all', { method:'POST', credentials:'include' }); } catch(e) {}
+  await new Promise(function(resolve){ setTimeout(resolve, 2500); });
+  await loadActs(1);
+  if (btn) { btn.disabled=false; btn.innerHTML='<i class="hgi-stroke hgi-refresh" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Refresh'; }
 }
 
 async function syncAllSessions() {
