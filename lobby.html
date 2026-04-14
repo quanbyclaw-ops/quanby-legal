@@ -97,22 +97,9 @@ function fail(msg) {
   log('APT=' + APT + ' ROM=' + ROM);
   if (!APT) { fail('Missing appointment ID.'); return; }
 
-  // Check sessionStorage first
-  try {
-    var storedApt = sessionStorage.getItem('ql_lk_apt') || '';
-    log('sessionStorage apt=' + storedApt + ' matches=' + (storedApt === APT));
-    if (storedApt === APT) {
-      var storedTok = sessionStorage.getItem('ql_lk_token') || '';
-      if (storedTok) {
-        _token = storedTok;
-        _user  = sessionStorage.getItem('ql_lk_user') || '';
-        _role  = sessionStorage.getItem('ql_lk_role') || '';
-        _room  = sessionStorage.getItem('ql_lk_room') || ROM;
-        log('Got token from sessionStorage len=' + _token.length, 'd-ok');
-        ready(); return;
-      }
-    }
-  } catch(e) { log('sessionStorage read error: ' + e.message, 'd-err'); }
+  // Always fetch fresh token — never reuse cached (stale tokens fail LiveKit)
+  log('Always fetching fresh token (no cache reuse)', 'd-info');
+  try { sessionStorage.clear(); } catch(e) {}
 
   // Auth refresh
   log('Calling /api/auth/refresh...');
