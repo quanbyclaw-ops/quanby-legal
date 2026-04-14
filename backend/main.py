@@ -5074,7 +5074,7 @@ async def registry_get_document(
             print(f"[SC] retrieval/file failed (non-fatal): {_sc_doc_err}", flush=True)
 
     # ── 2. DoconChain vault — fetch completed project file ────────────────────
-    dc_uuid = act.get("doconchain_project_uuid") or ""
+    dc_uuid = act.get("dc_project_uuid") or act.get("doconchain_project_uuid") or ""
     dc_files = []
     dc_view_url = None
 

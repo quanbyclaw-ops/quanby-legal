@@ -399,14 +399,14 @@ function renderTable(acts) {
         <td style="font-size:.8rem;white-space:nowrap;">${date}</td>
         <td style="max-width:220px;">
           <div style="font-weight:600;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(act.doc_name)}">${esc(act.doc_name) || '—'}</div>
-          ${act.dc_reference_number ? '<div style="font-size:.7rem;color:var(--muted);margin-top:.15rem;">Ref: ' + esc(act.dc_reference_number) + '</div>' : ''}
+          ${act.dc_reference_no ? '<div style="font-size:.7rem;color:var(--muted);margin-top:.15rem;">Ref: ' + esc(act.dc_reference_no) + '</div>' : ''}
         </td>
         <td><span class="badge ${typeBadge}">${act.act_type || '—'}</span></td>
         <td style="font-size:.82rem;">${act.fee ? '<span style="color:var(--text);">'+esc(act.fee)+'</span>' : '<span style="color:var(--muted);">—</span>'}</td>
         <td>${dcBadge}</td>
         <td>${scBadge}</td>
         <td onclick="event.stopPropagation()" id="doc-links-${act.id}" style="white-space:nowrap;">
-          ${act.doconchain_project_uuid
+          ${act.dc_project_uuid
             ? '<span style="color:var(--muted);font-size:.7rem;opacity:.6;"><i class="hgi-stroke hgi-loading-03" style="font-size:.75rem;vertical-align:middle;margin-right:.2rem;"></i></span>'
             : '<span style="color:var(--muted);font-size:.75rem;">—</span>'
           }
@@ -437,7 +437,7 @@ function renderTable(acts) {
   wrap.innerHTML = html;
   // Auto-fetch documents for all acts with doconchain_project_uuid
   acts.forEach(function(act) {
-    if (act.doconchain_project_uuid) {
+    if (act.dc_project_uuid) {
       fetchActDocument(act.id);
     }
   });
@@ -447,7 +447,7 @@ function renderDetail(act) {
   const signers = act.dc_signers_snapshot || [];
   return `
     <div class="detail-grid">
-      <div class="detail-field"><label>DC Reference No.</label><span>${esc(act.dc_reference_number) || '—'}</span></div>
+      <div class="detail-field"><label>DC Reference No.</label><span>${esc(act.dc_reference_no) || '—'}</span></div>
       <div class="detail-field"><label>Appointment ID</label><span>${esc(act.apt_id) || '—'}</span></div>
       <div class="detail-field"><label>Principal</label><span>${esc(act.principal_name) || '—'}${act.principal_email ? ' <span style=\"color:var(--muted);font-size:.75rem;\">(' + esc(act.principal_email) + ')</span>' : ''}</span></div>
       <div class="detail-field"><label>Witness</label><span>${act.witness_name ? esc(act.witness_name) + (act.witness_email ? ' <span style=\"color:var(--muted);font-size:.75rem;\">(' + esc(act.witness_email) + ')</span>' : '') : '<span style=\"color:var(--muted);\">None</span>'}</span></div>
@@ -490,7 +490,7 @@ function renderDetail(act) {
         }).join('');
         return '<div style="margin-top:.75rem;"><div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:.4rem .75rem;background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);">Signatories</div>' + rows + '</div>';
       })()}
-      <div class="detail-field"><label>DC Project UUID</label><span class="mono">${esc(act.doconchain_project_uuid) || '—'}</span></div>
+      <div class="detail-field"><label>DC Project UUID</label><span class="mono">${esc(act.dc_project_uuid) || '—'}</span></div>
       <div class="detail-field"><label>SC Registry ID</label><span>${esc(act.sc_registry_id) || '—'}</span></div>
 
     </div>
@@ -566,7 +566,7 @@ async function exportCsv() {
       a.witness_name || '',
       a.witness_email || '',
       a.dc_status || '',
-      a.dc_reference_number || '',
+      a.dc_reference_no || '',
       a.sc_synced ? 'Yes' : 'No',
       a.sc_registry_id || '',
       a.location || '',
@@ -607,7 +607,7 @@ async function exportPdf() {
         <td>${esc(a.doc_name||'—')}</td>
         <td><span style="background:rgba(14,165,233,.15);color:#38bdf8;padding:.1rem .4rem;border-radius:4px;font-size:.72rem;">${esc(a.act_type||'—')}</span></td>
         <td>${esc(a.principal_name||'—')}</td>
-        <td>${esc(a.dc_status||'—')}</td>
+        <td>${a.dc_status === 'completed' ? 'Completed' : esc(a.dc_status||'—')}</td>
         <td>${nrid}</td>
       </tr>`;
     }).join('');
