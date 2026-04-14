@@ -4394,7 +4394,9 @@ def _act_exists(registry: dict, enp_id: str, dc_uuid: str) -> bool:
     return False
 
 def _populate_registry_bg(apt_id: str, enp_id: str) -> None:
-    """Background thread: populate registry acts from a completed appointment."""
+    """Background thread: populate registry acts from a completed appointment.
+    Max runtime: 90 seconds. Never blocks API workers."""
+    import signal as _sig_reg
     try:
         import urllib.request as _ureg, json as _jreg
 
@@ -4590,7 +4592,7 @@ def _populate_registry_bg(apt_id: str, enp_id: str) -> None:
             ]
             if pending_docs:
                 import time as _t_retry
-                for _retry in range(20):  # retry for up to 10 minutes
+                for _retry in range(3):  # retry max 3 times (90s total)
                     _t_retry.sleep(30)
                     print(f'[Registry] Retry {_retry+1}/3 for apt {apt_id}', flush=True)
                     with _registry_lock:
