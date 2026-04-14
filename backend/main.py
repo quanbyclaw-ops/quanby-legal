@@ -2590,8 +2590,8 @@ import jwt as _pyjwt
 
 def _create_livekit_token(room_name: str, identity: str, name: str, can_publish: bool = True) -> str:
     """Generate a LiveKit access token using JWT (HS256)."""
-    api_key    = os.getenv("LIVEKIT_API_KEY", "APIfmzJ2GVEV3TJ")
-    api_secret = os.getenv("LIVEKIT_API_SECRET", "sTxyVlCJaPF9QMJTevLvT1xRmSPiXSZXZnLgGoJsIOH")
+    api_key    = os.getenv("LIVEKIT_API_KEY", "APIRn8F2gpDAQHw")
+    api_secret = os.getenv("LIVEKIT_API_SECRET", "NseFKsnBr5rXxWlCTYUz33Hc6l7c64f0W3DHzN18r1eB")
     now = int(time.time())
     grants = {
         "room": room_name,
@@ -3645,8 +3645,8 @@ async def end_session(
 def _livekit_egress_jwt(action: str) -> str:
     """Generate a short-lived JWT for LiveKit server API calls."""
     import time as _time_e, base64 as _b64e
-    _api_key    = os.getenv("LIVEKIT_API_KEY", "APIfmzJ2GVEV3TJ")
-    _api_secret = os.getenv("LIVEKIT_API_SECRET", "sTxyVlCJaPF9QMJTevLvT1xRmSPiXSZXZnLgGoJsIOH")
+    _api_key    = os.getenv("LIVEKIT_API_KEY", "APIRn8F2gpDAQHw")
+    _api_secret = os.getenv("LIVEKIT_API_SECRET", "NseFKsnBr5rXxWlCTYUz33Hc6l7c64f0W3DHzN18r1eB")
     now = int(_time_e.time())
     header  = {"alg": "HS256", "typ": "JWT"}
     payload = {
@@ -3716,8 +3716,8 @@ async def start_recording(
     import time as _time_rec
     _ts = int(_time_rec.time())
     _filepath = f"{room_name}-{_ts}.mp4"
-    _lk_api_key    = os.getenv('LIVEKIT_API_KEY', 'APIfmzJ2GVEV3TJ')
-    _lk_api_secret = os.getenv('LIVEKIT_API_SECRET', 'sTxyVlCJaPF9QMJTevLvT1xRmSPiXSZXZnLgGoJsIOH')
+    _lk_api_key    = os.getenv('LIVEKIT_API_KEY', 'APIRn8F2gpDAQHw')
+    _lk_api_secret = os.getenv('LIVEKIT_API_SECRET', 'NseFKsnBr5rXxWlCTYUz33Hc6l7c64f0W3DHzN18r1eB')
     _lk_url        = os.getenv('LIVEKIT_URL', 'wss://quanby-lms-k4aq44qe.livekit.cloud')
 
     # Use livekit-api SDK (async — works directly in FastAPI's async context)
