@@ -622,22 +622,30 @@ async function exportCsv() {
     const data = await res.json();
     const acts = data.acts || [];
 
-    const headers = ['Registry #','Date','Document','Act Type','Workflow','Fee','DC Reference','DC Status','Principal','Principal Email','Witness','Witness Email','SC Synced','SC Registry ID','Location'];
+    const headers = [
+      'Registry No.', 'Date Notarized', 'Document Name', 'Act Type', 'Fee (PHP)',
+      'Principal Name', 'Principal Email', 'Witness', 'DC Reference No.',
+      'DC Status', 'SC Synced', 'SC Registry ID (NRID)', 'Location',
+      'ENP Name', 'Commission No.', 'Roll No.'
+    ];
     const rows = acts.map(a => [
-      a.id || '',
+      String(a.id||'').slice(0,8).toUpperCase(),
       a.executed_at ? new Date(a.executed_at).toISOString().slice(0,10) : '',
       a.doc_name || '',
-      a.act_type || '',
+      a.act_type || a.notarization_type || '',
+      a.fee || '₱100',
       a.principal_name || '',
       a.principal_email || '',
       a.witness_name || '',
-      a.witness_email || '',
-      a.dc_status || '',
       a.dc_reference_no || '',
+      a.dc_status === 'completed' ? 'Completed' : (a.dc_status || ''),
       a.sc_synced ? 'Yes' : 'No',
       a.sc_registry_id || '',
       a.location || '',
-    ].map(v => `"${String(v).replace(/"/g,'""')}"`));
+      a.enp_name || '',
+      a.commission_no || '',
+      a.roll_no || '',
+    ].map(v => '"' + String(v).replace(/"/g, '""') + '"'));
 
     const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -669,23 +677,20 @@ async function exportPdf() {
       const actDate = a.executed_at ? new Date(a.executed_at).toLocaleDateString('en-PH') : '—';
       const nrid = a.sc_registry_id ? `<span style="color:#6ee7b7;font-size:.72rem;">${esc(a.sc_registry_id)}</span>` : '<span style="color:#888;">Pending</span>';
       return `<tr style="${i%2===0?'background:#0f1220;':'background:#080b18;'}">
-        <td>${String(a.id||'').slice(0,8).toUpperCase()}</td>
-        <td>${actDate}</td>
-        <td>${esc(a.doc_name||'—')}</td>
-        <td><span style="background:rgba(14,165,233,.15);color:#38bdf8;padding:.1rem .4rem;border-radius:4px;font-size:.72rem;">${esc(a.act_type||'—')}</span></td>
-        <td>${esc(a.principal_name||'—')}</td>
-        <td>${a.dc_status === 'completed' ? 'Completed' : esc(a.dc_status||'—')}</td>
-        <td>${nrid}</td>
+        <td style="font-weight:700;color:#c9a84c;font-size:.72rem;">${String(a.id||'').slice(0,8).toUpperCase()}</td>
+        <td style="white-space:nowrap;">${actDate}</td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(a.doc_name||'')}">${esc(a.doc_name||'—')}</td>
+        <td>${esc(a.act_type||a.notarization_type||'—')}</td>
+        <td>${esc(a.fee||'₱100')}</td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(a.principal_name||'—')}</td>
+        <td>${a.dc_status === 'completed' ? '<span style="color:#6ee7b7;">Completed</span>' : esc(a.dc_status||'—')}</td>
+        <td style="font-size:.7rem;">${nrid}</td>
       </tr>`;
     }).join('');
 
     const html = `<!DOCTYPE html>
-<html><head><meta charset='UTF-8'>
-<meta http-equiv=" cache-control content=
-o-cache no-store must-revalidate>
- <meta http-equiv=pragma content=
-o-cache>
- <title>Notarial Registry</title>
+<html><head><meta charset="UTF-8">
+<title>Quanby Legal — Notarial Registry Export</title>
 <style>
   body{font-family:'Segoe UI',sans-serif;background:#080b18;color:#e8eaf2;margin:0;padding:0;}
   .header{background:linear-gradient(135deg,#1B2A6B,#0d1535);padding:2rem 2.5rem;border-bottom:2px solid rgba(201,168,76,.4);}
