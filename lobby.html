@@ -101,20 +101,9 @@ function fail(msg) {
   log('Always fetching fresh token (no cache reuse)', 'd-info');
   try { sessionStorage.clear(); } catch(e) {}
 
-  // Auth refresh
-  log('Calling /api/auth/refresh...');
-  try { var rr = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); log('refresh=' + rr.status); } catch(e) { log('refresh error: ' + e.message, 'd-err'); }
-
-  if (!GTK) {
-    log('Calling /api/auth/me...');
-    try {
-      var r = await fetch('/api/auth/me', { credentials: 'include' });
-      log('auth/me=' + r.status);
-      if (!r.ok) { fail('Session expired (HTTP ' + r.status + '). Please sign in again.'); return; }
-      var me = await r.json();
-      log('Logged in as: ' + me.email, 'd-ok');
-    } catch(e) { fail('Network error: ' + e.message); return; }
-  }
+  // Refresh token silently - skip auth/me check (join API has refresh fallback)
+  log('Refreshing auth token...');
+  try { var rr = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); log('refresh=' + rr.status); } catch(e) { log('refresh error (continuing): ' + e.message, 'd-err'); }
 
   // Get room if missing
   if (!_room) {

@@ -3445,11 +3445,23 @@ async def create_session(
 @app.post("/api/sessions/join")
 async def join_session(
     req: SessionJoinRequest,
+    response: Response,
     authorization: Optional[str] = Header(None),
     ql_access: Optional[str] = Cookie(default=None),
+    ql_refresh: Optional[str] = Cookie(default=None),
 ):
     """Client or ENP joins an existing LiveKit session."""
     user = get_current_user(authorization, ql_access)
+    if not user and ql_refresh:
+        from auth import verify_refresh_token, create_access_token
+        rp = verify_refresh_token(ql_refresh)
+        if rp:
+            _ru = get_user(rp.get("user_id", ""))
+            if _ru:
+                user = _ru
+                _nt = create_access_token({"user_id": _ru["id"], "email": _ru.get("email", "")})
+                response.set_cookie(key=_ACCESS_COOKIE, value=_nt, httponly=True,
+                    secure=_COOKIE_SECURE, samesite=_COOKIE_SAMESITE, max_age=7*24*3600, path="/")
     if not user:
         raise HTTPException(401, "Unauthorized")
 
