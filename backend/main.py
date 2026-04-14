@@ -1844,6 +1844,8 @@ def _sc_request(method: str, path: str, payload: dict = None, token: str = None,
         except Exception:
             err_body = r.text[:800]
         print(f'[SC ERROR] {r.status_code} {url} body={str(err_body)[:800]}', file=_sys_req.stderr, flush=True)
+        if r.status_code == 403:
+            raise RuntimeError(f'SC API access denied (403). The Supreme Court staging system must grant your account access to {path}. Contact SC eNotarization team to whitelist your API credentials.')
         raise RuntimeError(f'SC API {r.status_code} on {path}: {str(err_body)[:500]}')
     if not r.content:
         return {}
