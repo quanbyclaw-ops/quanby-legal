@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Join Session — Quanby Legal</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0e1a;color:#e6edf3;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+.card{background:#111827;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:2.5rem 2rem;max-width:460px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.logo{font-size:2.5rem;margin-bottom:.5rem}
+h1{font-size:1.3rem;font-weight:700;color:#c9a84c;margin-bottom:.4rem}
+.sub{color:#64748b;font-size:.85rem;margin-bottom:2rem}
+#status{font-size:.88rem;color:#94a3b8;margin-bottom:1rem;min-height:1.5rem;line-height:1.5}
+#status.err{color:#f87171}
+#status.ok{color:#34d399}
+/* debug log */
+#debug{background:#0a0e1a;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:.75rem;margin-bottom:1rem;text-align:left;font-size:.72rem;font-family:monospace;color:#94a3b8;max-height:140px;overflow-y:auto;display:none}
+#debug .d-err{color:#f87171}
+#debug .d-ok{color:#34d399}
+#debug .d-info{color:#60a5fa}
+#join-btn{width:100%;padding:.9rem;background:linear-gradient(135deg,#c9a84c,#e0c06a);color:#0a0e1a;font-size:1rem;font-weight:800;border:none;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:.15s;margin-bottom:.75rem}
+#join-btn:hover{opacity:.88}
+#join-btn:disabled{opacity:.4;cursor:not-allowed}
+.back{color:#64748b;font-size:.82rem;text-decoration:none}
+.back:hover{color:#00d4c8}
+.spin{width:20px;height:20px;border:2px solid rgba(0,0,0,.2);border-top-color:#0a0e1a;border-radius:50%;animation:sp .6s linear infinite;flex-shrink:0}
+@keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">⚖️</div>
+  <h1>Quanby Legal</h1>
+  <p class="sub">Notarization Session</p>
+  <div id="status">Preparing your session…</div>
+  <div id="debug"></div>
+  <button id="join-btn" disabled onclick="join()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+    Join Session
+  </button>
+  <a href="/appointments" class="back">← Back to Appointments</a>
+</div>
+
+<script>
+var P   = new URLSearchParams(location.search);
+var APT = P.get('apt')  || '';
+var ROM = P.get('room') || '';
+var GTK = P.get('guest_token') || '';
+
+var _urlToken = P.get('lk_token') || '';
+var _urlUser  = P.get('lk_user')  || '';
+var _urlRole  = P.get('lk_role')  || '';
+
+var _token = '', _user = '', _role = '', _room = ROM;
+
+var _dbg = document.getElementById('debug');
+function log(msg, cls) {
+  _dbg.style.display = 'block';
+  var line = document.createElement('div');
+  line.className = cls || 'd-info';
+  line.textContent = new Date().toISOString().substr(11,8) + ' ' + msg;
+  _dbg.appendChild(line);
+  _dbg.scrollTop = _dbg.scrollHeight;
+  console.log('[Lobby] ' + msg);
+}
+
+if (_urlToken && APT) {
+  log('URL token found (len=' + _urlToken.length + '), storing in sessionStorage');
+  try {
+    sessionStorage.setItem('ql_lk_token', _urlToken);
+    sessionStorage.setItem('ql_lk_user',  _urlUser);
+    sessionStorage.setItem('ql_lk_role',  _urlRole);
+    sessionStorage.setItem('ql_lk_apt',   APT);
+    sessionStorage.setItem('ql_lk_room',  ROM);
+    log('sessionStorage set OK', 'd-ok');
+  } catch(e) { log('sessionStorage FAILED: ' + e.message, 'd-err'); }
+}
+
+function setStatus(msg, cls) {
+  var el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = cls || '';
+}
+function ready() {
+  setStatus('✅ Ready — click Join Session', 'ok');
+  document.getElementById('join-btn').disabled = false;
+}
+function fail(msg) {
+  setStatus('❌ ' + msg, 'err');
+  log('FAIL: ' + msg, 'd-err');
+  document.getElementById('join-btn').disabled = true;
+}
+
+(async function boot() {
+  log('APT=' + APT + ' ROM=' + ROM);
+  if (!APT) { fail('Missing appointment ID.'); return; }
+
+  // Check sessionStorage first
+  try {
+    var storedApt = sessionStorage.getItem('ql_lk_apt') || '';
+    log('sessionStorage apt=' + storedApt + ' matches=' + (storedApt === APT));
+    if (storedApt === APT) {
+      var storedTok = sessionStorage.getItem('ql_lk_token') || '';
+      if (storedTok) {
+        _token = storedTok;
+        _user  = sessionStorage.getItem('ql_lk_user') || '';
+        _role  = sessionStorage.getItem('ql_lk_role') || '';
+        _room  = sessionStorage.getItem('ql_lk_room') || ROM;
+        log('Got token from sessionStorage len=' + _token.length, 'd-ok');
+        ready(); return;
+      }
+    }
+  } catch(e) { log('sessionStorage read error: ' + e.message, 'd-err'); }
+
+  // Auth refresh
+  log('Calling /api/auth/refresh...');
+  try { var rr = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); log('refresh=' + rr.status); } catch(e) { log('refresh error: ' + e.message, 'd-err'); }
+
+  if (!GTK) {
+    log('Calling /api/auth/me...');
+    try {
+      var r = await fetch('/api/auth/me', { credentials: 'include' });
+      log('auth/me=' + r.status);
+      if (!r.ok) { fail('Session expired (HTTP ' + r.status + '). Please sign in again.'); return; }
+      var me = await r.json();
+      log('Logged in as: ' + me.email, 'd-ok');
+    } catch(e) { fail('Network error: ' + e.message); return; }
+  }
+
+  // Get room if missing
+  if (!_room) {
+    log('Calling /api/sessions/' + APT + '...');
+    try {
+      var sr = await fetch('/api/sessions/' + APT, { credentials: 'include' });
+      log('sessions=' + sr.status);
+      if (!sr.ok) { fail('Session not found (HTTP ' + sr.status + ').'); return; }
+      var sd = await sr.json();
+      log('session_status=' + sd.session_status + ' room=' + sd.room_name);
+      if (sd.session_status !== 'active') { fail('Session not active (status: ' + sd.session_status + ').'); return; }
+      _room = sd.room_name || sd.session_room_name || '';
+    } catch(e) { fail('Session load error: ' + e.message); return; }
+  }
+
+  // Get LiveKit token
+  log('Calling /api/sessions/join room=' + _room + '...');
+  try {
+    var jr = await fetch('/api/sessions/join', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ room_name: _room, apt_id: APT })
+    });
+    log('join=' + jr.status);
+    if (!jr.ok) {
+      var je = await jr.json().catch(function(){ return {}; });
+      fail(je.detail || 'Join failed HTTP ' + jr.status);
+      return;
+    }
+    var jd = await jr.json();
+    _token = jd.token;
+    _user  = jd.user_name || '';
+    _role  = jd.user_role || '';
+    _room  = jd.room_name || _room;
+    log('Token received len=' + _token.length + ' role=' + _role, 'd-ok');
+
+    try {
+      sessionStorage.setItem('ql_lk_token', _token);
+      sessionStorage.setItem('ql_lk_user',  _user);
+      sessionStorage.setItem('ql_lk_role',  _role);
+      sessionStorage.setItem('ql_lk_apt',   APT);
+      sessionStorage.setItem('ql_lk_room',  _room);
+      log('sessionStorage saved', 'd-ok');
+    } catch(e) { log('sessionStorage save failed: ' + e.message, 'd-err'); }
+
+    ready();
+  } catch(e) { fail('Join error: ' + e.message); }
+})();
+
+function join() {
+  if (!_token) { fail('No token available.'); return; }
+  var btn = document.getElementById('join-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spin"></div> Entering…';
+  log('Navigating to session.html...');
+  var url = '/session?apt=' + encodeURIComponent(APT) + '&room=' + encodeURIComponent(_room) + '&from_lobby=1';
+  if (GTK) url += '&guest_token=' + encodeURIComponent(GTK);
+  log('URL: ' + url);
+  window.location.href = url;
+}
+</script>
+</body>
+</html>
