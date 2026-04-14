@@ -1845,7 +1845,14 @@ def _sc_request(method: str, path: str, payload: dict = None, token: str = None,
             err_body = r.text[:800]
         print(f'[SC ERROR] {r.status_code} {url} body={str(err_body)[:800]}', file=_sys_req.stderr, flush=True)
         raise RuntimeError(f'SC API {r.status_code} on {path}: {str(err_body)[:500]}')
-    return r.json() if r.content else {}
+    if not r.content:
+        return {}
+    try:
+        return r.json()
+    except Exception:
+        # SC returned non-JSON success response (e.g. HTML)
+        print(f'[SC WARN] Non-JSON response from {path}: {r.text[:200]}', file=_sys_req.stderr, flush=True)
+        return { raw_response: r.text[:200]}
 
 
 def _sc_upload_pdf(nrid: str, pdf_bytes: bytes, doc_name: str, token: str = None) -> dict:
@@ -4703,14 +4710,16 @@ async def registry_sync_all(
     if not ended_apts:
         return {"success": True, "message": "No ended sessions found", "queued": 0}
 
-    for aid in ended_apts:
-        _tsyncall.Thread(
-            target=_populate_registry_bg,
-            args=(aid, enp_id),
-            daemon=True,
-        ).start()
+    # Run sequentially in a single background thread to prevent worker exhaustion
+    def _sync_all_bg():
+        for aid in ended_apts:
+            try:
+                _populate_registry_bg(aid, enp_id)
+            except Exception:
+                pass
 
-    return {"success": True, "message": f"Syncing {len(ended_apts)} sessions", "queued": len(ended_apts)}
+    _tsyncall.Thread(target=_sync_all_bg, daemon=True).start()
+    return {"success": True, "message": f"Queued {len(ended_apts)} sessions for sync", "queued": len(ended_apts)}
 
 
 # ─── GET /api/registry/acts ───────────────────────────────────────────────────
