@@ -1529,159 +1529,92 @@ async function submitDocument() {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 async function init() {
-  console.log('[INIT] Starting. FROM_LOBBY=' + FROM_LOBBY + ' APT_ID=' + APT_ID + ' LK_TOKEN_LEN=' + LK_TOKEN.length + ' ROOM=' + ROOM_NAME);
-  setLoading('Token=' + LK_TOKEN.length + ' Room=' + (ROOM_NAME||'NONE') + ' Lobby=' + FROM_LOBBY);
+  setLoading('Connecting to session…');
 
-  // Guest flow (witness/observer via invite link)
   if (GUEST_TOKEN) {
     await startPrejoin(null, 'Guest', 'WITNESS');
     return;
   }
 
-  // Direct join: lk_token in URL = connect immediately, no auth needed
-  if (LK_TOKEN && ROOM_NAME && APT_ID) {
-    console.log('[Session] TOKEN path: connecting directly. room=' + ROOM_NAME + ' token_len=' + LK_TOKEN.length);
-    setLoading('Joining meeting...');
-    (async function() {
-      try {
-        var _role = LK_ROLE || 'ENP';
-        var _uname = LK_USER || 'Participant';
-        _room = new LivekitClient.Room({ adaptiveStream: true, dynacast: true });
-        setupRoomEvents(_room, _uname, _role);
-        await _room.connect('wss://quanby-lms-k4aq44qe.livekit.cloud', LK_TOKEN, { autoSubscribe: true });
-        console.log('[Session] CONNECTED! state=' + _room.state);
-        _room.remoteParticipants.forEach(function(p) {
-          addParticipantTile(p);
-          p.trackPublications.forEach(function(pub) {
-            if (pub.track && pub.isSubscribed) attachTrack(pub.track, p);
-          });
-        });
-        try { await _room.localParticipant.enableCameraAndMicrophone(); } catch(e) {}
-        fetch('/api/sessions/' + APT_ID, { credentials: 'include' })
-          .then(function(r) { return r.ok ? r.json() : null; })
-          .then(function(s) { if (s) { _sessionInfo = s; _currentAptId = APT_ID; if (_sessionInfo) { try { restoreSessionDocuments(); renderParticipantsList(); populateSignPanel(_role === 'ENP'); } catch(e) {} } } })
-          .catch(function() {});
-        hideLoading();
-        postJoinSetup(_uname, _role, _role);
-        if (_role === 'ENP') loadDcToken();
-      } catch(e) {
-        console.error('[Session] Connect error:', e);
-        showError('LiveKit error: ' + e.message + '<br><br>Please <a href= /appointments style=color:#00d4c8>go back to Appointments</a>, end the session and start a new one.');
-      }
-    })();
+  if (!APT_ID) {
+    showError('Missing appointment ID.');
     return;
   }
 
-  // If we have apt but no token, get token directly (bypass auth/me)
-  if (APT_ID && !LK_TOKEN) {
-    var _roomForJoin = ROOM_NAME;
-    setLoading('Getting session token...');
+  // Step 1: Refresh auth token
+  try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
+
+  // Step 2: Get LiveKit token — use URL token, or call join API
+  var _lkToken = LK_TOKEN;
+  var _lkUser = LK_USER || '';
+  var _lkRole = LK_ROLE || 'Client';
+  var _lkRoom = ROOM_NAME;
+
+  if (!_lkToken) {
+    setLoading('Getting token…');
     try {
-      try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-      var _jr2 = await fetch('/api/sessions/join', {
+      var _jr = await fetch('/api/sessions/join', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ room_name: _roomForJoin || ROOM_NAME, apt_id: APT_ID })
+        body: JSON.stringify({ room_name: _lkRoom, apt_id: APT_ID })
       });
-      if (_jr2.ok) {
-        var _jd2 = await _jr2.json();
-        var _t2 = _jd2.token, _u2 = _jd2.user_name || '', _r2 = _jd2.user_role || 'Client';
-        setLoading('Connecting...');
-        _room = new LivekitClient.Room({ adaptiveStream: true, dynacast: true });
-        setupRoomEvents(_room, _u2, _r2);
-        await _room.connect('wss://quanby-lms-k4aq44qe.livekit.cloud', _t2, { autoSubscribe: true });
-        _room.remoteParticipants.forEach(function(p) {
-          addParticipantTile(p);
-          p.trackPublications.forEach(function(pub) { if (pub.track && pub.isSubscribed) attachTrack(pub.track, p); });
-        });
-        try { await _room.localParticipant.enableCameraAndMicrophone(); } catch(e) {}
-        fetch('/api/sessions/' + APT_ID, { credentials: 'include' })
-          .then(function(r) { return r.ok ? r.json() : null; })
-          .then(function(s) { if (s) { _sessionInfo = s; _currentAptId = APT_ID; try { restoreSessionDocuments(); renderParticipantsList(); populateSignPanel(_r2 === 'ENP'); } catch(e) {} } })
-          .catch(function() {});
-        hideLoading();
-        postJoinSetup(_u2, _r2, _r2);
-        if (_r2 === 'ENP') loadDcToken();
+      if (!_jr.ok) {
+        var _je = await _jr.json().catch(function(){return{};});
+        showError((_je.detail || 'Join failed: HTTP ' + _jr.status) + '<br><a href="/appointments" style="color:#00d4c8">Back to Appointments</a>');
         return;
       }
-      var _je2 = await _jr2.json().catch(function(){return{};});
-      showError((_je2.detail || 'Could not join session ('+_jr2.status+')') + '<br><a href= /appointments style=color:#00d4c8>← Back</a>');
-    } catch(e2) {
-      showError('Connection error: ' + e2.message + '<br><a href=/appointments style=color:#00d4c8>← Back</a>');
-    }
-    return;
-  }
-
-  // Auth check
-  let me;
-  try {
-    try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-    const _authController = new AbortController();
-    const _authTimeout = setTimeout(() => _authController.abort(), 10000);
-    let r;
-    try {
-      r = await fetch('/api/auth/me', { credentials: 'include', signal: _authController.signal });
-    } finally { clearTimeout(_authTimeout); }
-    if (r.status === 401) { try { const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); if (ref.ok) r = await fetch('/api/auth/me', { credentials: 'include' }); } catch(e) {} }
-    if (!r.ok) {
-      // Show visible error instead of reloading (prevents infinite reload loop)
-      document.getElementById('loading-screen').innerHTML = [
-        '<div style="text-align:center;padding:2rem;">',
-        '<div style="font-size:2rem;margin-bottom:1rem">🔒</div>',
-        '<div style="color:var(--text);font-size:1rem;margin-bottom:.5rem;font-weight:600;">Session Expired</div>',
-        '<div style="color:var(--muted);font-size:.85rem;margin-bottom:1.5rem;">Your session expired. Please sign in again to join the meeting.</div>',
-        '<a href="/?sso=1" style="display:inline-block;padding:.6rem 1.5rem;background:linear-gradient(135deg,#c9a84c,#e0c06a);color:#0a0e1a;font-weight:700;border-radius:8px;text-decoration:none;font-size:.9rem;">Sign In &rarr;</a>',
-        '<div style="margin-top:.75rem;"><a href="/appointments" style="color:var(--teal);font-size:.85rem;">← Back to Appointments</a></div>',
-        '</div>'
-      ].join('');
+      var _jd = await _jr.json();
+      _lkToken = _jd.token;
+      _lkUser  = _jd.user_name || '';
+      _lkRole  = _jd.user_role || 'Client';
+      _lkRoom  = _jd.room_name || _lkRoom;
+    } catch(e) {
+      showError('Network error: ' + e.message + '<br><a href="/appointments" style="color:#00d4c8">Back</a>');
       return;
     }
-    me = await r.json();
-    _me = me;
-  } catch(e) {
-    console.warn('[Session] auth failed', e);
-    document.getElementById('loading-screen').innerHTML = [
-      '<div style="text-align:center;padding:2rem;">',
-      '<div style="font-size:2rem;margin-bottom:1rem">⚠️</div>',
-      '<div style="color:var(--text);font-size:1rem;margin-bottom:.5rem;font-weight:600;">Authentication Error</div>',
-      '<div style="color:var(--muted);font-size:.85rem;margin-bottom:1.5rem;">Could not verify your identity. Please try signing in again.</div>',
-      '<a href="/?sso=1" style="display:inline-block;padding:.6rem 1.5rem;background:linear-gradient(135deg,#c9a84c,#e0c06a);color:#0a0e1a;font-weight:700;border-radius:8px;text-decoration:none;font-size:.9rem;">Sign In &rarr;</a>',
-      '</div>'
-    ].join('');
-    return;
   }
 
-  // Load session info
-  setLoading('Loading session info…');
+  // Step 3: Load session info (non-blocking UI data)
+  var _sessionLoaded = false;
+  fetch('/api/sessions/' + APT_ID, { credentials: 'include' })
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(s) {
+      if (s) {
+        _sessionInfo = s;
+        _currentAptId = APT_ID;
+        _sessionLoaded = true;
+      }
+    }).catch(function(){});
+
+  // Step 4: Connect to LiveKit
+  setLoading('Connecting…');
   try {
-    const r = await fetch(`/api/sessions/${APT_ID}`, { credentials: 'include' });
-    if (!r.ok) { showError('Session not found or you are not authorized.'); return; }
-    _sessionInfo = await r.json();
-    _currentAptId = typeof APT_ID !== "undefined" ? APT_ID : (_sessionInfo.apt_id || "");
-  } catch(e) { showError('Could not load session info.'); return; }
+    _room = new LivekitClient.Room({ adaptiveStream: true, dynacast: true });
+    setupRoomEvents(_room, _lkUser, _lkRole);
+    await _room.connect('wss://quanby-lms-k4aq44qe.livekit.cloud', _lkToken, { autoSubscribe: true });
 
-  if (_sessionInfo.session_status !== 'active') {
-    document.getElementById('loading-screen').innerHTML =
-      '<div style="text-align:center;padding:2rem;">' +
-      '<div style="font-size:2rem;margin-bottom:1rem">⚠️</div>' +
-      '<div style="color:var(--red);font-size:1rem;margin-bottom:.5rem;font-weight:600;">Session not active</div>' +
-      '<div style="color:var(--muted);font-size:.85rem;margin-bottom:1.5rem;">Status: ' + (_sessionInfo.session_status || 'unknown') + '. Please start the session from your appointments page.</div>' +
-      '<a href="/appointments" style="display:inline-block;padding:.6rem 1.5rem;background:rgba(20,184,166,.15);border:1px solid rgba(20,184,166,.4);border-radius:8px;color:var(--teal);font-size:.9rem;text-decoration:none;">← Back to Appointments</a>' +
-      '</div>';
-    return;
-  }
+    _room.remoteParticipants.forEach(function(p) {
+      addParticipantTile(p);
+      p.trackPublications.forEach(function(pub) {
+        if (pub.track && pub.isSubscribed) attachTrack(pub.track, p);
+      });
+    });
 
-  const isEnp = me.id === _sessionInfo.enp_id;
-  if (FROM_LOBBY) {
-    // Came from lobby — skip session.html's own pre-join screen, join directly
-    const userName = isEnp ? _sessionInfo.enp_name : _sessionInfo.client_name;
-    const userRole = isEnp ? 'ENP' : 'Client';
-    // Ensure prejoin is hidden (it should be, but safety check)
-    var _pj = document.getElementById('prejoin');
-    if (_pj) _pj.style.display = 'none';
-    await joinSession(me, userRole);
-  } else {
-    await startPrejoin(me, isEnp ? _sessionInfo.enp_name : _sessionInfo.client_name, isEnp ? 'ENP' : 'Client');
+    try { await _room.localParticipant.enableCameraAndMicrophone(); } catch(e) {}
+
+    hideLoading();
+    postJoinSetup(_lkUser, _lkRole, _lkRole);
+    if (_lkRole === 'ENP') loadDcToken();
+
+    // Load session UI after connect
+    setTimeout(function() {
+      if (_sessionInfo) {
+        try { restoreSessionDocuments(); renderParticipantsList(); populateSignPanel(_lkRole === 'ENP'); } catch(e) {}
+      }
+    }, 1000);
+
+  } catch(e) {
+    showError('LiveKit error: ' + e.message + '<br>Please <a href="/appointments" style="color:#00d4c8">start a new session</a>.');
   }
 }
 
