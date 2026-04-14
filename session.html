@@ -1530,7 +1530,7 @@ async function submitDocument() {
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 async function init() {
   console.log('[INIT] Starting. FROM_LOBBY=' + FROM_LOBBY + ' APT_ID=' + APT_ID + ' LK_TOKEN_LEN=' + LK_TOKEN.length + ' ROOM=' + ROOM_NAME);
-  setLoading('Checking authentication…');
+  setLoading('Token=' + LK_TOKEN.length + ' Room=' + (ROOM_NAME||'NONE') + ' Lobby=' + FROM_LOBBY);
 
   // Guest flow (witness/observer via invite link)
   if (GUEST_TOKEN) {
