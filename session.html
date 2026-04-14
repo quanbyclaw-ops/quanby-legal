@@ -1572,15 +1572,16 @@ async function init() {
     return;
   }}
 
-  // If we have room + apt but no token, get token directly (bypass auth/me)
-  if (ROOM_NAME && APT_ID && !LK_TOKEN) {
+  // If we have apt but no token, get token directly (bypass auth/me)
+  if (APT_ID && !LK_TOKEN) {
+    var _roomForJoin = ROOM_NAME;
     setLoading('Getting session token...');
     try {
       try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
       var _jr2 = await fetch('/api/sessions/join', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ room_name: ROOM_NAME, apt_id: APT_ID })
+        body: JSON.stringify({ room_name: _roomForJoin || ROOM_NAME, apt_id: APT_ID })
       });
       if (_jr2.ok) {
         var _jd2 = await _jr2.json();
