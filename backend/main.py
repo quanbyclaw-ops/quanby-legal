@@ -3449,6 +3449,25 @@ async def get_plot_link(
         if not link:
             raise HTTPException(502, f"No link in DoconChain response: {str(resp_data)[:200]}")
 
+        # Resolve short links (link.doconchain.com/...) to full URL with embedded auth token
+        # Short links embed a session-bound token that expires — resolving gives us the live
+        # token that was just generated, preventing login redirects on popup open.
+        resolved_link = link
+        if "link.doconchain.com" in link:
+            import urllib.request as _ureq_resolve
+            try:
+                _resolve_req = _ureq_resolve.Request(
+                    link,
+                    headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"},
+                    method="GET",
+                )
+                with _ureq_resolve.urlopen(_resolve_req, timeout=10) as _rr:
+                    resolved_link = _rr.url
+                print(f"[PlotLink] resolved short link to full URL (has token params: {('token=' in resolved_link)})", flush=True)
+            except Exception as _re:
+                print(f"[PlotLink] short link resolve failed (using original): {_re}", flush=True)
+                resolved_link = link
+
         # Record that plotting was started for this document
         with _apts_lock:
             _reload_appointments()
@@ -3464,11 +3483,11 @@ async def get_plot_link(
           # NOTE: Do NOT strip token/api_token — DC needs them for auto-login in popup.
         try:
             from urllib.parse import urlparse
-            _base = urlparse(link).netloc + urlparse(link).path
+            _base = urlparse(resolved_link).netloc + urlparse(resolved_link).path
         except Exception:
-            _base = link[:60]
+            _base = resolved_link[:60]
         print(f"[PlotLink] link ready: {_base}", flush=True)
-        return {"link": link, "project_uuid": project_uuid}
+        return {"link": resolved_link, "project_uuid": project_uuid}
 
     except HTTPException:
         raise
