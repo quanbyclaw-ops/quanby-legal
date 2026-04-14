@@ -155,7 +155,7 @@
     }
   </style>
 </head>
-<body>
+<body style="background:#0d0f1a;color:#e2e8f0;">
 
 <nav>
   <div class="nav-content">
@@ -285,6 +285,8 @@ let debounceTimer = null;
 // ─── Auth & Boot ──────────────────────────────────────────────────────────────
 
 async function boot() {
+  // Show nav immediately while auth loads
+  document.getElementById('nav-name').textContent = '...';
   await QLAuth.requireAuth(async function(user) {
     try {
       const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || user.email || '?';
