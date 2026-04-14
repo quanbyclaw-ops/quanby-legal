@@ -2,6 +2,15 @@
 <html lang="en">
 <head>
   <script src="/assets/ql-auth.js"></script>
+<script>
+// Override to use 3 retries (faster) for registry page
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.QLAuth && QLAuth.authMeWithRetry) {
+    var _orig = QLAuth.authMeWithRetry;
+    QLAuth.authMeWithRetry = function(max) { return _orig(3); };
+  }
+});
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notarial Registry — Quanby Legal</title>
