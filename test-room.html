@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LiveKit Test Room</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0e1a;color:#e6edf3;font-family:monospace;padding:1.5rem}
+h1{color:#c9a84c;margin-bottom:1rem;font-size:1.2rem}
+#log{background:#0d1117;border:1px solid #333;border-radius:8px;padding:1rem;height:220px;overflow-y:auto;font-size:.78rem;margin-bottom:1rem;white-space:pre-wrap}
+.ok{color:#34d399}.err{color:#f87171}.info{color:#60a5fa}.warn{color:#fbbf24}
+#video-grid{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem}
+.vid-wrap{background:#111;border:1px solid #333;border-radius:8px;overflow:hidden;position:relative;width:280px;aspect-ratio:16/9}
+.vid-wrap video{width:100%;height:100%;object-fit:cover}
+.vid-label{position:absolute;bottom:.4rem;left:.6rem;background:rgba(0,0,0,.7);color:#fff;font-size:.7rem;padding:.1rem .4rem;border-radius:4px}
+.btn{padding:.6rem 1.2rem;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:.85rem;margin-right:.5rem;margin-bottom:.5rem}
+.btn-gold{background:linear-gradient(135deg,#c9a84c,#e0c06a);color:#0a0e1a}
+.btn-red{background:#dc2626;color:#fff}
+.btn-gray{background:#374151;color:#e6edf3}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .5s linear infinite;vertical-align:middle;margin-right:.4rem}
+@keyframes sp{to{transform:rotate(360deg)}}
+#info{background:#111827;border:1px solid #334155;border-radius:8px;padding:.75rem;font-size:.78rem;margin-bottom:1rem;color:#94a3b8}
+</style>
+</head>
+<body>
+<h1>⚡ LiveKit Test Room</h1>
+<div id="info">Status: idle</div>
+<div id="log"></div>
+<div>
+  <button class="btn btn-gold" onclick="startTest()">🚀 Create & Join Random Room</button>
+  <button class="btn btn-gray" onclick="leaveRoom()">⬛ Leave</button>
+  <button class="btn btn-gray" onclick="clearLog()">🗑 Clear Log</button>
+</div>
+<br>
+<div id="video-grid"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.umd.min.js"></script>
+<script>
+var LK_URL = 'wss://quanby-lms-k4aq44qe.livekit.cloud';
+var _room = null;
+var _logEl = document.getElementById('log');
+var _infoEl = document.getElementById('info');
+
+function log(msg, cls) {
+  var t = new Date().toISOString().substr(11,8);
+  var line = document.createElement('div');
+  line.className = cls || 'info';
+  line.textContent = t + ' ' + msg;
+  _logEl.appendChild(line);
+  _logEl.scrollTop = _logEl.scrollHeight;
+  console.log('[TestRoom] ' + msg);
+}
+function info(msg) { _infoEl.textContent = 'Status: ' + msg; }
+function clearLog() { _logEl.innerHTML = ''; }
+
+async function startTest() {
+  if (_room && _room.state === 'connected') {
+    log('Already connected — leave first', 'warn');
+    return;
+  }
+
+  var roomName = 'test-' + Math.random().toString(36).slice(2,10);
+  var userName = 'tester-' + Math.random().toString(36).slice(2,6);
+
+  log('Creating room: ' + roomName);
+  info('Getting token...');
+
+  try {
+    // Get token from backend
+    var r = await fetch('/api/test/token?room=' + encodeURIComponent(roomName) + '&user=' + encodeURIComponent(userName), { credentials: 'include' });
+    log('token API status: ' + r.status, r.ok ? 'ok' : 'err');
+    if (!r.ok) {
+      var e = await r.json().catch(function(){return{};});
+      log('Error: ' + JSON.stringify(e), 'err');
+      info('Failed to get token: ' + r.status);
+      return;
+    }
+    var d = await r.json();
+    var token = d.token;
+    log('Token received, len=' + token.length, 'ok');
+    log('Room: ' + d.room + ' | User: ' + d.user);
+    log('LK URL: ' + LK_URL);
+
+    info('Connecting to LiveKit...');
+    _room = new LivekitClient.Room({ adaptiveStream: true, dynacast: true });
+
+    // Events
+    _room.on(LivekitClient.RoomEvent.Connected, function() {
+      log('CONNECTED! state=' + _room.state, 'ok');
+      info('Connected to room: ' + d.room);
+    });
+    _room.on(LivekitClient.RoomEvent.Disconnected, function(reason) {
+      log('Disconnected: ' + reason, 'warn');
+      info('Disconnected');
+    });
+    _room.on(LivekitClient.RoomEvent.TrackSubscribed, function(track, pub, participant) {
+      log('Track subscribed: ' + track.kind + ' from ' + participant.identity, 'ok');
+      if (track.kind === 'video' || track.kind === 'audio') attachTrack(track, participant.identity);
+    });
+    _room.on(LivekitClient.RoomEvent.TrackUnsubscribed, function(track) { track.detach(); });
+    _room.on(LivekitClient.RoomEvent.ParticipantConnected, function(p) { log('Participant joined: ' + p.identity, 'ok'); });
+    _room.on(LivekitClient.RoomEvent.ParticipantDisconnected, function(p) { log('Participant left: ' + p.identity, 'warn'); });
+    _room.on(LivekitClient.RoomEvent.ConnectionStateChanged, function(state) { log('Connection state: ' + state); });
+
+    log('Calling room.connect()...');
+    await _room.connect(LK_URL, token, { autoSubscribe: true });
+    log('room.connect() returned, state=' + _room.state, 'ok');
+
+    // Publish local tracks
+    log('Enabling camera and mic...');
+    try {
+      await _room.localParticipant.enableCameraAndMicrophone();
+      log('Camera & mic enabled', 'ok');
+      // Show local video
+      _room.localParticipant.videoTrackPublications.forEach(function(pub) {
+        if (pub.track) attachTrack(pub.track, 'You (local)', true);
+      });
+    } catch(camErr) {
+      log('Camera/mic error: ' + camErr.message, 'warn');
+    }
+
+  } catch(e) {
+    log('ERROR: ' + e.message, 'err');
+    log('Stack: ' + (e.stack||'').split('\n')[0], 'err');
+    info('Failed: ' + e.message);
+  }
+}
+
+function attachTrack(track, label, isLocal) {
+  var grid = document.getElementById('video-grid');
+  var wrap = document.createElement('div');
+  wrap.className = 'vid-wrap';
+  wrap.id = 'track-' + (track.sid || label);
+  var el = track.attach();
+  wrap.appendChild(el);
+  var lbl = document.createElement('div');
+  lbl.className = 'vid-label';
+  lbl.textContent = (isLocal ? '🟢 ' : '') + label;
+  wrap.appendChild(lbl);
+  grid.appendChild(wrap);
+}
+
+async function leaveRoom() {
+  if (_room) {
+    await _room.disconnect();
+    _room = null;
+    document.getElementById('video-grid').innerHTML = '';
+    log('Left room', 'warn');
+    info('Disconnected');
+  }
+}
+</script>
+</body>
+</html>

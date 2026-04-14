@@ -2646,6 +2646,23 @@ _LIVEKIT_URL = "wss://quanby-lms-k4aq44qe.livekit.cloud"
 
 # ─── GET /api/sessions/my-ip ──────────────────────────────────────────────────
 
+
+# ─── GET /api/test/token ─────────────────────────────────────────────────────
+# No auth required — pure LiveKit test endpoint
+
+@app.get("/api/test/token")
+async def test_livekit_token(room: str = "test-room", user: str = "tester"):
+    """Generate a LiveKit token for testing — no auth needed."""
+    token = _create_livekit_token(room, user, user, can_publish=True)
+    return {
+        "token": token,
+        "room": room,
+        "user": user,
+        "url": _LIVEKIT_URL,
+        "api_key": os.getenv("LIVEKIT_API_KEY", ""),
+    }
+
+
 @app.get("/api/sessions/my-ip")
 async def get_my_ip(request: Request):
     """Return the client IP for VPN/proxy detection. No auth required."""
