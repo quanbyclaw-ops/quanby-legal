@@ -340,6 +340,26 @@ document.addEventListener('DOMContentLoaded', function() {
   if (_dvo) _dvo.addEventListener('click', function(e) { if (e.target === this) closeDocViewer(); });
 });
 
+
+function downloadDoc(url, name) {
+  if (!url) return;
+  // Use fetch so we can force-download without about:blank#blocked
+  fetch(url, { credentials: 'include' })
+    .then(function(r) {
+      if (!r.ok) { alert('Could not download document (HTTP ' + r.status + ')'); return null; }
+      return r.blob();
+    })
+    .then(function(blob) {
+      if (!blob) return;
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name || 'notarized-document.pdf';
+      a.click();
+      setTimeout(function() { URL.revokeObjectURL(a.href); }, 5000);
+    })
+    .catch(function(e) { alert('Download failed: ' + e.message); });
+}
+
 function openInNewTab(url) { if(url) window.open(url, "_blank", "noopener"); }
 
 async function boot() {
@@ -853,9 +873,10 @@ async function fetchActDocument(actId) {
     linksEl.dataset.dlUrl = dlUrl;
     linksEl.dataset.dlName = dlName;
     linksEl.innerHTML =
-      '<a href="' + esc(dlUrl) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" '
-      + 'style="display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .6rem;background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.3);border-radius:6px;font-size:.74rem;font-weight:600;text-decoration:none;margin-right:.3rem;">'
-      + '<i class="hgi-stroke hgi-download-01" style="font-size:.78rem;"></i>Download</a>'
+      '<button onclick="event.stopPropagation();downloadDoc(this.dataset.url, this.dataset.name)" '
+      + 'data-url="' + esc(dlUrl) + '" data-name="' + esc(dlName) + '" '
+      + 'style="display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .6rem;background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.3);border-radius:6px;font-size:.74rem;font-weight:600;cursor:pointer;margin-right:.3rem;">'
+      + '<i class="hgi-stroke hgi-download-01" style="font-size:.78rem;"></i>Download</button>'
       + '<button onclick="event.stopPropagation();openDocViewer(this.dataset.url, this.dataset.name)" data-url="' + esc(dlUrl) + '" data-name="' + esc(dlName) + '" '
       + 'style="display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .6rem;background:rgba(88,166,255,.12);color:#58a6ff;border:1px solid rgba(88,166,255,.3);border-radius:6px;font-size:.74rem;font-weight:600;cursor:pointer;">'
       + '<i class="hgi-stroke hgi-eye" style="font-size:.78rem;"></i>View</button>';
