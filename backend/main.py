@@ -5099,7 +5099,7 @@ async def registry_get_document(
     dc_files = []
     dc_view_url = None
 
-    # Also try vault UUID for direct file access
+    # Get DC file via vault download endpoint (most reliable on staging)
     dc_vault_uuid = act.get("dc_vault_uuid") or ""
     if dc_uuid or dc_vault_uuid:
         def _fetch_dc_vault():
@@ -5110,19 +5110,19 @@ async def registry_get_document(
                     continue
                 try:
                     tok = _get_dc_token(email=_email)
-                    # Try vault/items/{vault_uuid} first (more reliable on staging)
+                    # Approach 1: vault/items/{vault_uuid}/download — returns raw PDF
                     if dc_vault_uuid:
-                        vault_url = f"{_DC_BASE}/vault/items/{dc_vault_uuid}?user_type=ENTERPRISE_API"
-                        req = _ureq_doc.Request(vault_url, headers={"Authorization": f"Bearer {tok}", "Accept": "application/json"})
+                        dl_url = f"{_DC_BASE}/vault/items/{dc_vault_uuid}/download?user_type=ENTERPRISE_API"
+                        dl_req = _ureq_doc.Request(dl_url, headers={"Authorization": f"Bearer {tok}", "Accept": "*/*"})
                         try:
-                            with _ureq_doc.urlopen(req, timeout=20) as r:
-                                resp = _json_doc.loads(r.read().decode())
-                            data = resp.get("data") or resp
-                            if data and (data.get("uuid") or data.get("project_uuid")):
-                                return data
-                        except Exception as _ve:
-                            print(f"[DC] vault/items/{dc_vault_uuid} failed: {_ve}", flush=True)
-                    # Fallback: project endpoint
+                            with _ureq_doc.urlopen(dl_req, timeout=30) as dl_r:
+                                ct = dl_r.headers.get("Content-Type", "")
+                                if "pdf" in ct.lower() or "application/octet" in ct.lower():
+                                    pdf_bytes = dl_r.read()
+                                    return {"_pdf_bytes": pdf_bytes, "_pdf_name": act.get("doc_name","document")+".pdf", "uuid": dc_vault_uuid}
+                        except Exception as _de:
+                            print(f"[DC] vault download failed: {_de}", flush=True)
+                    # Approach 2: project details for signer info
                     if dc_uuid:
                         url = f"{_DC_BASE}/api/v2/projects/{dc_uuid}?user_type=ENTERPRISE_API"
                         req = _ureq_doc.Request(url, headers={"Authorization": f"Bearer {tok}", "Accept": "application/json"})
@@ -5133,7 +5133,7 @@ async def registry_get_document(
                             if data and data.get("uuid"):
                                 return data
                         except Exception as _pe:
-                            print(f"[DC] /api/v2/projects/{dc_uuid} failed: {_pe}", flush=True)
+                            print(f"[DC] project details failed: {_pe}", flush=True)
                 except Exception as _e:
                     print(f"[DC] fetch failed for {_email}: {_e}", flush=True)
                     continue
@@ -5147,6 +5147,17 @@ async def registry_get_document(
                 pass
             vault_item = await loop.run_in_executor(None, _fetch_dc_vault)
             if vault_item:
+                # If we got raw PDF bytes, serve them directly
+                if vault_item.get("_pdf_bytes"):
+                    _pdf_b = vault_item["_pdf_bytes"]
+                    _pdf_n = vault_item["_pdf_name"]
+                    import base64 as _b64
+                    dc_files.append({
+                        "fileName": _pdf_n,
+                        "downloadUrl": f"data:application/pdf;base64,{_b64.b64encode(_pdf_b).decode()}",
+                        "source": "vault_download",
+                        "size": len(_pdf_b),
+                    })
                 # Build download/view links from vault item
                 dc_view_url = f"{_DC_APP_URL}/sign/{dc_uuid}"
                 # If vault item has contents (files), expose them
