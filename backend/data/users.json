@@ -9,9 +9,9 @@
     "provider_id": "107860232248282532544",
     "email_verified": true,
     "role": "attorney",
-    "onboarding_step": "test",
+    "onboarding_step": "kyc_id",
     "profile": {
-      "prefix": "",
+      "prefix": "Atty",
       "first_name": "Christian Lotino",
       "middle_initial": "",
       "last_name": "Montesor",
@@ -27,22 +27,482 @@
       "ibp_no": "123456",
       "ibp_no_date": "2026-04-30",
       "notary_address": "Cabangan Legazpi",
-      "home_street": "",
-      "barangay": "",
-      "city_province": "",
+      "home_street": "Daraga",
+      "barangay": "Daraga",
+      "city_province": "Legazpi",
       "mcle_no_period": "VIII",
       "mcle_no": "1234567",
-      "mcle_no_date": "2026-04-30"
+      "mcle_no_date": "2026-04-30",
+      "npn": "NPN-2026-00012"
     },
-    "test_result": null,
+    "test_result": {
+      "total": 50,
+      "correct": 50,
+      "score_pct": 100.0,
+      "passed": true,
+      "passing_score": 70,
+      "results": [
+        {
+          "id": "atty_010",
+          "question": "A Deed of Absolute Sale must be notarized primarily because:",
+          "user_answer": "D",
+          "user_answer_text": "B. It converts the document from a private to a public instrument, giving it evidentiary weight",
+          "correct_answer_text": "B. It converts the document from a private to a public instrument, giving it evidentiary weight",
+          "is_correct": true,
+          "category": "Legal Practice"
+        },
+        {
+          "id": "atty_009",
+          "question": "Which court or body accredits Electronic Notarization Facilities (ENFs) in the Philippines?",
+          "user_answer": "D",
+          "user_answer_text": "C. Supreme Court of the Philippines",
+          "correct_answer_text": "C. Supreme Court of the Philippines",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_002",
+          "question": "Which Republic Act governs the legal validity of electronic signatures in the Philippines?",
+          "user_answer": "D",
+          "user_answer_text": "C. RA 8792 \u2014 Electronic Commerce Act",
+          "correct_answer_text": "C. RA 8792 \u2014 Electronic Commerce Act",
+          "is_correct": true,
+          "category": "Legal Framework"
+        },
+        {
+          "id": "atty_041",
+          "question": "The Supreme Court accreditation requirement for ENP platforms primarily ensures that the platform:",
+          "user_answer": "A",
+          "user_answer_text": "B. Meets technical, security, and procedural standards set by the Court to protect the integrity of notarial acts",
+          "correct_answer_text": "B. Meets technical, security, and procedural standards set by the Court to protect the integrity of notarial acts",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_042",
+          "question": "Under A.M. No. 24-10-14-SC, liveness verification during Remote Electronic Notarization (REN) is required to:",
+          "user_answer": "C",
+          "user_answer_text": "B. Confirm that the person appearing is physically present and alive, preventing impersonation and spoofing attacks",
+          "correct_answer_text": "B. Confirm that the person appearing is physically present and alive, preventing impersonation and spoofing attacks",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_011",
+          "question": "Under A.M. No. 24-10-14-SC, the electronic notarial register (e-register) must be maintained for a minimum of:",
+          "user_answer": "B",
+          "user_answer_text": "C. Ten (10) years",
+          "correct_answer_text": "C. Ten (10) years",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_020",
+          "question": "In Philippine corporate law under RA 11232 (Revised Corporation Code), the minimum number of incorporators required to form a stock corporation is:",
+          "user_answer": "B",
+          "user_answer_text": "C. One (1)",
+          "correct_answer_text": "C. One (1)",
+          "is_correct": true,
+          "category": "Corporate Law"
+        },
+        {
+          "id": "atty_039",
+          "question": "When an ENP's notarial commission EXPIRES, they must:",
+          "user_answer": "A",
+          "user_answer_text": "B. Immediately cease performing notarial acts and surrender or secure their notarial records pending renewal or transfer",
+          "correct_answer_text": "B. Immediately cease performing notarial acts and surrender or secure their notarial records pending renewal or transfer",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_014",
+          "question": "In a contract of lease under Philippine law, the lessee's right to the property is BEST described as:",
+          "user_answer": "C",
+          "user_answer_text": "B. A personal right enforceable only against the lessor",
+          "correct_answer_text": "B. A personal right enforceable only against the lessor",
+          "is_correct": true,
+          "category": "Civil Law"
+        },
+        {
+          "id": "atty_045",
+          "question": "Which of the following is a PROHIBITED ACT under the Notarial Practice Rules?",
+          "user_answer": "A",
+          "user_answer_text": "B. Notarizing an instrument where the signatory is not personally present (in-person) or properly connected via AVT (remote), or whose identity has not been verified",
+          "correct_answer_text": "B. Notarizing an instrument where the signatory is not personally present (in-person) or properly connected via AVT (remote), or whose identity has not been verified",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_015",
+          "question": "The DICT National PKI (PNPKI) issues digital certificates that serve as:",
+          "user_answer": "C",
+          "user_answer_text": "B. Government-grade identity verification for electronic signatures",
+          "correct_answer_text": "B. Government-grade identity verification for electronic signatures",
+          "is_correct": true,
+          "category": "Technology"
+        },
+        {
+          "id": "atty_021",
+          "question": "A jurat in a notarial act requires the affiant to:",
+          "user_answer": "A",
+          "user_answer_text": "B. Sign in the presence of the notary and swear/affirm the truth of the contents",
+          "correct_answer_text": "B. Sign in the presence of the notary and swear/affirm the truth of the contents",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_049",
+          "question": "Under A.M. No. 24-10-14-SC, conflict of interest rules prohibit an ENP from notarizing a document when:",
+          "user_answer": "B",
+          "user_answer_text": "B. The ENP is a party to the instrument, a relative within the fourth civil degree of the principal, or has a direct financial interest in the transaction",
+          "correct_answer_text": "B. The ENP is a party to the instrument, a relative within the fourth civil degree of the principal, or has a direct financial interest in the transaction",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_037",
+          "question": "What is the minimum document retention period for electronic notarial certificates under A.M. No. 24-10-14-SC?",
+          "user_answer": "D",
+          "user_answer_text": "B. Ten (10) years",
+          "correct_answer_text": "B. Ten (10) years",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_023",
+          "question": "Under A.M. No. 24-10-14-SC, which document CANNOT be e-notarized?",
+          "user_answer": "A",
+          "user_answer_text": "B. A Last Will and Testament",
+          "correct_answer_text": "B. A Last Will and Testament",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_048",
+          "question": "The penalty for performing notarial acts WITHOUT a valid notarial commission in the Philippines is:",
+          "user_answer": "C",
+          "user_answer_text": "B. Criminal liability for falsification of public documents, in addition to administrative sanctions including disbarment proceedings",
+          "correct_answer_text": "B. Criminal liability for falsification of public documents, in addition to administrative sanctions including disbarment proceedings",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_006",
+          "question": "BSP Circular No. 944 specifically governs:",
+          "user_answer": "D",
+          "user_answer_text": "B. Electronic Know-Your-Customer (eKYC) standards for financial institutions",
+          "correct_answer_text": "B. Electronic Know-Your-Customer (eKYC) standards for financial institutions",
+          "is_correct": true,
+          "category": "Regulatory"
+        },
+        {
+          "id": "atty_018",
+          "question": "Under Philippine law, a Special Power of Attorney (SPA) grants the attorney-in-fact authority to perform:",
+          "user_answer": "B",
+          "user_answer_text": "B. Only acts specifically enumerated in the SPA",
+          "correct_answer_text": "B. Only acts specifically enumerated in the SPA",
+          "is_correct": true,
+          "category": "Civil Law"
+        },
+        {
+          "id": "atty_027",
+          "question": "An ENP who performs notarial acts outside their authorized territorial jurisdiction may face:",
+          "user_answer": "A",
+          "user_answer_text": "B. Suspension or revocation of their notarial commission",
+          "correct_answer_text": "B. Suspension or revocation of their notarial commission",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_019",
+          "question": "The National Privacy Commission (NPC) requires organizations to designate a:",
+          "user_answer": "A",
+          "user_answer_text": "B. Data Protection Officer (DPO)",
+          "correct_answer_text": "B. Data Protection Officer (DPO)",
+          "is_correct": true,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "atty_038",
+          "question": "Under RA 10173 (Data Privacy Act), what is the required action when a personal data breach occurs that likely harms data subjects?",
+          "user_answer": "A",
+          "user_answer_text": "B. Notify the National Privacy Commission (NPC) within 72 hours of discovery and inform affected data subjects",
+          "correct_answer_text": "B. Notify the National Privacy Commission (NPC) within 72 hours of discovery and inform affected data subjects",
+          "is_correct": true,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "atty_033",
+          "question": "The primary difference between a Jurat and an Acknowledgment is:",
+          "user_answer": "A",
+          "user_answer_text": "B. In a Jurat, the affiant swears to the truth of the document's contents; in an Acknowledgment, the principal confirms it is their free and voluntary act",
+          "correct_answer_text": "B. In a Jurat, the affiant swears to the truth of the document's contents; in an Acknowledgment, the principal confirms it is their free and voluntary act",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_012",
+          "question": "SEC Memorandum Circular No. 28-2020 primarily authorizes:",
+          "user_answer": "A",
+          "user_answer_text": "B. Remote notarization for SEC filings",
+          "correct_answer_text": "B. Remote notarization for SEC filings",
+          "is_correct": true,
+          "category": "Regulatory"
+        },
+        {
+          "id": "atty_004",
+          "question": "What is the maximum validity period of a notarial commission in the Philippines?",
+          "user_answer": "B",
+          "user_answer_text": "B. Two (2) years",
+          "correct_answer_text": "B. Two (2) years",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_040",
+          "question": "Under the 2004 Rules on Notarial Practice, which of the following constitutes COMPETENT EVIDENCE OF IDENTITY?",
+          "user_answer": "B",
+          "user_answer_text": "B. At least one current government-issued ID with photograph and signature of the individual",
+          "correct_answer_text": "B. At least one current government-issued ID with photograph and signature of the individual",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_005",
+          "question": "Under RA 10173 (Data Privacy Act), personal data collected during e-notarization must be:",
+          "user_answer": "C",
+          "user_answer_text": "C. Processed lawfully, fairly, and for specified, explicit, and legitimate purposes",
+          "correct_answer_text": "C. Processed lawfully, fairly, and for specified, explicit, and legitimate purposes",
+          "is_correct": true,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "atty_024",
+          "question": "The blockchain audit trail in Quanby Legal ensures document integrity through:",
+          "user_answer": "D",
+          "user_answer_text": "B. Cryptographic hashing and immutable distributed ledger entries",
+          "correct_answer_text": "B. Cryptographic hashing and immutable distributed ledger entries",
+          "is_correct": true,
+          "category": "Technology"
+        },
+        {
+          "id": "atty_030",
+          "question": "Under A.M. No. 24-10-14-SC, an ENP must verify the identity of a remote principal using:",
+          "user_answer": "C",
+          "user_answer_text": "B. Government-issued ID and liveness verification through audiovisual technology",
+          "correct_answer_text": "B. Government-issued ID and liveness verification through audiovisual technology",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_043",
+          "question": "Under the Anti-Money Laundering Act (RA 9160, as amended by RA 10365), notaries public are classified as:",
+          "user_answer": "C",
+          "user_answer_text": "B. Covered persons required to perform customer due diligence and report suspicious transactions to the AMLC",
+          "correct_answer_text": "B. Covered persons required to perform customer due diligence and report suspicious transactions to the AMLC",
+          "is_correct": true,
+          "category": "Compliance"
+        },
+        {
+          "id": "atty_035",
+          "question": "Under BSP Circular 944, which of the following is an acceptable method for eKYC identity verification?",
+          "user_answer": "B",
+          "user_answer_text": "B. Facial recognition with liveness detection matched against a government-issued ID",
+          "correct_answer_text": "B. Facial recognition with liveness detection matched against a government-issued ID",
+          "is_correct": true,
+          "category": "Regulatory"
+        },
+        {
+          "id": "atty_046",
+          "question": "An electronic notarial certificate under A.M. No. 24-10-14-SC must contain:",
+          "user_answer": "A",
+          "user_answer_text": "B. The ENP's name, commission number, commission expiry date, jurisdiction, type of notarial act, and a statement that the required verification was performed",
+          "correct_answer_text": "B. The ENP's name, commission number, commission expiry date, jurisdiction, type of notarial act, and a statement that the required verification was performed",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_034",
+          "question": "Under RA 8792 (Electronic Commerce Act), an electronic signature is legally binding when:",
+          "user_answer": "A",
+          "user_answer_text": "B. It is distinctively linked to the signatory, capable of identifying them, created under their sole control, and any alteration to the document is detectable",
+          "correct_answer_text": "B. It is distinctively linked to the signatory, capable of identifying them, created under their sole control, and any alteration to the document is detectable",
+          "is_correct": true,
+          "category": "Legal Framework"
+        },
+        {
+          "id": "atty_025",
+          "question": "Under the Labor Code of the Philippines, regular employees may only be dismissed for:",
+          "user_answer": "D",
+          "user_answer_text": "B. Just causes or authorized causes, with due process",
+          "correct_answer_text": "B. Just causes or authorized causes, with due process",
+          "is_correct": true,
+          "category": "Labor Law"
+        },
+        {
+          "id": "atty_026",
+          "question": "For a Memorandum of Agreement (MOA) to be legally enforceable in the Philippines, it must have:",
+          "user_answer": "C",
+          "user_answer_text": "B. Consent, object, and cause \u2014 the essential requisites of a valid contract",
+          "correct_answer_text": "B. Consent, object, and cause \u2014 the essential requisites of a valid contract",
+          "is_correct": true,
+          "category": "Civil Law"
+        },
+        {
+          "id": "atty_013",
+          "question": "Under the Anti-Money Laundering Act (RA 9160, as amended), covered persons must report suspicious transactions to:",
+          "user_answer": "D",
+          "user_answer_text": "B. The Anti-Money Laundering Council (AMLC)",
+          "correct_answer_text": "B. The Anti-Money Laundering Council (AMLC)",
+          "is_correct": true,
+          "category": "Compliance"
+        },
+        {
+          "id": "atty_008",
+          "question": "Under the Civil Code of the Philippines, which element is NOT required for a valid contract?",
+          "user_answer": "B",
+          "user_answer_text": "D. Notarization of the document",
+          "correct_answer_text": "D. Notarization of the document",
+          "is_correct": true,
+          "category": "Civil Law"
+        },
+        {
+          "id": "atty_001",
+          "question": "Under A.M. No. 24-10-14-SC, what is the primary difference between In-Person Electronic Notarization (IEN) and Remote Electronic Notarization (REN)?",
+          "user_answer": "D",
+          "user_answer_text": "B. IEN requires the principal to be physically present; REN allows the principal to appear via audiovisual communication technology",
+          "correct_answer_text": "B. IEN requires the principal to be physically present; REN allows the principal to appear via audiovisual communication technology",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_003",
+          "question": "Under the 2004 Rules on Notarial Practice (as extended by A.M. No. 24-10-14-SC), a notary public must ensure the principal is NOT:",
+          "user_answer": "A",
+          "user_answer_text": "C. Under duress, influence, or incapacity",
+          "correct_answer_text": "C. Under duress, influence, or incapacity",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_036",
+          "question": "Under A.M. No. 24-10-14-SC, the ENP's electronic notarial register (e-register) must include:",
+          "user_answer": "B",
+          "user_answer_text": "B. Entry number, date and time, type of notarial act, name and ID of principal, description of document, and fee charged",
+          "correct_answer_text": "B. Entry number, date and time, type of notarial act, name and ID of principal, description of document, and fee charged",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_032",
+          "question": "Under the 2004 Rules on Notarial Practice, a notary public is PROHIBITED from notarizing a document if:",
+          "user_answer": "C",
+          "user_answer_text": "B. The notary is a party to the instrument or has a financial interest in the transaction",
+          "correct_answer_text": "B. The notary is a party to the instrument or has a financial interest in the transaction",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_017",
+          "question": "An acknowledgment in a notarial act means the principal declares before the notary that:",
+          "user_answer": "D",
+          "user_answer_text": "B. The instrument is his/her free and voluntary act and deed",
+          "correct_answer_text": "B. The instrument is his/her free and voluntary act and deed",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_044",
+          "question": "Under A.M. No. 24-10-14-SC, cross-border notarization by a Philippine ENP is permitted when:",
+          "user_answer": "B",
+          "user_answer_text": "B. The principal is a Filipino citizen or foreign national executing a document for use in the Philippines, subject to applicable Philippine rules",
+          "correct_answer_text": "B. The principal is a Filipino citizen or foreign national executing a document for use in the Philippines, subject to applicable Philippine rules",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_028",
+          "question": "Under RA 10173, the right of a data subject to request deletion of their personal data is known as the:",
+          "user_answer": "B",
+          "user_answer_text": "B. Right to erasure or blocking",
+          "correct_answer_text": "B. Right to erasure or blocking",
+          "is_correct": true,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "atty_016",
+          "question": "Under A.M. No. 24-10-14-SC, which of the following is a MANDATORY requirement for all REN sessions?",
+          "user_answer": "C",
+          "user_answer_text": "B. Both the ENP and principal must be recorded via audiovisual communication technology",
+          "correct_answer_text": "B. Both the ENP and principal must be recorded via audiovisual communication technology",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_050",
+          "question": "Under RA 10173 and A.M. No. 24-10-14-SC, personal data collected during an e-notarization session may be retained by the ENP or platform for:",
+          "user_answer": "B",
+          "user_answer_text": "B. Only as long as necessary for the purpose of the notarization, and in compliance with the minimum retention period required by law (ten years for the e-register), after which it must be securely disposed of",
+          "correct_answer_text": "B. Only as long as necessary for the purpose of the notarization, and in compliance with the minimum retention period required by law (ten years for the e-register), after which it must be securely disposed of",
+          "is_correct": true,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "atty_007",
+          "question": "An Electronic Notary Public (ENP) may perform Remote Electronic Notarization (REN) for a principal located abroad ONLY IF:",
+          "user_answer": "C",
+          "user_answer_text": "B. The principal is a Filipino citizen and the document is for use in the Philippines, subject to applicable rules",
+          "correct_answer_text": "B. The principal is a Filipino citizen and the document is for use in the Philippines, subject to applicable rules",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_047",
+          "question": "Under RA 8792, which type of transaction is EXCLUDED from being conducted entirely through electronic means?",
+          "user_answer": "B",
+          "user_answer_text": "B. Execution of negotiable instruments such as checks, promissory notes, and bills of exchange requiring physical delivery",
+          "correct_answer_text": "B. Execution of negotiable instruments such as checks, promissory notes, and bills of exchange requiring physical delivery",
+          "is_correct": true,
+          "category": "Legal Framework"
+        },
+        {
+          "id": "atty_031",
+          "question": "Under A.M. No. 24-10-14-SC, which of the following is a ground for REVOCATION of an ENP's commission?",
+          "user_answer": "C",
+          "user_answer_text": "B. Gross misconduct, conviction of a crime involving moral turpitude, or violation of the Rules on ENP",
+          "correct_answer_text": "B. Gross misconduct, conviction of a crime involving moral turpitude, or violation of the Rules on ENP",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_029",
+          "question": "An e-notarized Deed of Sale for real property in the Philippines must still be submitted to which agency for transfer of title?",
+          "user_answer": "A",
+          "user_answer_text": "B. Bureau of Internal Revenue (BIR) for tax clearance, then Register of Deeds",
+          "correct_answer_text": "B. Bureau of Internal Revenue (BIR) for tax clearance, then Register of Deeds",
+          "is_correct": true,
+          "category": "Legal Practice"
+        },
+        {
+          "id": "atty_022",
+          "question": "Under RA 8792, an electronic document has the same legal effect as a paper document UNLESS:",
+          "user_answer": "B",
+          "user_answer_text": "B. The law specifically requires a document to be in writing and excludes electronic form",
+          "correct_answer_text": "B. The law specifically requires a document to be in writing and excludes electronic form",
+          "is_correct": true,
+          "category": "Legal Framework"
+        }
+      ],
+      "retake_fee_php": 0
+    },
     "liveness_verified": false,
     "national_id_uploaded": false,
-    "certificate_status": "none",
-    "certificate_id": null,
+    "certificate_status": "certified",
+    "certificate_id": "QL-ENP-20260414-84E31DEA5A1E4D01",
     "retake_count": 0,
     "retake_payment_confirmed": false,
     "created_at": "2026-04-14T00:23:22.037320+00:00",
-    "last_login": "2026-04-14T00:47:33.907295+00:00"
+    "last_login": "2026-04-14T04:17:08.294349+00:00"
   },
   "259d90bd-aedb-4c6c-adcf-daffcb3b041e": {
     "id": "259d90bd-aedb-4c6c-adcf-daffcb3b041e",
@@ -74,5 +534,572 @@
     "retake_payment_confirmed": false,
     "created_at": "2026-04-14T00:31:46.533061+00:00",
     "last_login": "2026-04-14T00:43:13.017517+00:00"
+  },
+  "2d1f9b54-728b-4cc3-abec-45b1cab33b58": {
+    "id": "2d1f9b54-728b-4cc3-abec-45b1cab33b58",
+    "email": "software@quanbyit.com",
+    "first_name": "Quanby",
+    "last_name": "Developer",
+    "picture": "https://lh3.googleusercontent.com/a/ACg8ocJF-_GWzLC4Bd51utsOgylVvv6SC8JvhDhiN1aclWbSUZkikw=s96-c",
+    "provider": "google",
+    "provider_id": "105802799376805006901",
+    "email_verified": true,
+    "role": "attorney",
+    "onboarding_step": "kyc_id",
+    "profile": {
+      "prefix": "",
+      "first_name": "Quanby",
+      "middle_initial": "",
+      "last_name": "Developer",
+      "suffix": "",
+      "phone": "+639295001017",
+      "roll_no": "12345",
+      "roll_date": "2026-04-15",
+      "commission_no": "2024 - 24",
+      "commission_no_valid_until": "2026-04-16",
+      "ptr_no": "1234567",
+      "ptr_no_location": "Manila",
+      "ptr_no_date": "2026-04-16",
+      "ibp_no": "123456",
+      "ibp_no_date": "2026-04-23",
+      "notary_address": "Manilaaaaa",
+      "home_street": "",
+      "barangay": "",
+      "city_province": "",
+      "mcle_no_period": "CVII",
+      "mcle_no": "1234567",
+      "mcle_no_date": "2026-04-15",
+      "npn": ""
+    },
+    "test_result": {
+      "total": 50,
+      "correct": 50,
+      "score_pct": 100.0,
+      "passed": true,
+      "passing_score": 70,
+      "results": [
+        {
+          "id": "atty_048",
+          "question": "The penalty for performing notarial acts WITHOUT a valid notarial commission in the Philippines is:",
+          "user_answer": "A",
+          "user_answer_text": "B. Criminal liability for falsification of public documents, in addition to administrative sanctions including disbarment proceedings",
+          "correct_answer_text": "B. Criminal liability for falsification of public documents, in addition to administrative sanctions including disbarment proceedings",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_022",
+          "question": "Under RA 8792, an electronic document has the same legal effect as a paper document UNLESS:",
+          "user_answer": "D",
+          "user_answer_text": "B. The law specifically requires a document to be in writing and excludes electronic form",
+          "correct_answer_text": "B. The law specifically requires a document to be in writing and excludes electronic form",
+          "is_correct": true,
+          "category": "Legal Framework"
+        },
+        {
+          "id": "atty_007",
+          "question": "An Electronic Notary Public (ENP) may perform Remote Electronic Notarization (REN) for a principal located abroad ONLY IF:",
+          "user_answer": "B",
+          "user_answer_text": "B. The principal is a Filipino citizen and the document is for use in the Philippines, subject to applicable rules",
+          "correct_answer_text": "B. The principal is a Filipino citizen and the document is for use in the Philippines, subject to applicable rules",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_021",
+          "question": "A jurat in a notarial act requires the affiant to:",
+          "user_answer": "A",
+          "user_answer_text": "B. Sign in the presence of the notary and swear/affirm the truth of the contents",
+          "correct_answer_text": "B. Sign in the presence of the notary and swear/affirm the truth of the contents",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_042",
+          "question": "Under A.M. No. 24-10-14-SC, liveness verification during Remote Electronic Notarization (REN) is required to:",
+          "user_answer": "C",
+          "user_answer_text": "B. Confirm that the person appearing is physically present and alive, preventing impersonation and spoofing attacks",
+          "correct_answer_text": "B. Confirm that the person appearing is physically present and alive, preventing impersonation and spoofing attacks",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_044",
+          "question": "Under A.M. No. 24-10-14-SC, cross-border notarization by a Philippine ENP is permitted when:",
+          "user_answer": "B",
+          "user_answer_text": "B. The principal is a Filipino citizen or foreign national executing a document for use in the Philippines, subject to applicable Philippine rules",
+          "correct_answer_text": "B. The principal is a Filipino citizen or foreign national executing a document for use in the Philippines, subject to applicable Philippine rules",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_012",
+          "question": "SEC Memorandum Circular No. 28-2020 primarily authorizes:",
+          "user_answer": "A",
+          "user_answer_text": "B. Remote notarization for SEC filings",
+          "correct_answer_text": "B. Remote notarization for SEC filings",
+          "is_correct": true,
+          "category": "Regulatory"
+        },
+        {
+          "id": "atty_047",
+          "question": "Under RA 8792, which type of transaction is EXCLUDED from being conducted entirely through electronic means?",
+          "user_answer": "A",
+          "user_answer_text": "B. Execution of negotiable instruments such as checks, promissory notes, and bills of exchange requiring physical delivery",
+          "correct_answer_text": "B. Execution of negotiable instruments such as checks, promissory notes, and bills of exchange requiring physical delivery",
+          "is_correct": true,
+          "category": "Legal Framework"
+        },
+        {
+          "id": "atty_040",
+          "question": "Under the 2004 Rules on Notarial Practice, which of the following constitutes COMPETENT EVIDENCE OF IDENTITY?",
+          "user_answer": "C",
+          "user_answer_text": "B. At least one current government-issued ID with photograph and signature of the individual",
+          "correct_answer_text": "B. At least one current government-issued ID with photograph and signature of the individual",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_043",
+          "question": "Under the Anti-Money Laundering Act (RA 9160, as amended by RA 10365), notaries public are classified as:",
+          "user_answer": "A",
+          "user_answer_text": "B. Covered persons required to perform customer due diligence and report suspicious transactions to the AMLC",
+          "correct_answer_text": "B. Covered persons required to perform customer due diligence and report suspicious transactions to the AMLC",
+          "is_correct": true,
+          "category": "Compliance"
+        },
+        {
+          "id": "atty_019",
+          "question": "The National Privacy Commission (NPC) requires organizations to designate a:",
+          "user_answer": "A",
+          "user_answer_text": "B. Data Protection Officer (DPO)",
+          "correct_answer_text": "B. Data Protection Officer (DPO)",
+          "is_correct": true,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "atty_004",
+          "question": "What is the maximum validity period of a notarial commission in the Philippines?",
+          "user_answer": "C",
+          "user_answer_text": "B. Two (2) years",
+          "correct_answer_text": "B. Two (2) years",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_003",
+          "question": "Under the 2004 Rules on Notarial Practice (as extended by A.M. No. 24-10-14-SC), a notary public must ensure the principal is NOT:",
+          "user_answer": "A",
+          "user_answer_text": "C. Under duress, influence, or incapacity",
+          "correct_answer_text": "C. Under duress, influence, or incapacity",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_032",
+          "question": "Under the 2004 Rules on Notarial Practice, a notary public is PROHIBITED from notarizing a document if:",
+          "user_answer": "B",
+          "user_answer_text": "B. The notary is a party to the instrument or has a financial interest in the transaction",
+          "correct_answer_text": "B. The notary is a party to the instrument or has a financial interest in the transaction",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_046",
+          "question": "An electronic notarial certificate under A.M. No. 24-10-14-SC must contain:",
+          "user_answer": "C",
+          "user_answer_text": "B. The ENP's name, commission number, commission expiry date, jurisdiction, type of notarial act, and a statement that the required verification was performed",
+          "correct_answer_text": "B. The ENP's name, commission number, commission expiry date, jurisdiction, type of notarial act, and a statement that the required verification was performed",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_031",
+          "question": "Under A.M. No. 24-10-14-SC, which of the following is a ground for REVOCATION of an ENP's commission?",
+          "user_answer": "A",
+          "user_answer_text": "B. Gross misconduct, conviction of a crime involving moral turpitude, or violation of the Rules on ENP",
+          "correct_answer_text": "B. Gross misconduct, conviction of a crime involving moral turpitude, or violation of the Rules on ENP",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_027",
+          "question": "An ENP who performs notarial acts outside their authorized territorial jurisdiction may face:",
+          "user_answer": "C",
+          "user_answer_text": "B. Suspension or revocation of their notarial commission",
+          "correct_answer_text": "B. Suspension or revocation of their notarial commission",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_014",
+          "question": "In a contract of lease under Philippine law, the lessee's right to the property is BEST described as:",
+          "user_answer": "A",
+          "user_answer_text": "B. A personal right enforceable only against the lessor",
+          "correct_answer_text": "B. A personal right enforceable only against the lessor",
+          "is_correct": true,
+          "category": "Civil Law"
+        },
+        {
+          "id": "atty_023",
+          "question": "Under A.M. No. 24-10-14-SC, which document CANNOT be e-notarized?",
+          "user_answer": "D",
+          "user_answer_text": "B. A Last Will and Testament",
+          "correct_answer_text": "B. A Last Will and Testament",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_026",
+          "question": "For a Memorandum of Agreement (MOA) to be legally enforceable in the Philippines, it must have:",
+          "user_answer": "B",
+          "user_answer_text": "B. Consent, object, and cause \u2014 the essential requisites of a valid contract",
+          "correct_answer_text": "B. Consent, object, and cause \u2014 the essential requisites of a valid contract",
+          "is_correct": true,
+          "category": "Civil Law"
+        },
+        {
+          "id": "atty_037",
+          "question": "What is the minimum document retention period for electronic notarial certificates under A.M. No. 24-10-14-SC?",
+          "user_answer": "C",
+          "user_answer_text": "B. Ten (10) years",
+          "correct_answer_text": "B. Ten (10) years",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_050",
+          "question": "Under RA 10173 and A.M. No. 24-10-14-SC, personal data collected during an e-notarization session may be retained by the ENP or platform for:",
+          "user_answer": "B",
+          "user_answer_text": "B. Only as long as necessary for the purpose of the notarization, and in compliance with the minimum retention period required by law (ten years for the e-register), after which it must be securely disposed of",
+          "correct_answer_text": "B. Only as long as necessary for the purpose of the notarization, and in compliance with the minimum retention period required by law (ten years for the e-register), after which it must be securely disposed of",
+          "is_correct": true,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "atty_041",
+          "question": "The Supreme Court accreditation requirement for ENP platforms primarily ensures that the platform:",
+          "user_answer": "C",
+          "user_answer_text": "B. Meets technical, security, and procedural standards set by the Court to protect the integrity of notarial acts",
+          "correct_answer_text": "B. Meets technical, security, and procedural standards set by the Court to protect the integrity of notarial acts",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_006",
+          "question": "BSP Circular No. 944 specifically governs:",
+          "user_answer": "B",
+          "user_answer_text": "B. Electronic Know-Your-Customer (eKYC) standards for financial institutions",
+          "correct_answer_text": "B. Electronic Know-Your-Customer (eKYC) standards for financial institutions",
+          "is_correct": true,
+          "category": "Regulatory"
+        },
+        {
+          "id": "atty_036",
+          "question": "Under A.M. No. 24-10-14-SC, the ENP's electronic notarial register (e-register) must include:",
+          "user_answer": "B",
+          "user_answer_text": "B. Entry number, date and time, type of notarial act, name and ID of principal, description of document, and fee charged",
+          "correct_answer_text": "B. Entry number, date and time, type of notarial act, name and ID of principal, description of document, and fee charged",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_035",
+          "question": "Under BSP Circular 944, which of the following is an acceptable method for eKYC identity verification?",
+          "user_answer": "D",
+          "user_answer_text": "B. Facial recognition with liveness detection matched against a government-issued ID",
+          "correct_answer_text": "B. Facial recognition with liveness detection matched against a government-issued ID",
+          "is_correct": true,
+          "category": "Regulatory"
+        },
+        {
+          "id": "atty_011",
+          "question": "Under A.M. No. 24-10-14-SC, the electronic notarial register (e-register) must be maintained for a minimum of:",
+          "user_answer": "C",
+          "user_answer_text": "C. Ten (10) years",
+          "correct_answer_text": "C. Ten (10) years",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_013",
+          "question": "Under the Anti-Money Laundering Act (RA 9160, as amended), covered persons must report suspicious transactions to:",
+          "user_answer": "A",
+          "user_answer_text": "B. The Anti-Money Laundering Council (AMLC)",
+          "correct_answer_text": "B. The Anti-Money Laundering Council (AMLC)",
+          "is_correct": true,
+          "category": "Compliance"
+        },
+        {
+          "id": "atty_025",
+          "question": "Under the Labor Code of the Philippines, regular employees may only be dismissed for:",
+          "user_answer": "B",
+          "user_answer_text": "B. Just causes or authorized causes, with due process",
+          "correct_answer_text": "B. Just causes or authorized causes, with due process",
+          "is_correct": true,
+          "category": "Labor Law"
+        },
+        {
+          "id": "atty_018",
+          "question": "Under Philippine law, a Special Power of Attorney (SPA) grants the attorney-in-fact authority to perform:",
+          "user_answer": "C",
+          "user_answer_text": "B. Only acts specifically enumerated in the SPA",
+          "correct_answer_text": "B. Only acts specifically enumerated in the SPA",
+          "is_correct": true,
+          "category": "Civil Law"
+        },
+        {
+          "id": "atty_002",
+          "question": "Which Republic Act governs the legal validity of electronic signatures in the Philippines?",
+          "user_answer": "B",
+          "user_answer_text": "C. RA 8792 \u2014 Electronic Commerce Act",
+          "correct_answer_text": "C. RA 8792 \u2014 Electronic Commerce Act",
+          "is_correct": true,
+          "category": "Legal Framework"
+        },
+        {
+          "id": "atty_029",
+          "question": "An e-notarized Deed of Sale for real property in the Philippines must still be submitted to which agency for transfer of title?",
+          "user_answer": "B",
+          "user_answer_text": "B. Bureau of Internal Revenue (BIR) for tax clearance, then Register of Deeds",
+          "correct_answer_text": "B. Bureau of Internal Revenue (BIR) for tax clearance, then Register of Deeds",
+          "is_correct": true,
+          "category": "Legal Practice"
+        },
+        {
+          "id": "atty_001",
+          "question": "Under A.M. No. 24-10-14-SC, what is the primary difference between In-Person Electronic Notarization (IEN) and Remote Electronic Notarization (REN)?",
+          "user_answer": "A",
+          "user_answer_text": "B. IEN requires the principal to be physically present; REN allows the principal to appear via audiovisual communication technology",
+          "correct_answer_text": "B. IEN requires the principal to be physically present; REN allows the principal to appear via audiovisual communication technology",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_015",
+          "question": "The DICT National PKI (PNPKI) issues digital certificates that serve as:",
+          "user_answer": "D",
+          "user_answer_text": "B. Government-grade identity verification for electronic signatures",
+          "correct_answer_text": "B. Government-grade identity verification for electronic signatures",
+          "is_correct": true,
+          "category": "Technology"
+        },
+        {
+          "id": "atty_005",
+          "question": "Under RA 10173 (Data Privacy Act), personal data collected during e-notarization must be:",
+          "user_answer": "D",
+          "user_answer_text": "C. Processed lawfully, fairly, and for specified, explicit, and legitimate purposes",
+          "correct_answer_text": "C. Processed lawfully, fairly, and for specified, explicit, and legitimate purposes",
+          "is_correct": true,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "atty_016",
+          "question": "Under A.M. No. 24-10-14-SC, which of the following is a MANDATORY requirement for all REN sessions?",
+          "user_answer": "D",
+          "user_answer_text": "B. Both the ENP and principal must be recorded via audiovisual communication technology",
+          "correct_answer_text": "B. Both the ENP and principal must be recorded via audiovisual communication technology",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_034",
+          "question": "Under RA 8792 (Electronic Commerce Act), an electronic signature is legally binding when:",
+          "user_answer": "C",
+          "user_answer_text": "B. It is distinctively linked to the signatory, capable of identifying them, created under their sole control, and any alteration to the document is detectable",
+          "correct_answer_text": "B. It is distinctively linked to the signatory, capable of identifying them, created under their sole control, and any alteration to the document is detectable",
+          "is_correct": true,
+          "category": "Legal Framework"
+        },
+        {
+          "id": "atty_045",
+          "question": "Which of the following is a PROHIBITED ACT under the Notarial Practice Rules?",
+          "user_answer": "C",
+          "user_answer_text": "B. Notarizing an instrument where the signatory is not personally present (in-person) or properly connected via AVT (remote), or whose identity has not been verified",
+          "correct_answer_text": "B. Notarizing an instrument where the signatory is not personally present (in-person) or properly connected via AVT (remote), or whose identity has not been verified",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_038",
+          "question": "Under RA 10173 (Data Privacy Act), what is the required action when a personal data breach occurs that likely harms data subjects?",
+          "user_answer": "B",
+          "user_answer_text": "B. Notify the National Privacy Commission (NPC) within 72 hours of discovery and inform affected data subjects",
+          "correct_answer_text": "B. Notify the National Privacy Commission (NPC) within 72 hours of discovery and inform affected data subjects",
+          "is_correct": true,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "atty_028",
+          "question": "Under RA 10173, the right of a data subject to request deletion of their personal data is known as the:",
+          "user_answer": "C",
+          "user_answer_text": "B. Right to erasure or blocking",
+          "correct_answer_text": "B. Right to erasure or blocking",
+          "is_correct": true,
+          "category": "Data Privacy"
+        },
+        {
+          "id": "atty_008",
+          "question": "Under the Civil Code of the Philippines, which element is NOT required for a valid contract?",
+          "user_answer": "B",
+          "user_answer_text": "D. Notarization of the document",
+          "correct_answer_text": "D. Notarization of the document",
+          "is_correct": true,
+          "category": "Civil Law"
+        },
+        {
+          "id": "atty_030",
+          "question": "Under A.M. No. 24-10-14-SC, an ENP must verify the identity of a remote principal using:",
+          "user_answer": "D",
+          "user_answer_text": "B. Government-issued ID and liveness verification through audiovisual technology",
+          "correct_answer_text": "B. Government-issued ID and liveness verification through audiovisual technology",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_049",
+          "question": "Under A.M. No. 24-10-14-SC, conflict of interest rules prohibit an ENP from notarizing a document when:",
+          "user_answer": "B",
+          "user_answer_text": "B. The ENP is a party to the instrument, a relative within the fourth civil degree of the principal, or has a direct financial interest in the transaction",
+          "correct_answer_text": "B. The ENP is a party to the instrument, a relative within the fourth civil degree of the principal, or has a direct financial interest in the transaction",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_010",
+          "question": "A Deed of Absolute Sale must be notarized primarily because:",
+          "user_answer": "A",
+          "user_answer_text": "B. It converts the document from a private to a public instrument, giving it evidentiary weight",
+          "correct_answer_text": "B. It converts the document from a private to a public instrument, giving it evidentiary weight",
+          "is_correct": true,
+          "category": "Legal Practice"
+        },
+        {
+          "id": "atty_024",
+          "question": "The blockchain audit trail in Quanby Legal ensures document integrity through:",
+          "user_answer": "B",
+          "user_answer_text": "B. Cryptographic hashing and immutable distributed ledger entries",
+          "correct_answer_text": "B. Cryptographic hashing and immutable distributed ledger entries",
+          "is_correct": true,
+          "category": "Technology"
+        },
+        {
+          "id": "atty_039",
+          "question": "When an ENP's notarial commission EXPIRES, they must:",
+          "user_answer": "B",
+          "user_answer_text": "B. Immediately cease performing notarial acts and surrender or secure their notarial records pending renewal or transfer",
+          "correct_answer_text": "B. Immediately cease performing notarial acts and surrender or secure their notarial records pending renewal or transfer",
+          "is_correct": true,
+          "category": "ENP Rules"
+        },
+        {
+          "id": "atty_033",
+          "question": "The primary difference between a Jurat and an Acknowledgment is:",
+          "user_answer": "B",
+          "user_answer_text": "B. In a Jurat, the affiant swears to the truth of the document's contents; in an Acknowledgment, the principal confirms it is their free and voluntary act",
+          "correct_answer_text": "B. In a Jurat, the affiant swears to the truth of the document's contents; in an Acknowledgment, the principal confirms it is their free and voluntary act",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_020",
+          "question": "In Philippine corporate law under RA 11232 (Revised Corporation Code), the minimum number of incorporators required to form a stock corporation is:",
+          "user_answer": "B",
+          "user_answer_text": "C. One (1)",
+          "correct_answer_text": "C. One (1)",
+          "is_correct": true,
+          "category": "Corporate Law"
+        },
+        {
+          "id": "atty_017",
+          "question": "An acknowledgment in a notarial act means the principal declares before the notary that:",
+          "user_answer": "C",
+          "user_answer_text": "B. The instrument is his/her free and voluntary act and deed",
+          "correct_answer_text": "B. The instrument is his/her free and voluntary act and deed",
+          "is_correct": true,
+          "category": "Notarial Practice"
+        },
+        {
+          "id": "atty_009",
+          "question": "Which court or body accredits Electronic Notarization Facilities (ENFs) in the Philippines?",
+          "user_answer": "B",
+          "user_answer_text": "C. Supreme Court of the Philippines",
+          "correct_answer_text": "C. Supreme Court of the Philippines",
+          "is_correct": true,
+          "category": "ENP Rules"
+        }
+      ],
+      "retake_fee_php": 0
+    },
+    "liveness_verified": false,
+    "national_id_uploaded": false,
+    "certificate_status": "certified",
+    "certificate_id": "QL-ENP-20260414-2156BADBD918449D",
+    "retake_count": 1,
+    "retake_payment_confirmed": false,
+    "created_at": "2026-04-14T03:53:49.455890+00:00",
+    "last_login": "2026-04-14T03:55:31.013778+00:00"
+  },
+  "1e14bd7c-e41f-4579-8bbc-cb084549205b": {
+    "id": "1e14bd7c-e41f-4579-8bbc-cb084549205b",
+    "email": "mj.balcueva.3@gmail.com",
+    "first_name": "Mj",
+    "last_name": "Balcueva",
+    "picture": "https://lh3.googleusercontent.com/a/ACg8ocL6_fL2fZWSoyoyuX58Jlk1Wlksm_uj34lTyXWKAJrDX9PPeM0LgA=s96-c",
+    "provider": "google",
+    "provider_id": "116682404850871914869",
+    "email_verified": true,
+    "role": "client",
+    "onboarding_step": "certified",
+    "profile": {
+      "prefix": "",
+      "first_name": "Mj",
+      "middle_initial": "",
+      "last_name": "Balcueva",
+      "suffix": "",
+      "phone": "+639295001017",
+      "organization": "",
+      "position": ""
+    },
+    "test_result": null,
+    "liveness_verified": false,
+    "national_id_uploaded": false,
+    "certificate_status": "none",
+    "certificate_id": null,
+    "retake_count": 0,
+    "retake_payment_confirmed": false,
+    "created_at": "2026-04-14T04:14:37.469325+00:00",
+    "last_login": "2026-04-14T04:41:47.290947+00:00"
+  },
+  "5e53e8ec-ab76-4766-b0c8-120bd5ef3e71": {
+    "id": "5e53e8ec-ab76-4766-b0c8-120bd5ef3e71",
+    "email": "christianmontesor120523@gmail.com",
+    "first_name": "Christian",
+    "last_name": "Montesor",
+    "picture": "https://lh3.googleusercontent.com/a/ACg8ocLaE_Yibt8OVdo0qSM0TmFl9wgqGnc_7ShUOJSIV-wjwOUEYQ=s96-c",
+    "provider": "google",
+    "provider_id": "109793424393932061266",
+    "email_verified": true,
+    "role": "client",
+    "onboarding_step": "certified",
+    "profile": {
+      "prefix": "",
+      "first_name": "Christian",
+      "middle_initial": "",
+      "last_name": "Montesor",
+      "suffix": "",
+      "phone": "+639462704475",
+      "organization": "",
+      "position": ""
+    },
+    "test_result": null,
+    "liveness_verified": false,
+    "national_id_uploaded": false,
+    "certificate_status": "none",
+    "certificate_id": null,
+    "retake_count": 0,
+    "retake_payment_confirmed": false,
+    "created_at": "2026-04-14T04:17:42.848119+00:00",
+    "last_login": "2026-04-14T04:17:42.848140+00:00"
   }
 }
