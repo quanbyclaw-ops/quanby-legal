@@ -1572,6 +1572,45 @@ async function init() {
     return;
   }}
 
+  // If we have room + apt but no token, get token directly (bypass auth/me)
+  if (ROOM_NAME && APT_ID && !LK_TOKEN) {
+    setLoading('Getting session token...');
+    try {
+      try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
+      var _jr2 = await fetch('/api/sessions/join', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ room_name: ROOM_NAME, apt_id: APT_ID })
+      });
+      if (_jr2.ok) {
+        var _jd2 = await _jr2.json();
+        var _t2 = _jd2.token, _u2 = _jd2.user_name || '', _r2 = _jd2.user_role || 'Client';
+        setLoading('Connecting...');
+        _room = new LivekitClient.Room({ adaptiveStream: true, dynacast: true });
+        setupRoomEvents(_room, _u2, _r2);
+        await _room.connect('wss://quanby-lms-k4aq44qe.livekit.cloud', _t2, { autoSubscribe: true });
+        _room.remoteParticipants.forEach(function(p) {
+          addParticipantTile(p);
+          p.trackPublications.forEach(function(pub) { if (pub.track && pub.isSubscribed) attachTrack(pub.track, p); });
+        });
+        try { await _room.localParticipant.enableCameraAndMicrophone(); } catch(e) {}
+        fetch('/api/sessions/' + APT_ID, { credentials: 'include' })
+          .then(function(r) { return r.ok ? r.json() : null; })
+          .then(function(s) { if (s) { _sessionInfo = s; _currentAptId = APT_ID; try { restoreSessionDocuments(); renderParticipantsList(); populateSignPanel(_r2 === 'ENP'); } catch(e) {} } })
+          .catch(function() {});
+        hideLoading();
+        postJoinSetup(_u2, _r2, _r2);
+        if (_r2 === 'ENP') loadDcToken();
+        return;
+      }
+      var _je2 = await _jr2.json().catch(function(){return{};});
+      showError((_je2.detail || 'Could not join session ('+_jr2.status+')') + '<br><a href= /appointments style=color:#00d4c8>← Back</a>');
+    } catch(e2) {
+      showError('Connection error: ' + e2.message + '<br><a href=/appointments style=color:#00d4c8>← Back</a>');
+    }
+    return;
+  }
+
   // Auth check
   let me;
   try {
