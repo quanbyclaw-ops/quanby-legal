@@ -1,44 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-    /* Quanby Legal: silently block Cloudflare beacon to prevent CORS/SRI errors */
-    (function() {
-      function isCFBeacon(el) {
-        return el && el.tagName === 'SCRIPT' && typeof el.src === 'string' &&
-               el.src.indexOf('cloudflareinsights') !== -1;
-      }
-      /* Intercept DOM insertions before they reach the browser */
-      var _ac = Element.prototype.appendChild;
-      Element.prototype.appendChild = function(c) {
-        if (isCFBeacon(c)) return c;
-        return _ac.call(this, c);
-      };
-      var _ib = Element.prototype.insertBefore;
-      Element.prototype.insertBefore = function(c, r) {
-        if (isCFBeacon(c)) return c;
-        return _ib.call(this, c, r);
-      };
-      /* Remove any already-injected beacon tags */
-      function stripNow() {
-        document.querySelectorAll('script[src*="cloudflareinsights"]').forEach(function(s) {
-          if (s.parentNode) s.parentNode.removeChild(s);
-        });
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', stripNow);
-      } else {
-        stripNow();
-      }
-      /* Suppress any resulting errors silently */
-      var _oe = window.onerror;
-      window.onerror = function(m, src, l, c, e) {
-        if (src && src.indexOf('cloudflareinsights') !== -1) return true;
-        if (_oe) return _oe.apply(this, arguments);
-      };
-    })();
-  </script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ENP Certification — Quanby Legal</title>
@@ -838,65 +800,9 @@
             .role-cards { grid-template-columns: 1fr; }
             .field-row { flex-direction: column; gap: 0; }
             .ob-card { padding: 1.5rem 1.25rem; }
-            .course-tabs { gap:0.25rem; }
-            .course-tab { padding:0.3rem 0.6rem; font-size:0.72rem; }
             .ob-line { width: 24px; }
             .ob-step { min-width: 48px; font-size: 0.65rem; }
         }
-
-        /* === INLINE COURSE MODULE === */
-        .course-module { display:flex; flex-direction:column; gap:1.25rem; }
-        /* ── Course Module ─────────────────────────────────── */
-        .course-tabs {
-            display:flex; flex-wrap:wrap; gap:0.375rem; margin-bottom:1.25rem;
-            width:100%; box-sizing:border-box;
-        }
-        .course-tab {
-            padding:0.35rem 0.75rem; border-radius:999px; font-size:0.75rem; font-weight:600;
-            background:rgba(255,255,255,0.06); color:#94a3b8;
-            border:1px solid rgba(255,255,255,0.1); cursor:pointer; transition:all 0.15s; white-space:nowrap;
-        }
-        .course-tab:hover { background:rgba(255,255,255,0.1); color:#f1f5f9; }
-        .course-tab.active { background:#7c3aed; color:#fff; border-color:#7c3aed; }
-        .course-tab.done { background:rgba(124,58,237,0.15); color:#a78bfa; border-color:rgba(124,58,237,0.3); }
-        /* Progress */
-        .course-progress-row { display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem; }
-        #lesson-label { font-size:0.75rem; font-weight:600; color:#94a3b8; white-space:nowrap; }
-        .course-progress-bar { flex:1; height:3px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; }
-        .course-progress-fill { height:100%; background:linear-gradient(90deg,#7c3aed,#a78bfa); border-radius:999px; transition:width 0.4s; }
-        /* Lesson content */
-        .lesson-pane { display:flex; flex-direction:column; gap:1rem; min-height:220px; }
-        .lesson-pane h3 { color:#c9a84c; font-size:1rem; font-weight:700; margin:0 0 0.5rem; letter-spacing:0.01em; }
-        .lesson-pane p { color:#cbd5e1; font-size:0.875rem; line-height:1.7; margin:0; }
-        .lesson-pane ul, .lesson-pane ol { color:#cbd5e1; font-size:0.875rem; line-height:1.7; padding-left:1.25rem; margin:0; }
-        .lesson-pane li { margin-bottom:0.4rem; }
-        /* Key term cards */
-        .key-term-card {
-            background:rgba(17,24,39,0.8); border-left:3px solid #7c3aed;
-            padding:0.875rem 1rem; border-radius:0 0.5rem 0.5rem 0;
-            font-size:0.85rem; line-height:1.6;
-        }
-        .key-term-card strong { color:#a78bfa; display:block; margin-bottom:0.2rem; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.05em; }
-        .key-term-card span { color:#94a3b8; }
-        /* Nav */
-        .lesson-nav { display:grid; grid-template-columns:1fr 1fr; gap:0.625rem; margin-top:1.5rem; border-top:1px solid rgba(255,255,255,0.07); padding-top:1.25rem; }
-        .lesson-nav button { padding:0.65rem 1rem; border-radius:0.5rem; font-size:0.85rem; font-weight:600; border:none; cursor:pointer; transition:all 0.15s; font-family:"Inter",sans-serif; }
-        .btn-lesson-prev { background:rgba(255,255,255,0.06); color:#94a3b8; border:1px solid rgba(255,255,255,0.1); }
-        .btn-lesson-prev:hover:not(:disabled) { background:rgba(255,255,255,0.1); color:#f1f5f9; }
-        .btn-lesson-next { background:#7c3aed; color:#fff; }
-        .btn-lesson-next:hover:not(:disabled) { background:#6d28d9; }
-        .btn-lesson-next:disabled, .btn-lesson-prev:disabled { opacity:0.3; cursor:not-allowed; }
-        /* Completion */
-        .course-complete-notice {
-            display:none; align-items:center; justify-content:center; gap:0.5rem;
-            background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25);
-            border-radius:0.5rem; padding:0.875rem 1rem; color:#34d399; font-size:0.85rem;
-            font-weight:600; margin-top:1.25rem;
-        }
-        .course-complete-notice.visible { display:flex; }
-        /* Proceed button */
-        #course-btn-row { justify-content:center; margin-top:1rem; }
-        #btn-proceed-exam { font-size:0.9rem; padding:0.75rem 2rem; border-radius:0.5rem; max-width:240px; }
     </style>
 </head>
 <body>
@@ -950,7 +856,7 @@
 <!-- MAIN CONTENT -->
 <div class="page-wrap">
     <!-- LOADING STATE -->
-    <div id="loading-screen" class="loading-screen" style="display:none;">
+    <div id="loading-screen" class="loading-screen">
         <div class="big-spinner"></div>
         <p>Checking your account…</p>
     </div>
@@ -982,8 +888,8 @@
     <!-- STEP PROGRESS -->
     <div id="progress-wrap" style="display:none; width:100%; max-width:680px;">
         <div class="page-header">
-            <h1 id="page-header-title">⚖️ ENP Certification</h1>
-            <p id="page-header-sub">Electronic Notary Public Certification under A.M. No. 24-10-14-SC</p>
+            <h1>⚖️ ENP Certification</h1>
+            <p>Electronic Notary Public Certification under A.M. No. 24-10-14-SC</p>
         </div>
         <div class="ob-progress" id="ob-progress"></div>
     </div>
@@ -994,8 +900,8 @@
         <div class="role-cards">
             <div class="role-card selected" id="role-attorney" onclick="selectRole('attorney')">
                 <div class="role-icon">⚖️</div>
-                <div class="role-title">Electronic Notary Public</div>
-                <div class="role-desc">IBP-registered, certified to perform electronic notarization</div>
+                <div class="role-title">Attorney / Law Firm</div>
+                <div class="role-desc">IBP-registered, practicing notary public</div>
             </div>
             <div class="role-card" id="role-client" onclick="selectRole('client')">
                 <div class="role-icon">👤</div>
@@ -1008,8 +914,8 @@
 
     <!-- STEP 2: PROFILE -->
     <div id="step-profile" class="ob-card" style="display:none;">
-        <h2 id="profile-step-title">Complete Your Profile</h2>
-        <p class="sub" id="profile-step-sub">Required for ENP certification under A.M. No. 24-10-14-SC.</p>
+        <h2>Complete Your Profile</h2>
+        <p class="sub">Required for ENP certification under A.M. No. 24-10-14-SC.</p>
         <div class="field-row">
             <div class="ob-field" style="flex:0 0 100px;">
                 <label>Prefix</label>
@@ -1232,8 +1138,17 @@
             </div>
 
         </div>
-        <!-- Client fields (principals don't need org/position) -->
-        <div id="client-fields" style="display:none;"></div>
+        <!-- Client fields -->
+        <div id="client-fields" style="display:none;">
+            <div class="ob-field">
+                <label>Organization (if applicable)</label>
+                <input type="text" id="ob-org" placeholder="e.g. ABC Corporation">
+            </div>
+            <div class="ob-field">
+                <label>Position / Title</label>
+                <input type="text" id="ob-position" placeholder="e.g. General Manager">
+            </div>
+        </div>
         <div id="err-profile" class="ob-error"></div>
         <div class="btn-row">
             <button class="btn-back" onclick="goToStep('role')">← Back</button>
@@ -1242,77 +1157,46 @@
     </div>
 
     <!-- STEP 3: COURSE + DISCLAIMER -->
-    <div id="step-course" class="ob-card" style="display:none;overflow-x:hidden;">
+    <div id="step-course" class="ob-card" style="display:none;">
         <h2><i data-lucide="book" class="qi"></i> Course Module</h2>
-        <p class="sub">Complete all lessons before taking your certification exam.</p>
-
-        <div class="course-module">
-            <div class="course-tabs" id="course-tabs">
-                <button class="course-tab active" data-mod="0" onclick="switchModule(0)">Introduction</button>
-                <button class="course-tab" data-mod="1" onclick="switchModule(1)">Platform Dashboards</button>
-                <button class="course-tab" data-mod="2" onclick="switchModule(2)">Core Services</button>
-                <button class="course-tab" data-mod="3" onclick="switchModule(3)">Stakeholder Roles</button>
-                <button class="course-tab" data-mod="4" onclick="switchModule(4)">Compliance</button>
-            </div>
-            <div class="course-progress-row">
-                <span id="lesson-label">Lesson 1 of 10</span>
-                <div class="course-progress-bar"><div class="course-progress-fill" id="course-progress-fill" style="width:0%"></div></div>
-            </div>
-            <div id="lesson-content" class="lesson-pane"></div>
-            <div class="lesson-nav">
-                <button class="btn-lesson-prev" id="btn-lesson-prev" onclick="lessonNav(-1)">&#8592; Previous</button>
-                <button class="btn-lesson-next" id="btn-lesson-next" onclick="lessonNav(1)">Next &#8594;</button>
-            </div>
+        <p class="sub">Read the course module before taking your certification exam.</p>
+        <div class="course-box">
+            <div style="font-size:2rem;margin-bottom:0.5rem;">📚</div>
+            <h4>Course Module: Mastering Quanby Legal</h4>
+            <p>This course covers Philippine ENP certification law including A.M. No. 24-10-14-SC, RA 8792, RA 10173, BSP Circular 944, and the 2004 Rules on Notarial Practice.</p>
+            <a href="/mastering-quanby-legal.pdf" target="_blank" class="btn-gold" style="font-size:0.9rem;padding:0.625rem 1.25rem;">
+                <i data-lucide="book-open" class="qi"></i> Download Course Module (PDF)
+            </a>
         </div>
-
-        <div class="course-complete-notice" id="course-complete-notice">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            All lessons complete &mdash; you may now proceed to the exam.
+        <div class="disclaimer-box">
+            <div class="disc-title"><i data-lucide="triangle-alert" class="qi"></i> Exam Notice</div>
+            <p style="color:var(--muted);font-size:0.875rem;margin-bottom:0.5rem;">Please read before proceeding:</p>
+            <ul>
+                <li>This exam consists of <strong>50 questions</strong> and is <strong>timed at 90 minutes</strong>.</li>
+                <li>Once started, the timer <strong>cannot be paused</strong>.</li>
+                <li>You must score <strong>70% (35 out of 50)</strong> to pass.</li>
+                <li>If you do not pass, you will be redirected to the course material.</li>
+                <li><strong>Retaking the exam requires a ₱500 GCash fee.</strong></li>
+                <li>Ensure you are ready before proceeding.</li>
+            </ul>
         </div>
-
+        <div class="check-row">
+            <label>
+                <input type="checkbox" id="course-checkbox" onchange="toggleStartBtn()">
+                <span>I have read the course module and understand the exam conditions above.</span>
+            </label>
+        </div>
         <div id="err-course" class="ob-error"></div>
-        <div class="btn-row" id="course-btn-row" style="display:none;margin-top:1rem;">
-            <button class="btn-primary" id="btn-proceed-exam" onclick="goToStep('exam')" style="width:100%;max-width:280px;margin:0 auto;"><i data-lucide="arrow-right" class="qi"></i> Proceed to Exam</button>
+        <div class="btn-row">
+            <button class="btn-back" onclick="goToStep('profile')">← Back</button>
+            <button class="btn-primary" id="btn-start-exam" disabled onclick="startExam()"><i data-lucide="graduation-cap" class="qi"></i> Start Exam</button>
         </div>
     </div>
 
-        <!-- STEP 4: EXAM -->
+    <!-- STEP 4: EXAM -->
     <div id="step-exam" style="display:none;" class="exam-wrap">
-
-        <!-- PRE-EXAM RULES SCREEN -->
-        <div id="exam-pre-screen" class="ob-card" style="max-width:680px;margin:0 auto;">
-            <h2 style="display:flex;align-items:center;gap:0.5rem;"><i data-lucide="graduation-cap" class="qi" style="color:var(--gold);"></i> ENP Certification Exam</h2>
-            <p class="sub" style="margin-bottom:1.5rem;">Please read the rules before you begin.</p>
-            <div class="disclaimer-box" style="margin-bottom:1.5rem;">
-                <div class="disc-title"><i data-lucide="triangle-alert" class="qi"></i> Exam Rules</div>
-                <p style="color:var(--muted);font-size:0.875rem;margin-bottom:0.75rem;">Read carefully before starting:</p>
-                <ul>
-                    <li>This exam consists of <strong>50 questions</strong> and is <strong>timed at 90 minutes</strong>.</li>
-                    <li>Once started, the timer <strong>cannot be paused</strong>.</li>
-                    <li>You must score <strong>70% (35 out of 50)</strong> to pass.</li>
-                    <li>If you do not pass, you will be redirected to the course material.</li>
-                    <li><strong>Retaking the exam requires a &#8369;500 GCash fee.</strong></li>
-                    <li>Ensure you are in a quiet environment and ready before proceeding.</li>
-                </ul>
-            </div>
-            <div class="check-row" style="margin-bottom:1.5rem;">
-                <label>
-                    <input type="checkbox" id="exam-ready-checkbox" onchange="toggleExamStart()">
-                    <span>I have read and understood the exam rules above and I am ready to begin.</span>
-                </label>
-            </div>
-            <div class="btn-row">
-                <button class="btn-back" onclick="goToStep('course')">&#8592; Back to Course</button>
-                <button class="btn-primary" id="btn-begin-exam" disabled onclick="beginExam()">
-                    <i data-lucide="play" class="qi"></i> Begin Exam
-                </button>
-            </div>
-        </div>
-
-        <!-- EXAM QUESTIONS (hidden until Begin is clicked) -->
-        <div id="exam-questions-wrap" style="display:none;width:100%;">
         <div class="exam-header">
-            <h2>ENP Certification Exam</h2>
+            <h2>📝 ENP Certification Exam</h2>
             <p class="sub">Answer all 50 questions. You need 70% (35/50) to pass.</p>
             <div class="answer-progress" id="answer-progress">
                 <span id="answer-count">0/50 answered</span>
@@ -1326,9 +1210,8 @@
             <button class="btn-primary" id="btn-submit-exam" onclick="submitExam()" style="max-width:280px;margin:0 auto;">
                 Submit Test
             </button>
-        </div><!-- end exam-submit-row -->
-        </div><!-- end exam-questions-wrap -->
-    </div><!-- end step-exam -->
+        </div>
+    </div>
 
     <!-- EXAM RESULT -->
     <div id="step-result" class="ob-card" style="display:none;">
@@ -1379,18 +1262,7 @@
             </button>
         </div>
     </div>
-
-    <!-- STEP: CLIENT DONE -->
-    <div id="step-done" class="ob-card" style="display:none;text-align:center;margin:0 auto;">
-        <div style="font-size:3.5rem;margin-bottom:1rem;">🎉</div>
-        <h2 style="margin-bottom:0.5rem;">You're all set!</h2>
-        <p class="sub" style="margin-bottom:2rem;">Your profile is complete. You can now book a notarization session with an ENP.</p>
-        <button class="btn-primary" onclick="completeOnboarding()" style="max-width:280px;margin:0 auto;">
-            Go to Dashboard →
-        </button>
-    </div>
-
-</div><!-- end page-wrap -->
+</div>
 
 <!-- RETAKE PAYMENT MODAL -->
 <div class="modal-overlay" id="retake-modal">
@@ -1449,21 +1321,13 @@ let _certificateId = null;
 let _currentPage = 0;
 const QUESTIONS_PER_PAGE = 10;
 
-// Steps are role-dependent: attorneys go through full flow, clients just role+profile+done
-const ENP_STEPS  = ['role','profile','course','exam','certificate','sc'];
-const ENP_LABELS = ['Role','Profile','Course','Exam','Certificate','SC Submit'];
-const CLIENT_STEPS  = ['role','profile','done'];
-const CLIENT_LABELS = ['Role','Profile','Done'];
-let OB_STEPS  = ENP_STEPS;
-let OB_LABELS = ENP_LABELS;
+const OB_STEPS = ['role','profile','course','exam','certificate','sc'];
+const OB_LABELS = ['Role','Profile','Course','Exam','Certificate','SC Submit'];
 
 // ═══════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════
 async function init() {
-    // Show loading screen at start
-    var _ls = document.getElementById('loading-screen');
-    if (_ls) _ls.style.display = 'block';
     try {
         let res = await fetch('/api/auth/me', { credentials: 'include' });
         if (res.status === 401) {
@@ -1533,20 +1397,7 @@ async function init() {
         _role = _user.role || 'attorney';
         const step = mapApiStepToLocal(_user.onboarding_step || 'role_select');
         showProgress();
-        if (step === 'certificate') {
-            // Go direct — skip goToStep routing to avoid patched wrapper interference
-            const certId = _user.certificate_id || '';
-            goToDownloadCert(certId);
-        } else if (step === 'certified') {
-            showScreen('certified-screen');
-        } else {
-            // Clients should never see course/exam steps ? guard for existing users stuck at "test"
-            if (_role === "client" && (step === "course" || step === "exam")) {
-                goToStep("done");
-            } else {
-                goToStep(step);
-            }
-        }
+        goToStep(step);
 
     } catch(e) {
         console.error('init error:', e);
@@ -1585,7 +1436,7 @@ function showProgress() {
 
 function showScreen(id) {
     document.getElementById('loading-screen').style.display = 'none';
-    const screens = ['auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc','step-done'];
+    const screens = ['auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc'];
     screens.forEach(s => {
         const el = document.getElementById(s);
         if (el) el.style.display = 'none';
@@ -1597,7 +1448,7 @@ function showScreen(id) {
 function goToStep(step) {
     _currentStep = step;
     updateProgress(step);
-    var _screens = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc','step-done'];
+    var _screens = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc'];
     _screens.forEach(function(id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
 
     const stepMap = {
@@ -1607,8 +1458,7 @@ function goToStep(step) {
         'exam':        'step-exam',
         'result':      'step-result',
         'certificate': 'step-certificate',
-        'sc':          'step-sc',
-        'done':        'step-done'
+        'sc':          'step-sc'
     };
     const target = stepMap[step];
     if (target) {
@@ -1633,15 +1483,6 @@ function goToStep(step) {
     // Hide timer if not on exam
     if (step !== 'exam') {
         document.getElementById('timer-banner').style.display = 'none';
-    } else {
-        var _pre = document.getElementById('exam-pre-screen');
-        var _qw = document.getElementById('exam-questions-wrap');
-        var _ec = document.getElementById('exam-ready-checkbox');
-        var _eb = document.getElementById('btn-begin-exam');
-        if (_pre) _pre.style.display = '';
-        if (_qw) _qw.style.display = 'none';
-        if (_ec) _ec.checked = false;
-        if (_eb) _eb.disabled = true;
     }
 
     // Scroll to top
@@ -1668,47 +1509,17 @@ function selectRole(role) {
     _role = role;
     document.getElementById('role-attorney').classList.toggle('selected', role === 'attorney');
     document.getElementById('role-client').classList.toggle('selected', role === 'client');
-    // Update page header immediately on role selection
-    updatePageHeader(role);
     submitRole();
-}
-
-function updatePageHeader(role) {
-    const isAttorney = role === 'attorney';
-    const hdrTitle = document.getElementById('page-header-title');
-    const hdrSub   = document.getElementById('page-header-sub');
-    if (hdrTitle) hdrTitle.textContent = isAttorney ? '⚖️ ENP Certification' : '👤 Complete Your Account';
-    if (hdrSub)   hdrSub.textContent   = isAttorney
-        ? 'Electronic Notary Public Certification under A.M. No. 24-10-14-SC'
-        : 'Set up your profile to start booking notarization sessions.';
 }
 
 async function submitRole() {
     document.getElementById("err-role").textContent = "";
     try {
-        let res = await fetch("/api/onboarding/role", {
+        const res = await fetch("/api/onboarding/role", {
             method: "POST", credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ role: _role })
         });
-        // Auto-refresh token on 401 and retry once
-        if (res.status === 401) {
-            try {
-                const ref = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
-                if (ref.ok) {
-                    res = await fetch("/api/onboarding/role", {
-                        method: "POST", credentials: "include",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ role: _role })
-                    });
-                } else {
-                    // Refresh failed — session truly expired, redirect to sign in
-                    sessionStorage.setItem('post_login_redirect', '/onboard');
-                    window.location.href = '/';
-                    return;
-                }
-            } catch(e) {}
-        }
         if (!res.ok) throw new Error((await res.json()).detail || "Failed");
         goToStep("profile");
     } catch(e) {
@@ -1723,20 +1534,6 @@ function toggleProfileFields() {
     const isAttorney = _role === 'attorney';
     document.getElementById('attorney-fields').style.display = isAttorney ? '' : 'none';
     document.getElementById('client-fields').style.display = isAttorney ? 'none' : '';
-    // Swap step definitions based on role
-    OB_STEPS  = isAttorney ? ENP_STEPS  : CLIENT_STEPS;
-    OB_LABELS = isAttorney ? ENP_LABELS : CLIENT_LABELS;
-    // Update page header via shared helper
-    updatePageHeader(_role);
-    // Update profile step card title/subtitle
-    const titleEl = document.getElementById('profile-step-title');
-    const subEl   = document.getElementById('profile-step-sub');
-    if (titleEl) titleEl.textContent = 'Complete Your Profile';
-    if (subEl) subEl.textContent = isAttorney
-        ? 'Required for ENP certification under A.M. No. 24-10-14-SC.'
-        : 'Tell us a little about yourself to get started.';
-    // Re-render progress bar for current step
-    updateProgress(_currentStep);
 }
 
 /* ── Custom Date Picker Engine ─────────────────────────── */
@@ -1897,14 +1694,6 @@ async function submitProfile() {
     const middleInit   = (document.getElementById('ob-middle-initial')|| {}).value?.trim() || '';
     const suffix       = (document.getElementById('ob-suffix')        || {}).value?.trim() || '';
     const lastName  = (document.getElementById('ob-last-name')  || {}).value?.trim() || '';
-    // Build full phone value into hidden field BEFORE validation reads it
-    const _pNum = (document.getElementById('ob-phone-number') || {}).value?.trim() || '';
-    const _pCode = document.getElementById('phone-code') ? document.getElementById('phone-code').textContent.trim() : '+63';
-    if (_pNum) {
-        const _clean = _pNum.replace(/[\s\-().]/g, '');
-        const _phEl = document.getElementById('ob-phone');
-        if (_phEl) _phEl.value = _pCode + _clean;
-    }
     const phone     = (document.getElementById('ob-phone')      || {}).value?.trim() || '';
     const rollNo          = (document.getElementById('ob-roll-no')           || {}).value?.trim() || '';
     const rollDate        = (document.getElementById('ob-roll-date')          || {}).value?.trim() || '';
@@ -1936,14 +1725,18 @@ async function submitProfile() {
     }
     _req(firstName, 'err-first-name', 'ob-first-name', 'First name is required.');
     _req(lastName,  'err-last-name',  'ob-last-name',  'Last name is required.');
-    // Validate phone (value already set above)
-    if (!_pNum) {
+    // Build full phone from country code + number input
+    const phoneNum = (document.getElementById('ob-phone-number') || {}).value?.trim() || '';
+    const phoneCode = document.getElementById('phone-code')?.textContent || '+63';
+    if (phoneNum) {
+        const clean = phoneNum.replace(/[\s\-().]/g, '');
+        document.getElementById('ob-phone').value = phoneCode + clean;
+    }
+    if (!phoneNum) {
         _fieldErr('err-phone', 'Phone number is required.');
-        const _wrap = document.getElementById('phone-input-wrap');
-        if (_wrap) _wrap.classList.add('invalid-phone'); hasError = true;
+        document.getElementById('phone-input-wrap')?.classList.add('invalid-phone'); hasError = true;
     } else {
-        const _wrap = document.getElementById('phone-input-wrap');
-        if (_wrap) _wrap.classList.remove('invalid-phone');
+        document.getElementById('phone-input-wrap')?.classList.remove('invalid-phone');
         _fieldErr('err-phone', '');
     }
     if (_role === 'attorney') {
@@ -1998,39 +1791,26 @@ async function submitProfile() {
         position:     (document.getElementById('ob-position') || {}).value?.trim() || '',
     };
     try {
-        // Refresh token before submit (with 401 auto-retry)
-        try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-        var res = await fetch('/api/onboarding/profile', {
+        const res = await fetch('/api/onboarding/profile', {
             method: 'POST', credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        // Auto-retry once on 401 (token may have just expired)
-        if (res.status === 401) {
-            await new Promise(function(r){ setTimeout(r, 400); });
-            try { await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' }); } catch(e) {}
-            res = await fetch('/api/onboarding/profile', {
-                method: 'POST', credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-        }
         if (!res.ok) {
             let msg = 'Failed to save profile. Please try again.';
-            if (res.status === 401) msg = 'Session expired. Please sign out and sign back in, then retry.';
             try {
                 const errData = await res.json();
                 const detail = errData.detail;
-                if (typeof detail === 'string' && res.status !== 401) msg = detail;
+                if (typeof detail === 'string') msg = detail;
                 else if (Array.isArray(detail)) msg = detail.map(function(e) { return e.msg || e.message || JSON.stringify(e); }).join('; ');
-                else if (detail && res.status !== 401) msg = JSON.stringify(detail);
+                else if (detail) msg = JSON.stringify(detail);
             } catch(jsonErr) {
-                if (res.status !== 401) msg = 'Server error (' + res.status + '). Please try again.';
+                // Server returned non-JSON (e.g. 500 HTML error page)
+                msg = 'Server error (' + res.status + '). Please try again.';
             }
             throw new Error(msg);
         }
-        // Attorneys go to course; clients go straight to done
-        goToStep(_role === 'attorney' ? 'course' : 'done');
+        goToStep('course');
     } catch(e) {
         document.getElementById('err-profile').textContent = e.message;
     } finally {
@@ -2042,24 +1822,18 @@ async function submitProfile() {
 // ═══════════════════════════════════════════════
 // STEP 3: COURSE / DISCLAIMER
 // ═══════════════════════════════════════════════
-function toggleStartBtn() { /* no-op - proceed button controlled by course completion */ }
-function toggleExamStart() {
-    const cb = document.getElementById('exam-ready-checkbox');
-    const btn = document.getElementById('btn-begin-exam');
-    if (btn) btn.disabled = !cb.checked;
-}
-function beginExam() {
-    const pre = document.getElementById('exam-pre-screen');
-    const qw = document.getElementById('exam-questions-wrap');
-    if (pre) pre.style.display = 'none';
-    if (qw) qw.style.display = 'block';
-    startExam();
+function toggleStartBtn() {
+    const cb = document.getElementById('course-checkbox');
+    const btn = document.getElementById('btn-start-exam');
+    btn.disabled = !cb.checked;
+    btn.style.opacity = cb.checked ? '1' : '0.45';
 }
 
 // ═══════════════════════════════════════════════
 // STEP 4: EXAM
 // ═══════════════════════════════════════════════
 async function startExam() {
+    goToStep('exam');
     document.getElementById('exam-questions').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);"><div class="big-spinner" style="width:36px;height:36px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;"></div>Loading your 50-question exam…</div>';
     document.getElementById('page-nav').innerHTML = '';
     try {
@@ -2070,20 +1844,6 @@ async function startExam() {
         _answers = {};
         _testSessionId = data.test_session_id;
         _currentPage = 0;
-        // Persist session ID so page refresh can resume
-        try { localStorage.setItem('ql_test_session_id', _testSessionId); } catch(e) {}
-
-        // DEV MODE: ?dev=true auto-selects option B for every question
-        const _devMode = new URLSearchParams(window.location.search).get('dev') === 'true';
-        if (_devMode) {
-            _questions.forEach(function(q) {
-                if (q.choices && q.choices.length > 1) {
-                    _answers[q.id] = 'B'; // option B
-                }
-            });
-            console.log('[DEV] Auto-filled', Object.keys(_answers).length, 'answers with option B');
-        }
-
         renderExamPage(0);
         startTimer(data.time_limit_minutes || 90);
         document.getElementById('timer-banner').style.display = 'block';
@@ -2116,7 +1876,7 @@ function renderExamPage(page) {
         `<div class="ob-question" id="q-${q.id}">
             <p>${start + i + 1}. ${q.question}</p>
             ${q.choices.map(c =>
-                `<div class="ob-choice ${(function(){ var q2 = _questions.find(function(x){return x.id===q.id;}); var idx2 = q2 ? q2.choices.indexOf(c) : -1; return _answers[q.id] === String.fromCharCode(65+idx2) ? 'selected' : ''; })()}" onclick="pickAnswer('${q.id}', this)">${c}</div>`
+                `<div class="ob-choice ${_answers[q.id] === c ? 'selected' : ''}" onclick="pickAnswer('${q.id}', this)">${c}</div>`
             ).join('')}
         </div>`
     ).join('');
@@ -2147,14 +1907,7 @@ function updateAnswerProgress() {
 
 function pickAnswer(qid, el) {
     const text = el.textContent;
-    // Store the letter (A/B/C/D) based on choice index
-    var q = _questions.find(function(q){ return q.id === qid; });
-    if (q) {
-        var idx = q.choices.indexOf(text);
-        _answers[qid] = idx >= 0 ? String.fromCharCode(65 + idx) : text;
-    } else {
-        _answers[qid] = text;
-    }
+    _answers[qid] = text;
     const block = document.getElementById('q-' + qid);
     if (block) block.querySelectorAll('.ob-choice').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
@@ -2217,20 +1970,12 @@ async function submitExam() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ answers: _answers, test_session_id: _testSessionId })
         });
-        let data;
-        try { data = await res.json(); } catch(jsonErr) { throw new Error('Server error — could not parse response.'); }
-        if (!res.ok) {
-            const msg = (data && (typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail))) || 'Submission failed.';
-            throw new Error(msg);
-        }
-        if (data.passed === undefined && data.success === undefined) {
-            throw new Error('Invalid response from server. Please try again.');
-        }
+        const data = await res.json();
         renderResult(data);
     } catch(e) {
         btn.disabled = false;
         btn.textContent = 'Submit Test';
-        document.getElementById('err-exam').textContent = e.message || 'Submission failed. Please try again.';
+        document.getElementById('err-exam').textContent = 'Submission failed. Please try again.';
     }
 }
 
@@ -2238,82 +1983,51 @@ async function submitExam() {
 // EXAM RESULT
 // ═══════════════════════════════════════════════
 function renderResult(data) {
-    if (!data || data.passed === undefined) {
-        document.getElementById('err-exam').textContent = 'Could not load results. Please refresh and try again.';
-        return;
-    }
     if (data.certificate_id) _certificateId = data.certificate_id;
-    var passed = data.passed;
-    var correct = data.correct !== undefined ? data.correct : 0;
-    var total = data.total || 50;
-    var scorePct = data.score_pct !== undefined ? Math.round(data.score_pct) : Math.round(correct / total * 100);
-    var certId = data.certificate_id || '';
+    const passed = data.passed;
+    const score = data.score !== undefined ? data.score : data.correct;
+    const total = data.total;
+    const scorePct = data.score_pct || Math.round(score / total * 100);
 
-    _clearProgress();
-    try { localStorage.removeItem("ql_test_session_id"); } catch(e) {}
+    goToStep('result');
 
-    // Show result directly
-    var allS = ['loading-screen','auth-gate','certified-screen','step-role','step-profile','step-course','step-exam','step-result','step-certificate','step-sc','step-done'];
-    allS.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
-    var re = document.getElementById('step-result');
-    if (re) re.style.display = '';
-    var pw = document.getElementById('progress-wrap');
-    if (pw) pw.style.display = 'block';
-    var wrap = document.getElementById('page-wrap') || document.querySelector('.page-wrap');
-    if (wrap) wrap.style.display = 'flex';
-    try { updateProgress('exam'); } catch(e) {}
-    window.scrollTo({top:0, behavior:'smooth'});
-
-    var bannerEl = document.getElementById('result-banner');
-    var contentEl = document.getElementById('result-content');
+    const bannerEl = document.getElementById('result-banner');
+    const contentEl = document.getElementById('result-content');
 
     if (passed) {
-        bannerEl.innerHTML = '<div class="result-banner pass">Passed! ' + correct + ' / ' + total + ' correct (' + scorePct + '%)</div>';
-        var html = '<p style="color:var(--muted);margin-bottom:1.5rem;text-align:center;">Congratulations! Your ENP certificate is ready to download.</p>';
-        html += '<div style="text-align:center;">';
-        html += '<button class="btn-primary" onclick="goToDownloadCert(\'' + certId + '\')" style="max-width:280px;margin:0 auto;display:inline-flex;align-items:center;gap:0.5rem;justify-content:center;">Download Certificate</button>';
-        html += '</div>';
-        contentEl.innerHTML = html;
+        bannerEl.innerHTML = `<div class="result-banner pass">🎉 Passed! — ${score}/${total} correct (${scorePct}%)</div>`;
+        contentEl.innerHTML = `
+            <p style="color:var(--muted);margin-bottom:1.5rem;">Congratulations! Your certificate is ready to download.</p>
+            <div style="text-align:center;">
+                <button class="btn-primary" onclick="goToDownloadCert('${data.certificate_id || ''}')" style="max-width:280px;margin:0 auto;">
+                    🎓 Proceed to Download Certificate →
+                </button>
+            </div>`;
     } else {
-        bannerEl.innerHTML = '<div class="result-banner fail">Not Passed &mdash; ' + correct + ' / ' + total + ' correct (' + scorePct + '%)</div>';
-        var html2 = '<p style="color:var(--muted);margin-bottom:1rem;text-align:center;">You need 70% (35/50) to pass. Review the course material and try again.</p>';
-        html2 += '<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:0.5rem;padding:1rem;margin-bottom:1.5rem;font-size:0.875rem;color:var(--muted);text-align:center;">A fail notification has been sent to your registered email.</div>';
-        html2 += '<div style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;">';
-        html2 += '<a href="/mastering-quanby-legal.pdf" target="_blank" class="btn-gold" style="text-align:center;width:100%;max-width:300px;">Review Course Material</a>';
-        html2 += '<button class="btn-primary" onclick="goToStep(\'course\')" style="max-width:300px;">Go to Course</button>';
-        html2 += '</div>';
-        contentEl.innerHTML = html2;
+        bannerEl.innerHTML = `<div class="result-banner fail">❌ Not Passed — ${score}/${total} correct (${scorePct}%)</div>`;
+        contentEl.innerHTML = `
+            <p style="color:var(--muted);margin-bottom:1rem;">You need 70% (35/50) to pass. Review the course material and try again.</p>
+            <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:0.5rem;padding:1rem;margin-bottom:1.5rem;font-size:0.875rem;color:var(--muted);">
+                📧 A notification has been sent to your registered email with retake instructions.
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;">
+                <a href="/mastering-quanby-legal.pdf" target="_blank" class="btn-gold" style="text-align:center;width:100%;max-width:300px;">
+                    📖 Review Course Material
+                </a>
+                <button class="btn-primary" onclick="openRetakeModal()" style="max-width:300px;">
+                    🔄 Retake Exam (₱500 fee)
+                </button>
+            </div>`;
     }
 }
 
-function _populateCertUI(certId) {
-    if (certId) _certificateId = certId;
-    var certIdEl = document.getElementById('cert-id-display');
-    var dlLink = document.getElementById('cert-download-link');
-    if (certIdEl) certIdEl.textContent = _certificateId || '';
-    if (dlLink) dlLink.href = '/api/certificate/' + (_certificateId || '');
-}
 function goToDownloadCert(certId) {
     if (certId) _certificateId = certId;
-    // Hide all other screens and show certificate step directly
-    var allScreens = ['loading-screen','auth-gate','certified-screen','step-role','step-profile',
-        'step-course','step-exam','step-result','step-sc','step-done'];
-    allScreens.forEach(function(id){ var el=document.getElementById(id); if(el) el.style.display='none'; });
-    var certEl = document.getElementById('step-certificate');
-    if (certEl) certEl.style.display = 'block';
-    var pw = document.getElementById('progress-wrap');
-    if (pw) pw.style.display = 'block';
-    var wrap = document.getElementById('page-wrap') || document.querySelector('.page-wrap');
-    if (wrap) wrap.style.display = 'flex';
-    try { updateProgress('certificate'); } catch(e) {}
-    _populateCertUI(certId);
-    window.scrollTo({top:0, behavior:'smooth'});
-    // Safeguard: re-show in case something hides it afterward
-    setTimeout(function() {
-        var el = document.getElementById('step-certificate');
-        if (el) el.style.display = 'block';
-        _populateCertUI(_certificateId);
-    }, 400);
+    const certIdEl = document.getElementById('cert-id-display');
+    const dlLink = document.getElementById('cert-download-link');
+    if (certIdEl) certIdEl.textContent = _certificateId || '';
+    if (dlLink) dlLink.href = '/api/certificate/' + (_certificateId || '');
+    goToStep('certificate');
 }
 
 // ═══════════════════════════════════════════════
@@ -2321,19 +2035,11 @@ function goToDownloadCert(certId) {
 // ═══════════════════════════════════════════════
 // Called on page load if user already has certificate step
 async function loadCertStep() {
-    var certId = (_user && _user.certificate_id) ? _user.certificate_id : _certificateId;
-    if (certId) {
-        goToDownloadCert(certId);
+    // Try to get cert ID from user object or API
+    if (_user && _user.certificate_id) {
+        goToDownloadCert(_user.certificate_id);
     } else {
-        // Try fetching from API in case _user not loaded yet
-        try {
-            var res = await fetch('/api/auth/me', { credentials: 'include' });
-            if (res.ok) {
-                var u = await res.json();
-                if (u.certificate_id) { goToDownloadCert(u.certificate_id); return; }
-            }
-        } catch(e) {}
-        goToDownloadCert('');
+        goToStep('certificate');
     }
 }
 
@@ -2410,7 +2116,7 @@ async function submitRetakePayment() {
 // ═══════════════════════════════════════════════
 async function completeOnboarding() {
     try { await fetch('/api/onboarding/complete', { method: 'POST', credentials: 'include' }); } catch(e) {}
-    window.location.href = '/dashboard';
+    window.location.href = '/';
 }
 
 // ═══════════════════════════════════════════════
@@ -2481,14 +2187,8 @@ async function signInWithGoogle() {
 // START
 // ═══════════════════════════════════════════════
 window.onerror = function(msg, src, line, col, err) {
-    // Ignore third-party script errors (Cloudflare beacon, etc.)
-    if (src && (src.indexOf('cloudflareinsights') >= 0 || src.indexOf('beacon.min') >= 0)) return true;
     var ls = document.getElementById('loading-screen');
-    if (ls && ls.style.display !== 'none') {
-        ls.style.display = 'block';
-        ls.innerHTML = '<div style="color:#f87171;padding:2rem;text-align:center;"><h3>Page Error</h3><p style="font-size:0.85rem;margin-top:0.5rem;">' + msg + '<br>Line ' + line + '</p><a href="/" style="color:#c9a84c;margin-top:1rem;display:inline-block;">← Back to Home</a></div>';
-    }
-    return true;
+    if (ls) ls.innerHTML = '<div style="color:#f87171;padding:2rem;text-align:center;"><h3>Page Error</h3><p style="font-size:0.85rem;margin-top:0.5rem;">' + msg + '<br>Line ' + line + '</p><a href="/" style="color:#c9a84c;margin-top:1rem;display:inline-block;">← Back to Home</a></div>';
 };
 
 if (document.readyState === 'loading') {
@@ -2509,196 +2209,6 @@ setTimeout(function() {
         '</div>';
     }
 }, 6000);
-// === INLINE COURSE MODULE ===
-var COURSE_MODULES = [
-    {
-        title: 'Introduction',
-        lessons: [
-            {
-                title: 'Lesson 1.1 \u2014 What is Quanby Legal?',
-                html: '<h3>What is Quanby Legal?</h3><p>Quanby Legal is a comprehensive digital platform designed to modernize the traditional notarization process. By creating a secure, digital bridge between Principals (clients) and Electronic Notary Publics (ENPs), we enable legal services to be delivered efficiently, regardless of physical location.</p><p style="margin-top:0.75rem;">This is not just a website \u2014 we facilitate legally binding acts requiring strict security, compliance, and seamless user experience.</p>'
-            },
-            {
-                title: 'Lesson 1.2 \u2014 Key Terminology',
-                html: '<h3>Key Terminology</h3><p>Familiarize yourself with the core terms used throughout the platform:</p><div class="key-term-card"><strong>Principal</strong><br><em>Individual or entity seeking legal services. Initiates bookings, uploads documents, and performs electronic signatures.</em></div><div class="key-term-card"><strong>ENP / Electronic Notary Public</strong><br><em>Commissioned legal professional authorized to perform notarial acts electronically. Verifies identities and applies the official digital seal.</em></div><div class="key-term-card"><strong>REN / Remote Electronic Notarization</strong><br><em>Notarization conducted via secure video call, with each party joining from their own location.</em></div><div class="key-term-card"><strong>Face Verification</strong><br><em>Mandatory AI-driven security checkpoint using a live selfie. Images are verified but NOT stored.</em></div><div class="key-term-card"><strong>Notarial Registry</strong><br><em>Secure digital record-keeping system maintained by the ENP \u2014 a compliant log of all notarial acts performed.</em></div>'
-            },
-            {
-                title: 'Lesson 1.3 \u2014 Course Objectives',
-                html: '<h3>Course Objectives</h3><p>By completing this course, you will be able to:</p><ol><li>Understand the dual roles: <strong>Principal</strong> and <strong>ENP</strong>, each with customized dashboards.</li><li>Recognize the importance of security: identity checks and face verification are <strong>mandatory</strong>.</li><li>Learn flexible notarization options: <strong>Remote Online Notarization</strong> and <strong>In-Person appointments</strong>.</li><li>Familiarize with key terminology: Principal, ENP, REN, Face Verification, and Notarial Registry.</li></ol>'
-            }
-        ]
-    },
-    {
-        title: 'Platform Dashboards',
-        lessons: [
-            {
-                title: 'Lesson 2.1 \u2014 Principal Dashboard',
-                html: '<h3>Principal Dashboard</h3><p>The Principal Dashboard is the central command center for clients. It provides a complete overview of your notarization activity.</p><ul><li>Total appointments overview and pending confirmations</li><li>Quick Actions: <strong>Book Consultation</strong> (remote advice) or <strong>Book a Notary</strong> (in-person)</li><li>Signing sessions tracking</li></ul><div class="key-term-card"><strong>Book a Notary Flow</strong><br><em>Select mode (Remote / In-Person) \u2192 Select date and time \u2192 Confirm booking</em></div><p style="margin-top:0.75rem;">Your <strong>Ongoing Sessions</strong> panel shows a gray <em>\u201cWait\u201d</em> button until the ENP starts the meeting. Once started, it turns into a green <strong>\u201cLive\u201d</strong> badge with a Join button.</p>'
-            },
-            {
-                title: 'Lesson 2.2 \u2014 ENP Dashboard',
-                html: '<h3>ENP Dashboard</h3><p>The ENP Dashboard gives legal professionals complete control over their digital notarial practice.</p><ul><li>Manage incoming appointment requests</li><li>Track your schedule and calendar</li><li>Maintain your digital <strong>Notarial Registry</strong></li><li>Manage practice settings and preferences</li></ul><div class="key-term-card"><strong>Mandatory Face Verification</strong><br><em>Before any session begins, all participants \u2014 including the ENP \u2014 must complete biometric face verification to ensure legal validity.</em></div>'
-            }
-        ]
-    },
-    {
-        title: 'Core Services',
-        lessons: [
-            {
-                title: 'Lesson 3.1 \u2014 Remote vs In-Person Notarization',
-                html: '<h3>Remote vs. In-Person Notarization</h3><div class="key-term-card"><strong>Remote Electronic Notarization (REN)</strong><br><em>Entire process is conducted online. A secure video link is sent after booking. Documents are uploaded digitally, identity is verified through digital means, and signing is handled electronically. Requires stable internet and technology familiarity.</em></div><div class="key-term-card"><strong>In-Person Electronic Notarization (IEN)</strong><br><em>Booking is made at a physical location. The Principal brings physical documents and a valid ID to the site. The ENP verifies identity in person, witnesses the signing, and applies the digital seal. Requires coordination and travel.</em></div>'
-            },
-            {
-                title: 'Lesson 3.2 \u2014 Live Session & Identity Verification',
-                html: '<h3>Live Session &amp; Identity Verification</h3><p>All participants must pass mandatory biometric <strong>Face Verification</strong> before entering the virtual notarial room.</p><ol><li>Confirm your booking</li><li>Wait for the ENP to start the session</li><li>Green <strong>\u201cLive\u201d</strong> badge appears on your dashboard</li><li>Click <strong>Join</strong></li><li>Complete <strong>Face Verification</strong> (live selfie, AI-verified, not stored)</li><li>Enter the virtual notarial room</li></ol><div class="key-term-card"><strong>For In-Person Sessions</strong><br><em>Bring your physical documents and a valid government-issued ID to the notary\u2019s location.</em></div>'
-            }
-        ]
-    },
-    {
-        title: 'Stakeholder Roles',
-        lessons: [
-            {
-                title: 'Lesson 4.1 \u2014 Principal, ENP, and Witness',
-                html: '<h3>Stakeholder Roles</h3><div class="key-term-card"><strong>Principal</strong><br><em>Individual or entity seeking legal services. Responsible for initiating the booking, uploading necessary documentation, and performing the electronic signature.</em></div><div class="key-term-card"><strong>ENP \u2014 Electronic Notary Public</strong><br><em>Commissioned legal professional authorized to perform notarial acts electronically. Verifies identities, conducts sessions, and applies the official digital seal to complete the act.</em></div><div class="key-term-card"><strong>Witness</strong><br><em>Present during the session (remote or in-person). Identity must be verified before participating. Witnesses the signing act and may be required for certain document types.</em></div>'
-            }
-        ]
-    },
-    {
-        title: 'Compliance',
-        lessons: [
-            {
-                title: 'Lesson 5.1 \u2014 Legal Framework',
-                html: '<h3>Legal Framework</h3><p>Quanby Legal operates within a robust Philippine legal and regulatory framework:</p><div class="key-term-card"><strong>A.M. No. 24-10-14-SC</strong><br><em>Supreme Court Rules on Electronic Notarization in the Philippines \u2014 the primary legal basis for ENP certification and all electronic notarial acts performed on the platform.</em></div><div class="key-term-card"><strong>RA 8792 \u2014 E-Commerce Act</strong><br><em>Provides legal recognition of electronic documents and electronic signatures in the Philippines.</em></div><div class="key-term-card"><strong>RA 10173 \u2014 Data Privacy Act</strong><br><em>Governs how personal data collected during notarization must be handled and protected.</em></div><div class="key-term-card"><strong>BSP Circular 944</strong><br><em>eKYC compliance framework for digital identity verification \u2014 governs our Face Verification process.</em></div>'
-            },
-            {
-                title: 'Lesson 5.2 \u2014 Security Protocols',
-                html: '<h3>Security Protocols</h3><div class="key-term-card"><strong>Face Verification</strong><br><em>AI-driven, live selfie capture. Images are verified but NOT stored. Mandatory for all session participants before entering the virtual room.</em></div><div class="key-term-card"><strong>Notarial Registry</strong><br><em>Secure, compliant log of all notarial acts performed on the platform. Includes session details and participant information. Maintained by the ENP.</em></div><div class="key-term-card"><strong>Digital Seal</strong><br><em>The ENP applies an official digital seal to complete and authenticate each notarial act \u2014 creating a tamper-evident, legally binding document.</em></div><div class="key-term-card"><strong>Audit Trail</strong><br><em>Every action on the platform is logged for compliance purposes. This ensures full accountability and legal traceability.</em></div>'
-            }
-        ]
-    }
-];
-
-var ALL_LESSONS = [];
-COURSE_MODULES.forEach(function(mod, mi) {
-    mod.lessons.forEach(function(lesson, li) {
-        ALL_LESSONS.push({ modIdx: mi, lessonIdx: li, title: lesson.title, html: lesson.html });
-    });
-});
-var TOTAL_LESSONS = ALL_LESSONS.length;
-var currentLesson = 0;
-
-// Persist course progress across page reloads
-var _QL_PROGRESS_KEY = 'ql_course_progress_v1';
-function _saveProgress() {
-    try { localStorage.setItem(_QL_PROGRESS_KEY, JSON.stringify({ viewedLessons: viewedLessons, currentLesson: currentLesson })); } catch(e) {}
-}
-function _loadProgress() {
-    try {
-        var saved = JSON.parse(localStorage.getItem(_QL_PROGRESS_KEY) || 'null');
-        if (saved && saved.viewedLessons) {
-            viewedLessons = saved.viewedLessons;
-            viewedCount = Object.keys(viewedLessons).filter(function(k){ return viewedLessons[k]; }).length;
-            if (saved.currentLesson !== undefined) currentLesson = Math.min(saved.currentLesson, TOTAL_LESSONS - 1);
-        }
-    } catch(e) {}
-}
-function _clearProgress() {
-    try { localStorage.removeItem(_QL_PROGRESS_KEY); } catch(e) {}
-}
-var viewedLessons = {};
-var viewedCount = 0;
-_loadProgress();
-
-function switchModule(modIdx) {
-    var idx = -1;
-    for (var i = 0; i < ALL_LESSONS.length; i++) {
-        if (ALL_LESSONS[i].modIdx === modIdx) { idx = i; break; }
-    }
-    if (idx >= 0) { currentLesson = idx; renderLesson(); }
-}
-
-function renderLesson() {
-    var lesson = ALL_LESSONS[currentLesson];
-    document.querySelectorAll('.course-tab').forEach(function(tab) {
-        var mi = parseInt(tab.dataset.mod);
-        tab.classList.remove('active', 'done');
-        if (mi === lesson.modIdx) {
-            tab.classList.add('active');
-        } else {
-            var modLessons = ALL_LESSONS.filter(function(l){ return l.modIdx === mi; });
-            var allSeen = modLessons.every(function(l){ return viewedLessons[ALL_LESSONS.indexOf(l)]; });
-            if (allSeen) tab.classList.add('done');
-        }
-    });
-    document.getElementById('lesson-content').innerHTML = lesson.html;
-    if (!viewedLessons[currentLesson]) {
-        viewedLessons[currentLesson] = true;
-        viewedCount++;
-        _saveProgress();
-    }
-    var pct = Math.round((viewedCount / TOTAL_LESSONS) * 100);
-    document.getElementById('course-progress-fill').style.width = pct + '%';
-    document.getElementById('lesson-label').textContent = 'Lesson ' + (currentLesson + 1) + ' of ' + TOTAL_LESSONS;
-    document.getElementById('btn-lesson-prev').disabled = (currentLesson === 0);
-    var isLast = (currentLesson === TOTAL_LESSONS - 1);
-    var nextBtn = document.getElementById('btn-lesson-next');
-    nextBtn.disabled = isLast;
-    nextBtn.textContent = isLast ? '\u2713 All Done' : 'Next \u2192';
-    if (isLast) {
-        nextBtn.onclick = function() {
-            var _br = document.getElementById('course-btn-row');
-            if (_br) { _br.style.display = 'flex'; _br.scrollIntoView({behavior:'smooth',block:'center'}); }
-            document.getElementById('course-complete-notice').classList.add('visible');
-        };
-    } else {
-        nextBtn.onclick = function() { lessonNav(1); };
-    }
-    try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch(e) {}
-    if (viewedCount >= TOTAL_LESSONS) {
-        document.getElementById('course-complete-notice').classList.add('visible');
-        // Show the Proceed to Exam button row
-        var _br = document.getElementById('course-btn-row');
-        if (_br) _br.style.display = 'flex';
-    }
-}
-
-function lessonNav(dir) {
-    var next = currentLesson + dir;
-    if (next < 0 || next >= TOTAL_LESSONS) return;
-    currentLesson = next;
-    renderLesson();
-}
-
-(function patchGoToStep() {
-    if (typeof goToStep === 'function') {
-        var _orig = goToStep;
-        window.goToStep = function(step) {
-            _orig(step);
-            if (step === 'course') {
-                setTimeout(function(){
-                    renderLesson();
-                    // Restore completed state if progress was saved
-                    if (viewedCount >= TOTAL_LESSONS) {
-                        document.getElementById('course-complete-notice').classList.add('visible');
-                        var _br = document.getElementById('course-btn-row');
-                        if (_br) _br.style.display = 'flex';
-                    }
-                }, 50);
-            }
-        };
-    }
-})();
-
-// On page load: if user is at 'test' step and has completed the course, show Proceed button
-// Also: if they have an active test session stored, go straight to exam
-document.addEventListener('DOMContentLoaded', function() {
-    // Check localStorage for an active test session ID
-    var savedSessionId = null;
-    try { savedSessionId = localStorage.getItem('ql_test_session_id'); } catch(e) {}
-    // We expose this for use in startExam to restore the session
-    if (savedSessionId) { window._savedTestSessionId = savedSessionId; }
-});
-
 </script>
     <script>try { if(typeof lucide!=="undefined") lucide.createIcons(); } catch(e) { console.warn("Lucide icons error:", e); }</script>
 </body>

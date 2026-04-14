@@ -45,8 +45,10 @@ from onboarding import (
     save_test_session, get_test_session,
     generate_certificate_id, get_certificate_html, get_certificate_email_html,
     lookup_user_by_certificate_id,
+    _load_test_sessions,
 )
 # Load persisted test sessions on startup
+_load_test_sessions()
 from question_bank import get_randomized_test, grade_test
 from email_service import send_welcome_email, send_test_fail_email
 
@@ -480,23 +482,11 @@ async def get_me(
 @app.post("/api/onboarding/role")
 async def set_role(
     req: RoleSelectRequest,
-    response: Response,
     authorization: Optional[str] = Header(None),
     ql_access: Optional[str] = Cookie(default=None),
-    ql_refresh: Optional[str] = Cookie(default=None),
 ):
     """Set user role: attorney or client."""
     user = get_current_user(authorization, ql_access)
-    if not user and ql_refresh:
-        from auth import verify_refresh_token, create_access_token
-        rp = verify_refresh_token(ql_refresh)
-        if rp:
-            _ru = get_user(rp.get("user_id", ""))
-            if _ru:
-                user = _ru
-                _new_access = create_access_token({"user_id": _ru["id"], "email": _ru.get("email", "")})
-                response.set_cookie(key=_ACCESS_COOKIE, value=_new_access, httponly=True,
-                    secure=_COOKIE_SECURE, samesite=_COOKIE_SAMESITE, max_age=24*3600, path="/")
     if not user:
         raise HTTPException(401, "Unauthorized")
     if req.role not in ("attorney", "client"):
@@ -511,25 +501,11 @@ async def set_role(
 @app.post("/api/onboarding/profile")
 async def save_profile(
     req: ProfileRequest,
-    response: Response,
     authorization: Optional[str] = Header(None),
     ql_access: Optional[str] = Cookie(default=None),
-    ql_refresh: Optional[str] = Cookie(default=None),
 ):
     """Save user profile information."""
     user = get_current_user(authorization, ql_access)
-    # If access token missing/expired, try refresh token inline (handles cookie timing issues)
-    if not user and ql_refresh:
-        from auth import verify_refresh_token, create_access_token, create_refresh_token
-        rp = verify_refresh_token(ql_refresh)
-        if rp:
-            _ru = get_user(rp.get("user_id", ""))
-            if _ru:
-                user = _ru
-                # Issue fresh access token cookie so subsequent requests work
-                _new_access = create_access_token({"user_id": _ru["id"], "email": _ru.get("email", "")})
-                response.set_cookie(key=_ACCESS_COOKIE, value=_new_access, httponly=True,
-                    secure=_COOKIE_SECURE, samesite=_COOKIE_SAMESITE, max_age=24*3600, path="/")
     if not user:
         raise HTTPException(401, "Unauthorized")
 
@@ -1682,46 +1658,6 @@ async def chatbot_endpoint(request: LegalChatRequest):
 
 
 
-# ── GET /api/sub-orgs/{sub_org_id}/dc-info ────────────────────────────────────
-@app.get("/api/sub-orgs/{sub_org_id}/dc-info")
-async def get_sub_org_dc_info(sub_org_id: str, request: Request):
-    """Fetch live sub-org details from DoconChain using the stored dc_sub_org_uuid."""
-    user = _require_attorney_or_admin(request)
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-    org = next((o for o in orgs if o["id"] == sub_org_id), None)
-    if not org:
-        raise HTTPException(404, "Sub-org not found")
-    dc_uuid = org.get("dc_sub_org_uuid")
-    if not dc_uuid:
-        raise HTTPException(404, "This sub-org has not been provisioned in DoconChain yet")
-    try:
-        import urllib.request as _ur_gi, urllib.error as _ue_gi, json as _json_gi
-        _tok_gi = _get_dc_token()
-        _req_gi = _ur_gi.Request(
-            f"{_DC_BASE}/api/v2/organizations/sub/{dc_uuid}?user_type=ENTERPRISE_API",
-            headers={"Authorization": f"Bearer {_tok_gi}", "Accept": "application/json"},
-            method="GET",
-        )
-        with _ur_gi.urlopen(_req_gi, timeout=20) as _r_gi:
-            _dc_gi = _json_gi.loads(_r_gi.read().decode())
-        # Update photo_url in local record if available
-        _photo = (_dc_gi.get("branding_photo_url") or _dc_gi.get("photo_url") or
-                  (_dc_gi.get("data") or {}).get("photo") or "")
-        if _photo and _photo != org.get("dc_photo_url"):
-            with _sub_orgs_lock:
-                orgs2 = _load_sub_orgs()
-                org2 = next((o for o in orgs2 if o["id"] == sub_org_id), None)
-                if org2:
-                    org2["dc_photo_url"] = _photo
-                    _save_sub_orgs(orgs2)
-        return {"dc_data": _dc_gi, "dc_sub_org_uuid": dc_uuid, "dc_photo_url": _photo}
-    except _ue_gi.HTTPError as he:
-        raise HTTPException(he.code, f"DoconChain error {he.code}: {he.read().decode()[:200]}")
-    except Exception as e:
-        raise HTTPException(502, f"Could not fetch from DoconChain: {str(e)[:200]}")
-
-
 if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("APP_PORT", 8080))
@@ -1885,26 +1821,19 @@ def _get_dc_token(email: str = None) -> str:
     if not token_str:
         raise ValueError(f"No DC token in response: {data}")
 
-    # Cache it — cap at 15-min TTL regardless of JWT exp.
-    # DoconChain staging tokens may carry a 24h exp in the JWT payload, but
-    # their server-side session can expire much sooner (especially after long
-    # idle periods). A 15-min hard cap guarantees a fresh token after any
-    # overnight idle without impacting normal intra-session usage.
+    # Cache it — try to parse JWT exp, else use 5-min TTL
     import time as _time2
-    _MAX_TTL = 15 * 60  # 15 minutes hard cap
     try:
         import base64 as _b64, json as _j
         parts_jwt = token_str.split('.')
         if len(parts_jwt) >= 2:
             pad = parts_jwt[1] + '=='
             payload = _j.loads(_b64.urlsafe_b64decode(pad))
-            jwt_exp = payload.get('exp', _time2.time() + _MAX_TTL)
-            # Use whichever is sooner: JWT exp or 15-min cap
-            exp = min(jwt_exp, _time2.time() + _MAX_TTL)
+            exp = payload.get('exp', _time2.time() + 300)
         else:
-            exp = _time2.time() + _MAX_TTL
+            exp = _time2.time() + 300
     except Exception:
-        exp = _time2.time() + _MAX_TTL
+        exp = _time2.time() + 300
 
     _dc_token_cache[_email] = (token_str, exp)
     return token_str
@@ -2017,11 +1946,9 @@ _load_appointments()
 
 class AppointmentCreateRequest(BaseModel):
     enp_id: str
-    notarization_type: str = "ACKNOWLEDGMENT"  # ACKNOWLEDGMENT | JURAT | AFFIRMATION | SIGNATURE_WITNESSING
+    notarization_type: str  # ACKNOWLEDGMENT | JURAT | AFFIRMATION | SIGNATURE_WITNESSING
     mode: str               # REN | IEN
     notes: str = ""
-    title: str = ""
-    preferred_time: str = ""
 
 
 class AppointmentActionRequest(BaseModel):
@@ -2070,7 +1997,9 @@ async def create_appointment(
     if user.get("role") != "client":
         raise HTTPException(403, "Only clients can book appointments")
 
-
+    valid_types = {"ACKNOWLEDGMENT", "JURAT", "AFFIRMATION", "SIGNATURE_WITNESSING"}
+    if req.notarization_type not in valid_types:
+        raise HTTPException(400, f"Invalid notarization_type. Valid: {valid_types}")
     if req.mode not in {"REN", "IEN"}:
         raise HTTPException(400, "Invalid mode. Valid: REN, IEN")
 
@@ -2096,8 +2025,6 @@ async def create_appointment(
         "notarization_type": req.notarization_type,
         "mode": req.mode,
         "notes": req.notes[:1000],
-        "title": req.title[:200] if req.title else "",
-        "preferred_time": req.preferred_time[:200] if req.preferred_time else "",
         "status": "PENDING",
         "created_at": now_iso,
         "updated_at": now_iso,
@@ -3276,51 +3203,31 @@ async def get_plot_link(
             with _ureq2.urlopen(_req, timeout=30) as _r:
                 return _json3.loads(_r.read().decode())
 
-        # IMPORTANT: Only use the ENP's own email — NEVER fall back to _DC_EMAIL.
-        # The org default email (stg_quanby@maildrop.cc) generates a different link
-        # format that exposes raw token/api_token params in the URL and belongs to
-        # a different DoconChain account. This is the root cause of the wrong plot link.
-        enp_email = (user.get("email") or "").lower().strip()
-        if not enp_email:
-            raise HTTPException(400, "ENP email not found — cannot generate plot link")
-
-        # Purge ALL cached tokens for this email to force a clean re-auth.
-        # Stale tokens from a previous session (different laptop/browser) cause
-        # the wrong email to appear in the generated link.
-        _dc_token_cache.pop(enp_email, None)
-        _dc_token_cache.pop(_DC_EMAIL, None)
-
         resp_data = None
-        _last_code = 502
+        _last_code = 401
         _last_body = "Unknown error"
-
-        # Retry up to 3 times with a fresh token each time
-        for _retry in range(3):
+        for _attempt_email in [_plot_email, _DC_EMAIL]:
+            # Force fresh token — invalidate any cached one
+            _dc_token_cache.pop(_attempt_email, None)
             try:
-                _tok = _get_dc_token(email=enp_email)
-                print(f"[PlotLink] attempt {_retry+1}: email={enp_email} token={_tok[:12]}...", flush=True)
+                _tok = _get_dc_token(email=_attempt_email)
             except Exception as _te:
-                _last_body = f"Token error for {enp_email}: {_te}"
-                print(f"[PlotLink] token failed attempt {_retry+1}: {_te}", flush=True)
-                _dc_token_cache.pop(enp_email, None)
+                _last_body = str(_te)
                 continue
             try:
                 resp_data = _call_plot_link(_tok)
-                print(f"[PlotLink] success on attempt {_retry+1} raw={str(resp_data)[:400]}", flush=True)
                 break
             except _uerr2.HTTPError as he:
                 _last_code = he.code
                 _last_body = he.read().decode(errors="replace")
-                _dc_token_cache.pop(enp_email, None)
-                print(f"[PlotLink] HTTP {he.code} on attempt {_retry+1}: {_last_body[:120]}", flush=True)
-                if he.code not in (401, 403):
-                    raise HTTPException(he.code, f"DoconChain error {he.code}: {_last_body[:300]}")
-                # 401/403 → clear cache and retry with fresh token
-                continue
-
+                # Invalidate token and try next email
+                _dc_token_cache.pop(_attempt_email, None)
+                if he.code in (401, 403):
+                    continue
+                raise HTTPException(he.code, f"DoconChain error {he.code}: {_last_body[:300]}")
         if resp_data is None:
             raise HTTPException(_last_code,
-                f"DoconChain plot link failed for {enp_email}: {_last_body[:300]}")
+                f"DoconChain error {_last_code}: {_last_body[:300]}")
 
         # Extract link — DC may return { data: { link: "..." } } or { link: "..." }
         link = (
@@ -3346,13 +3253,6 @@ async def get_plot_link(
                         _save_appointments()
                         break
 
-          # NOTE: Do NOT strip token/api_token — DC needs them for auto-login in popup.
-        try:
-            from urllib.parse import urlparse
-            _base = urlparse(link).netloc + urlparse(link).path
-        except Exception:
-            _base = link[:60]
-        print(f"[PlotLink] link ready: {_base}", flush=True)
         return {"link": link, "project_uuid": project_uuid}
 
     except HTTPException:
@@ -5095,7 +4995,7 @@ import jwt as _pyjwt_admin
 from fastapi.responses import FileResponse as _FileResponse
 from datetime import datetime as _admin_dt, timezone as _admin_tz, timedelta as _admin_td
 
-_ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "michael@quanbyai.com")
+_ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 _ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "Alyssa7719!!")
 _ADMIN_SECRET   = os.getenv("SECRET_KEY", "change-me-in-production")
 _ADMIN_COOKIE   = "ql_admin"
@@ -5440,578 +5340,3 @@ async def admin_list_registry(
         "per_page": per_page,
         "pages": max(1, (total + per_page - 1) // per_page),
     }
-
-# ── Sub-Organizations ─────────────────────────────────────────────────────────
-# Appended to main.py before `if __name__ == "__main__":`
-
-_SUB_ORGS_FILE = os.path.join(os.path.dirname(__file__), "data", "sub_orgs.json")
-_sub_orgs_lock = threading.Lock()
-
-
-def _load_sub_orgs() -> list:
-    """Load sub-orgs from disk."""
-    try:
-        with open(_SUB_ORGS_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return data if isinstance(data, list) else []
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
-
-
-def _save_sub_orgs(data: list) -> None:
-    """Persist sub-orgs to disk atomically."""
-    tmp = _SUB_ORGS_FILE + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-    os.replace(tmp, _SUB_ORGS_FILE)
-
-
-def _require_attorney_or_admin(request: Request):
-    """Return current user if attorney or admin, else raise 401/403.
-    Accepts both ql_admin cookie (admin panel) and ql_access cookie (user JWT).
-    """
-    # First: check ql_admin cookie (admin panel session)
-    admin = _get_admin_user(request)
-    if admin:
-        return {"id": "admin", "role": "admin", "email": "admin@quanby.ai", "first_name": "Admin", "last_name": ""}
-    # Then: check user JWT (ql_access cookie or Authorization header)
-    from onboarding import get_user as _gu
-    token = None
-    auth_header = request.headers.get("authorization")
-    if auth_header and auth_header.startswith("Bearer "):
-        token = auth_header.split(" ", 1)[1]
-    if not token:
-        token = request.cookies.get("ql_access")
-    if not token:
-        raise HTTPException(401, "Unauthorized")
-    from auth import verify_jwt as _vj
-    payload = _vj(token)
-    if not payload:
-        raise HTTPException(401, "Unauthorized")
-    # Admin path via user JWT
-    if payload.get("role") == "admin":
-        return {"id": payload.get("sub", "admin"), "role": "admin", "email": payload.get("email", "")}
-    user = _gu(payload.get("user_id", ""))
-    if not user:
-        raise HTTPException(401, "Unauthorized")
-    if user.get("role") not in ("attorney", "admin"):
-        raise HTTPException(403, "Forbidden: attorney or admin role required")
-    return user
-
-
-def _find_user_by_email(email: str):
-    """Find a user by email from in-memory USERS dict."""
-    from onboarding import USERS as _USERS
-    email_lower = email.lower().strip()
-    for uid, u in _USERS.items():
-        if (u.get("email") or "").lower() == email_lower:
-            return dict(u)
-    return None
-
-
-class _SubOrgCreateReq(BaseModel):
-    name: str
-    address: Optional[str] = ""
-    type: Optional[str] = "Department"
-    dc_client_key: Optional[str] = ""
-    dc_client_secret: Optional[str] = ""
-    dc_email: Optional[str] = ""
-    owner_email: Optional[str] = None  # Admin can set owner to specific ENP by email
-
-
-class _SubOrgPatchReq(BaseModel):
-    name: Optional[str] = None
-    address: Optional[str] = None
-    type: Optional[str] = None
-    dc_client_key: Optional[str] = None
-    dc_client_secret: Optional[str] = None
-    dc_email: Optional[str] = None
-
-
-class _SubOrgMemberReq(BaseModel):
-    email: str
-    role: str = "Staff"
-
-
-class _SubOrgCredReq(BaseModel):
-    dc_client_key: str = ""
-    dc_client_secret: str = ""
-    dc_email: str = ""
-
-
-class _SubOrgCreditTransferReq(BaseModel):
-    amount: int
-
-
-# ── GET /api/sub-orgs ─────────────────────────────────────────────────────────
-@app.get("/api/sub-orgs")
-async def list_sub_orgs(request: Request):
-    user = _require_attorney_or_admin(request)
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-    uid = user["id"]
-    role = user.get("role")
-    if role == "admin":
-        result = orgs
-    else:
-        result = [
-            o for o in orgs
-            if o.get("owner_id") == uid
-            or any(m.get("user_id") == uid for m in o.get("members", []))
-        ]
-    # Strip sensitive DC credentials from list view
-    safe = []
-    for o in result:
-        s = {k: v for k, v in o.items() if k not in ("dc_client_key", "dc_client_secret")}
-        s["dc_client_key_set"] = bool(o.get("dc_client_key"))
-        s["dc_client_secret_set"] = bool(o.get("dc_client_secret"))
-        safe.append(s)
-    return safe
-
-
-# ── POST /api/sub-orgs ────────────────────────────────────────────────────────
-@app.post("/api/sub-orgs")
-async def create_sub_org(
-    request: Request,
-    name: str = Form(...),
-    address: str = Form(""),
-    type: str = Form("Department"),
-    owner_email: str = Form(""),
-    dc_client_key: str = Form(""),
-    dc_client_secret: str = Form(""),
-    dc_email: str = Form(""),
-    photo: UploadFile = File(None),
-):
-    # Wrap into a req-like object for compatibility
-    class _Req:
-        pass
-    req = _Req()
-    req.name = name
-    req.address = address
-    req.type = type
-    req.owner_email = owner_email
-    req.dc_client_key = dc_client_key
-    req.dc_client_secret = dc_client_secret
-    req.dc_email = dc_email
-    req._photo = photo
-    user = _require_attorney_or_admin(request)
-    if not req.name or not req.name.strip():
-        raise HTTPException(400, "name is required")
-    valid_types = ("Department", "Branch", "Division", "Team")
-    org_type = req.type if req.type in valid_types else "Department"
-    now = _dt.now(_tz.utc).isoformat()
-    # Resolve owner: admin can specify owner_email to assign to a specific ENP
-    owner_id = user["id"]
-    if req.owner_email and req.owner_email.strip():
-        owner_candidate = _find_user_by_email(req.owner_email.strip())
-        if owner_candidate:
-            owner_id = owner_candidate["id"]
-    org = {
-        "id": str(uuid.uuid4()),
-        "name": req.name.strip(),
-        "address": req.address or "",
-        "type": org_type,
-        "owner_id": owner_id,
-        "dc_client_key": req.dc_client_key or "",
-        "dc_client_secret": req.dc_client_secret or "",
-        "dc_email": req.dc_email or "",
-        "credits_total": 0,
-        "credits_used": 0,
-        "members": [],
-        "created_at": now,
-        "updated_at": now,
-    }
-    # Add DC-tracking fields
-    org["dc_sub_org_id"]   = None
-    org["dc_sub_org_uuid"] = None
-
-    # Read photo bytes if provided
-    _photo_bytes = None
-    _photo_name = None
-    if hasattr(req, '_photo') and req._photo and req._photo.filename:
-        try:
-            _photo_bytes = await req._photo.read()
-            _photo_name = req._photo.filename
-        except Exception:
-            pass
-
-    # Provision sub-org in DoconChain (non-blocking)
-    _dc_provision_error = None
-    try:
-        import urllib.request as _ur_so, urllib.error as _ue_so, json as _json_so
-        # Use owner ENP's token if available, else fall back to org token
-        _enp_user_so = None
-        try:
-            from onboarding import get_user as _get_user_so
-            _enp_user_so = _get_user_so(org.get("owner_id", ""))
-        except Exception:
-            pass
-        _enp_email_so = (_enp_user_so.get("email") if _enp_user_so else None) or _DC_EMAIL
-        try:
-            _dc_token_so = _get_dc_token(email=_enp_email_so)
-        except Exception:
-            _dc_token_so = _get_dc_token()
-        _bd = "QLSubOrg" + org["id"].replace("-","")[:12]
-        _CRLF = b"\r\n"
-        def _field(name, value):
-            return (
-                b"--" + _bd.encode() + _CRLF +
-                b"Content-Disposition: form-data; name=\"" + name.encode() + b"\"" + _CRLF +
-                _CRLF + str(value).encode("utf-8") + _CRLF
-            )
-        # organization_uuid = numeric org ID (not UUID) per DC API spec
-        _body_so = (
-            _field("name", org["name"]) +
-            _field("address", org["address"] or org["name"]) +
-            _field("sub_organization_type_name", org["type"]) +
-            _field("organization_uuid", _DC_ORG_UUID)
-        )
-        # Attach photo if provided
-        if _photo_bytes and _photo_name:
-            _ext = _photo_name.rsplit('.', 1)[-1].lower() if '.' in _photo_name else 'png'
-            _mime = {'jpg':'image/jpeg','jpeg':'image/jpeg','png':'image/png','gif':'image/gif','webp':'image/webp'}.get(_ext, 'image/png')
-            _body_so += (
-                b"--" + _bd.encode() + b"\r\n" +
-                b"Content-Disposition: form-data; name=\"photo\"; filename=\"" + _photo_name.encode() + b"\"\r\n" +
-                b"Content-Type: " + _mime.encode() + b"\r\n\r\n" +
-                _photo_bytes + b"\r\n"
-            )
-        _body_so += b"--" + _bd.encode() + b"--" + b"\r\n"
-        # (removed trailing b"--" + _bd.encode() + b"--" + _CRLF — now inline above)
-        print(f"[SubOrg] Creating DC sub-org: name={org['name']} type={org['type']} org_id={_DC_ORG_ID} token_email={_enp_email_so}", flush=True)
-        _req_so = _ur_so.Request(
-            f"{_DC_BASE}/api/v2/organizations/sub?user_type=ENTERPRISE_API",
-            data=_body_so,
-            headers={
-                "Authorization": f"Bearer {_dc_token_so}",
-                "Content-Type": f"multipart/form-data; boundary={_bd}",
-                "Accept": "application/json",
-            },
-            method="POST",
-        )
-        with _ur_so.urlopen(_req_so, timeout=20) as _r_so:
-            _dc_resp = _json_so.loads(_r_so.read().decode())
-        _dc_data = _dc_resp.get("data") or _dc_resp.get("message") or _dc_resp
-        if isinstance(_dc_data, dict):
-            # DC returns nested sub_org_data for the sub-org details
-            _sub_data = _dc_data.get("sub_org_data") or _dc_data
-            org["dc_sub_org_id"]     = str(_sub_data.get("id") or "")
-            org["dc_sub_org_uuid"]   = str(_sub_data.get("uuid") or "")
-            org["dc_photo_url"]      = str(_sub_data.get("photo") or _sub_data.get("photo_url") or _sub_data.get("avatar") or "")
-            # Store DC-generated credentials for this sub-org
-            if _dc_data.get("client_key"):
-                org["dc_client_key"]    = str(_dc_data["client_key"])
-            if _dc_data.get("client_secret"):
-                org["dc_client_secret"] = str(_dc_data["client_secret"])
-            print(f"[SubOrg] DC provisioned: id={org['dc_sub_org_id']} uuid={org['dc_sub_org_uuid']} photo={bool(org['dc_photo_url'])}", flush=True)
-    except Exception as _dc_so_err:
-        _dc_provision_error = str(_dc_so_err)
-        print(f"[SubOrg] DC provisioning failed (non-fatal): {_dc_so_err}", flush=True)
-
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-        orgs.append(org)
-        _save_sub_orgs(orgs)
-
-    result = {"success": True, "id": org["id"], "sub_org": org}
-    if _dc_provision_error:
-        result["dc_warning"] = f"Sub-org created locally. DoconChain: {_dc_provision_error[:150]}"
-    elif org.get("dc_sub_org_uuid"):
-        result["dc_provisioned"] = True
-        result["dc_sub_org_uuid"] = org["dc_sub_org_uuid"]
-    return result
-
-
-# ── GET /api/sub-orgs/{sub_org_id} ───────────────────────────────────────────
-@app.get("/api/sub-orgs/{sub_org_id}")
-async def get_sub_org(sub_org_id: str, request: Request):
-    user = _require_attorney_or_admin(request)
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-    org = next((o for o in orgs if o["id"] == sub_org_id), None)
-    if not org:
-        raise HTTPException(404, "Sub-org not found")
-    uid = user["id"]
-    role = user.get("role")
-    if role != "admin" and org.get("owner_id") != uid and not any(m.get("user_id") == uid for m in org.get("members", [])):
-        raise HTTPException(403, "Forbidden")
-    s = {k: v for k, v in org.items() if k not in ("dc_client_key", "dc_client_secret")}
-    s["dc_client_key_set"] = bool(org.get("dc_client_key"))
-    s["dc_client_secret_set"] = bool(org.get("dc_client_secret"))
-    return s
-
-
-# ── PATCH /api/sub-orgs/{sub_org_id} ─────────────────────────────────────────
-@app.patch("/api/sub-orgs/{sub_org_id}")
-async def patch_sub_org(sub_org_id: str, req: _SubOrgPatchReq, request: Request):
-    user = _require_attorney_or_admin(request)
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-        org = next((o for o in orgs if o["id"] == sub_org_id), None)
-        if not org:
-            raise HTTPException(404, "Sub-org not found")
-        uid = user["id"]
-        role = user.get("role")
-        if role != "admin" and org.get("owner_id") != uid:
-            raise HTTPException(403, "Forbidden: only owner or admin can edit")
-        valid_types = ("Department", "Branch", "Division", "Team")
-        if req.name is not None:
-            org["name"] = req.name.strip()
-        if req.address is not None:
-            org["address"] = req.address
-        if req.type is not None and req.type in valid_types:
-            org["type"] = req.type
-        if req.dc_client_key is not None:
-            org["dc_client_key"] = req.dc_client_key
-        if req.dc_client_secret is not None:
-            org["dc_client_secret"] = req.dc_client_secret
-        if req.dc_email is not None:
-            org["dc_email"] = req.dc_email
-        org["updated_at"] = _dt.now(_tz.utc).isoformat()
-        _save_sub_orgs(orgs)
-    return {"success": True, "sub_org": org}
-
-
-# ── DELETE /api/sub-orgs/{sub_org_id} ────────────────────────────────────────
-@app.delete("/api/sub-orgs/{sub_org_id}")
-async def delete_sub_org(sub_org_id: str, request: Request):
-    user = _require_attorney_or_admin(request)
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-        org = next((o for o in orgs if o["id"] == sub_org_id), None)
-        if not org:
-            raise HTTPException(404, "Sub-org not found")
-        uid = user["id"]
-        role = user.get("role")
-        if role != "admin" and org.get("owner_id") != uid:
-            raise HTTPException(403, "Forbidden: only owner or admin can delete")
-        orgs = [o for o in orgs if o["id"] != sub_org_id]
-        _save_sub_orgs(orgs)
-    return {"success": True}
-
-
-# ── GET /api/sub-orgs/{sub_org_id}/members ───────────────────────────────────
-@app.get("/api/sub-orgs/{sub_org_id}/members")
-async def list_sub_org_members(sub_org_id: str, request: Request):
-    user = _require_attorney_or_admin(request)
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-    org = next((o for o in orgs if o["id"] == sub_org_id), None)
-    if not org:
-        raise HTTPException(404, "Sub-org not found")
-    uid = user["id"]
-    role = user.get("role")
-    if role != "admin" and org.get("owner_id") != uid and not any(m.get("user_id") == uid for m in org.get("members", [])):
-        raise HTTPException(403, "Forbidden")
-    return org.get("members", [])
-
-
-# ── POST /api/sub-orgs/{sub_org_id}/members ──────────────────────────────────
-@app.post("/api/sub-orgs/{sub_org_id}/members")
-async def add_sub_org_member(sub_org_id: str, req: _SubOrgMemberReq, request: Request):
-    user = _require_attorney_or_admin(request)
-    if req.role not in ("ENP", "Staff"):
-        raise HTTPException(400, "role must be ENP or Staff")
-    target = _find_user_by_email(req.email)
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-        org = next((o for o in orgs if o["id"] == sub_org_id), None)
-        if not org:
-            raise HTTPException(404, "Sub-org not found")
-        uid = user["id"]
-        role = user.get("role")
-        if role != "admin" and org.get("owner_id") != uid:
-            raise HTTPException(403, "Forbidden: only owner or admin can add members")
-        if not target:
-            # Non-admin: must find registered user
-            if role != "admin":
-                raise HTTPException(404, f"No user found with email: {req.email}")
-            # Admin: invite unregistered user by email
-            invite_id = f"invite_{req.email.lower().strip()}"
-            if any(m.get("user_id") == invite_id for m in org.get("members", [])):
-                raise HTTPException(409, "This email is already invited to this sub-org")
-            member = {
-                "user_id": invite_id,
-                "email": req.email.lower().strip(),
-                "name": req.email.lower().strip(),
-                "role": req.role,
-                "status": "invited",
-            }
-        else:
-            # Check if already a member
-            if any(m.get("user_id") == target["id"] for m in org.get("members", [])):
-                raise HTTPException(409, "User is already a member of this sub-org")
-            member = {
-                "user_id": target["id"],
-                "email": target.get("email", ""),
-                "name": f"{target.get('first_name', '')} {target.get('last_name', '')}".strip() or target.get("email", ""),
-                "role": req.role,
-                "status": "active",
-            }
-        org.setdefault("members", []).append(member)
-        org["updated_at"] = _dt.now(_tz.utc).isoformat()
-        _save_sub_orgs(orgs)
-        # Capture org details for DC call (outside lock scope for network call)
-        _dc_suborg_uuid = org.get("dc_sub_org_uuid") or ""
-        _dc_suborg_id   = org.get("dc_sub_org_id") or ""
-        _org_type       = org.get("type", "Department")
-
-    # Provision member in DoconChain (non-blocking)
-    _dc_member_error = None
-    _dc_member_result = None
-    if _dc_suborg_uuid and target:
-        try:
-            import urllib.request as _ur_m, urllib.error as _ue_m, json as _json_m
-            _dc_token_m = _get_dc_token()
-            _bd_m = "QLMember" + member["user_id"].replace("-","")[:12]
-            _CRLF = b"\r\n"
-            _fn = target.get("first_name") or member["email"].split("@")[0]
-            _ln = target.get("last_name") or "."
-            _em = member["email"]
-            # organization JSON string as required by DC
-            import json as _json_org
-            _org_json = _json_org.dumps({"id": int(_dc_suborg_id) if _dc_suborg_id.isdigit() else 0, "sub_organization_type_name": _org_type})
-            def _mf(name, value):
-                return (b"--" + _bd_m.encode() + _CRLF +
-                        b"Content-Disposition: form-data; name=\"" + name.encode() + b"\"" + _CRLF +
-                        _CRLF + str(value).encode("utf-8") + _CRLF)
-            _body_m = (
-                _mf("data[0][email]",           _em) +
-                _mf("data[0][first_name]",      _fn) +
-                _mf("data[0][last_name]",       _ln) +
-                _mf("data[0][role]",            "Member") +
-                _mf("data[0][organization]",    _org_json) +
-                _mf("data[0][organization_id]", _dc_suborg_uuid) +
-                b"--" + _bd_m.encode() + b"--" + _CRLF
-            )
-            _url_m = f"{_DC_BASE}/api/v2/sub-organizations/{_dc_suborg_uuid}/members?user_type=ENTERPRISE_API"
-            _req_m = _ur_m.Request(_url_m, data=_body_m, headers={
-                "Authorization": f"Bearer {_dc_token_m}",
-                "Content-Type": f"multipart/form-data; boundary={_bd_m}",
-                "Accept": "application/json",
-            }, method="POST")
-            with _ur_m.urlopen(_req_m, timeout=20) as _r_m:
-                _dc_member_result = _json_m.loads(_r_m.read().decode())
-            print(f"[SubOrg Member] DC added {_em} to {_dc_suborg_uuid}: {str(_dc_member_result)[:120]}", flush=True)
-        except Exception as _dc_m_err:
-            _dc_member_error = str(_dc_m_err)
-            print(f"[SubOrg Member] DC add failed (non-fatal): {_dc_m_err}", flush=True)
-
-    result = {"success": True, "member": member}
-    if _dc_member_error:
-        result["dc_warning"] = f"Member added locally. DoconChain: {_dc_member_error[:150]}"
-    elif _dc_member_result:
-        result["dc_provisioned"] = True
-    return result
-
-
-# ── DELETE /api/sub-orgs/{sub_org_id}/members/{user_id} ──────────────────────
-@app.delete("/api/sub-orgs/{sub_org_id}/members/{member_user_id}")
-async def remove_sub_org_member(sub_org_id: str, member_user_id: str, request: Request):
-    user = _require_attorney_or_admin(request)
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-        org = next((o for o in orgs if o["id"] == sub_org_id), None)
-        if not org:
-            raise HTTPException(404, "Sub-org not found")
-        uid = user["id"]
-        role = user.get("role")
-        if role != "admin" and org.get("owner_id") != uid:
-            raise HTTPException(403, "Forbidden: only owner or admin can remove members")
-        before = len(org.get("members", []))
-        org["members"] = [m for m in org.get("members", []) if m.get("user_id") != member_user_id]
-        if len(org["members"]) == before:
-            raise HTTPException(404, "Member not found")
-        org["updated_at"] = _dt.now(_tz.utc).isoformat()
-        _save_sub_orgs(orgs)
-    return {"success": True}
-
-
-# ── GET /api/sub-orgs/{sub_org_id}/credits ───────────────────────────────────
-@app.get("/api/sub-orgs/{sub_org_id}/credits")
-async def get_sub_org_credits(sub_org_id: str, request: Request):
-    user = _require_attorney_or_admin(request)
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-    org = next((o for o in orgs if o["id"] == sub_org_id), None)
-    if not org:
-        raise HTTPException(404, "Sub-org not found")
-    uid = user["id"]
-    role = user.get("role")
-    if role != "admin" and org.get("owner_id") != uid and not any(m.get("user_id") == uid for m in org.get("members", [])):
-        raise HTTPException(403, "Forbidden")
-    total = org.get("credits_total", 0)
-    used = org.get("credits_used", 0)
-    return {"total": total, "used": used, "remaining": max(0, total - used)}
-
-
-# ── POST /api/sub-orgs/{sub_org_id}/credits/transfer ─────────────────────────
-@app.post("/api/sub-orgs/{sub_org_id}/credits/transfer")
-async def transfer_sub_org_credits(sub_org_id: str, req: _SubOrgCreditTransferReq, request: Request):
-    user = _require_attorney_or_admin(request)
-    if req.amount <= 0:
-        raise HTTPException(400, "amount must be positive")
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-        org = next((o for o in orgs if o["id"] == sub_org_id), None)
-        if not org:
-            raise HTTPException(404, "Sub-org not found")
-        uid = user["id"]
-        role = user.get("role")
-        if role != "admin" and org.get("owner_id") != uid:
-            raise HTTPException(403, "Forbidden: only owner or admin can transfer credits")
-        org["credits_total"] = org.get("credits_total", 0) + req.amount
-        org["updated_at"] = _dt.now(_tz.utc).isoformat()
-        _save_sub_orgs(orgs)
-    return {"success": True, "credits_total": org["credits_total"]}
-
-
-# ── GET /api/sub-orgs/{sub_org_id}/credentials ───────────────────────────────
-@app.get("/api/sub-orgs/{sub_org_id}/credentials")
-async def get_sub_org_credentials(sub_org_id: str, request: Request):
-    user = _require_attorney_or_admin(request)
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-    org = next((o for o in orgs if o["id"] == sub_org_id), None)
-    if not org:
-        raise HTTPException(404, "Sub-org not found")
-    uid = user["id"]
-    role = user.get("role")
-    if role != "admin" and org.get("owner_id") != uid:
-        raise HTTPException(403, "Forbidden: only owner or admin can view credentials")
-
-    def _mask(s: str) -> str:
-        if not s:
-            return ""
-        if len(s) <= 8:
-            return "*" * len(s)
-        return s[:4] + "*" * (len(s) - 8) + s[-4:]
-
-    return {
-        "dc_client_key": _mask(org.get("dc_client_key", "")),
-        "dc_client_secret": _mask(org.get("dc_client_secret", "")),
-        "dc_email": org.get("dc_email", ""),
-        "dc_client_key_raw": org.get("dc_client_key", ""),
-        "dc_client_secret_raw": org.get("dc_client_secret", ""),
-    }
-
-
-# ── PUT /api/sub-orgs/{sub_org_id}/credentials ───────────────────────────────
-@app.put("/api/sub-orgs/{sub_org_id}/credentials")
-async def update_sub_org_credentials(sub_org_id: str, req: _SubOrgCredReq, request: Request):
-    user = _require_attorney_or_admin(request)
-    with _sub_orgs_lock:
-        orgs = _load_sub_orgs()
-        org = next((o for o in orgs if o["id"] == sub_org_id), None)
-        if not org:
-            raise HTTPException(404, "Sub-org not found")
-        uid = user["id"]
-        role = user.get("role")
-        if role != "admin" and org.get("owner_id") != uid:
-            raise HTTPException(403, "Forbidden: only owner or admin can update credentials")
-        org["dc_client_key"] = req.dc_client_key
-        org["dc_client_secret"] = req.dc_client_secret
-        org["dc_email"] = req.dc_email
-        org["updated_at"] = _dt.now(_tz.utc).isoformat()
-        _save_sub_orgs(orgs)
-    return {"success": True}

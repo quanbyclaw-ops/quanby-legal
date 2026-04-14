@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notarial Registry — Quanby Legal</title>
+  <link rel="stylesheet" href="https://cdn.hugeicons.com/font/hgi-stroke-rounded.css" />
+  <link rel="icon" href="/favicon.ico">
+  <style>
+    :root{--navy:#1B2A6B;--gold:#C9A84C;--teal:#0EA5E9;--bg:#0D0F1A;--surface:#141726;--surface2:#1a1f35;--border:rgba(255,255,255,0.07);--text:#e8eaf2;--muted:#8b90a8;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+
+    /* NAV */
+    nav{background:rgba(10,12,24,0.97);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+    .nav-content{max-width:1280px;margin:0 auto;padding:0 2rem;height:64px;display:flex;align-items:center;gap:2rem;}
+    .nav-logo{font-size:1rem;font-weight:700;color:var(--gold);text-decoration:none;white-space:nowrap;}
+    .nav-links{display:flex;gap:1.5rem;align-items:center;flex:1;justify-content:center;}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:0.875rem;font-weight:500;transition:color 0.15s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--text);}
+    .nav-user{display:flex;align-items:center;gap:0.625rem;cursor:pointer;position:relative;}
+    .nav-user-name{font-size:0.85rem;color:var(--muted);}
+
+    /* MAIN LAYOUT */
+    .container{max-width:1280px;margin:0 auto;padding:2rem;}
+    .page-header{margin-bottom:2rem;}
+    .page-title{font-size:1.75rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:0.75rem;}
+    .page-subtitle{color:var(--muted);font-size:0.875rem;margin-top:0.375rem;}
+
+    /* STATS BAR */
+    .stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.75rem;}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:0.75rem;padding:1.25rem 1.5rem;display:flex;align-items:center;gap:1rem;}
+    .stat-icon{width:42px;height:42px;border-radius:0.625rem;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0;}
+    .stat-icon.blue{background:rgba(14,165,233,0.15);}
+    .stat-icon.green{background:rgba(16,185,129,0.15);}
+    .stat-icon.yellow{background:rgba(245,158,11,0.15);}
+    .stat-value{font-size:1.75rem;font-weight:700;line-height:1;}
+    .stat-label{color:var(--muted);font-size:0.8rem;margin-top:0.25rem;}
+
+    /* TOOLBAR */
+    .toolbar{display:flex;gap:0.75rem;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center;}
+    .search-wrap{flex:1;min-width:200px;position:relative;}
+    .search-wrap input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:0.5rem;padding:0.625rem 1rem 0.625rem 2.5rem;color:var(--text);font-size:0.875rem;outline:none;transition:border-color 0.15s;}
+    .search-wrap input:focus{border-color:var(--teal);}
+    .search-wrap .search-icon{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;}
+    select{background:var(--surface);border:1px solid var(--border);border-radius:0.5rem;padding:0.625rem 1rem;color:var(--text);font-size:0.875rem;outline:none;cursor:pointer;}
+    select:focus{border-color:var(--teal);}
+    .btn{display:inline-flex;align-items:center;gap:0.375rem;padding:0.625rem 1.25rem;border-radius:0.5rem;font-size:0.875rem;font-weight:500;cursor:pointer;border:none;transition:opacity 0.15s;}
+    .btn:hover{opacity:0.88;}
+    .btn-primary{background:var(--teal);color:#fff;}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+    .btn-sm{padding:0.375rem 0.75rem;font-size:0.8rem;}
+    .btn-gold{background:var(--gold);color:#fff;}
+    .btn-danger{background:var(--red);color:#fff;}
+    .btn-success{background:var(--green);color:#fff;}
+
+    /* TABLE */
+    .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:0.75rem;overflow:hidden;}
+    table{width:100%;border-collapse:collapse;}
+    thead th{background:var(--surface2);padding:0.75rem 1rem;text-align:left;font-size:0.78rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;border-bottom:1px solid var(--border);}
+    tbody tr{border-bottom:1px solid var(--border);transition:background 0.1s;}
+    tbody tr:last-child{border-bottom:none;}
+    tbody tr:hover{background:rgba(255,255,255,0.02);}
+    tbody tr.expanded{background:rgba(14,165,233,0.04);}
+    td{padding:0.875rem 1rem;font-size:0.875rem;vertical-align:middle;}
+    td.mono{font-family:monospace;font-size:0.8rem;color:var(--muted);}
+
+    /* BADGES */
+    .badge{display:inline-flex;align-items:center;padding:0.2rem 0.6rem;border-radius:999px;font-size:0.75rem;font-weight:600;white-space:nowrap;}
+    .badge-green{background:rgba(16,185,129,0.15);color:#6ee7b7;}
+    .badge-blue{background:rgba(14,165,233,0.15);color:#7dd3fc;}
+    .badge-yellow{background:rgba(245,158,11,0.15);color:#fcd34d;}
+    .badge-red{background:rgba(239,68,68,0.15);color:#fca5a5;}
+    .badge-purple{background:rgba(139,92,246,0.15);color:#c4b5fd;}
+    .badge-gray{background:rgba(139,145,168,0.15);color:var(--muted);}
+
+    /* EXPANDABLE ROW DETAIL */
+    .detail-row td{padding:0;background:rgba(14,165,233,0.04);border-bottom:1px solid var(--border);}
+    .detail-inner{padding:1.25rem 1.5rem;display:none;}
+    .detail-inner.open{display:block;}
+    .detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem 2rem;margin-bottom:1rem;}
+    .detail-field label{font-size:0.73rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:0.2rem;}
+    .detail-field span{font-size:0.875rem;color:var(--text);}
+    .signers-snapshot{background:var(--surface2);border:1px solid var(--border);border-radius:0.5rem;padding:0.875rem;font-family:monospace;font-size:0.78rem;color:var(--muted);max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;}
+
+    /* PAGINATION */
+    .pagination{display:flex;align-items:center;justify-content:space-between;margin-top:1.25rem;flex-wrap:wrap;gap:0.75rem;}
+    .pagination-info{font-size:0.85rem;color:var(--muted);}
+    .pagination-pages{display:flex;gap:0.375rem;}
+    .page-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:0.375rem;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.875rem;transition:background 0.1s;}
+    .page-btn:hover{background:var(--surface2);}
+    .page-btn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+    .page-btn:disabled{opacity:0.4;cursor:default;}
+
+    /* EMPTY STATE */
+    .empty-state{text-align:center;padding:4rem 2rem;}
+    .empty-state .icon{font-size:3rem;margin-bottom:1rem;}
+    .empty-state h3{font-size:1.125rem;margin-bottom:0.5rem;}
+    .empty-state p{color:var(--muted);font-size:0.875rem;}
+
+    /* LOADING */
+    .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+
+    /* TOAST */
+    #toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;}
+    .toast-msg{background:var(--surface2);border:1px solid var(--border);border-radius:0.625rem;padding:0.75rem 1.25rem;font-size:0.875rem;box-shadow:0 4px 20px rgba(0,0,0,0.4);animation:toastIn 0.25s ease;pointer-events:all;}
+    .toast-msg.success{border-color:rgba(16,185,129,0.4);color:#6ee7b7;}
+    .toast-msg.error{border-color:rgba(239,68,68,0.4);color:#fca5a5;}
+    @keyframes toastIn{from{transform:translateY(16px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+    /* GATE */
+    #enp-gate{display:flex;align-items:center;justify-content:center;min-height:60vh;}
+    .gate-card{background:var(--surface);border:1px solid var(--border);border-radius:1rem;padding:3rem;text-align:center;max-width:420px;}
+    .gate-card .icon{font-size:2.5rem;margin-bottom:1rem;}
+
+    @media(max-width:768px){
+      .stats-bar{grid-template-columns:1fr;}
+      .toolbar{flex-direction:column;align-items:stretch;}
+      .search-wrap{min-width:unset;}
+      .detail-grid{grid-template-columns:1fr;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-content">
+    <a class="nav-logo" href="/dashboard"><i class="hgi-stroke hgi-scales" style="font-size:1.1rem;vertical-align:middle;margin-right:.35rem;"></i>Quanby Legal</a>
+    <div class="nav-links" id="nav-links">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/appointments">Appointments</a>
+      <a href="/registry" class="active"><i class="hgi-stroke hgi-book-open-01" style="font-size:.95rem;vertical-align:middle;margin-right:.3rem;"></i>Registry</a>
+    </div>
+    <div class="nav-user">
+      <span class="nav-user-name" id="nav-name">Loading…</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ENP Gate (shown if not attorney) -->
+<div id="enp-gate" style="display:none;">
+  <div class="gate-card">
+    <div class="icon"><i class="hgi-stroke hgi-lock-01" style="font-size:2rem;color:#8b949e;"></i></div>
+    <h2 style="margin-bottom:0.5rem;">ENP Access Only</h2>
+    <p style="color:var(--muted);font-size:0.875rem;margin-bottom:1.5rem;">The Notarial Registry is only accessible to certified Electronic Notary Publics.</p>
+    <a href="/dashboard" class="btn btn-primary">← Back to Dashboard</a>
+  </div>
+</div>
+
+<!-- Main Registry UI -->
+<div id="registry-ui" style="display:none;">
+  <div class="container">
+    <div class="page-header">
+      <div class="page-title"><i class="hgi-stroke hgi-book-open-01" style="font-size:1.4rem;vertical-align:middle;margin-right:.5rem;color:var(--accent);"></i>Notarial Registry</div>
+      <div class="page-subtitle">Your electronic notarial acts book — SC-compliant record of all completed notarizations</div>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="hgi-stroke hgi-file-edit" style="font-size:1.4rem;"></i></div>
+        <div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-label">Total Acts</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="hgi-stroke hgi-calendar-03" style="font-size:1.4rem;"></i></div>
+        <div>
+          <div class="stat-value" id="stat-month">—</div>
+          <div class="stat-label">This Month</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon yellow"><i class="hgi-stroke hgi-clock-01" style="font-size:1.4rem;"></i></div>
+        <div>
+          <div class="stat-value" id="stat-pending">—</div>
+          <div class="stat-label">Pending SC Sync</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon"><i class="hgi-stroke hgi-search-01"></i></span>
+        <input type="text" id="search-input" placeholder="Search by document, principal, or reference…" oninput="debouncedLoad()">
+      </div>
+      <select id="type-filter" onchange="loadActs(1)">
+        <option value="">All Types</option>
+        <option value="ACKNOWLEDGMENT">Acknowledgment</option>
+        <option value="JURAT">Jurat</option>
+        <option value="OATH">Oath</option>
+        <option value="AFFIDAVIT">Affidavit</option>
+      </select>
+      <button class="btn btn-outline" onclick="exportCsv()"><i class="hgi-stroke hgi-download-01" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Export CSV</button>
+      <button class="btn btn-primary" onclick="loadActs(1)"><i class="hgi-stroke hgi-refresh" style="font-size:.9rem;vertical-align:middle;margin-right:.3rem;"></i>Refresh</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap" id="table-wrap">
+      <div class="empty-state"><div class="spinner"></div><p style="margin-top:1rem;color:var(--muted);">Loading acts…</p></div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination" style="display:none;"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let currentPage = 1;
+let totalPages  = 1;
+let currentActs = [];
+let expandedRow = null;
+let debounceTimer = null;
+
+// ─── Auth & Boot ──────────────────────────────────────────────────────────────
+async function boot() {
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (!res.ok) { window.location = '/'; return; }
+    const user = await res.json();
+
+    document.getElementById('nav-name').textContent =
+      `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email;
+
+    if (user.role !== 'attorney') {
+      document.getElementById('enp-gate').style.display = 'flex';
+      return;
+    }
+    document.getElementById('registry-ui').style.display = 'block';
+    loadActs(1);
+  } catch(e) {
+    window.location = '/';
+  }
+}
+
+// ─── Load Acts ────────────────────────────────────────────────────────────────
+async function loadActs(page) {
+  currentPage = page || 1;
+  const search   = document.getElementById('search-input').value.trim();
+  const actType  = document.getElementById('type-filter').value;
+
+  let url = `/api/registry/acts?page=${currentPage}&per_page=20`;
+  if (search)  url += `&search=${encodeURIComponent(search)}`;
+  if (actType) url += `&act_type=${encodeURIComponent(actType)}`;
+
+  const wrap = document.getElementById('table-wrap');
+  wrap.innerHTML = `<div class="empty-state"><div class="spinner"></div><p style="margin-top:1rem;color:var(--muted);">Loading…</p></div>`;
+
+  try {
+    const res = await fetch(url, { credentials: 'include' });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+
+    // Stats
+    const s = data.stats || {};
+    document.getElementById('stat-total').textContent   = s.total   ?? data.total ?? 0;
+    document.getElementById('stat-month').textContent   = s.this_month ?? '—';
+    document.getElementById('stat-pending').textContent = s.pending_sc_sync ?? '—';
+
+    currentActs = data.acts || [];
+    totalPages  = data.pages || 1;
+
+    renderTable(currentActs);
+    renderPagination(data.total, currentPage, totalPages);
+  } catch(e) {
+    wrap.innerHTML = `<div class="empty-state"><div class="icon"><i class="hgi-stroke hgi-alert-circle" style="font-size:2.5rem;color:#f85149;"></i></div><h3>Error loading acts</h3><p>${e.message}</p></div>`;
+  }
+}
+
+function debouncedLoad() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => loadActs(1), 400);
+}
+
+// ─── Render Table ─────────────────────────────────────────────────────────────
+function renderTable(acts) {
+  const wrap = document.getElementById('table-wrap');
+  if (!acts.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="icon"><i class="hgi-stroke hgi-folder-01" style="font-size:2.5rem;color:#8b949e;"></i></div><h3>No acts found</h3><p>Completed notarial acts will appear here automatically after sessions end.</p></div>`;
+    document.getElementById('pagination').style.display = 'none';
+    return;
+  }
+
+  let html = `
+    <table>
+      <thead>
+        <tr>
+          <th>Registry #</th>
+          <th>Date</th>
+          <th>Document</th>
+          <th>Act Type</th>
+          <th>Fee</th>
+          <th>Status</th>
+          <th>SC Sync</th>
+          <th>Notarized Document</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="acts-tbody">
+  `;
+
+  acts.forEach((act, idx) => {
+    const date = act.executed_at ? new Date(act.executed_at).toLocaleDateString('en-PH', { year:'numeric',month:'short',day:'numeric' }) : '—';
+    const actNo = (act.id || '').slice(0,8).toUpperCase();
+    const typeBadge = typeToClass(act.act_type);
+    const dcBadge   = act.dc_status === 'completed'
+      ? '<span class="badge badge-green"><i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.75rem;vertical-align:middle;margin-right:.2rem;"></i>Completed</span>'
+      : `<span class="badge badge-yellow">${act.dc_status || '—'}</span>`;
+    const scBadge = act.sc_synced
+      ? `<span class="badge badge-green"><i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.75rem;vertical-align:middle;margin-right:.2rem;"></i>Synced</span>`
+      : `<span class="badge badge-yellow"><i class="hgi-stroke hgi-clock-01" style="font-size:.75rem;vertical-align:middle;margin-right:.2rem;"></i>Pending</span>`;
+
+    html += `
+      <tr id="row-${idx}" onclick="toggleDetail(${idx})" style="cursor:pointer;">
+        <td class="mono" style="font-size:.78rem;font-weight:700;color:var(--accent);">${actNo}</td>
+        <td style="font-size:.8rem;white-space:nowrap;">${date}</td>
+        <td style="max-width:220px;">
+          <div style="font-weight:600;font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(act.doc_name)}">${esc(act.doc_name) || '—'}</div>
+          ${act.dc_reference_number ? '<div style="font-size:.7rem;color:var(--muted);margin-top:.15rem;">Ref: ' + esc(act.dc_reference_number) + '</div>' : ''}
+        </td>
+        <td><span class="badge ${typeBadge}">${act.act_type || '—'}</span></td>
+        <td style="font-size:.82rem;">${act.fee ? '<span style="color:var(--text);">'+esc(act.fee)+'</span>' : '<span style="color:var(--muted);">—</span>'}</td>
+        <td>${dcBadge}</td>
+        <td>${scBadge}</td>
+        <td onclick="event.stopPropagation()" id="doc-links-${act.id}" style="white-space:nowrap;">
+          ${act.doconchain_project_uuid
+            ? '<span style="color:var(--muted);font-size:.75rem;">Loading…</span>'
+            : '<span style="color:var(--muted);font-size:.75rem;">—</span>'
+          }
+        </td>
+        <td onclick="event.stopPropagation()" style="white-space:nowrap;">
+          ${!act.sc_synced
+            ? `<button class="btn btn-sm btn-gold" onclick="syncSC('${act.id}', ${idx})"><i class="hgi-stroke hgi-cloud-upload" style="font-size:.78rem;vertical-align:middle;margin-right:.25rem;"></i>Sync SC</button>`
+            : `<span class="mono" style="font-size:.72rem;color:var(--muted);background:rgba(255,255,255,.05);padding:.2rem .5rem;border-radius:4px;display:inline-block;max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(act.sc_registry_id)||''}">${esc(act.sc_registry_id)||''}</span>`
+          }
+        </td>
+      </tr>
+      <tr class="detail-row" id="detail-${idx}">
+        <td colspan="9" style="padding:0;">
+          <div class="detail-inner" id="detail-inner-${idx}">
+            ${renderDetail(act)}
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+  // Auto-fetch documents for all acts with doconchain_project_uuid
+  acts.forEach(function(act) {
+    if (act.doconchain_project_uuid) {
+      fetchActDocument(act.id);
+    }
+  });
+}
+
+function renderDetail(act) {
+  const signers = act.dc_signers_snapshot || [];
+  return `
+    <div class="detail-grid">
+      <div class="detail-field"><label>DC Reference No.</label><span>${esc(act.dc_reference_number) || '—'}</span></div>
+      <div class="detail-field"><label>Appointment ID</label><span>${esc(act.apt_id) || '—'}</span></div>
+      <div class="detail-field"><label>Principal</label><span>${esc(act.principal_name) || '—'}${act.principal_email ? ' <span style=\"color:var(--muted);font-size:.75rem;\">(' + esc(act.principal_email) + ')</span>' : ''}</span></div>
+      <div class="detail-field"><label>Witness</label><span>${act.witness_name ? esc(act.witness_name) + (act.witness_email ? ' <span style=\"color:var(--muted);font-size:.75rem;\">(' + esc(act.witness_email) + ')</span>' : '') : '<span style=\"color:var(--muted);\">None</span>'}</span></div>
+      <div class="detail-field"><label>ENP Name</label><span>${esc(act.enp_name) || '—'}</span></div>
+      <div class="detail-field"><label>Roll No.</label><span>${esc(act.roll_no) || '—'}</span></div>
+      <div class="detail-field"><label>Commission No.</label><span>${esc(act.commission_no) || '—'}</span></div>
+      <div class="detail-field"><label>Location</label><span>${esc(act.location) || '—'}</span></div>
+      ${(function() {
+        var signers = act.dc_signers_snapshot || [];
+        if (!signers.length) return '';
+        var enpEmail = act.enp_email || '';
+        var principalEmail = (act.principal_email || '').toLowerCase();
+        var witnessEmail = (act.witness_email || '').toLowerCase();
+        var rows = signers.map(function(s) {
+          var sEmail = (s.email || '').toLowerCase();
+          var sName = s.name || ((s.first_name||'') + ' ' + (s.last_name||'')).trim() || sEmail;
+          var role, roleColor;
+          if (sEmail === enpEmail.toLowerCase()) {
+            role = 'Notary'; roleColor = '#a78bfa';
+          } else if (sEmail === principalEmail) {
+            role = 'Principal'; roleColor = '#58a6ff';
+          } else if (sEmail === witnessEmail) {
+            role = 'Witness'; roleColor = '#f59e0b';
+          } else {
+            role = s.signer_role || 'Signer'; roleColor = '#8b949e';
+          }
+          var status = (s.status || '').toLowerCase();
+          var signed = status === 'signed' || status === 'completed';
+          var signedAt = s.signed_at ? new Date(s.signed_at).toLocaleString('en-PH') : '';
+          return '<div style="display:flex;align-items:center;gap:.75rem;padding:.5rem .75rem;border-bottom:1px solid rgba(255,255,255,.05);font-size:.8rem;">'
+            + '<span style="min-width:70px;padding:.2rem .5rem;border-radius:4px;font-size:.68rem;font-weight:700;text-align:center;background:' + roleColor + '1a;color:' + roleColor + ';border:1px solid ' + roleColor + '33;">' + role + '</span>'
+            + '<div style="flex:1;min-width:0;">'
+            +   '<div style="font-weight:600;color:var(--text);">' + esc(sName) + '</div>'
+            +   '<div style="color:var(--muted);font-size:.72rem;">' + esc(sEmail) + (signedAt ? ' · Signed ' + signedAt : '') + '</div>'
+            + '</div>'
+            + '<span style="padding:.15rem .5rem;border-radius:4px;font-size:.68rem;font-weight:700;' + (signed ? 'background:rgba(63,185,80,.15);color:#3fb950;' : 'background:rgba(139,148,158,.12);color:#8b949e;') + '">'
+            + (signed ? '<i class=\"hgi-stroke hgi-checkmark-circle-01\" style=\"font-size:.75rem;vertical-align:middle;margin-right:.2rem;\"></i>Signed' : '<i class=\"hgi-stroke hgi-clock-01\" style=\"font-size:.75rem;vertical-align:middle;margin-right:.2rem;\"></i>Pending')
+            + '</span>'
+            + '</div>';
+        }).join('');
+        return '<div style="margin-top:.75rem;"><div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:.4rem .75rem;background:rgba(255,255,255,.03);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);">Signatories</div>' + rows + '</div>';
+      })()}
+      <div class="detail-field"><label>DC Project UUID</label><span class="mono">${esc(act.doconchain_project_uuid) || '—'}</span></div>
+      <div class="detail-field"><label>SC Registry ID</label><span>${esc(act.sc_registry_id) || '—'}</span></div>
+
+    </div>
+
+  `;
+}
+
+function toggleDetail(idx) {
+  const inner = document.getElementById(`detail-inner-${idx}`);
+  if (!inner) return;
+  const isOpen = inner.classList.contains('open');
+  // Close previous
+  if (expandedRow !== null && expandedRow !== idx) {
+    const prev = document.getElementById(`detail-inner-${expandedRow}`);
+    if (prev) prev.classList.remove('open');
+    const prevRow = document.getElementById(`row-${expandedRow}`);
+    if (prevRow) prevRow.classList.remove('expanded');
+  }
+  if (isOpen) {
+    inner.classList.remove('open');
+    document.getElementById(`row-${idx}`)?.classList.remove('expanded');
+    expandedRow = null;
+  } else {
+    inner.classList.add('open');
+    document.getElementById(`row-${idx}`)?.classList.add('expanded');
+    expandedRow = idx;
+    // Auto-fetch document when row opens
+    const _actForDoc = (typeof currentActs !== 'undefined') ? currentActs[idx] : null;
+    if (_actForDoc && _actForDoc.doconchain_project_uuid) {
+      fetchActDocument(_actForDoc.id);
+    }
+  }
+}
+
+// ─── Sync to SC ───────────────────────────────────────────────────────────────
+async function syncSC(actId, idx) {
+  try {
+    const res = await fetch(`/api/registry/acts/${actId}/sync-sc`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Sync failed');
+    showToast(`Synced! SC Registry ID: ${data.sc_registry_id}`, 'success');
+    loadActs(currentPage);
+  } catch(e) {
+    showToast(e.message, 'error');
+  }
+}
+
+// ─── Export CSV ───────────────────────────────────────────────────────────────
+async function exportCsv() {
+  try {
+    const search   = document.getElementById('search-input').value.trim();
+    const actType  = document.getElementById('type-filter').value;
+
+    let url = '/api/registry/acts?page=1&per_page=9999';
+    if (search)  url += `&search=${encodeURIComponent(search)}`;
+    if (actType) url += `&act_type=${encodeURIComponent(actType)}`;
+
+    const res = await fetch(url, { credentials: 'include' });
+    const data = await res.json();
+    const acts = data.acts || [];
+
+    const headers = ['Registry #','Date','Document','Act Type','Workflow','Fee','DC Reference','DC Status','Principal','Principal Email','Witness','Witness Email','SC Synced','SC Registry ID','Location'];
+    const rows = acts.map(a => [
+      a.id || '',
+      a.executed_at ? new Date(a.executed_at).toISOString().slice(0,10) : '',
+      a.doc_name || '',
+      a.act_type || '',
+      a.principal_name || '',
+      a.principal_email || '',
+      a.witness_name || '',
+      a.witness_email || '',
+      a.dc_status || '',
+      a.dc_reference_number || '',
+      a.sc_synced ? 'Yes' : 'No',
+      a.sc_registry_id || '',
+      a.location || '',
+    ].map(v => `"${String(v).replace(/"/g,'""')}"`));
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `notarial-registry-${new Date().toISOString().slice(0,10)}.csv`;
+    link.click();
+    showToast(`Exported ${acts.length} acts`, 'success');
+  } catch(e) {
+    showToast('Export failed: ' + e.message, 'error');
+  }
+}
+
+// ─── Pagination ───────────────────────────────────────────────────────────────
+function renderPagination(total, page, pages) {
+  const pag = document.getElementById('pagination');
+  if (pages <= 1 && total === 0) { pag.style.display = 'none'; return; }
+  pag.style.display = 'flex';
+
+  const start = (page - 1) * 20 + 1;
+  const end   = Math.min(page * 20, total);
+
+  let btns = '';
+  const lo = Math.max(1, page - 2);
+  const hi = Math.min(pages, page + 2);
+  if (lo > 1) btns += `<button class="page-btn" onclick="loadActs(1)">1</button>`;
+  if (lo > 2) btns += `<span style="color:var(--muted);padding:0 0.25rem">…</span>`;
+  for (let i = lo; i <= hi; i++) {
+    btns += `<button class="page-btn${i===page?' active':''}" onclick="loadActs(${i})">${i}</button>`;
+  }
+  if (hi < pages - 1) btns += `<span style="color:var(--muted);padding:0 0.25rem">…</span>`;
+  if (hi < pages) btns += `<button class="page-btn" onclick="loadActs(${pages})">${pages}</button>`;
+
+  pag.innerHTML = `
+    <span class="pagination-info">Showing ${total ? start : 0}–${end} of ${total} acts</span>
+    <div class="pagination-pages">
+      <button class="page-btn" onclick="loadActs(${page-1})" ${page<=1?'disabled':''}>‹</button>
+      ${btns}
+      <button class="page-btn" onclick="loadActs(${page+1})" ${page>=pages?'disabled':''}>›</button>
+    </div>
+  `;
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function typeToClass(t) {
+  const m = { ACKNOWLEDGMENT:'badge-blue', JURAT:'badge-purple', OATH:'badge-green', AFFIDAVIT:'badge-yellow' };
+  return m[t] || 'badge-gray';
+}
+
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg, type='success') {
+  const wrap = document.getElementById('toast');
+  const el = document.createElement('div');
+  el.className = `toast-msg ${type}`;
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+boot();
+
+async function fetchActDocument(actId) {
+  const linksEl = document.getElementById('doc-links-' + actId);
+  if (!linksEl) return;
+  if (linksEl.querySelector('a')) return;
+  try {
+    const res = await fetch('/api/registry/acts/' + actId + '/document', { credentials: 'include' });
+    const data = await res.json();
+    if (!res.ok) { linksEl.innerHTML = '<span style="color:var(--muted);font-size:.75rem;">—</span>'; return; }
+    let dlUrl = '', dlName = 'Notarized Document';
+    const dcFile = (data.dc_files || [])[0];
+    const scFile = (data.sc_files || [])[0];
+    if (dcFile) { dlUrl = dcFile.downloadUrl || dcFile.url || ''; dlName = dcFile.fileName || dlName; }
+    else if (scFile) { dlUrl = scFile.downloadUrl || scFile.url || ''; dlName = scFile.fileName || dlName; }
+    else if (data.doconchain_view_url) { dlUrl = data.doconchain_view_url; }
+    if (!dlUrl) { linksEl.innerHTML = '<span style="color:var(--muted);font-size:.75rem;">—</span>'; return; }
+    // Store on element to avoid inline quote escaping issues
+    linksEl.dataset.dlUrl = dlUrl;
+    linksEl.dataset.dlName = dlName;
+    linksEl.innerHTML =
+      '<a href="' + esc(dlUrl) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" '
+      + 'style="display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .6rem;background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.3);border-radius:6px;font-size:.74rem;font-weight:600;text-decoration:none;margin-right:.3rem;">'
+      + '<i class="hgi-stroke hgi-download-01" style="font-size:.78rem;"></i>Download</a>'
+      + '<button onclick="event.stopPropagation();openDocModalById(this)" data-url="' + esc(dlUrl) + '" data-name="' + esc(dlName) + '" '
+      + 'style="display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .6rem;background:rgba(88,166,255,.12);color:#58a6ff;border:1px solid rgba(88,166,255,.3);border-radius:6px;font-size:.74rem;font-weight:600;cursor:pointer;">'
+      + '<i class="hgi-stroke hgi-eye" style="font-size:.78rem;"></i>View</button>';
+  } catch(e) {
+    if (linksEl) linksEl.innerHTML = '<span style="color:var(--muted);font-size:.75rem;">—</span>';
+  }
+}
+
+function openDocModalById(btn) {
+  const url = btn.dataset.url || '';
+  const name = btn.dataset.name || 'Document Preview';
+  openDocModal(url, name);
+}
+
+function openDocModal(url, name) {
+  document.getElementById('doc-modal-title').textContent = name || 'Document Preview';
+  document.getElementById('doc-modal-download').href = url;
+  document.getElementById('doc-modal-iframe').src = url;
+  const modal = document.getElementById('doc-preview-modal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDocModal() {
+  const modal = document.getElementById('doc-preview-modal');
+  modal.style.display = 'none';
+  document.getElementById('doc-modal-iframe').src = '';
+  document.body.style.overflow = '';
+}
+</script>
+
+<!-- Document Preview Modal -->
+<div id="doc-preview-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid rgba(255,255,255,.1);border-radius:12px;width:90%;max-width:960px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.08);">
+      <div style="font-weight:700;font-size:.95rem;color:var(--text);" id="doc-modal-title">Document Preview</div>
+      <div style="display:flex;align-items:center;gap:.75rem;">
+        <a id="doc-modal-download" href="#" target="_blank" rel="noopener"
+          style="display:inline-flex;align-items:center;gap:.3rem;padding:.3rem .75rem;background:rgba(63,185,80,.12);color:#3fb950;border:1px solid rgba(63,185,80,.3);border-radius:6px;font-size:.78rem;font-weight:600;text-decoration:none;">
+          <i class="hgi-stroke hgi-download-01" style="font-size:.85rem;"></i>Download
+        </a>
+        <button onclick="closeDocModal()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.3rem;line-height:1;padding:.2rem .4rem;">&times;</button>
+      </div>
+    </div>
+    <div style="flex:1;overflow:auto;padding:.5rem;">
+      <iframe id="doc-modal-iframe" src="" style="width:100%;height:calc(90vh - 80px);border:none;border-radius:6px;background:#fff;"></iframe>
+    </div>
+  </div>
+</div>
+</body>
+</html>

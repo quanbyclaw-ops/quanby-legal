@@ -1,0 +1,52 @@
+[
+  {
+    "id": "0d670918-5843-4158-948f-a15502794b19",
+    "name": "DOSC Team",
+    "address": "dosc legazpi",
+    "type": "Department",
+    "owner_id": "admin",
+    "dc_client_key": "",
+    "dc_client_secret": "",
+    "dc_email": "",
+    "credits_total": 0,
+    "credits_used": 0,
+    "members": [],
+    "created_at": "2026-04-13T03:16:56.134926+00:00",
+    "updated_at": "2026-04-13T03:16:56.134926+00:00"
+  },
+  {
+    "id": "299bfc84-194c-4059-a520-658972345fc1",
+    "name": "Team Legal",
+    "address": "Cabangan Legazpi",
+    "type": "Department",
+    "owner_id": "admin",
+    "dc_client_key": "",
+    "dc_client_secret": "",
+    "dc_email": "",
+    "credits_total": 0,
+    "credits_used": 0,
+    "members": [],
+    "created_at": "2026-04-13T05:07:40.015816+00:00",
+    "updated_at": "2026-04-13T05:07:40.015816+00:00",
+    "dc_sub_org_id": null,
+    "dc_sub_org_uuid": null
+  },
+  {
+    "id": "3cece685-a381-4ca6-93a5-582cd6f5a400",
+    "name": "Team Cabangan",
+    "address": "Legazpi City",
+    "type": "Department",
+    "owner_id": "admin",
+    "dc_client_key": "U2FsdGVkX1/hq3nobmwURCRhE82+YG/b9KjLBPqiudU=",
+    "dc_client_secret": "TiYApW6j1EDHQe9CaaMIgjmd8",
+    "dc_email": "",
+    "credits_total": 0,
+    "credits_used": 0,
+    "members": [],
+    "created_at": "2026-04-13T05:14:38.772407+00:00",
+    "updated_at": "2026-04-13T05:14:38.772407+00:00",
+    "dc_sub_org_id": "2007",
+    "dc_sub_org_uuid": "f051a46e-2511-41c7-ad40-66e6ab677921",
+    "dc_photo_url": "https://s3.ap-southeast-1.amazonaws.com/stg-doc-public-assets/users-v2/development-f051a46e-2511-41c7-ad40-66e6ab677921-profile-VH0.png"
+  }
+]
