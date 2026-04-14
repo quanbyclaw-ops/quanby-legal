@@ -327,7 +327,102 @@
     .cert-actions { flex-direction: column; }
     .services-grid { grid-template-columns: 1fr; }
   }
-</style>
+
+  /* ── AI Insight Card ── */
+  .ai-insight-card {
+    background: linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(245,158,11,0.08) 100%);
+    border: 1px solid rgba(16,185,129,0.25);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: none; /* shown only for ENPs */
+    position: relative;
+    overflow: hidden;
+  }
+  .ai-insight-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--green), var(--gold));
+  }
+  .ai-insight-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--green);
+  }
+  .ai-insight-header .ai-badge {
+    background: rgba(16,185,129,0.15);
+    color: var(--green);
+    font-size: 0.65rem;
+    padding: 0.15rem 0.45rem;
+    border-radius: 20px;
+    border: 1px solid rgba(16,185,129,0.3);
+    font-weight: 700;
+  }
+  .ai-insight-summary {
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+  }
+  .ai-insight-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+  }
+  .ai-action-pill {
+    background: rgba(245,158,11,0.12);
+    border: 1px solid rgba(245,158,11,0.3);
+    color: var(--gold);
+    font-size: 0.75rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .ai-action-pill.info {
+    background: rgba(99,102,241,0.1);
+    border-color: rgba(99,102,241,0.3);
+    color: #818cf8;
+  }
+  .ai-insight-note {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.4;
+  }
+  .ai-insight-loading {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .ai-insight-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+  .ai-stat-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    min-width: 60px;
+  }
+  .ai-stat-chip .num { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+  .ai-stat-chip .lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  </style>
 <script src="https://hv-camera-web-sg.s3-ap-southeast-1.amazonaws.com/hyperverge-web-sdk@10.3.0/src/sdk.min.js"></script>
 </head>
 <body>
@@ -540,6 +635,22 @@
       </div>
     </div>
 
+
+    <!-- ─── AI Insight Card (ENP only) ─────────────────────────── -->
+    <div id="ai-insight-card" class="ai-insight-card">
+      <div class="ai-insight-header">
+        <i class="hgi-stroke hgi-sparkles" style="font-size:1rem;"></i>
+        AI Insights
+        <span class="ai-badge">Agentic AI</span>
+      </div>
+      <div id="ai-insight-body">
+        <div class="ai-insight-loading">
+          <i class="hgi-stroke hgi-loading-03" style="font-size:0.9rem;"></i>
+          Analyzing your notarization activity…
+        </div>
+      </div>
+    </div>
+
     <!-- ⑥ NOTARIZATION SERVICES (role-based) -->
     <div class="dash-section" id="booking-actions" style="display:none;">
       <div class="section-header">
@@ -663,6 +774,58 @@ async function loadDashboard() {
             if (el) el.textContent = pending > 0 ? pending + ' pending request' + (pending > 1 ? 's' : '') : 'No pending requests';
           }).catch(() => {});
       }
+    }
+
+
+    // ── Agentic AI Insight (ENP only) ──────────────────────────────────
+    if (user.role === 'attorney') {
+      const insightCard = document.getElementById('ai-insight-card');
+      if (insightCard) insightCard.style.display = '';
+
+      fetch('/api/dashboard/ai-insight', { credentials: 'include' })
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(data => {
+          if (!data.success || !data.insight) return;
+          const ins = data.insight;
+          const body = document.getElementById('ai-insight-body');
+          if (!body) return;
+
+          const stats = ins.stats || {};
+          const actionItems = (ins.action_items || []).map(a =>
+            `<span class="ai-action-pill">${a}</span>`
+          ).join('');
+
+          const moodColor = ins.mood === 'busy' ? 'var(--amber)' :
+                            ins.mood === 'quiet' ? 'var(--muted)' : 'var(--green)';
+
+          body.innerHTML = `
+            <div class="ai-insight-stats">
+              <div class="ai-stat-chip">
+                <span class="num">${stats.pending || 0}</span>
+                <span class="lbl">Pending</span>
+              </div>
+              <div class="ai-stat-chip">
+                <span class="num">${stats.confirmed || 0}</span>
+                <span class="lbl">Confirmed</span>
+              </div>
+              <div class="ai-stat-chip">
+                <span class="num">${stats.completed || 0}</span>
+                <span class="lbl">Completed</span>
+              </div>
+              <div class="ai-stat-chip">
+                <span class="num">${stats.total || 0}</span>
+                <span class="lbl">Total</span>
+              </div>
+            </div>
+            <div class="ai-insight-summary">${ins.summary || ''}</div>
+            ${actionItems ? `<div class="ai-insight-actions">${actionItems}</div>` : ''}
+            <div class="ai-insight-note">${ins.insight || ''}</div>
+          `;
+        })
+        .catch(() => {
+          const body = document.getElementById('ai-insight-body');
+          if (body) body.innerHTML = '<div class="ai-insight-loading">AI insight unavailable right now.</div>';
+        });
     }
 
     // Status chip

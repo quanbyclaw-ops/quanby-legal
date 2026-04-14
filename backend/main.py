@@ -32,7 +32,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 from contract_parser import extract_text, clean_text, get_contract_summary_for_context
-from ai_engine import analyze_contract, chat_about_contract, generate_contract
+from ai_engine import analyze_contract, chat_about_contract, generate_contract, generate_notarization_summary, validate_document_pre_upload, generate_dashboard_insight
 from auth import (
     create_jwt, create_access_token, create_refresh_token,
     verify_jwt, verify_refresh_token,
@@ -2658,6 +2658,46 @@ class SessionInviteRequest(BaseModel):
 _LIVEKIT_URL = "wss://quanby-lms-k4aq44qe.livekit.cloud"
 
 
+
+# ─── GET /api/dashboard/ai-insight ─── Agentic Dashboard Insight ─────────────
+
+# Simple in-memory cache: {enp_id: (timestamp, insight)}
+_dashboard_insight_cache: dict = {}
+_INSIGHT_CACHE_TTL = 300  # 5 minutes
+
+@app.get("/api/dashboard/ai-insight")
+async def get_dashboard_ai_insight(
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Return AI-generated dashboard insight for ENP — summarizes activity & action items."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    if user.get("role") != "attorney":
+        raise HTTPException(403, "ENP only")
+
+    import time as _insight_time
+    enp_id = user["id"]
+    cached = _dashboard_insight_cache.get(enp_id)
+    if cached:
+        ts, insight = cached
+        if _insight_time.time() - ts < _INSIGHT_CACHE_TTL:
+            return {"success": True, "insight": insight, "cached": True}
+
+    # Load ENP's appointments
+    with _apts_lock:
+        _reload_appointments()
+        my_apts = [a for a in _appointments.values() if a.get("enp_id") == enp_id]
+
+    result = generate_dashboard_insight(my_apts, user)
+    if not result.get("success"):
+        raise HTTPException(500, f"Insight generation failed: {result.get('error', 'unknown')}")
+
+    insight = result["insight"]
+    _dashboard_insight_cache[enp_id] = (_insight_time.time(), insight)
+    return {"success": True, "insight": insight, "cached": False}
+
 # ─── GET /api/sessions/my-ip ──────────────────────────────────────────────────
 
 
@@ -3692,10 +3732,78 @@ async def end_session(
         _populate_registry_bg(apt_id, _enp_id_hook)
     _t_endsession.Thread(target=_delayed_populate, daemon=True).start()
 
+    # Background: generate Agentic Notarization Summary
+    def _generate_summary_bg():
+        import time as _ts; _ts.sleep(3)  # wait for apt data to settle
+        try:
+            with _apts_lock:
+                _reload_appointments()
+                _apt_snap = _appointments.get(apt_id, {})
+            _enp_snap = get_user(user["id"]) or {}
+            result = generate_notarization_summary(_apt_snap, _enp_snap)
+            if result.get("success"):
+                with _apts_lock:
+                    _reload_appointments()
+                    if apt_id in _appointments:
+                        _appointments[apt_id]["ai_summary"] = result["summary"]
+                        _appointments[apt_id]["ai_summary_generated_at"] = _dt.now(_tz.utc).isoformat()
+                        _save_appointments()
+        except Exception as _e:
+            pass  # Non-blocking — summary failure never breaks session end
+
+    import threading as _t_summary
+    _t_summary.Thread(target=_generate_summary_bg, daemon=True).start()
+
     return {"success": True}
 
 
 # ─── LiveKit Egress helpers ───────────────────────────────────────────────────
+
+
+# ─── GET /api/sessions/{apt_id}/summary ─── Agentic Notarization Summary ─────
+
+@app.get("/api/sessions/{apt_id}/summary")
+async def get_session_summary(
+    apt_id: str,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """Return AI-generated Agentic Notarization Summary for a completed session."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+
+    with _apts_lock:
+        _reload_appointments()
+        apt = _appointments.get(apt_id)
+    if not apt:
+        raise HTTPException(404, "Appointment not found")
+    if user["id"] not in (apt.get("enp_id"), apt.get("client_id")):
+        raise HTTPException(403, "Not authorized for this session")
+
+    summary = apt.get("ai_summary")
+    if not summary:
+        # Generate on-demand if not already cached
+        enp_user = get_user(apt.get("enp_id", "")) or {}
+        result = generate_notarization_summary(apt, enp_user)
+        if result.get("success"):
+            summary = result["summary"]
+            with _apts_lock:
+                _reload_appointments()
+                if apt_id in _appointments:
+                    _appointments[apt_id]["ai_summary"] = summary
+                    _appointments[apt_id]["ai_summary_generated_at"] = _dt.now(_tz.utc).isoformat()
+                    _save_appointments()
+        else:
+            raise HTTPException(500, f"Summary generation failed: {result.get('error', 'unknown')}")
+
+    return {
+        "success": True,
+        "apt_id": apt_id,
+        "session_status": apt.get("session_status", "unknown"),
+        "summary": summary,
+        "generated_at": apt.get("ai_summary_generated_at"),
+    }
 
 def _livekit_egress_jwt(action: str) -> str:
     """Generate a short-lived JWT for LiveKit server API calls."""
@@ -4059,6 +4167,37 @@ async def session_upload_document(
     if not file_bytes:
         raise HTTPException(400, "Empty file")
 
+    # ── Agentic Pre-Notarization Checklist: AI validates document before upload ──
+    _ai_validation = None
+    try:
+        # Extract text for AI validation (best-effort, no hard fail)
+        _file_text_for_ai = ""
+        try:
+            if file_name.lower().endswith(".txt"):
+                _file_text_for_ai = file_bytes.decode("utf-8", errors="replace")
+            elif file_name.lower().endswith(".pdf"):
+                import io as _io_ai
+                try:
+                    import pypdf as _pypdf
+                    _reader = _pypdf.PdfReader(_io_ai.BytesIO(file_bytes))
+                    _file_text_for_ai = " ".join(p.extract_text() or "" for p in _reader.pages[:5])
+                except ImportError:
+                    pass
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+        if _file_text_for_ai.strip():
+            _val_result = validate_document_pre_upload(
+                _file_text_for_ai, file_name, notarization_type,
+                apt if isinstance(apt, dict) else {}
+            )
+            if _val_result.get("success"):
+                _ai_validation = _val_result.get("validation")
+    except Exception:
+        pass  # Non-blocking — AI validation never blocks upload
+
     DC_BASE = _DC_BASE
     DC_CLIENT_KEY = _DC_CLIENT_KEY
     DC_CLIENT_SECRET = _DC_CLIENT_SECRET
@@ -4172,7 +4311,8 @@ async def session_upload_document(
         _save_appointments()
 
     return {"success": True, "doc_name": doc_name, "notarization_type": notarization_type,
-            "project_uuid": project_uuid, "sign_link": sign_link}
+            "project_uuid": project_uuid, "sign_link": sign_link,
+            "ai_validation": _ai_validation}
 
 # ─── PATCH /api/sessions/{apt_id}/documents/{project_uuid}/fee ────────────────
 

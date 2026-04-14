@@ -309,3 +309,273 @@ Generate the complete contract document now:"""
             "success": False,
             "error": str(e)
         }
+
+
+# ─── AGENTIC AI UPGRADE ── Post-Notarization Summary Agent ───────────────────
+
+def generate_notarization_summary(apt: dict, enp_user: dict) -> dict:
+    """
+    Post-Notarization Summary Agent (Agentic AI — Executing + Memory).
+    After a session ends, generates a structured Agentic Notarization Summary.
+    Compliant with Philippine RA 8792 (Electronic Commerce Act).
+    ENP remains the executing authority — AI assists only.
+    """
+    client = get_client()
+
+    enp_profile = enp_user.get("profile") or {}
+    enp_full_name = f"{enp_user.get('first_name', '')} {enp_user.get('last_name', '')}".strip()
+    roll_no = enp_profile.get("roll_no", "N/A")
+    commission_no = enp_profile.get("commission_no", "N/A")
+    commission_valid = enp_profile.get("commission_no_valid_until", "N/A")
+
+    docs = apt.get("session_documents", [])
+    doc_summaries = []
+    for d in docs:
+        doc_summaries.append(
+            f"- {d.get('doc_name', d.get('name', 'Document'))} "
+            f"[{d.get('notarization_type', 'ACKNOWLEDGMENT')}] "
+            f"uploaded by {d.get('uploaded_by_name', 'unknown')} "
+            f"at {d.get('uploaded_at', 'N/A')}"
+        )
+    docs_text = "\n".join(doc_summaries) if doc_summaries else "No documents uploaded."
+
+    prompt = f"""You are the Quanby Legal Post-Notarization Summary Agent.
+Generate a structured Agentic Notarization Summary for this completed e-notarization session.
+
+SESSION DATA:
+- Appointment ID: {apt.get("apt_id", "N/A")}
+- Session Title: {apt.get("title", "Notarization Session")}
+- Notarization Type: {apt.get("notarization_type", "N/A")}
+- Session Mode: {apt.get("mode", "REN")}
+- Client: {apt.get("client_name", "N/A")} <{apt.get("client_email", "")}>
+- ENP: {enp_full_name}
+- ENP Roll No.: {roll_no}
+- ENP Commission No.: {commission_no} (valid until {commission_valid})
+- Session Started: {apt.get("confirmed_at", apt.get("created_at", "N/A"))}
+- Session Ended: {apt.get("session_ended_at", "N/A")}
+- Notes: {apt.get("notes", "")}
+
+DOCUMENTS NOTARIZED:
+{docs_text}
+
+Generate a JSON summary in this exact structure:
+{{
+  "summary_type": "Agentic Notarization Summary",
+  "apt_id": "{apt.get("apt_id", "N/A")}",
+  "session_title": "...",
+  "notarization_type": "...",
+  "mode": "REN or IEN",
+  "parties": {{
+    "client_name": "...",
+    "client_email": "...",
+    "enp_name": "...",
+    "enp_roll_no": "...",
+    "enp_commission_no": "...",
+    "enp_commission_valid_until": "..."
+  }},
+  "documents": [
+    {{
+      "doc_name": "...",
+      "notarization_type": "...",
+      "uploaded_by": "...",
+      "uploaded_at": "..."
+    }}
+  ],
+  "session_timeline": {{
+    "created_at": "...",
+    "confirmed_at": "...",
+    "ended_at": "..."
+  }},
+  "compliance": {{
+    "ra_8792": "Compliant",
+    "sc_rules": "A.M. No. 24-10-14-SC compliant",
+    "authority_note": "ENP is the executing authority. AI assistance does not replace ENP judgment.",
+    "note": "This e-notarization was conducted under Philippine RA 8792 and Supreme Court Electronic Notarization Rules."
+  }},
+  "ai_observations": "2-3 sentence professional summary of this notarization session",
+  "generated_at": "ISO timestamp of when this summary was generated",
+  "generated_by": "Quanby Legal Agentic AI — Post-Notarization Summary Agent"
+}}"""
+
+    try:
+        from datetime import datetime, timezone
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.1,
+            max_tokens=1500,
+        )
+        raw = response.choices[0].message.content
+        import json as _json
+        try:
+            js = raw.find("{"); je = raw.rfind("}") + 1
+            summary = _json.loads(raw[js:je]) if js != -1 and je > js else {"raw": raw}
+        except Exception:
+            summary = {"raw": raw}
+        summary["generated_at"] = datetime.now(timezone.utc).isoformat()
+        return {"success": True, "summary": summary}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# ─── AGENTIC AI UPGRADE ── Pre-Notarization Checklist Agent ──────────────────
+
+def validate_document_pre_upload(
+    file_text: str,
+    file_name: str,
+    notarization_type: str,
+    apt: dict,
+) -> dict:
+    """
+    Pre-Notarization Checklist Agent (Agentic AI — Sensing + Reasoning).
+    Validates document suitability before upload to a notarization session.
+    Checks notarization type, required fields, parties, and flags issues.
+    """
+    client = get_client()
+
+    prompt = f"""You are the Quanby Legal Pre-Notarization Checklist Agent.
+Validate this document BEFORE it is uploaded to a notarization session.
+
+CONTEXT:
+- Requested Notarization Type: {notarization_type}
+- Appointment Notes: {apt.get("notes", "None")}
+- Client: {apt.get("client_name", "Unknown")}
+- Document File: {file_name}
+
+DOCUMENT TEXT (first 3000 chars):
+---
+{file_text[:3000]}
+---
+
+Perform a pre-notarization checklist and return JSON:
+{{
+  "checklist_agent": "Quanby Legal Pre-Notarization Checklist Agent",
+  "document_name": "{file_name}",
+  "notarization_type_requested": "{notarization_type}",
+  "notarization_type_detected": "What type this document actually is",
+  "type_match": true,
+  "type_mismatch_note": "If mismatch, explain why",
+  "required_fields_present": {{
+    "parties_named": true,
+    "dates_present": true,
+    "signature_blocks": true,
+    "notarization_block": true,
+    "description": "Summary of what fields are present or missing"
+  }},
+  "issues": [
+    {{
+      "severity": "high/medium/low/info",
+      "title": "Issue title",
+      "description": "Details",
+      "recommendation": "Fix suggestion"
+    }}
+  ],
+  "ra_8792_ready": true,
+  "ra_8792_notes": "Any RA 8792 compliance notes",
+  "overall_verdict": "READY / NEEDS_REVIEW / NOT_READY",
+  "overall_note": "1-2 sentence summary for the ENP before proceeding"
+}}"""
+
+    try:
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.1,
+            max_tokens=1200,
+        )
+        raw = response.choices[0].message.content
+        import json as _json
+        try:
+            js = raw.find("{"); je = raw.rfind("}") + 1
+            result = _json.loads(raw[js:je]) if js != -1 and je > js else {"raw": raw}
+        except Exception:
+            result = {"raw": raw}
+        return {"success": True, "validation": result}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+# ─── AGENTIC AI UPGRADE ── Dashboard AI Insight Agent ────────────────────────
+
+def generate_dashboard_insight(appointments: list, enp_user: dict) -> dict:
+    """
+    Dashboard AI Insight Agent (Agentic AI — Planning + Proactive Notification).
+    Summarizes recent notarizations and flags pending action items for the ENP.
+    """
+    client = get_client()
+
+    enp_name = f"{enp_user.get('first_name', '')} {enp_user.get('last_name', '')}".strip()
+
+    recent = sorted(appointments, key=lambda a: a.get("created_at", ""), reverse=True)[:10]
+    apt_lines = []
+    for a in recent:
+        apt_lines.append(
+            f"- [{a.get('status', '?')}] {a.get('title', 'Appointment')} | "
+            f"Client: {a.get('client_name', '?')} | "
+            f"Type: {a.get('notarization_type', '?')} | "
+            f"Mode: {a.get('mode', '?')} | "
+            f"Created: {a.get('created_at', '?')[:10]}"
+        )
+    apts_text = "\n".join(apt_lines) if apt_lines else "No appointments yet."
+
+    pending_count = sum(1 for a in appointments if a.get("status") == "PENDING")
+    confirmed_count = sum(1 for a in appointments if a.get("status") == "CONFIRMED")
+    ended_count = sum(1 for a in appointments if a.get("session_status") == "ended")
+
+    prompt = f"""You are the Quanby Legal Dashboard AI Insight Agent.
+Generate a concise, actionable AI insight summary for ENP {enp_name}.
+
+APPOINTMENT STATISTICS:
+- Pending (awaiting confirmation): {pending_count}
+- Confirmed (upcoming): {confirmed_count}
+- Completed sessions: {ended_count}
+- Total: {len(appointments)}
+
+RECENT APPOINTMENTS:
+{apts_text}
+
+Return a compact JSON insight:
+{{
+  "insight_agent": "Quanby Legal Dashboard AI Insight",
+  "enp_name": "{enp_name}",
+  "stats": {{
+    "pending": {pending_count},
+    "confirmed": {confirmed_count},
+    "completed": {ended_count},
+    "total": {len(appointments)}
+  }},
+  "summary": "1 sentence summary of overall notarization activity",
+  "action_items": [
+    "Action item 1",
+    "Action item 2 if any"
+  ],
+  "insight": "2-3 sentence professional insight about patterns, activity, or recommendations for the ENP",
+  "mood": "busy/steady/quiet"
+}}"""
+
+    try:
+        response = client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+            max_tokens=600,
+        )
+        raw = response.choices[0].message.content
+        import json as _json
+        try:
+            js = raw.find("{"); je = raw.rfind("}") + 1
+            result = _json.loads(raw[js:je]) if js != -1 and je > js else {"raw": raw}
+        except Exception:
+            result = {"raw": raw}
+        return {"success": True, "insight": result}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
