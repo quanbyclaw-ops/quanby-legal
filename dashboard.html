@@ -670,8 +670,10 @@ async function loadDashboard() {
     const chip = document.getElementById('status-chip');
     if (certStatus === 'certified') {
       chip.className = 'status-chip certified'; chip.innerHTML = '<i class="hgi-stroke hgi-checkmark-circle-01" style="font-size:.85rem;vertical-align:middle;margin-right:.25rem;"></i>ENP Certified';
-    } else {
+    } else if (user.role === 'attorney') {
       chip.className = 'status-chip pending'; chip.innerHTML = '<i class="hgi-stroke hgi-clock-01" style="font-size:.85rem;vertical-align:middle;margin-right:.25rem;"></i>Pending Certification';
+    } else {
+      chip.style.display = 'none';
     }
 
     // Onboarding step
