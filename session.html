@@ -1871,6 +1871,16 @@ async function joinSession(me, userRole) {
 
 let _dcToken = ''; // token kept in memory only, not displayed
 
+async function loadDcToken() {
+  try {
+    const r = await fetch('/api/sessions/dc-token', { credentials: 'include' });
+    if (r.ok) {
+      const d = await r.json();
+      _dcToken = d.token || '';
+    }
+  } catch(e) { console.warn('[Session] loadDcToken failed:', e); }
+}
+
 function postJoinSetup(userName, role, userRole) {
   // Show ENP-only controls
   const isEnp = (role === 'ENP');
