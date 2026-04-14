@@ -4409,8 +4409,16 @@ def _act_exists(registry: dict, enp_id: str, dc_uuid: str) -> bool:
 
 def _populate_registry_bg(apt_id: str, enp_id: str) -> None:
     """Background thread: populate registry acts from a completed appointment.
-    Max runtime: 90 seconds. Never blocks API workers."""
+    Max runtime: 60 seconds hard cap. Never blocks API workers."""
     import signal as _sig_reg
+    import threading as _t_reg
+    # Hard timeout: kill this thread's work after 60s to prevent blocking
+    _timeout_flag = [False]
+    def _set_timeout():
+        _timeout_flag[0] = True
+    _timeout_timer = _t_reg.Timer(60.0, _set_timeout)
+    _timeout_timer.daemon = True
+    _timeout_timer.start()
     try:
         import urllib.request as _ureg, json as _jreg
 
@@ -4717,13 +4725,26 @@ async def registry_sync_all(
     if not ended_apts:
         return {"success": True, "message": "No ended sessions found", "queued": 0}
 
-    # Run sequentially in a single background thread to prevent worker exhaustion
+    # Run sequentially in a single background thread — prevents worker exhaustion
+    # Global lock ensures only one sync-all runs at a time
+    import threading as _t_lock
+    _SYNC_LOCK = getattr(registry_sync_all, '_lock', None)
+    if _SYNC_LOCK is None:
+        registry_sync_all._lock = _t_lock.Lock()
+        _SYNC_LOCK = registry_sync_all._lock
+
+    if not _SYNC_LOCK.acquire(blocking=False):
+        return {"success": True, "message": "Sync already in progress — please wait", "queued": 0}
+
     def _sync_all_bg():
-        for aid in ended_apts:
-            try:
-                _populate_registry_bg(aid, enp_id)
-            except Exception:
-                pass
+        try:
+            for aid in ended_apts:
+                try:
+                    _populate_registry_bg(aid, enp_id)
+                except Exception as _e:
+                    print(f"[Registry] sync error for {aid}: {_e}", flush=True)
+        finally:
+            _SYNC_LOCK.release()
 
     _tsyncall.Thread(target=_sync_all_bg, daemon=True).start()
     return {"success": True, "message": f"Queued {len(ended_apts)} sessions for sync", "queued": len(ended_apts)}
