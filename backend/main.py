@@ -770,6 +770,38 @@ async def start_test(
     }
 
 
+
+@app.get("/api/certification/dev-answers")
+async def dev_get_answers(
+    session_id: str,
+    authorization: Optional[str] = Header(None),
+    ql_access: Optional[str] = Cookie(default=None),
+):
+    """DEV ONLY: Return correct answer letters for a test session."""
+    user = get_current_user(authorization, ql_access)
+    if not user:
+        raise HTTPException(401, "Unauthorized")
+    session = get_test_session(session_id)
+    if not session:
+        raise HTTPException(404, "Test session not found")
+    if session["user_id"] != user["id"]:
+        raise HTTPException(403, "Forbidden")
+    answer_key = session.get("answer_key", {})
+    questions = session.get("questions", [])
+    answers = {}
+    for q in questions:
+        qid = q["id"]
+        correct_text = answer_key.get(qid, "")
+        choices = q.get("choices", [])
+        for idx, choice in enumerate(choices):
+            if choice == correct_text:
+                answers[qid] = chr(65 + idx)
+                break
+        else:
+            answers[qid] = "A"
+    return {"answers": answers, "total": len(answers)}
+
+
 @app.post("/api/certification/submit")
 async def submit_test(
     req: TestAnswerRequest,

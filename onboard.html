@@ -2076,17 +2076,33 @@ async function startExam() {
         // DEV MODE: ?dev=true auto-selects option B for every question
         const _devMode = new URLSearchParams(window.location.search).get('dev') === 'true';
         if (_devMode) {
-            _questions.forEach(function(q) {
-                if (q.choices && q.choices.length > 1) {
-                    _answers[q.id] = 'B'; // option B
+            try {
+                const _devRes = await fetch('/api/certification/dev-answers?session_id=' + _testSessionId, { credentials: 'include' });
+                if (_devRes.ok) {
+                    const _devData = await _devRes.json();
+                    Object.assign(_answers, _devData.answers || {});
+                    console.log('[DEV] Auto-filled correct answers:', Object.keys(_answers).length);
+                } else {
+                    // Fallback: pick A
+                    _questions.forEach(function(q) {
+                        if (q.choices && q.choices.length > 0) { _answers[q.id] = 'A'; }
+                    });
                 }
-            });
-            console.log('[DEV] Auto-filled', Object.keys(_answers).length, 'answers with option B');
+            } catch(e) {
+                _questions.forEach(function(q) {
+                    if (q.choices && q.choices.length > 0) { _answers[q.id] = 'A'; }
+                });
+            }
         }
 
         renderExamPage(0);
         startTimer(data.time_limit_minutes || 90);
         document.getElementById('timer-banner').style.display = 'block';
+
+        // DEV MODE: auto-submit after filling
+        if (_devMode && Object.keys(_answers).length === _questions.length) {
+            setTimeout(function() { submitExam(); }, 800);
+        }
     } catch(e) {
         document.getElementById('exam-questions').innerHTML =
             '<div class="ob-error" style="text-align:center;padding:2rem;">' + e.message + '</div>';
