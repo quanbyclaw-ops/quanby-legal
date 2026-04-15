@@ -3320,17 +3320,49 @@ async def get_plot_link(
                         _save_appointments()
                         break
 
-        # Construct the enterprise plot URL directly instead of following DC short links.
-        # DC short links resolve to stale session tokens on first call of a new session.
-        # The ENTERPRISE_API URL format is deterministic and needs no embedded token.
-        from urllib.parse import quote as _urlquote2
-        resolved_link = (
-            _DC_APP_URL + "/" + project_uuid
-            + "?page=1&user_type=ENTERPRISE_API"
-            + "&email=" + _urlquote2(enp_email)
-            + "&signer_role=Signer&api=true"
-        )
-        print("[PlotLink] enterprise URL built directly for " + enp_email, flush=True)
+        # Resolve DC short link by capturing the 302 Location header (NOT following through).
+        # The 302 Location contains the fresh token+api_token for auto-login.
+        # Following all the way to the app gives an "Oops" page (no browser session).
+        resolved_link = link
+        if "link.doconchain.com" in link or "doconchain.com" in link:
+            import urllib.request as _ureq_r, urllib.error as _uerr_r
+
+            class _NoRedirect(_ureq_r.HTTPRedirectHandler):
+                def http_error_302(self, req, fp, code, msg, headers):
+                    raise _uerr_r.HTTPError(req.full_url, code, msg, headers, fp)
+                http_error_301 = http_error_302
+                http_error_303 = http_error_302
+                http_error_307 = http_error_302
+
+            _opener = _ureq_r.build_opener(_NoRedirect)
+            _r3 = _ureq_r.Request(
+                link,
+                headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"},
+                method="GET",
+            )
+            try:
+                with _opener.open(_r3, timeout=10) as _rr:
+                    resolved_link = link
+                    print(f"[PlotLink] short link returned 200 (no redirect), using original", flush=True)
+            except _uerr_r.HTTPError as _he:
+                _loc = _he.headers.get("Location", "")
+                if _loc and _loc.startswith("http"):
+                    resolved_link = _loc
+                    _has_token = "api_token=" in resolved_link
+                    print(f"[PlotLink] short link resolved via {_he.code} redirect (has api_token: {_has_token})", flush=True)
+                else:
+                    resolved_link = link
+                    print(f"[PlotLink] short link resolve: {_he.code} but no Location, using original", flush=True)
+            except Exception as _re:
+                resolved_link = link
+                print(f"[PlotLink] short link resolve failed: {_re}, using original", flush=True)
+
+        try:
+            from urllib.parse import urlparse
+            _base = urlparse(resolved_link).netloc + urlparse(resolved_link).path
+        except Exception:
+            _base = resolved_link[:60]
+        print(f"[PlotLink] link ready: {_base}", flush=True)
         return {"link": resolved_link, "project_uuid": project_uuid}
 
     except HTTPException:
