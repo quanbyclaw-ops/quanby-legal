@@ -3320,14 +3320,18 @@ async def get_plot_link(
                         _save_appointments()
                         break
 
-          # NOTE: Do NOT strip token/api_token — DC needs them for auto-login in popup.
-        try:
-            from urllib.parse import urlparse
-            _base = urlparse(link).netloc + urlparse(link).path
-        except Exception:
-            _base = link[:60]
-        print(f"[PlotLink] link ready: {_base}", flush=True)
-        return {"link": link, "project_uuid": project_uuid}
+        # Construct the enterprise plot URL directly instead of following DC short links.
+        # DC short links resolve to stale session tokens on first call of a new session.
+        # The ENTERPRISE_API URL format is deterministic and needs no embedded token.
+        from urllib.parse import quote as _urlquote2
+        resolved_link = (
+            _DC_APP_URL + "/" + project_uuid
+            + "?page=1&user_type=ENTERPRISE_API"
+            + "&email=" + _urlquote2(enp_email)
+            + "&signer_role=Signer&api=true"
+        )
+        print("[PlotLink] enterprise URL built directly for " + enp_email, flush=True)
+        return {"link": resolved_link, "project_uuid": project_uuid}
 
     except HTTPException:
         raise
